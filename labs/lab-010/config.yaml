@@ -1,0 +1,41 @@
+metadata:
+  name: "ats-001-lab-010"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-base-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "sysctl-lab-setup"
+      description: "Creates /opt/course and persistently sets net.ipv4.ip_forward=1 via /etc/sysctl.d/"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-kernel-release"
+      description: "Confirms /opt/course/kernel matches the running kernel's `uname -r` release string"
+      type: "file"
+      source: "validation/validate-kernel.sh"
+
+    - name: "verify-ip-forward"
+      description: "Confirms /opt/course/ip_forward equals 1, the persistent value set at bootstrap"
+      type: "file"
+      source: "validation/validate-ip_forward.sh"
+
+    - name: "verify-timezone"
+      description: "Confirms /opt/course/timezone matches the system's configured timezone"
+      type: "file"
+      source: "validation/validate-timezone.sh"
+
+teardown:
+  keepCluster: false
