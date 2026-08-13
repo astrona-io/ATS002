@@ -1,5 +1,8 @@
 metadata:
   name: "ats-001-lab-010"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
 
 runtime:
   type: "qemu"
