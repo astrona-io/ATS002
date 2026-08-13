@@ -1,6 +1,6 @@
 # ATS002
 
-[![Donate via Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/Astrona.io/donate)
+[![Liberapay](https://img.shields.io/badge/Liberapay-Support_Astrona.io-F6C915?logo=liberapay&logoColor=black&style=for-the-badge)](https://liberapay.com/Astrona.io)
 
 Free LFCS (Linux Foundation Certified System Administrator) training material,
 covering the **Operations Deployment** domain (25% of exam weight).
