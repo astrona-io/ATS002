@@ -1,5 +1,5 @@
 metadata:
-  name: "ats-001-lab-010"
+  name: "ats-002-lab-010"
   docs:
     solution: "docs/solution.md"
     question: "docs/question.md"
@@ -9,7 +9,7 @@ runtime:
   qemu:
   - image:
       type: "oci"
-      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-base-{ARCH}"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
 
     cpus: 2
     memoryMB: 2048
