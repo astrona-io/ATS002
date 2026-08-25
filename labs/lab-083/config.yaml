@@ -1,0 +1,51 @@
+metadata:
+  name: "ats-002-lab-083"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    # A real, GPT-partitioned secondary disk with real filesystems on its
+    # two partitions. This whole scenario needs no adaptation: it operates
+    # entirely on this non-root disk, and the VM stays fully SSH-reachable
+    # throughout, exactly as the source scenario describes.
+    extraDisks:
+      - sizeGB: 2
+        serial: "lab083-vdc"
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-083-setup"
+      description: "Partitions the extraDisk (GPT, 2 partitions) and formats each with ext4, seeding a marker file on each so post-restore data integrity is checkable"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-backup-file-exists"
+      description: "Confirms a non-empty sgdisk partition-table backup file exists at /root/vdc-ptable-backup.bin"
+      type: "file"
+      source: "validation/validate-backup-file-exists.sh"
+
+    - name: "verify-partition-table-restored"
+      description: "Confirms the secondary disk currently has 2 partitions matching the original layout"
+      type: "file"
+      source: "validation/validate-partition-table-restored.sh"
+
+    - name: "verify-filesystems-intact"
+      description: "Confirms both partitions mount cleanly and their original marker files are readable"
+      type: "file"
+      source: "validation/validate-filesystems-intact.sh"
+
+teardown:
+  keepCluster: false

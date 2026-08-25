@@ -1,0 +1,49 @@
+metadata:
+  name: "ats-002-lab-060"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 3072
+    diskSizeGB: 20
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-060-setup"
+      description: "Installs Docker, starts the rpmbox Rocky Linux 9 container, builds and stages a real metrics-shipper RPM, then corrupts the RPM database after the fact"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-rpmdb-healthy"
+      description: "Confirms rpm -qa inside rpmbox completes cleanly with no database errors and a plausible package count"
+      type: "file"
+      source: "validation/validate-rpmdb-healthy.sh"
+
+    - name: "verify-metrics-shipper-installed"
+      description: "Confirms metrics-shipper-1.4.0-1.x86_64 is installed inside rpmbox"
+      type: "file"
+      source: "validation/validate-metrics-shipper-installed.sh"
+
+    - name: "verify-devtools-group-installed"
+      description: "Confirms the Development Tools group is installed inside rpmbox, with gcc and make actually present"
+      type: "file"
+      source: "validation/validate-devtools-group-installed.sh"
+
+    - name: "verify-dnf-check-clean"
+      description: "Confirms dnf check inside rpmbox passes cleanly against the rebuilt database after all transactions"
+      type: "file"
+      source: "validation/validate-dnf-check-clean.sh"
+
+teardown:
+  keepCluster: false

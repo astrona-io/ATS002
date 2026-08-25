@@ -1,0 +1,45 @@
+metadata:
+  name: "ats-002-lab-084"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    # This lab operates on the VM's own primary disk. Bootstrap only
+    # removes the on-disk grub.cfg -- it never touches the currently
+    # running kernel, so the VM's CURRENT boot (already in progress
+    # before bootstrap runs) stays fully SSH-reachable. Only the NEXT
+    # reboot would be affected, which is the honest framing this lab uses
+    # ("fix it before that happens" rather than "you're already down").
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-084-setup"
+      description: "Removes /boot/grub/grub.cfg (leaving the currently-running kernel untouched) and drops a timestamp marker for validation to compare against"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-grub-config-regenerated"
+      description: "Confirms /boot/grub/grub.cfg exists, is non-empty, contains menuentry lines, and was regenerated after bootstrap ran"
+      type: "file"
+      source: "validation/validate-grub-config-regenerated.sh"
+
+    - name: "verify-grub-installed"
+      description: "Confirms GRUB's boot-sector/EFI code was genuinely reinstalled and grub-install --recheck reports success"
+      type: "file"
+      source: "validation/validate-grub-installed.sh"
+
+teardown:
+  keepCluster: false

@@ -1,0 +1,49 @@
+metadata:
+  name: "ats-002-lab-040"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-040-setup"
+      description: "Installs apparmor-utils and stands up two services (logshipper, metrics-agent), each with a deliberately too-strict AppArmor profile in enforce mode blocking their relocated paths"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-logshipper-enforce"
+      description: "Confirms the logshipper AppArmor profile is loaded and in enforce mode, not complain"
+      type: "file"
+      source: "validation/validate-logshipper-enforce.sh"
+
+    - name: "verify-logshipper-write"
+      description: "Confirms logshipper is actively writing to /srv/shiplogs with no fresh AppArmor denials"
+      type: "file"
+      source: "validation/validate-logshipper-write.sh"
+
+    - name: "verify-metrics-agent-enforce"
+      description: "Confirms the metrics-agent AppArmor profile is loaded and in enforce mode, not complain"
+      type: "file"
+      source: "validation/validate-metrics-agent-enforce.sh"
+
+    - name: "verify-metrics-agent-read"
+      description: "Confirms metrics-agent is successfully reading /etc/metrics-agent/remote.conf with no fresh AppArmor denials"
+      type: "file"
+      source: "validation/validate-metrics-agent-read.sh"
+
+teardown:
+  keepCluster: false

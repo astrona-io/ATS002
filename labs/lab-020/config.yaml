@@ -1,0 +1,55 @@
+metadata:
+  name: "ats-002-lab-020"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-020-capstone-setup"
+      description: "Installs Docker, starts the decommissioned billing_v1 container squatting on host port 9090, and creates the ops-monitor service account with docker-group access"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-billing-v1-retired"
+      description: "Confirms the decommissioned billing_v1 container no longer exists"
+      type: "file"
+      source: "validation/validate-billing-v1-retired.sh"
+
+    - name: "verify-billing-v2-config"
+      description: "Confirms billing_v2 is running, image nginx:alpine, memory limit 64m, and port map 9090->80"
+      type: "file"
+      source: "validation/validate-billing-v2-config.sh"
+
+    - name: "verify-ops-monitor-docker-access"
+      description: "Confirms ops-monitor is in the docker group, so its cron job can actually run docker commands"
+      type: "file"
+      source: "validation/validate-ops-monitor-docker-access.sh"
+
+    - name: "verify-cron-schedule"
+      description: "Confirms ops-monitor's per-user crontab has a job scheduled every minute that restarts billing_v2"
+      type: "file"
+      source: "validation/validate-cron-schedule.sh"
+
+    - name: "verify-auto-recovery"
+      description: "Stops billing_v2 to simulate a crash and confirms the scheduled cron job automatically restarts it within about 90 seconds"
+      type: "file"
+      source: "validation/validate-auto-recovery.sh"
+
+teardown:
+  keepCluster: false

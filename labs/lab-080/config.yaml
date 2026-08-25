@@ -1,0 +1,62 @@
+metadata:
+  name: "ats-002-lab-080"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    # Main disk: this VM's own root filesystem and boot process. Its
+    # CURRENT boot already succeeded before bootstrap ever runs, and
+    # bootstrap only removes /boot/grub/grub.cfg (never touching the
+    # already-running kernel or GRUB's own installed boot-sector/EFI
+    # code) -- the exact lab-084 mechanism, reused here as one half of
+    # this capstone. SSH stays fully reachable throughout.
+    diskSizeGB: 15
+    extraDisks:
+      # Secondary disk: a real, GPT-partitioned disk with real
+      # filesystems -- the lab-083 mechanism, reused here as the other
+      # half. This scenario needs no safety adaptation of its own: it
+      # operates entirely on this non-root disk.
+      - sizeGB: 2
+        serial: "lab080-vdc"
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-080-setup"
+      description: "On the primary disk, removes /boot/grub/grub.cfg and drops a timestamp marker; on the secondary extraDisk, partitions it with two ext4 partitions, seeds marker files, backs up its GPT table, then zaps it to simulate a disaster that already happened before the student logged in"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-partition-table-restored"
+      description: "Confirms the secondary disk currently has 2 partitions matching the original layout"
+      type: "file"
+      source: "validation/validate-partition-table-restored.sh"
+
+    - name: "verify-filesystems-intact"
+      description: "Confirms both partitions on the secondary disk mount cleanly and their original marker files are readable"
+      type: "file"
+      source: "validation/validate-filesystems-intact.sh"
+
+    - name: "verify-grub-config-regenerated"
+      description: "Confirms /boot/grub/grub.cfg on the primary disk exists, is non-empty, contains menuentry lines, and was regenerated after bootstrap ran"
+      type: "file"
+      source: "validation/validate-grub-config-regenerated.sh"
+
+    - name: "verify-grub-installed"
+      description: "Confirms GRUB's boot-sector/EFI code on the primary disk was genuinely reinstalled and grub-install --recheck reports success"
+      type: "file"
+      source: "validation/validate-grub-installed.sh"
+
+teardown:
+  keepCluster: false

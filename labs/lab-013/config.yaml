@@ -1,0 +1,40 @@
+metadata:
+  name: "ats-002-lab-013"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "kernel-modules-lab-setup"
+      description: "Ensures the pcspkr module is loaded (simulating the annoying-beep starting state) so the student has something real to blacklist and unload"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-dummy-module-loaded-persistently"
+      description: "Confirms the dummy module is loaded with numdummies=2 live, and persists both the load and the parameter across reboots"
+      type: "file"
+      source: "validation/validate-dummy-module.sh"
+
+    - name: "verify-pcspkr-blacklisted"
+      description: "Confirms pcspkr is blacklisted, unloaded now, and stays absent after a udevadm trigger re-detection pass"
+      type: "file"
+      source: "validation/validate-pcspkr-blacklist.sh"
+
+teardown:
+  keepCluster: false

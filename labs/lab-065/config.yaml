@@ -1,0 +1,49 @@
+metadata:
+  name: "ats-002-lab-065"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 3072
+    diskSizeGB: 20
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-065-setup"
+      description: "Installs Docker, starts the rpmbox Rocky Linux 9 container with fresh repo metadata, and pre-installs automake independently of any group"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-group-not-installed"
+      description: "Confirms the Development Tools group no longer shows as installed inside rpmbox after removal"
+      type: "file"
+      source: "validation/validate-group-not-installed.sh"
+
+    - name: "verify-automake-survives"
+      description: "Confirms automake (pre-installed independently of the group) survived the group removal"
+      type: "file"
+      source: "validation/validate-automake-survives.sh"
+
+    - name: "verify-gcc-removed"
+      description: "Confirms gcc (installed only because of the group) was actually removed along with the group"
+      type: "file"
+      source: "validation/validate-gcc-removed.sh"
+
+    - name: "verify-dnf-check-clean"
+      description: "Confirms dnf check inside rpmbox passes cleanly after the install/remove cycle"
+      type: "file"
+      source: "validation/validate-dnf-check-clean.sh"
+
+teardown:
+  keepCluster: false

@@ -1,0 +1,41 @@
+metadata:
+  name: "ats-002-lab-082"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    # Main disk: the VM's own root filesystem and boot process. Never
+    # touched by this lab -- the "locked-out system" in the scenario
+    # lives entirely on the extraDisk below, so this VM stays reachable
+    # over SSH the whole time for grading.
+    diskSizeGB: 15
+    extraDisks:
+      - sizeGB: 1
+        serial: "lab082-data001"
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-082-setup"
+      description: "Formats the extraDisk into a stand-in 'data-001' root filesystem and seeds /etc/shadow with a locked root account"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-root-password-reset"
+      description: "Confirms the stand-in disk's /etc/shadow root line has a non-empty password hash different from the bootstrap-seeded placeholder"
+      type: "file"
+      source: "validation/validate-root-password-reset.sh"
+
+teardown:
+  keepCluster: false

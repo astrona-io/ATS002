@@ -1,0 +1,40 @@
+metadata:
+  name: "ats-002-lab-055"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "apt-groups-lab-setup"
+      description: "Ensures build-essential/git/cmake/pkg-config are absent (clean baseline for the toolchain task), and builds+installs a locally-built stand-in PHP 8.1 module family (php8.1-cli, php8.1-common, php8.1-fpm, php8.1-mysql, php8.1-curl, php8.1-xml) via real .deb packages, since Ubuntu 24.04's own archive ships PHP 8.3 by default and carries no real php8.1-* packages"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-toolchain-installed"
+      description: "Confirms build-essential, git, cmake, and pkg-config are all cleanly installed"
+      type: "file"
+      source: "validation/validate-toolchain-installed.sh"
+
+    - name: "verify-php81-family-held"
+      description: "Confirms every installed php8.1-* package is present in apt-mark showhold (recomputed live, not hardcoded)"
+      type: "file"
+      source: "validation/validate-php81-family-held.sh"
+
+teardown:
+  keepCluster: false

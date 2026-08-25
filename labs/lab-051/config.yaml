@@ -1,0 +1,45 @@
+metadata:
+  name: "ats-002-lab-051"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "vendor-repo-lab-setup"
+      description: "Stands up a fully real, self-contained local APT repository (reprepro + a dedicated GPG signing key + a stub 'nginx' .deb at a distinct version) served over HTTP on 127.0.0.1, simulating a third-party vendor repository without depending on any real external host"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-modern-trust-configured"
+      description: "Confirms a sources.list.d entry uses signed-by= pointing at a valid, dedicated keyring under /etc/apt/keyrings/ (not the deprecated apt-key global keyring)"
+      type: "file"
+      source: "validation/validate-modern-trust-configured.sh"
+
+    - name: "verify-nginx-pinned-installed"
+      description: "Confirms nginx is installed at the exact vendor-published version recorded during bootstrap"
+      type: "file"
+      source: "validation/validate-nginx-pinned-installed.sh"
+
+    - name: "verify-nginx-held"
+      description: "Confirms nginx appears in apt-mark showhold"
+      type: "file"
+      source: "validation/validate-nginx-held.sh"
+
+teardown:
+  keepCluster: false

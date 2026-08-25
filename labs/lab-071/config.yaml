@@ -1,0 +1,44 @@
+metadata:
+  name: "ats-002-lab-071"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 3072
+    diskSizeGB: 20
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-071-zypperbox-setup"
+      description: "Installs Docker on the Ubuntu host, starts the zypperbox openSUSE Leap 15.6 container, and seeds it with telnet-server installed and fail2ban absent"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-fail2ban-installed"
+      description: "Confirms fail2ban is installed inside zypperbox"
+      type: "file"
+      source: "validation/validate-fail2ban-installed.sh"
+
+    - name: "verify-telnetd-removed"
+      description: "Confirms telnet-server has been removed from zypperbox"
+      type: "file"
+      source: "validation/validate-telnetd-removed.sh"
+
+    - name: "verify-zypper-history"
+      description: "Confirms zypper's own history log recorded the fail2ban install and telnet-server removal"
+      type: "file"
+      source: "validation/validate-zypper-history.sh"
+
+teardown:
+  keepCluster: false

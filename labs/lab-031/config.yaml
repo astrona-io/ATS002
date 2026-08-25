@@ -1,0 +1,34 @@
+metadata:
+  name: "ats-002-lab-031"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 20
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-031-setup"
+      description: "Stages the links-2.14.tar.bz2 source tarball at /tools/ and installs build-essential so the tarball is genuinely buildable"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-links-installed"
+      description: "Confirms links is installed at /usr/bin/links, is a real compiled ELF binary, and was built with ipv6 support disabled"
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

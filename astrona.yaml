@@ -1,0 +1,687 @@
+training:
+  id: ATS002
+  title: "LFCS: Operations Deployment"
+  description: >
+    Training material covering the Linux Foundation Certified System
+    Administrator (LFCS) Operations Deployment domain, with hands-on labs
+    for each competency.
+
+  certification:
+    name: Linux Foundation Certified System Administrator
+    code: LFCS
+    provider: Linux Foundation
+    domain: Operations Deployment
+    weight: 25
+
+modules:
+  - id: module-010
+    title: "Section 010: Kernel Tuning, Process Limits, and Device Forensics"
+    description: >
+      Learn to read and persist live kernel state with sysctl, diagnose and
+      raise the three independent process/thread ceilings a workload can
+      hit, manage kernel modules (parameterized loads and permanent
+      blacklisting), give disks stable udev-based names immune to
+      device-letter reassignment, and use strace to catch a misbehaving or
+      hung process in the act before safely terminating it.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-010/README.md
+
+      - type: reading
+        title: "Module 1: Reading and Reshaping the Live Kernel with sysctl"
+        path: sections/section-010/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-011/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-011/docs/solution.md
+
+      - type: lab
+        title: "sysctl Live Kernel State Lab"
+        path: labs/lab-011
+
+      - type: reading
+        title: "Module 2: Process Limits — pid_max, ulimit, and the Three Ceilings"
+        path: sections/section-010/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-012/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-012/docs/solution.md
+
+      - type: lab
+        title: "Process & Thread Ceilings Lab"
+        path: labs/lab-012
+
+      - type: reading
+        title: "Module 3: Kernel Modules — Loading, Parameters, and Blacklisting"
+        path: sections/section-010/module-03/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-013/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-013/docs/solution.md
+
+      - type: lab
+        title: "Kernel Module Loading & Blacklisting Lab"
+        path: labs/lab-013
+
+      - type: reading
+        title: "Module 4: udev — Giving a Device a Name It Can Keep"
+        path: sections/section-010/module-04/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-014/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-014/docs/solution.md
+
+      - type: lab
+        title: "Stable Device Naming with udev Lab"
+        path: labs/lab-014
+
+      - type: reading
+        title: "Module 5: Catching a Process in the Act with strace"
+        path: sections/section-010/module-05/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-015/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-015/docs/solution.md
+
+      - type: lab
+        title: "Process Forensics with strace Lab"
+        path: labs/lab-015
+
+      - type: reading
+        title: "Section 010 Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics"
+        path: sections/section-010/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-010/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-010/docs/solution.md
+
+      - type: lab
+        title: "Kernel, Process, Module & Device Runtime Management Capstone Lab"
+        path: labs/lab-010
+
+  - id: module-020
+    title: "Section 020: Scheduled & Containerized Workloads"
+    description: >
+      Covers the two mechanisms admins lean on to keep systems running
+      unattended: per-user vs. system-wide cron scheduling (and safely
+      migrating jobs between them without duplicate execution), and the
+      Docker container lifecycle — stopping containers gracefully,
+      extracting precise facts from docker inspect via Go templates, and
+      launching new containers with exact memory and port constraints.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-020/README.md
+
+      - type: reading
+        title: "Module 1: Per-User Cron Job Scheduling"
+        path: sections/section-020/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-021/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-021/docs/solution.md
+
+      - type: lab
+        title: "Per-User Cron Job Scheduling Lab"
+        path: labs/lab-021
+
+      - type: reading
+        title: "Module 2: Docker Container Lifecycle"
+        path: sections/section-020/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-022/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-022/docs/solution.md
+
+      - type: lab
+        title: "Docker Container Lifecycle Lab"
+        path: labs/lab-022
+
+      - type: reading
+        title: "Section 020 Knowledge Check: Scheduled & Containerized Workloads"
+        path: sections/section-020/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-020/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-020/docs/solution.md
+
+      - type: lab
+        title: "Scheduled Container Recovery Capstone Lab"
+        path: labs/lab-020
+
+  - id: module-030
+    title: "Section 030: Building & Virtualizing Systems"
+    description: >
+      Compiling and installing software directly from source when a
+      package manager can't help you, and standing up and managing full
+      virtual machines with libvirt when a container isn't isolated
+      enough — precise control over exactly where a build lands and
+      exactly what capabilities a VM ends up with.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-030/README.md
+
+      - type: reading
+        title: "Module 1: Compile & Install From Source"
+        path: sections/section-030/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-031/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-031/docs/solution.md
+
+      - type: lab
+        title: "Compile & Install From Source Lab"
+        path: labs/lab-031
+
+      - type: reading
+        title: "Module 2: libvirt Virtual Machine Lifecycle"
+        path: sections/section-030/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-032/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-032/docs/solution.md
+
+      - type: lab
+        title: "libvirt Virtual Machine Lifecycle Lab"
+        path: labs/lab-032
+
+      - type: reading
+        title: "Section 030 Knowledge Check: Building & Virtualizing Systems"
+        path: sections/section-030/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-030/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-030/docs/solution.md
+
+      - type: lab
+        title: "New Toolchain, New Host Capstone Lab"
+        path: labs/lab-030
+
+  - id: module-040
+    title: "Section 040: Mandatory Access Control — SELinux & AppArmor"
+    description: >
+      Diagnose Mandatory Access Control denials that occur even when
+      standard DAC permissions are correct. Hands-on AppArmor profile
+      diagnosis and repair on the platform's native Ubuntu image, plus a
+      fully worked, honestly-labeled conceptual walkthrough of the
+      equivalent SELinux workflow used on RHEL-family exam hosts.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-040/README.md
+
+      - type: reading
+        title: "Module 1: AppArmor Profile Enforcement & the Other MAC System: SELinux"
+        path: sections/section-040/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-041/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-041/docs/solution.md
+
+      - type: lab
+        title: "AppArmor Profile Enforcement Lab"
+        path: labs/lab-041
+
+      - type: reading
+        title: "Section 040 Knowledge Check: Mandatory Access Control — SELinux & AppArmor"
+        path: sections/section-040/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-040/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-040/docs/solution.md
+
+      - type: lab
+        title: "Two Services, Two Denials Capstone Lab"
+        path: labs/lab-040
+
+  - id: module-050
+    title: "Section 050: Debian Package Management: Repositories, dpkg & APT"
+    description: >
+      The full Debian/Ubuntu package-management stack from the bottom up
+      — dpkg low-level package surgery, the daily apt maintenance loop,
+      read-only package research before any change, bulk/group
+      operations with holds, and trusting third-party vendor repositories
+      the modern signed-by way.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-050/README.md
+
+      - type: reading
+        title: "Module 1: Third-Party Repositories & Package Pinning"
+        path: sections/section-050/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-051/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-051/docs/solution.md
+
+      - type: lab
+        title: "Third-Party Repositories & Package Pinning Lab"
+        path: labs/lab-051
+
+      - type: reading
+        title: "Module 2: dpkg Low-Level Package Management"
+        path: sections/section-050/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-052/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-052/docs/solution.md
+
+      - type: lab
+        title: "dpkg Low-Level Package Management Lab"
+        path: labs/lab-052
+
+      - type: reading
+        title: "Module 3: APT Basic Package Operations"
+        path: sections/section-050/module-03/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-053/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-053/docs/solution.md
+
+      - type: lab
+        title: "APT Basic Package Operations Lab"
+        path: labs/lab-053
+
+      - type: reading
+        title: "Module 4: APT Package Information Lookup"
+        path: sections/section-050/module-04/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-054/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-054/docs/solution.md
+
+      - type: lab
+        title: "APT Package Information Lookup Lab"
+        path: labs/lab-054
+
+      - type: reading
+        title: "Module 5: APT Package Groups & Bulk Operations"
+        path: sections/section-050/module-05/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-055/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-055/docs/solution.md
+
+      - type: lab
+        title: "APT Package Groups & Bulk Operations Lab"
+        path: labs/lab-055
+
+      - type: reading
+        title: "Section 050 Knowledge Check: Debian Package Management"
+        path: sections/section-050/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-050/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-050/docs/solution.md
+
+      - type: lab
+        title: "New App Server Onboarding Capstone Lab"
+        path: labs/lab-050
+
+  - id: module-060
+    title: "Section 060: RPM/DNF Package Management: rpm, dnf & Package Groups"
+    description: >
+      The full RPM-family package-management stack from the bottom up —
+      low-level rpm package surgery and RPM database recovery, the daily
+      dnf maintenance loop, read-only package research, and dnf's
+      first-class package groups. All labs run real rpm/dnf tooling
+      inside a privileged Rocky Linux 9 Docker container on the
+      platform's Ubuntu VM image.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-060/README.md
+
+      - type: reading
+        title: "Module 1: RPM Low-Level Package Management"
+        path: sections/section-060/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-061/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-061/docs/solution.md
+
+      - type: lab
+        title: "RPM Low-Level Package Management Lab"
+        path: labs/lab-061
+
+      - type: reading
+        title: "Module 2: Rebuilding a Corrupted RPM Database"
+        path: sections/section-060/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-062/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-062/docs/solution.md
+
+      - type: lab
+        title: "Rebuilding a Corrupted RPM Database Lab"
+        path: labs/lab-062
+
+      - type: reading
+        title: "Module 3: DNF Basic Package Operations"
+        path: sections/section-060/module-03/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-063/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-063/docs/solution.md
+
+      - type: lab
+        title: "DNF Basic Package Operations Lab"
+        path: labs/lab-063
+
+      - type: reading
+        title: "Module 4: DNF Package Information Lookup"
+        path: sections/section-060/module-04/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-064/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-064/docs/solution.md
+
+      - type: lab
+        title: "DNF Package Information Lookup Lab"
+        path: labs/lab-064
+
+      - type: reading
+        title: "Module 5: DNF Package Groups"
+        path: sections/section-060/module-05/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-065/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-065/docs/solution.md
+
+      - type: lab
+        title: "DNF Package Groups Lab"
+        path: labs/lab-065
+
+      - type: reading
+        title: "Section 060 Knowledge Check: RPM/DNF Package Management"
+        path: sections/section-060/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-060/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-060/docs/solution.md
+
+      - type: lab
+        title: "RPM/DNF Package Management Capstone Lab"
+        path: labs/lab-060
+
+  - id: module-070
+    title: "Section 070: SUSE Package Management: Zypper"
+    description: >
+      The zypper package tool used across openSUSE and SUSE Linux
+      Enterprise, including the patch-vs-update distinction unique to
+      SUSE, install/remove/history operations, and the search/info/
+      what-provides research workflow — exercised inside a real
+      opensuse/leap:15.6 Docker sandbox on the platform's Ubuntu VM.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-070/README.md
+
+      - type: reading
+        title: "Module 1: Zypper Basic Package Operations"
+        path: sections/section-070/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-071/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-071/docs/solution.md
+
+      - type: lab
+        title: "Zypper Basic Package Operations Lab"
+        path: labs/lab-071
+
+      - type: reading
+        title: "Module 2: Zypper Package Information Lookup"
+        path: sections/section-070/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-072/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-072/docs/solution.md
+
+      - type: lab
+        title: "Zypper Package Information Lookup Lab"
+        path: labs/lab-072
+
+      - type: reading
+        title: "Section 070 Knowledge Check: SUSE Package Management: Zypper"
+        path: sections/section-070/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-070/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-070/docs/solution.md
+
+      - type: lab
+        title: "Zypper Research-Then-Act Capstone Lab"
+        path: labs/lab-070
+
+  - id: module-080
+    title: "Section 080: System Disaster Recovery"
+    description: >
+      A calm, repeatable procedure for getting back into a broken
+      machine: chroot-based root filesystem and password repair, GPT
+      partition table backup and restoration, and GRUB bootloader
+      reinstallation — every boot-breaking scenario safely re-staged onto
+      a disposable secondary disk so the grading VM always stays
+      SSH-reachable.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-080/README.md
+
+      - type: reading
+        title: "Module 1: Root-Filesystem Repair via chroot"
+        path: sections/section-080/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-081/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-081/docs/solution.md
+
+      - type: lab
+        title: "Root-Filesystem Repair via chroot Lab"
+        path: labs/lab-081
+
+      - type: reading
+        title: "Module 2: Password Reset & Single-User Recovery"
+        path: sections/section-080/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-082/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-082/docs/solution.md
+
+      - type: lab
+        title: "Password Reset & Single-User Recovery Lab"
+        path: labs/lab-082
+
+      - type: reading
+        title: "Module 3: Partition Table Backup & Recovery"
+        path: sections/section-080/module-03/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-083/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-083/docs/solution.md
+
+      - type: lab
+        title: "Partition Table Backup & Recovery Lab"
+        path: labs/lab-083
+
+      - type: reading
+        title: "Module 4: GRUB Corruption Recovery"
+        path: sections/section-080/module-04/course.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-084/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-084/docs/solution.md
+
+      - type: lab
+        title: "GRUB Corruption Recovery Lab"
+        path: labs/lab-084
+
+      - type: reading
+        title: "Section 080 Knowledge Check: System Disaster Recovery"
+        path: sections/section-080/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/lab-080/docs/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/lab-080/docs/solution.md
+
+      - type: lab
+        title: "System Disaster Recovery Integration Capstone Lab"
+        path: labs/lab-080
+
+  - id: module-090
+    title: "LFCS Operations Deployment Domain Certification Quiz"
+    description: >
+      A comprehensive, scenario-based final assessment covering all 26
+      modules across the 8 sections of this domain, simulating actual
+      Linux Foundation exam pressure.
+
+    content:
+      - type: reading
+        title: "Final Domain Certification Quiz"
+        path: sections/final-domain-quiz.md

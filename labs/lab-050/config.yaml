@@ -1,0 +1,55 @@
+metadata:
+  name: "ats-002-lab-050"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "capstone-onboarding-lab-setup"
+      description: "Stands up a local fake vendor APT repository serving telemetry-agent over HTTP (like lab-051), leaves the real 'tree' package half-configured (like lab-052), ensures curl/git/jq are absent, builds and installs a locally-built obsagent-* module family via real .deb packages (like lab-055's PHP stand-in), and prepares /opt/course/onboarding for the recorded research answer"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-vendor-repo-trusted-pinned-held"
+      description: "Confirms modern signed-by trust is configured, telemetry-agent is installed at the exact vendor-published version, and it is held"
+      type: "file"
+      source: "validation/validate-vendor-repo-trusted-pinned-held.sh"
+
+    - name: "verify-tree-recovered"
+      description: "Confirms the previously half-configured tree package now shows a clean ii status and dpkg --audit is clean"
+      type: "file"
+      source: "validation/validate-tree-recovered.sh"
+
+    - name: "verify-toolchain-installed"
+      description: "Confirms curl, git, and jq are all cleanly installed"
+      type: "file"
+      source: "validation/validate-toolchain-installed.sh"
+
+    - name: "verify-obsagent-family-held"
+      description: "Confirms every installed obsagent-* package is present in apt-mark showhold (recomputed live, not hardcoded)"
+      type: "file"
+      source: "validation/validate-obsagent-family-held.sh"
+
+    - name: "verify-onboarding-answer-recorded"
+      description: "Confirms /opt/course/onboarding/redis-candidate.txt records redis-server's live candidate version and source repository"
+      type: "file"
+      source: "validation/validate-onboarding-answer-recorded.sh"
+
+teardown:
+  keepCluster: false
