@@ -1,0 +1,49 @@
+metadata:
+  name: "ats-002-lab-072"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 3072
+    diskSizeGB: 20
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-072-zypperbox-setup"
+      description: "Installs Docker on the Ubuntu host, starts the zypperbox openSUSE Leap 15.6 container, seeds python3-base/python3-pip as installed, and pre-creates /root/answers for the student's research findings"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-search-answer"
+      description: "Confirms /root/answers/01-search.txt records a zypper search hit for fail2ban"
+      type: "file"
+      source: "validation/validate-search-answer.sh"
+
+    - name: "verify-info-answer"
+      description: "Confirms /root/answers/02-info.txt records zypper info metadata for nginx, without nginx actually being installed"
+      type: "file"
+      source: "validation/validate-info-answer.sh"
+
+    - name: "verify-what-provides-answer"
+      description: "Confirms /root/answers/03-what-provides.txt records zypper what-provides identifying iproute2 for /usr/sbin/ip"
+      type: "file"
+      source: "validation/validate-what-provides-answer.sh"
+
+    - name: "verify-installed-python3-answer"
+      description: "Confirms /root/answers/04-installed-python3.txt records an installed-only zypper search listing python3-base and python3-pip"
+      type: "file"
+      source: "validation/validate-installed-python3-answer.sh"
+
+teardown:
+  keepCluster: false

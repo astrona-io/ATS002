@@ -25,54 +25,54 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 1. Third-Party Repositories & Package Pinning
 *   **Module Reader:** **[Module 1: Third-Party Repositories & Package Pinning](./module-01/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-051`**
+*   **Practice Lab Sandbox:** **`labs/section-050/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-051
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-01/lab-01
     ```
 *   **Hands-on Objective:** Add a vendor's third-party APT repository using the modern `signed-by` keyring approach (no `apt-key`), install an exact pinned version of its `nginx` package, and hold it so a routine upgrade cannot move it.
 
 ### 2. dpkg Low-Level Package Management
 *   **Module Reader:** **[Module 2: dpkg Low-Level Package Management](./module-02/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-052`**
+*   **Practice Lab Sandbox:** **`labs/section-050/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-052
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-02/lab-01
     ```
 *   **Hands-on Objective:** Inspect a standalone `.deb` file before installing it, install it directly with `dpkg -i`, answer file-ownership questions in both directions, and recover an unrelated package left stuck in a half-configured state.
 
 ### 3. APT Basic Package Operations
 *   **Module Reader:** **[Module 3: APT Basic Package Operations](./module-03/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-053`**
+*   **Practice Lab Sandbox:** **`labs/section-050/module-03/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-053
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-03/lab-01
     ```
 *   **Hands-on Objective:** Run a realistic maintenance pass — refresh the index, preview and apply upgrades, install a new package, then fully purge an unneeded one (including its configuration and orphaned dependencies).
 
 ### 4. APT Package Information Lookup
 *   **Module Reader:** **[Module 4: APT Package Information Lookup](./module-04/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-054`**
+*   **Practice Lab Sandbox:** **`labs/section-050/module-04/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-054
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-04/lab-01
     ```
 *   **Hands-on Objective:** Research packages entirely read-only — search by keyword, pull full metadata, confirm installed-versus-candidate version and source repository, and list installed/upgradable packages by pattern.
 
 ### 5. APT Package Groups & Bulk Operations
 *   **Module Reader:** **[Module 5: APT Package Groups & Bulk Operations](./module-05/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-055`**
+*   **Practice Lab Sandbox:** **`labs/section-050/module-05/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-055
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-05/lab-01
     ```
 *   **Hands-on Objective:** Install a build toolchain as one atomic transaction, find an entire installed package family by naming pattern, and hold that whole family together ahead of a risky upgrade.
 
 ### 6. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/lab-050` (New App Server Onboarding)**
+*   **Comprehensive Challenge:** **`labs/section-050/capstone/lab-01` (New App Server Onboarding)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-050
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/capstone/lab-01
     ```
 *   **Hands-on Objective:** Connect the dots on a freshly provisioned server — trust and pin a vendor repository, recover a package stuck mid-install, install a toolchain and bulk-hold a package family, and research a package to answer a specific onboarding question.
 

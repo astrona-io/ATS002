@@ -1,0 +1,34 @@
+metadata:
+  name: "ats-002-lab-041"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-041-setup"
+      description: "Installs apparmor-utils, creates the appservice daemon and its relocated log directory, and loads a deliberately too-strict AppArmor profile in enforce mode"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-appservice-apparmor-fix"
+      description: "Confirms the appservice AppArmor profile is genuinely enforcing and correctly permits writes to /srv/applogs"
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

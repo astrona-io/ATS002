@@ -25,54 +25,54 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 1. RPM Low-Level Package Management
 *   **Module Reader:** **[Module 1: RPM Low-Level Package Management](./module-01/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-061`**
+*   **Practice Lab Sandbox:** **`labs/section-060/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-061
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-01/lab-01
     ```
 *   **Hands-on Objective:** Inspect a standalone `.rpm` file before installing it, install it directly with `rpm`, answer file-ownership questions in both directions, and verify that its installed files still match what the package originally recorded.
 
 ### 2. Rebuilding a Corrupted RPM Database
 *   **Module Reader:** **[Module 2: Rebuilding a Corrupted RPM Database](./module-02/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-062`**
+*   **Practice Lab Sandbox:** **`labs/section-060/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-062
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-02/lab-01
     ```
 *   **Hands-on Objective:** Confirm a genuinely corrupted, real sqlite-backed RPM database (not a dependency conflict or a disk-space problem), back it up, rebuild it, and verify the system is back to a clean, queryable state.
 
 ### 3. DNF Basic Package Operations
 *   **Module Reader:** **[Module 3: DNF Basic Package Operations](./module-03/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-063`**
+*   **Practice Lab Sandbox:** **`labs/section-060/module-03/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-063
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-03/lab-01
     ```
 *   **Hands-on Objective:** Run a realistic `dnf` maintenance pass — check and apply upgrades, install and remove packages, clean up orphaned dependencies, and use `dnf history` to undo and redo a transaction.
 
 ### 4. DNF Package Information Lookup
 *   **Module Reader:** **[Module 4: DNF Package Information Lookup](./module-04/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-064`**
+*   **Practice Lab Sandbox:** **`labs/section-060/module-04/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-064
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-04/lab-01
     ```
 *   **Hands-on Objective:** Research packages entirely read-only — find a candidate package by keyword, pull full metadata without installing it, determine what package would provide a missing command, and list installed packages by naming pattern.
 
 ### 5. DNF Package Groups
 *   **Module Reader:** **[Module 5: DNF Package Groups](./module-05/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-065`**
+*   **Practice Lab Sandbox:** **`labs/section-060/module-05/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-065
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-05/lab-01
     ```
 *   **Hands-on Objective:** Discover a repository-published package group, inspect its real mandatory/default/optional membership before installing it, install and confirm it, then remove it cleanly — while reasoning precisely about which packages the removal does and doesn't touch.
 
 ### 6. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/lab-060` (RPM/DNF Package Management Capstone)**
+*   **Comprehensive Challenge:** **`labs/section-060/capstone/lab-01` (RPM/DNF Package Management Capstone)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-060
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/capstone/lab-01
     ```
 *   **Hands-on Objective:** Connect the dots on an overnight incident — diagnose and repair a genuinely corrupted RPM database, inspect and install a standalone RPM staged before the incident, then discover, inspect, and install a full `dnf` package group to finish setting the host up as a build server.
 

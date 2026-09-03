@@ -21,19 +21,19 @@ This section is divided into two modules, each paired with hands-on practice ins
 
 ### 1. Zypper Basic Package Operations
 *   **Module Reader:** **[Module 1: Zypper Basic Package Operations](./module-01/course.md)**
-*   **Associated Lab:** **`labs/lab-071`**
+*   **Associated Lab:** **`labs/section-070/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-071
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-070/module-01/lab-01
     ```
 *   **Hands-on Objective:** Inside `zypperbox`, refresh repository metadata, report available raw updates versus curated patches separately, apply only the patches per a conservative security policy, install `fail2ban`, remove `telnet-server` (the package providing the `telnetd` daemon), and review the resulting operation history.
 
 ### 2. Zypper Package Information Lookup
 *   **Module Reader:** **[Module 2: Zypper Package Information Lookup](./module-02/course.md)**
-*   **Associated Lab:** **`labs/lab-072`**
+*   **Associated Lab:** **`labs/section-070/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-072
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-070/module-02/lab-01
     ```
 *   **Hands-on Objective:** Inside `zypperbox`, research candidate intrusion-prevention packages by keyword, pull full metadata for `nginx` without installing it, identify which package provides `/usr/sbin/ip`, and list every installed `python3-*` package using zypper's own filtered search.
 
@@ -48,5 +48,5 @@ Test your theoretical knowledge and diagnostic reasoning before tackling the cap
 Once you're confident, put both skill sets to work together in one coherent maintenance-window scenario:
 
 ```bash
-astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-070
+astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-070/capstone/lab-01
 ```

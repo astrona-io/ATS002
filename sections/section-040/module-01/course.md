@@ -256,4 +256,4 @@ To prove you can diagnose and repair a real path-based MAC denial:
 5. Confirm the fix by generating a fresh denial-worthy event and checking that it now succeeds — and confirm the profile is genuinely back in `enforce` mode, not left in `complain` mode as a shortcut.
 6. Without a VM, talk through the SELinux-equivalent fix for the same kind of scenario: which two commands replace the AppArmor profile edit, and why does `chcon` alone not survive a relabel?
 
-The hands-on half of this checklist is exactly what `labs/lab-041` grades.
+The hands-on half of this checklist is exactly what `labs/section-040/module-01/lab-01` grades.

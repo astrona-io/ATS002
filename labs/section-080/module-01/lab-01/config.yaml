@@ -1,0 +1,41 @@
+metadata:
+  name: "ats-002-lab-081"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    # Main disk: the VM's own root filesystem and boot process. Never
+    # touched by this lab -- the "broken system" in the scenario lives
+    # entirely on the extraDisk below, so this VM stays reachable over
+    # SSH the whole time for grading.
+    diskSizeGB: 15
+    extraDisks:
+      - sizeGB: 2
+        serial: "lab081-data001"
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-081-setup"
+      description: "Partitions the extraDisk into a stand-in 'data-001' root partition and data partition, and seeds the root partition's /etc/fstab with a deliberately mistyped UUID"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-fstab-fixed"
+      description: "Confirms /etc/fstab on the stand-in disk's root partition now references the data partition's real UUID"
+      type: "file"
+      source: "validation/validate-fstab-fixed.sh"
+
+teardown:
+  keepCluster: false

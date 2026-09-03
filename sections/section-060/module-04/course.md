@@ -12,7 +12,7 @@ Same arrangement as the earlier chapters — bootstrap has already installed Doc
 docker exec -it rpmbox bash
 ```
 
-Since this chapter is read-only, the lab will ask you to save the output of a few specific lookups into files under `/home/candidate/answers/` inside the container, so your research has a concrete, checkable record — see the lab's `docs/question.md` for the exact filenames expected.
+Since this chapter is read-only, the lab will ask you to save the output of a few specific lookups into files under `/home/candidate/answers/` inside the container, so your research has a concrete, checkable record — see the lab's `question.md` for the exact filenames expected.
 
 ---
 

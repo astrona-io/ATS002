@@ -21,18 +21,18 @@ This section has one module, deliberately built around two parts — a real hand
 
 ### 1. AppArmor Profile Enforcement & the Other MAC System: SELinux
 * **Module Reader:** **[Module 1: AppArmor Profile Enforcement & the Other MAC System: SELinux](./module-01/course.md)**
-* **Practice Lab Sandbox:** **`labs/lab-041`**
+* **Practice Lab Sandbox:** **`labs/section-040/module-01/lab-01`**
 * **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-041
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-040/module-01/lab-01
     ```
 * **Hands-on Objective:** On `web-srv1`, diagnose why the `appservice` daemon — reconfigured to log to `/srv/applogs` — fails to write there despite fully correct DAC permissions, find the denial in the audit trail, close the gap in its AppArmor profile, and confirm the fix survives with the profile genuinely back in `enforce` mode.
 
 ### 2. Section Capstone Challenge
-* **Comprehensive Challenge:** **`labs/lab-040` (Two Services, Two Denials)**
+* **Comprehensive Challenge:** **`labs/section-040/capstone/lab-01` (Two Services, Two Denials)**
 * **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-040
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-040/capstone/lab-01
     ```
 * **Hands-on Objective:** Connect the dots across two independent services. Repair `logshipper`, whose profile blocks a *write* to its relocated log directory, and separately repair `metrics-agent`, whose profile blocks a *read* of its relocated credentials file — diagnosing and fixing each AppArmor denial from its own audit trail, with both profiles left genuinely enforcing at the end.
 

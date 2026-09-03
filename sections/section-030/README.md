@@ -21,27 +21,27 @@ This section is divided into two focused modules, each paired with a dedicated h
 
 ### 1. Compile & Install From Source
 *   **Module Reader:** **[Module 1: Compile & Install From Source](./module-01/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-031`**
+*   **Practice Lab Sandbox:** **`labs/section-030/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-031
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-01/lab-01
     ```
 *   **Hands-on Objective:** Extract a `.tar.bz2` source tarball staged on the host, discover the project's install-location and IPv6 feature-toggle flags by reading `./configure --help`, then build and install the binary so it lands at the exact path `/usr/bin/links` with IPv6 support compiled out.
 
 ### 2. libvirt Virtual Machine Lifecycle
 *   **Module Reader:** **[Module 2: libvirt Virtual Machine Lifecycle](./module-02/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-032`**
+*   **Practice Lab Sandbox:** **`labs/section-030/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-032
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-02/lab-01
     ```
 *   **Hands-on Objective:** Define a new persistent KVM domain named `inventory-db` around an existing qcow2 disk image with 2048 MiB of memory, 2 vCPUs, and a default NAT network attachment, configure it to autostart with the host, then demonstrate both a graceful `virsh shutdown` and a hard `virsh destroy`.
 
 ### 3. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/lab-030` (New Toolchain, New Host)**
+*   **Comprehensive Challenge:** **`labs/section-030/capstone/lab-01` (New Toolchain, New Host)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-030
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/capstone/lab-01
     ```
 *   **Hands-on Objective:** Connect the dots. Compile and install a build-status reporting tool from source at a precise path with a feature disabled, then define, autostart, and stand up a persistent libvirt domain for a new internal service — a single maintenance window that touches both a build pipeline and a hypervisor.
 

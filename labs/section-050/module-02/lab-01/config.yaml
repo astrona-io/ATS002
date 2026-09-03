@@ -1,0 +1,45 @@
+metadata:
+  name: "ats-002-lab-052"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "dpkg-lab-setup"
+      description: "Builds a real logtail-utils .deb and stages it under /home/candidate/downloads/, then installs cowsay and manually corrupts its dpkg status entry to half-configured, simulating an interrupted install for recovery practice"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-logtail-installed"
+      description: "Confirms logtail-utils is cleanly installed (ii) and /usr/bin/logtail is on disk"
+      type: "file"
+      source: "validation/validate-logtail-installed.sh"
+
+    - name: "verify-ownership-lookups"
+      description: "Confirms dpkg -S /usr/bin/logtail and dpkg -L logtail-utils both resolve correctly (indirectly, by re-checking package/file state)"
+      type: "file"
+      source: "validation/validate-ownership-lookups.sh"
+
+    - name: "verify-cowsay-recovered"
+      description: "Confirms the previously half-configured cowsay package now shows a clean ii status"
+      type: "file"
+      source: "validation/validate-cowsay-recovered.sh"
+
+teardown:
+  keepCluster: false

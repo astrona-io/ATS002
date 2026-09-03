@@ -35,15 +35,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-011/docs/question.md
+        path: labs/section-010/module-01/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-011/docs/solution.md
+        path: labs/section-010/module-01/lab-01/solution.md
 
       - type: lab
         title: "sysctl Live Kernel State Lab"
-        path: labs/lab-011
+        path: labs/section-010/module-01/lab-01
 
       - type: reading
         title: "Module 2: Process Limits — pid_max, ulimit, and the Three Ceilings"
@@ -51,15 +51,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-012/docs/question.md
+        path: labs/section-010/module-02/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-012/docs/solution.md
+        path: labs/section-010/module-02/lab-01/solution.md
 
       - type: lab
         title: "Process & Thread Ceilings Lab"
-        path: labs/lab-012
+        path: labs/section-010/module-02/lab-01
 
       - type: reading
         title: "Module 3: Kernel Modules — Loading, Parameters, and Blacklisting"
@@ -67,15 +67,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-013/docs/question.md
+        path: labs/section-010/module-03/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-013/docs/solution.md
+        path: labs/section-010/module-03/lab-01/solution.md
 
       - type: lab
         title: "Kernel Module Loading & Blacklisting Lab"
-        path: labs/lab-013
+        path: labs/section-010/module-03/lab-01
 
       - type: reading
         title: "Module 4: udev — Giving a Device a Name It Can Keep"
@@ -83,15 +83,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-014/docs/question.md
+        path: labs/section-010/module-04/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-014/docs/solution.md
+        path: labs/section-010/module-04/lab-01/solution.md
 
       - type: lab
         title: "Stable Device Naming with udev Lab"
-        path: labs/lab-014
+        path: labs/section-010/module-04/lab-01
 
       - type: reading
         title: "Module 5: Catching a Process in the Act with strace"
@@ -99,15 +99,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-015/docs/question.md
+        path: labs/section-010/module-05/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-015/docs/solution.md
+        path: labs/section-010/module-05/lab-01/solution.md
 
       - type: lab
         title: "Process Forensics with strace Lab"
-        path: labs/lab-015
+        path: labs/section-010/module-05/lab-01
 
       - type: reading
         title: "Section 010 Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics"
@@ -115,15 +115,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-010/docs/question.md
+        path: labs/section-010/capstone/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-010/docs/solution.md
+        path: labs/section-010/capstone/lab-01/solution.md
 
       - type: lab
         title: "Kernel, Process, Module & Device Runtime Management Capstone Lab"
-        path: labs/lab-010
+        path: labs/section-010/capstone/lab-01
 
   - id: module-020
     title: "Section 020: Scheduled & Containerized Workloads"
@@ -146,15 +146,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-021/docs/question.md
+        path: labs/section-020/module-01/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-021/docs/solution.md
+        path: labs/section-020/module-01/lab-01/solution.md
 
       - type: lab
         title: "Per-User Cron Job Scheduling Lab"
-        path: labs/lab-021
+        path: labs/section-020/module-01/lab-01
 
       - type: reading
         title: "Module 2: Docker Container Lifecycle"
@@ -162,15 +162,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-022/docs/question.md
+        path: labs/section-020/module-02/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-022/docs/solution.md
+        path: labs/section-020/module-02/lab-01/solution.md
 
       - type: lab
         title: "Docker Container Lifecycle Lab"
-        path: labs/lab-022
+        path: labs/section-020/module-02/lab-01
 
       - type: reading
         title: "Section 020 Knowledge Check: Scheduled & Containerized Workloads"
@@ -178,15 +178,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-020/docs/question.md
+        path: labs/section-020/capstone/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-020/docs/solution.md
+        path: labs/section-020/capstone/lab-01/solution.md
 
       - type: lab
         title: "Scheduled Container Recovery Capstone Lab"
-        path: labs/lab-020
+        path: labs/section-020/capstone/lab-01
 
   - id: module-030
     title: "Section 030: Building & Virtualizing Systems"
@@ -208,15 +208,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-031/docs/question.md
+        path: labs/section-030/module-01/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-031/docs/solution.md
+        path: labs/section-030/module-01/lab-01/solution.md
 
       - type: lab
         title: "Compile & Install From Source Lab"
-        path: labs/lab-031
+        path: labs/section-030/module-01/lab-01
 
       - type: reading
         title: "Module 2: libvirt Virtual Machine Lifecycle"
@@ -224,15 +224,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-032/docs/question.md
+        path: labs/section-030/module-02/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-032/docs/solution.md
+        path: labs/section-030/module-02/lab-01/solution.md
 
       - type: lab
         title: "libvirt Virtual Machine Lifecycle Lab"
-        path: labs/lab-032
+        path: labs/section-030/module-02/lab-01
 
       - type: reading
         title: "Section 030 Knowledge Check: Building & Virtualizing Systems"
@@ -240,15 +240,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-030/docs/question.md
+        path: labs/section-030/capstone/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-030/docs/solution.md
+        path: labs/section-030/capstone/lab-01/solution.md
 
       - type: lab
         title: "New Toolchain, New Host Capstone Lab"
-        path: labs/lab-030
+        path: labs/section-030/capstone/lab-01
 
   - id: module-040
     title: "Section 040: Mandatory Access Control — SELinux & AppArmor"
@@ -270,15 +270,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-041/docs/question.md
+        path: labs/section-040/module-01/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-041/docs/solution.md
+        path: labs/section-040/module-01/lab-01/solution.md
 
       - type: lab
         title: "AppArmor Profile Enforcement Lab"
-        path: labs/lab-041
+        path: labs/section-040/module-01/lab-01
 
       - type: reading
         title: "Section 040 Knowledge Check: Mandatory Access Control — SELinux & AppArmor"
@@ -286,15 +286,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-040/docs/question.md
+        path: labs/section-040/capstone/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-040/docs/solution.md
+        path: labs/section-040/capstone/lab-01/solution.md
 
       - type: lab
         title: "Two Services, Two Denials Capstone Lab"
-        path: labs/lab-040
+        path: labs/section-040/capstone/lab-01
 
   - id: module-050
     title: "Section 050: Debian Package Management: Repositories, dpkg & APT"
@@ -316,15 +316,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-051/docs/question.md
+        path: labs/section-050/module-01/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-051/docs/solution.md
+        path: labs/section-050/module-01/lab-01/solution.md
 
       - type: lab
         title: "Third-Party Repositories & Package Pinning Lab"
-        path: labs/lab-051
+        path: labs/section-050/module-01/lab-01
 
       - type: reading
         title: "Module 2: dpkg Low-Level Package Management"
@@ -332,15 +332,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-052/docs/question.md
+        path: labs/section-050/module-02/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-052/docs/solution.md
+        path: labs/section-050/module-02/lab-01/solution.md
 
       - type: lab
         title: "dpkg Low-Level Package Management Lab"
-        path: labs/lab-052
+        path: labs/section-050/module-02/lab-01
 
       - type: reading
         title: "Module 3: APT Basic Package Operations"
@@ -348,15 +348,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-053/docs/question.md
+        path: labs/section-050/module-03/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-053/docs/solution.md
+        path: labs/section-050/module-03/lab-01/solution.md
 
       - type: lab
         title: "APT Basic Package Operations Lab"
-        path: labs/lab-053
+        path: labs/section-050/module-03/lab-01
 
       - type: reading
         title: "Module 4: APT Package Information Lookup"
@@ -364,15 +364,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-054/docs/question.md
+        path: labs/section-050/module-04/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-054/docs/solution.md
+        path: labs/section-050/module-04/lab-01/solution.md
 
       - type: lab
         title: "APT Package Information Lookup Lab"
-        path: labs/lab-054
+        path: labs/section-050/module-04/lab-01
 
       - type: reading
         title: "Module 5: APT Package Groups & Bulk Operations"
@@ -380,15 +380,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-055/docs/question.md
+        path: labs/section-050/module-05/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-055/docs/solution.md
+        path: labs/section-050/module-05/lab-01/solution.md
 
       - type: lab
         title: "APT Package Groups & Bulk Operations Lab"
-        path: labs/lab-055
+        path: labs/section-050/module-05/lab-01
 
       - type: reading
         title: "Section 050 Knowledge Check: Debian Package Management"
@@ -396,15 +396,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-050/docs/question.md
+        path: labs/section-050/capstone/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-050/docs/solution.md
+        path: labs/section-050/capstone/lab-01/solution.md
 
       - type: lab
         title: "New App Server Onboarding Capstone Lab"
-        path: labs/lab-050
+        path: labs/section-050/capstone/lab-01
 
   - id: module-060
     title: "Section 060: RPM/DNF Package Management: rpm, dnf & Package Groups"
@@ -427,15 +427,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-061/docs/question.md
+        path: labs/section-060/module-01/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-061/docs/solution.md
+        path: labs/section-060/module-01/lab-01/solution.md
 
       - type: lab
         title: "RPM Low-Level Package Management Lab"
-        path: labs/lab-061
+        path: labs/section-060/module-01/lab-01
 
       - type: reading
         title: "Module 2: Rebuilding a Corrupted RPM Database"
@@ -443,15 +443,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-062/docs/question.md
+        path: labs/section-060/module-02/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-062/docs/solution.md
+        path: labs/section-060/module-02/lab-01/solution.md
 
       - type: lab
         title: "Rebuilding a Corrupted RPM Database Lab"
-        path: labs/lab-062
+        path: labs/section-060/module-02/lab-01
 
       - type: reading
         title: "Module 3: DNF Basic Package Operations"
@@ -459,15 +459,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-063/docs/question.md
+        path: labs/section-060/module-03/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-063/docs/solution.md
+        path: labs/section-060/module-03/lab-01/solution.md
 
       - type: lab
         title: "DNF Basic Package Operations Lab"
-        path: labs/lab-063
+        path: labs/section-060/module-03/lab-01
 
       - type: reading
         title: "Module 4: DNF Package Information Lookup"
@@ -475,15 +475,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-064/docs/question.md
+        path: labs/section-060/module-04/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-064/docs/solution.md
+        path: labs/section-060/module-04/lab-01/solution.md
 
       - type: lab
         title: "DNF Package Information Lookup Lab"
-        path: labs/lab-064
+        path: labs/section-060/module-04/lab-01
 
       - type: reading
         title: "Module 5: DNF Package Groups"
@@ -491,15 +491,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-065/docs/question.md
+        path: labs/section-060/module-05/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-065/docs/solution.md
+        path: labs/section-060/module-05/lab-01/solution.md
 
       - type: lab
         title: "DNF Package Groups Lab"
-        path: labs/lab-065
+        path: labs/section-060/module-05/lab-01
 
       - type: reading
         title: "Section 060 Knowledge Check: RPM/DNF Package Management"
@@ -507,15 +507,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-060/docs/question.md
+        path: labs/section-060/capstone/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-060/docs/solution.md
+        path: labs/section-060/capstone/lab-01/solution.md
 
       - type: lab
         title: "RPM/DNF Package Management Capstone Lab"
-        path: labs/lab-060
+        path: labs/section-060/capstone/lab-01
 
   - id: module-070
     title: "Section 070: SUSE Package Management: Zypper"
@@ -537,15 +537,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-071/docs/question.md
+        path: labs/section-070/module-01/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-071/docs/solution.md
+        path: labs/section-070/module-01/lab-01/solution.md
 
       - type: lab
         title: "Zypper Basic Package Operations Lab"
-        path: labs/lab-071
+        path: labs/section-070/module-01/lab-01
 
       - type: reading
         title: "Module 2: Zypper Package Information Lookup"
@@ -553,15 +553,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-072/docs/question.md
+        path: labs/section-070/module-02/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-072/docs/solution.md
+        path: labs/section-070/module-02/lab-01/solution.md
 
       - type: lab
         title: "Zypper Package Information Lookup Lab"
-        path: labs/lab-072
+        path: labs/section-070/module-02/lab-01
 
       - type: reading
         title: "Section 070 Knowledge Check: SUSE Package Management: Zypper"
@@ -569,15 +569,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-070/docs/question.md
+        path: labs/section-070/capstone/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-070/docs/solution.md
+        path: labs/section-070/capstone/lab-01/solution.md
 
       - type: lab
         title: "Zypper Research-Then-Act Capstone Lab"
-        path: labs/lab-070
+        path: labs/section-070/capstone/lab-01
 
   - id: module-080
     title: "Section 080: System Disaster Recovery"
@@ -600,15 +600,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-081/docs/question.md
+        path: labs/section-080/module-01/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-081/docs/solution.md
+        path: labs/section-080/module-01/lab-01/solution.md
 
       - type: lab
         title: "Root-Filesystem Repair via chroot Lab"
-        path: labs/lab-081
+        path: labs/section-080/module-01/lab-01
 
       - type: reading
         title: "Module 2: Password Reset & Single-User Recovery"
@@ -616,15 +616,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-082/docs/question.md
+        path: labs/section-080/module-02/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-082/docs/solution.md
+        path: labs/section-080/module-02/lab-01/solution.md
 
       - type: lab
         title: "Password Reset & Single-User Recovery Lab"
-        path: labs/lab-082
+        path: labs/section-080/module-02/lab-01
 
       - type: reading
         title: "Module 3: Partition Table Backup & Recovery"
@@ -632,15 +632,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-083/docs/question.md
+        path: labs/section-080/module-03/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-083/docs/solution.md
+        path: labs/section-080/module-03/lab-01/solution.md
 
       - type: lab
         title: "Partition Table Backup & Recovery Lab"
-        path: labs/lab-083
+        path: labs/section-080/module-03/lab-01
 
       - type: reading
         title: "Module 4: GRUB Corruption Recovery"
@@ -648,15 +648,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-084/docs/question.md
+        path: labs/section-080/module-04/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-084/docs/solution.md
+        path: labs/section-080/module-04/lab-01/solution.md
 
       - type: lab
         title: "GRUB Corruption Recovery Lab"
-        path: labs/lab-084
+        path: labs/section-080/module-04/lab-01
 
       - type: reading
         title: "Section 080 Knowledge Check: System Disaster Recovery"
@@ -664,15 +664,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/lab-080/docs/question.md
+        path: labs/section-080/capstone/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/lab-080/docs/solution.md
+        path: labs/section-080/capstone/lab-01/solution.md
 
       - type: lab
         title: "System Disaster Recovery Integration Capstone Lab"
-        path: labs/lab-080
+        path: labs/section-080/capstone/lab-01
 
   - id: module-090
     title: "LFCS Operations Deployment Domain Certification Quiz"

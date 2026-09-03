@@ -21,27 +21,27 @@ This section is divided into two focused modules, each paired with a dedicated h
 
 ### 1. Per-User Cron Job Scheduling
 *   **Module Reader:** **[Module 1: Per-User Cron Job Scheduling](./module-01/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-021`**
+*   **Practice Lab Sandbox:** **`labs/section-020/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-021
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/module-01/lab-01
     ```
 *   **Hands-on Objective:** Migrate a system-wide cronjob on `data-001` into a per-user crontab owned by `asset-manager`, add a new twice-weekly job with a compound day-of-week schedule, and remove the original system-wide entry so the job no longer fires twice.
 
 ### 2. Docker Container Lifecycle
 *   **Module Reader:** **[Module 2: Docker Container Lifecycle](./module-02/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-022`**
+*   **Practice Lab Sandbox:** **`labs/section-020/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-022
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/module-02/lab-01
     ```
 *   **Hands-on Objective:** Stop a running container, extract another container's IP address and volume mount destination using `docker inspect --format`, and launch a new detached container with a hard memory limit and a host-to-container port mapping.
 
 ### 3. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/lab-020` (Scheduled Container Recovery)**
+*   **Comprehensive Challenge:** **`labs/section-020/capstone/lab-01` (Scheduled Container Recovery)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-020
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/capstone/lab-01
     ```
 *   **Hands-on Objective:** Connect the dots. Retire a decommissioned container that is squatting on a needed port, launch its constrained replacement, and schedule a per-user cron job that automatically restarts the new container if it ever stops.
 

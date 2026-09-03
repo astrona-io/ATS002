@@ -1,0 +1,40 @@
+metadata:
+  name: "ats-002-lab-015"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "strace-lab-setup"
+      description: "Starts collector1/collector2/collector3 as long-running services; only collector2 periodically calls the forbidden kill() syscall"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-guilty-process-removed"
+      description: "Confirms collector2 (the only process that calls kill()) is terminated and its executable removed"
+      type: "file"
+      source: "validation/validate-guilty-removed.sh"
+
+    - name: "verify-innocent-processes-untouched"
+      description: "Confirms collector1 and collector3 (which never call kill()) are still running with their executables intact"
+      type: "file"
+      source: "validation/validate-innocent-untouched.sh"
+
+teardown:
+  keepCluster: false

@@ -1,0 +1,45 @@
+metadata:
+  name: "ats-002-lab-053"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "apt-basics-lab-setup"
+      description: "Ensures fail2ban is not installed, and installs ftp with a real config file under /etc so its purge can be verified"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-fail2ban-installed"
+      description: "Confirms fail2ban is now cleanly installed"
+      type: "file"
+      source: "validation/validate-fail2ban-installed.sh"
+
+    - name: "verify-ftp-purged"
+      description: "Confirms ftp is fully purged (not just removed) -- package gone and /etc/ftp* config gone"
+      type: "file"
+      source: "validation/validate-ftp-purged.sh"
+
+    - name: "verify-autoremove-clean"
+      description: "Confirms no orphaned auto-installed packages remain (apt autoremove --dry-run reports nothing to remove)"
+      type: "file"
+      source: "validation/validate-autoremove-clean.sh"
+
+teardown:
+  keepCluster: false

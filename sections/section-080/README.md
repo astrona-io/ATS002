@@ -22,45 +22,45 @@ This section is divided into four focused modules, each paired with a dedicated 
 
 ### 1. Root-Filesystem Repair via chroot
 *   **Module Reader:** **[Module 1: Root-Filesystem Repair via chroot](./module-01/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-081`**
+*   **Practice Lab Sandbox:** **`labs/section-080/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-081
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/module-01/lab-01
     ```
 *   **Hands-on Objective:** Mount a disposable second disk representing a broken system's root filesystem, bind-mount `/dev`, `/proc`, and `/sys` into it, `chroot` in, fix a mistyped UUID in `/etc/fstab`, and prove the fix with `mount -a`.
 
 ### 2. Password Reset & Single-User Recovery
 *   **Module Reader:** **[Module 2: Password Reset & Single-User Recovery](./module-02/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-082`**
+*   **Practice Lab Sandbox:** **`labs/section-080/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-082
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/module-02/lab-01
     ```
 *   **Hands-on Objective:** Practice the chroot-based half of the real recovery mechanic — mount a disposable disk representing a locked-out system, chroot in, and reset the root account's password hash in `/etc/shadow`.
 
 ### 3. Partition Table Backup & Recovery
 *   **Module Reader:** **[Module 3: Partition Table Backup & Recovery](./module-03/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-083`**
+*   **Practice Lab Sandbox:** **`labs/section-080/module-03/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-083
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/module-03/lab-01
     ```
 *   **Hands-on Objective:** Back up a secondary GPT disk's partition table with `sgdisk --backup`, verify the backup, wipe the table with `sgdisk --zap-all`, restore it with `sgdisk --load-backup`, and confirm the filesystems inside are still intact.
 
 ### 4. GRUB Corruption Recovery
 *   **Module Reader:** **[Module 4: GRUB Corruption Recovery](./module-04/course.md)**
-*   **Practice Lab Sandbox:** **`labs/lab-084`**
+*   **Practice Lab Sandbox:** **`labs/section-080/module-04/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-084
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/module-04/lab-01
     ```
 *   **Hands-on Objective:** Recover from a missing `/boot/grub/grub.cfg` on a VM whose next reboot would otherwise fail — reinstall GRUB's boot-sector code with `grub-install` and regenerate a fresh, working configuration with `update-grub`.
 
 ### 5. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/lab-080` (System Disaster Recovery Integration)**
+*   **Comprehensive Challenge:** **`labs/section-080/capstone/lab-01` (System Disaster Recovery Integration)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/lab-080
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/capstone/lab-01
     ```
 *   **Hands-on Objective:** A bad night on call. Restore a secondary disk's partition table from an existing backup and confirm its filesystems survived, then reinstall and regenerate a stale GRUB configuration on the primary disk before the next scheduled reboot happens.
 

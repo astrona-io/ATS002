@@ -1,0 +1,50 @@
+metadata:
+  name: "ats-002-lab-022"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-022-docker-setup"
+      description: "Installs Docker, and starts two running containers as the starting state: frontend_v1 (to be stopped) and frontend_v2 (with an assigned bridge IP and one bind-mounted volume)"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-frontend-v1-stopped"
+      description: "Confirms frontend_v1 shows STATUS Exited, not removed"
+      type: "file"
+      source: "validation/validate-frontend-v1-stopped.sh"
+
+    - name: "verify-ip-address-file"
+      description: "Confirms /opt/course/11/ip-address matches frontend_v2's actual assigned IP address"
+      type: "file"
+      source: "validation/validate-ip-address.sh"
+
+    - name: "verify-mount-destination-file"
+      description: "Confirms /opt/course/11/mount-destination matches frontend_v2's actual volume mount destination"
+      type: "file"
+      source: "validation/validate-mount-destination.sh"
+
+    - name: "verify-frontend-v3-launched"
+      description: "Confirms frontend_v3 is running, detached, image nginx:alpine, memory limit 30m, and port map 1234->80"
+      type: "file"
+      source: "validation/validate-frontend-v3.sh"
+
+teardown:
+  keepCluster: false

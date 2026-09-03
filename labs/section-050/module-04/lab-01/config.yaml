@@ -1,0 +1,55 @@
+metadata:
+  name: "ats-002-lab-054"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "apt-research-lab-setup"
+      description: "Refreshes the package index, installs several real python3-* packages so the pattern-listing task has genuine results, and creates /opt/course/apt-research for the student's recorded research output. nginx and fail2ban are deliberately left uninstalled but available in the index -- the research tasks target them precisely because they are not installed."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-fail2ban-search-recorded"
+      description: "Confirms /opt/course/apt-research/fail2ban-search.txt contains a genuine apt search hit for fail2ban"
+      type: "file"
+      source: "validation/validate-fail2ban-search-recorded.sh"
+
+    - name: "verify-nginx-metadata-recorded"
+      description: "Confirms /opt/course/apt-research/nginx-show.txt contains nginx's Package/Version fields, matching the live candidate version"
+      type: "file"
+      source: "validation/validate-nginx-metadata-recorded.sh"
+
+    - name: "verify-nginx-policy-recorded"
+      description: "Confirms /opt/course/apt-research/nginx-policy.txt contains Installed:/Candidate: lines matching apt-cache policy's live output"
+      type: "file"
+      source: "validation/validate-nginx-policy-recorded.sh"
+
+    - name: "verify-python3-list-recorded"
+      description: "Confirms /opt/course/apt-research/python3-installed.txt matches the live set of installed python3-* packages"
+      type: "file"
+      source: "validation/validate-python3-list-recorded.sh"
+
+    - name: "verify-upgradable-list-recorded"
+      description: "Confirms /opt/course/apt-research/upgradable.txt matches the live apt list --upgradable output"
+      type: "file"
+      source: "validation/validate-upgradable-list-recorded.sh"
+
+teardown:
+  keepCluster: false

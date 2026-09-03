@@ -1,0 +1,45 @@
+metadata:
+  name: "ats-002-lab-014"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    # NOTE: real USB passthrough isn't available in this QEMU sandbox, so
+    # the scenario's "external USB backup drive" is reframed as an
+    # extraDisk identified by a stable `serial` attribute -- exactly the
+    # kind of attribute a real USB drive's ATTRS{serial} would expose.
+    # As with other labs using extraDisks, astrona-cli does not guarantee
+    # this disk lands on any particular /dev/vdX letter, so bootstrap and
+    # validation both resolve it via /dev/disk/by-id/virtio-<serial>
+    # rather than a raw device name.
+    extraDisks:
+      - sizeGB: 1
+        serial: "lab014-backup-drive"
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-014-setup"
+      description: "Partitions and formats the extraDisk (serial lab014-backup-drive) with a single ext4 partition, simulating an already-in-use external backup drive"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-udev-symlinks"
+      description: "Confirms a custom udev rule under /etc/udev/rules.d/ creates stable /dev/backup-drive and /dev/backup-drive1 symlinks that resolve to the disk with serial lab014-backup-drive"
+      type: "file"
+      source: "validation/validate-udev-symlinks.sh"
+
+teardown:
+  keepCluster: false
