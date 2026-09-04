@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bootstrap: installs the real "tree" package cleanly, then manually
+# Bootstrap: tree ships pre-installed in the base image; this manually
 # edits its stanza in /var/lib/dpkg/status to flip its Status line from
 # "install ok installed" to "install ok half-configured" -- reproducing,
 # deterministically, exactly the on-disk state a real interrupted
@@ -14,8 +14,6 @@
 # scenario.
 
 set -eu
-
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y tree
 
 sudo python3 - <<'PYEOF'
 import re

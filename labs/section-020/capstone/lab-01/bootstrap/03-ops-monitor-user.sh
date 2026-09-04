@@ -12,9 +12,4 @@ fi
 
 sudo usermod -aG docker ops-monitor
 
-if ! command -v crontab >/dev/null 2>&1; then
-  sudo apt-get update -y
-  sudo apt-get install -y cron
-fi
-
 sudo systemctl enable --now cron

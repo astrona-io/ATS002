@@ -16,11 +16,6 @@
 
 set -eu
 
-if ! command -v gcc >/dev/null 2>&1 || ! command -v make >/dev/null 2>&1; then
-  sudo apt-get update -y
-  sudo apt-get install -y build-essential
-fi
-
 sudo mkdir -p /tools
 BUILD_ROOT="$(mktemp -d)"
 SRC_DIR="$BUILD_ROOT/vmreport-1.0"

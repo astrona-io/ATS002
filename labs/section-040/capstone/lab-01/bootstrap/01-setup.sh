@@ -16,10 +16,6 @@
 # only AppArmor stands in the way.
 set -eu
 
-export DEBIAN_FRONTEND=noninteractive
-sudo apt-get update -y
-sudo apt-get install -y apparmor apparmor-utils
-
 sudo mkdir -p /etc/apparmor.d/local
 
 ##############################################################################

@@ -5,10 +5,6 @@
 # the write to /srv/applogs is genuinely denied and reproducible.
 set -eu
 
-export DEBIAN_FRONTEND=noninteractive
-sudo apt-get update -y
-sudo apt-get install -y apparmor apparmor-utils
-
 # Dedicated, unprivileged system user for the service.
 if ! id -u appservice >/dev/null 2>&1; then
   sudo useradd --system --no-create-home --shell /usr/sbin/nologin appservice

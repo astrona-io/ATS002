@@ -8,9 +8,7 @@
 
 set -eu
 
-echo "Installing Docker..."
-sudo apt-get update -y
-sudo apt-get install -y docker.io
+echo "Enabling Docker..."
 sudo systemctl enable --now docker
 
 echo "Waiting for the Docker daemon to be ready..."

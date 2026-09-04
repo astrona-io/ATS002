@@ -13,16 +13,6 @@
 
 set -eu
 
-if ! command -v virsh >/dev/null 2>&1; then
-  sudo apt-get update -y
-  sudo apt-get install -y \
-    qemu-system-x86 \
-    libvirt-daemon-system \
-    libvirt-clients \
-    virtinst \
-    bridge-utils
-fi
-
 sudo systemctl enable --now libvirtd
 
 for i in $(seq 1 30); do

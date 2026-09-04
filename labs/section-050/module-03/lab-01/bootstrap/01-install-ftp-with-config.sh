@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Bootstrap: installs the real "ftp" client package, then registers a real
-# configuration file under /etc as one of its tracked dpkg conffiles.
+# Bootstrap: ftp ships pre-installed in the base image; this registers a
+# real configuration file under /etc as one of its tracked dpkg conffiles.
 #
 # The stock "ftp" client package ships no /etc configuration of its own,
 # so to make "purge vs. remove, verified by /etc leftovers" a reliable,
@@ -12,8 +12,6 @@
 # scripted imitation of it.
 
 set -eu
-
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ftp
 
 sudo tee /etc/ftp.conf >/dev/null <<'EOF'
 # Legacy default FTP client site configuration.
