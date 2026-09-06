@@ -37,15 +37,15 @@ for _ in $(seq 1 30); do
   sleep 1
 done
 
-# The 'default' NAT network ships with libvirt-daemon-system but is not
-# always auto-started on first boot -- do not assume.
-if ! sudo virsh net-info default >/dev/null 2>&1; then
-  echo "[playground] WARNING: 'default' network missing -- unexpected on this image" >&2
-else
-  if ! sudo virsh net-info default | grep -q "Active:.*yes"; then
-    sudo virsh net-start default
-  fi
+# The 'default' NAT network ships with libvirt-daemon-system. Make sure it
+# is started and set to autostart. net-start on an already-active network
+# exits non-zero -- that is fine here, so tolerate it rather than parsing
+# net-info (a `| grep -q` pipeline trips `set -o pipefail` via SIGPIPE).
+if sudo virsh net-info default >/dev/null 2>&1; then
+  sudo virsh net-start default 2>/dev/null || true
   sudo virsh net-autostart default >/dev/null 2>&1 || true
+else
+  echo "[playground] WARNING: 'default' network missing -- unexpected on this image" >&2
 fi
 
 # Stage an empty disk image to wrap a domain around. Empty on purpose:
