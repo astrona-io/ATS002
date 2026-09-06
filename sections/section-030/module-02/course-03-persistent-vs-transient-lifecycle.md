@@ -84,7 +84,37 @@ Persistent:     yes
 `Persistent: yes` is the definitive answer. `Persistent: no` on a VM that is supposed to survive maintenance is the bug, caught before it bites.
 
 > [!TIP]
-> **Try it — watch a transient domain vanish.** Take a working domain XML. `sudo virsh dumpxml inventory-db > /tmp/d.xml` gives you one. Edit `/tmp/d.xml`: change `<name>` to `scratch-vm` and delete the `<uuid>` line so it gets a fresh one. Now `sudo virsh create /tmp/d.xml`, then `sudo virsh list --all` — `scratch-vm` is `running`. `sudo virsh shutdown scratch-vm` (or `destroy`), wait for it to stop, and run `sudo virsh list --all` again. `scratch-vm` is gone entirely — no `shut off` line, and `sudo virsh start scratch-vm` errors with "failed to get domain". Repeat the whole sequence with `sudo virsh define /tmp/d.xml` instead of `create`, plus a separate `sudo virsh start scratch-vm`: this time after it stops it is still listed as `shut off` and starts again fine. Clean up with `sudo virsh undefine scratch-vm`.
+> **Try it — watch a transient domain vanish.** Build a throwaway domain on its own fresh disk and start it the *transient* way with `virsh create`. On the host:
+>
+> ```sh
+> sudo qemu-img create -f qcow2 /var/lib/libvirt/images/scratch-vm.qcow2 1G
+> sudo virt-install --name scratch-vm --memory 512 --vcpus 1 \
+>   --disk path=/var/lib/libvirt/images/scratch-vm.qcow2,format=qcow2 \
+>   --import --network network=default --graphics none --noautoconsole \
+>   --print-xml > /tmp/scratch.xml
+> sudo virsh create /tmp/scratch.xml       # transient: start, do NOT register
+> sudo virsh list --all
+> sudo virsh destroy scratch-vm            # stop it (empty disk, no clean shutdown possible)
+> sudo virsh list --all
+> sudo virsh start scratch-vm              # nothing to start from
+> ```
+>
+> Expect something like:
+>
+> ```text
+> Domain 'scratch-vm' created from /tmp/scratch.xml
+>  Id   Name          State
+> -----------------------------
+>  4    scratch-vm    running
+>  5    inventory-db  running
+> Domain 'scratch-vm' destroyed
+>  Id   Name          State
+> -----------------------------
+>  5    inventory-db  running
+> error: failed to get domain 'scratch-vm'
+> ```
+>
+> `virt-install --print-xml` builds the domain XML and prints it instead of defining anything — a clean way to hand `virsh create` some input. The moment `scratch-vm` stopped it was gone from `virsh list --all` entirely — no `shut off` line — and `virsh start` has nothing to work from. Now repeat with `sudo virsh define /tmp/scratch.xml` plus a separate `sudo virsh start scratch-vm`: this time after `destroy` it stays listed as `shut off` and starts again. Clean up: `sudo virsh undefine scratch-vm` and `sudo rm /var/lib/libvirt/images/scratch-vm.qcow2`.
 
 > [!WARNING]
 > The classic mistake in this topic: defining a VM that is meant to outlive reboots with `virsh create` (or a bare `virt-install --transient`, which behaves the same way). Symptoms:

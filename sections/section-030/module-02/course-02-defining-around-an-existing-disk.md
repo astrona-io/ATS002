@@ -96,7 +96,55 @@ sudo virsh net-list          # is 'default' active?
 If `default` shows `inactive`, a domain attached to it will fail to start with a network error — `sudo virsh net-start default` fixes it.
 
 > [!TIP]
-> **Try it — read the XML the command generated.** Right after `virt-install` returns, run `sudo virsh dumpxml inventory-db | less` and find the `<memory>`, `<vcpu>`, `<disk>`, and `<interface>` elements. Match each one back to the flag in the table above. Then `sudo cat /etc/libvirt/qemu/inventory-db.xml` — the on-disk persistent copy Part 1 described — and confirm the same values are there. You have just watched flags become a file.
+> **Try it — define the domain around the staged disk.** The playground staged an empty `/var/lib/libvirt/images/inventory-db.qcow2` for exactly this. On the host:
+>
+> ```sh
+> sudo virt-install \
+>   --name inventory-db \
+>   --memory 2048 \
+>   --vcpus 2 \
+>   --disk path=/var/lib/libvirt/images/inventory-db.qcow2,format=qcow2 \
+>   --import \
+>   --network network=default \
+>   --os-variant detect=on,require=off \
+>   --graphics none \
+>   --noautoconsole
+> ```
+>
+> Expect something like:
+>
+> ```text
+> WARNING  KVM acceleration not available, using 'qemu'
+> Starting install...
+> Domain creation completed.
+> ```
+>
+> The KVM warning is expected — this host is itself a VM, so libvirt falls back to software (TCG) emulation. It changes nothing about the lifecycle. `sudo virsh list --all` now shows `inventory-db` as `running`. The guest console would show "no bootable device" because the disk is empty; that is fine, the module is about the domain, not what boots inside it.
+
+The command returned having done three things — built the XML, `define`d it, `start`ed it. You can now see all three layers from Part 1 at once: the daemon tracking the domain, and a real `qemu-system` process underneath it.
+
+> [!TIP]
+> **Try it — flags became a file, and a process.** On the host:
+>
+> ```sh
+> sudo virsh dumpxml inventory-db | grep -E '<memory|<vcpu|<source (file|network)'
+> sudo cat /etc/libvirt/qemu/inventory-db.xml | grep -E '<memory|<vcpu'
+> pgrep -af qemu-system | head -1
+> ```
+>
+> Expect something like:
+>
+> ```text
+>   <memory unit='KiB'>2097152</memory>
+>   <vcpu placement='static'>2</vcpu>
+>     <source file='/var/lib/libvirt/images/inventory-db.qcow2'/>
+>     <source network='default'/>
+>   <memory unit='KiB'>2097152</memory>
+>   <vcpu placement='static'>2</vcpu>
+> 12874 /usr/bin/qemu-system-x86_64 -name guest=inventory-db,debug-threads=on -machine ...
+> ```
+>
+> `--memory 2048` (MiB on the command line) is stored as `2097152` KiB in both the live XML and the on-disk file; the PIDs and paths in the `qemu-system` line vary. The daemon derived that entire QEMU command line from the XML — you never typed any of it.
 
 > [!WARNING]
 > Two mistakes that both *look* like the command failed when it did not:

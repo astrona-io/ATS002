@@ -1,5 +1,14 @@
 # libvirt Virtual Machine Lifecycle
 
+<!-- astrona:playground -->
+> [!NOTE]
+> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS002/tree/main/sections/section-030/module-02/playground)
+>
+> ```sh
+> astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-02/playground
+> astrona destroy libvirt-vm-lifecycle
+> ```
+
 A container shares the host kernel. A virtual machine does not — it boots its own kernel, runs its own init system, and behaves, from the inside, exactly like a physical computer. Managing that is a genuinely different discipline from managing containers, and on Linux the tool that does it is **libvirt**: a daemon (`libvirtd`, or the newer per-hypervisor `virtqemud`) plus a command-line client (`virsh`) that sit on top of the KVM hypervisor and manage what libvirt calls a **domain** — its own word for "one managed virtual machine."
 
 The contrast with containers is the boundary to keep in mind throughout: a container runtime hands you a process tree in namespaces and shares almost everything with the host; libvirt hands you a raw disk image and makes you state, in one XML document, exactly how much memory the guest gets, how many virtual CPUs, which disk it boots, and which network it plugs into. Everything `virsh` does afterward — starting, stopping, inspecting, autostarting — refers back to that one document, or to a small piece of metadata sitting next to it.
@@ -31,7 +40,13 @@ After this module you can:
 
 Assumed: comfort with a Linux shell, `sudo`, reading and lightly editing XML, and the basic idea of a hypervisor. Section 020's container modules are useful contrast but not a prerequisite. You do **not** need to know QEMU command-line syntax — the point of Part 1 is that libvirt builds it for you.
 
-The playground provides a host with `libvirt`, `virsh`, `virt-install`, and KVM available, the `default` NAT network defined, and at least one pre-populated qcow2 disk image staged under `/var/lib/libvirt/images/` to define a domain around. Every command block states the shell, host, and privilege it assumes; the `virsh destroy` and `virsh shutdown` exercises in Part 5 act on a practice domain only.
+The playground (callout above) provides one Ubuntu 24.04 host with `libvirt`, `virsh`, and `virt-install` installed, `libvirtd` running, the `default` NAT network active, and an **empty** 2 GiB qcow2 staged at `/var/lib/libvirt/images/inventory-db.qcow2` to define a domain around. Nested KVM may be absent — `virsh` falls back to software emulation and every lifecycle transition behaves the same. Get a shell with:
+
+```sh
+astrona ssh astro-libvirt-vm-lifecycle
+```
+
+The running machine is `astro-libvirt-vm-lifecycle` (Astrona prefixes `astro-`); the environment name for `astrona destroy` is `libvirt-vm-lifecycle`. The **Try it** checkpoints through Parts 1–5 build on each other — they define `inventory-db` in Part 2 and reuse it — so work them in order on one running host. Every command block states the shell, host, and privilege it assumes.
 
 ## Where this fits
 

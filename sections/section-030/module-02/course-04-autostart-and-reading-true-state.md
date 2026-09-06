@@ -43,7 +43,27 @@ Two consequences fall straight out of that:
 - **Undefining removes the link too.** `virsh undefine` cleans up the `autostart/` symlink along with the definition, so you never get a dangling link pointing at a deleted file.
 
 > [!TIP]
-> **Try it — see the switch as a file operation.** Run `sudo ls /etc/libvirt/qemu/autostart/ 2>/dev/null` (may be empty or not exist yet). Then `sudo virsh autostart inventory-db` and `sudo ls -l /etc/libvirt/qemu/autostart/` — the symlink appeared. `sudo virsh autostart --disable inventory-db` and list again — it is gone. You just watched a `virsh` verb translate directly into creating and deleting one symlink.
+> **Try it — the switch is one symlink.** On the host, with `inventory-db` defined from Part 2:
+>
+> ```sh
+> sudo ls /etc/libvirt/qemu/autostart/ 2>/dev/null || echo "(no autostart dir yet)"
+> sudo virsh autostart inventory-db
+> sudo ls -l /etc/libvirt/qemu/autostart/
+> sudo virsh autostart --disable inventory-db
+> sudo ls /etc/libvirt/qemu/autostart/ 2>/dev/null || echo "(empty again)"
+> ```
+>
+> Expect something like:
+>
+> ```text
+> (no autostart dir yet)
+> Domain 'inventory-db' marked as autostarted
+> lrwxrwxrwx 1 root root 32 Sep  6 12:00 inventory-db.xml -> /etc/libvirt/qemu/inventory-db.xml
+> Domain 'inventory-db' unmarked as autostarted
+> (empty again)
+> ```
+>
+> The `virsh autostart` verb did exactly one thing to the filesystem: create (then delete) that symlink. Re-enable it before the next checkpoint: `sudo virsh autostart inventory-db`.
 
 ## `virsh dominfo` is the authoritative state
 
@@ -98,7 +118,30 @@ Two traps in those two memory lines.
 
 So "verify 2048 MiB was allocated" → check **`Max memory`**, and expect `2097152 KiB`.
 
-> [!WARNING]
+> [!TIP]
+> **Try it — read the domain's real state.** On the host:
+>
+> ```sh
+> sudo virsh dominfo inventory-db
+> ```
+>
+> Expect something like:
+>
+> ```text
+> Id:             5
+> Name:           inventory-db
+> UUID:           7b9f...c2a1
+> OS Type:        hvm
+> State:          running
+> CPU(s):         2
+> Max memory:     2097152 KiB
+> Used memory:    2097152 KiB
+> Persistent:     yes
+> Autostart:      enable
+> Managed save:   no
+> ```
+>
+> `Id` varies. `Max memory: 2097152 KiB` is the `--memory 2048` you passed in Part 2 — `2048 × 1024`, not a mismatch. `Persistent: yes` (Part 3) and `Autostart: enable` (from the checkpoint above) are both here because both have a file on disk backing them.
 > - `Autostart: enable` reads oddly but is correct output — do not "fix" it.
 > - A `dominfo` `Max memory` of `2097152 KiB` is **not** a bug when the task said 2048 MiB. Convert units first.
 > - Do not report a memory mismatch based on `Used memory`. If it looks low, check whether it just reflects live ballooning; `Max memory` is the entitlement the task cares about.

@@ -56,7 +56,30 @@ Read that top to bottom every time something misbehaves. If `virsh list` shows a
 The daemon has historically been a single `libvirtd`. Recent libvirt splits it into per-hypervisor daemons — `virtqemud` for QEMU/KVM — plus side daemons like `virtnetworkd`. You rarely need to care: `systemctl status libvirtd` on an older host, `systemctl status virtqemud` on a newer one, and `virsh` finds whichever is present.
 
 > [!TIP]
-> **Try it — see the three layers at once.** With a domain running, run `virsh list` to get its state, then on the host run `pgrep -af qemu-system` and `ps -o pid,cmd -p "$(pgrep -f "guest=inventory-db")"`. You are looking at the exact QEMU command line the daemon built from the XML: the `-m` value is the memory, `-smp` is the vCPUs, each `-drive` is a `--disk` you asked for. Nothing in that command line came from you directly — the daemon derived all of it.
+> **Try it — find the daemon, confirm no domains yet.**
+>
+> The playground from the callout under the landing page's H1 is already up. Get a shell on the host:
+>
+> ```sh
+> astrona ssh astro-libvirt-vm-lifecycle
+> ```
+>
+> Then, on that host:
+>
+> ```sh
+> systemctl is-active libvirtd
+> sudo virsh list --all
+> ```
+>
+> Expect something like:
+>
+> ```text
+> active
+>  Id   Name   State
+> --------------------
+> ```
+>
+> The daemon (middle layer) is running; the bottom layer has no QEMU process yet because no domain is defined — you define `inventory-db` in Part 2. Later checkpoints run commands directly on this host; they do not repeat the `astrona ssh` line.
 
 ## The connection URI decides *which* libvirt you manage
 
@@ -77,6 +100,23 @@ For this module, always use the system instance:
 # either run everything through sudo, or export this once per shell:
 export LIBVIRT_DEFAULT_URI=qemu:///system
 ```
+
+> [!TIP]
+> **Try it — see the two worlds.** On the playground host, ask `virsh` which URI it picked, as yourself and then as root:
+>
+> ```sh
+> virsh uri
+> sudo virsh uri
+> ```
+>
+> Expect something like:
+>
+> ```text
+> qemu:///session
+> qemu:///system
+> ```
+>
+> Same binary, two different registries. Anything you do in the rest of this module goes through `qemu:///system`, so prefix `virsh` with `sudo` (or export the variable above). A domain you define under `sudo` genuinely will not show up in a bare `virsh list --all`.
 
 ## The domain XML is the definition; everything else refers to it
 
@@ -111,8 +151,29 @@ sudo ls -l /etc/libvirt/qemu/
 - Do **not** hand-edit that file with a text editor. The daemon caches definitions in memory and only re-reads this directory on restart; your edit will be silently overwritten the next time anything calls `virsh define`. Use `virsh edit`, which locks, validates, and reloads.
 - Copying `inventory-db.xml` to another host is *most* of a migration, but not all of it — anything libvirt tracks as separate metadata (autostart, snapshots) is not inside that file. Part 4 shows exactly what autostart stores instead.
 
+The `inventory-db` domain does not exist yet — you build it in Part 2. But the same "a definition is a file on disk, and `virsh` reads it through the daemon" rule already applies to the `default` NAT network the playground set up, so you can see the pattern now.
+
 > [!TIP]
-> **Try it — prove the file is the domain.** Run `sudo virsh dumpxml inventory-db > /tmp/before.xml`, then `sudo diff <(sudo cat /etc/libvirt/qemu/inventory-db.xml) /tmp/before.xml`. On a *stopped* domain the two are nearly identical. Start the domain, dump again, and diff the new dump against `/tmp/before.xml`: the additions — `<address ...>` lines under each device, an `<alias>` here and there — are the live-only details QEMU chose at boot.
+> **Try it — a definition is a file.** On the playground host:
+>
+> ```sh
+> sudo ls /etc/libvirt/qemu/            # no domain XML yet
+> sudo ls /etc/libvirt/qemu/networks/   # but the 'default' network is here
+> diff <(sudo virsh net-dumpxml default) <(sudo cat /etc/libvirt/qemu/networks/default.xml)
+> ```
+>
+> Expect something like:
+>
+> ```text
+> networks
+> default.xml
+> 1c1
+> < <network>
+> ---
+> > <network connections='1'>
+> ```
+>
+> The only difference is a live-only `connections='1'` attribute the daemon adds in memory — exactly the persistent-vs-live split described above, here for a network instead of a domain. After you define `inventory-db` in Part 2, `sudo ls /etc/libvirt/qemu/` will show `inventory-db.xml` next to `networks/`.
 
 > *A domain is one guest; its XML file under `/etc/libvirt/qemu/` is the definition, and `virsh` is a client that edits or acts on that file through the daemon — never touch the file directly.*
 

@@ -36,8 +36,32 @@ watch -n1 virsh list --all
 
 If the guest has no ACPI handler installed (`acpid` missing on some minimal images), is hung, or is mid-crash, the event lands on the floor. The domain never leaves `running`. It will sit there indefinitely, waiting for a cooperation that is not coming. That is the signal to escalate.
 
+The playground's `inventory-db` has an **empty** disk — no OS, so nothing inside it listens for the ACPI event. That makes it a perfect demonstration of the stuck case: `virsh shutdown` returns success and the domain never stops.
+
 > [!TIP]
-> **Try it — watch the asynchronous gap.** In one terminal: `watch -n1 virsh list --all`. In another: `virsh shutdown inventory-db`. The command returns instantly, and for a few seconds the `watch` pane still shows `running` — that is the guest running its shutdown scripts. Then it flips to `shut off`. Now `virsh start inventory-db`, wait for it to boot, and try `virsh shutdown` on a guest you have deliberately broken ACPI on (or just a guest still in early boot before `acpid` starts): the state stays `running` and never changes. That stuck state is exactly when `destroy` is the right call.
+> **Try it — a shutdown request that goes nowhere.** `inventory-db` should be `running` (re-`start` it if a previous checkpoint left it stopped). On the host:
+>
+> ```sh
+> sudo virsh start inventory-db 2>/dev/null; sleep 2
+> sudo virsh shutdown inventory-db
+> sudo virsh list --all
+> sleep 10
+> sudo virsh list --all
+> ```
+>
+> Expect something like:
+>
+> ```text
+> Domain 'inventory-db' is being shut down
+>  Id   Name          State
+> -----------------------------
+>  6    inventory-db  running
+>  Id   Name          State
+> -----------------------------
+>  6    inventory-db  running
+> ```
+>
+> The command reported success and returned immediately — but ten seconds later the domain is still `running`, and it will stay that way forever. No OS caught the power-button event. On a real guest with `systemd` (or `acpid`) running, the second `virsh list --all` would instead show `shut off`, after a short delay while the guest ran its shutdown scripts. Either way, `virsh shutdown` returning tells you nothing — you confirm with `virsh list`.
 
 ## `virsh destroy` — pull the cord now
 
@@ -62,6 +86,33 @@ Despite the name, `destroy` **deletes nothing** — not the domain definition, n
 `destroy` is **synchronous and unconditional**: by the time the command returns, the domain is `shut off`. It always works — there is no guest cooperation to fail.
 
 The cost is real: an unclean stop can leave the guest filesystem needing a journal replay on next boot, and any application data still in guest RAM is lost. Modern journalling filesystems almost always recover cleanly, but "almost always" is why `destroy` is the escalation, not the default.
+
+> [!TIP]
+> **Try it — the stop that always works.** Following straight on from the previous checkpoint, `inventory-db` is still stuck `running` after the ignored `shutdown`. Escalate:
+>
+> ```sh
+> pgrep -af "guest=inventory-db" | head -1
+> sudo virsh destroy inventory-db
+> sudo virsh list --all
+> pgrep -af "guest=inventory-db" | head -1 || echo "(qemu process gone)"
+> sudo ls /etc/libvirt/qemu/inventory-db.xml
+> sudo virsh start inventory-db
+> ```
+>
+> Expect something like:
+>
+> ```text
+> 12874 /usr/bin/qemu-system-x86_64 -name guest=inventory-db,debug-threads=on ...
+> Domain 'inventory-db' destroyed
+>  Id   Name          State
+> -----------------------------
+>  -    inventory-db  shut off
+> (qemu process gone)
+> /etc/libvirt/qemu/inventory-db.xml
+> Domain 'inventory-db' started
+> ```
+>
+> `destroy` returned with the domain already `shut off` — no delay, no polling — and the QEMU process is gone. The definition file is untouched, so `virsh start` brings it right back. That is the difference from `undefine`, covered just below.
 
 Analogy (flagged as analogy): `shutdown` versus `destroy` is the difference between *asking someone to finish what they're doing and leave the room*, versus *cutting the lights and locking the door regardless of whether they're mid-sentence*. Both end with an empty room. Only one gives the occupant a chance to save their work first. Where it breaks down: a hung guest is someone who has already stopped responding to any request — at that point locking the door is the only move left.
 
