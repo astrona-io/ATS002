@@ -223,6 +223,26 @@ modules:
         path: sections/section-030/module-02/course.md
 
       - type: reading
+        title: "Module 2.1: The domain and the libvirt stack"
+        path: sections/section-030/module-02/course-01-domain-and-the-libvirt-stack.md
+
+      - type: reading
+        title: "Module 2.2: Defining a domain around an existing disk"
+        path: sections/section-030/module-02/course-02-defining-around-an-existing-disk.md
+
+      - type: reading
+        title: "Module 2.3: Persistent vs. transient — the domain lifecycle"
+        path: sections/section-030/module-02/course-03-persistent-vs-transient-lifecycle.md
+
+      - type: reading
+        title: "Module 2.4: Autostart and reading a domain's true state"
+        path: sections/section-030/module-02/course-04-autostart-and-reading-true-state.md
+
+      - type: reading
+        title: "Module 2.5: Graceful shutdown vs. hard power-off"
+        path: sections/section-030/module-02/course-05-graceful-shutdown-vs-hard-destroy.md
+
+      - type: reading
         title: Question
         path: labs/section-030/module-02/lab-01/question.md
 

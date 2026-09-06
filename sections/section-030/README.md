@@ -30,6 +30,11 @@ This section is divided into two focused modules, each paired with a dedicated h
 
 ### 2. libvirt Virtual Machine Lifecycle
 *   **Module Reader:** **[Module 2: libvirt Virtual Machine Lifecycle](./module-02/course.md)**
+    1.  [The domain and the libvirt stack](./module-02/course-01-domain-and-the-libvirt-stack.md)
+    2.  [Defining a domain around an existing disk](./module-02/course-02-defining-around-an-existing-disk.md)
+    3.  [Persistent vs. transient — the domain lifecycle](./module-02/course-03-persistent-vs-transient-lifecycle.md)
+    4.  [Autostart and reading a domain's true state](./module-02/course-04-autostart-and-reading-true-state.md)
+    5.  [Graceful shutdown vs. hard power-off](./module-02/course-05-graceful-shutdown-vs-hard-destroy.md)
 *   **Practice Lab Sandbox:** **`labs/section-030/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
