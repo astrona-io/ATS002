@@ -25,6 +25,25 @@ sudo readlink -f /proc/1235/exe
 
 **Why before the kill:** `/proc/PID/` is a live window into a running task, not a record. The moment the process exits, `/proc/1235/` is gone entirely — `readlink /proc/1235/exe` returns `No such file or directory`. Kill first and the path you needed no longer exists to look up. Graders and real postmortems check specifically for this ordering.
 
+> [!TIP]
+> **Try it — resolve first, then watch `/proc` vanish.** On the host, using `collector3` (safe to stop — it just sleeps):
+>
+> ```bash
+> P=$(pgrep -f collector3)
+> sudo readlink -f /proc/$P/exe
+> sudo systemctl stop collector3.service
+> sudo readlink -f /proc/$P/exe 2>&1
+> ```
+>
+> Expect something like:
+>
+> ```text
+> /bin/bash
+> readlink: /proc/733/exe: No such file or directory
+> ```
+>
+> The real backing binary is `/bin/bash` — not "collector3", because these are scripts. And the instant the service stopped, `/proc/$P/` was gone; the resolve had to happen first. (`systemctl start collector3.service` to bring it back.)
+
 ```
   confirmed PID 1235
         │

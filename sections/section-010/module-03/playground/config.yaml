@@ -1,0 +1,28 @@
+# kernel-modules playground — a clean sandbox, no task, no grading.
+metadata:
+  name: "kernel-modules-lab"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Ensures kmod tooling is present. The dummy and pcspkr modules ship with the kernel; nothing is loaded or configured."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 15
+      display: false
+      sshPasswordAuth: false

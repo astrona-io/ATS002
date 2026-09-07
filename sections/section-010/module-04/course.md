@@ -1,5 +1,14 @@
 # Chapter 4: udev — Giving a Device a Name It Can Keep
 
+<!-- astrona:playground -->
+> [!NOTE]
+> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS002/tree/main/sections/section-010/module-04/playground)
+>
+> ```sh
+> astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-04/playground
+> astrona destroy udev-stable-naming
+> ```
+
 `/dev/sdb` is not a promise, it is a race result: the letter is assigned in the order the kernel discovered devices this boot, tied to nothing about the physical drive. Plug in an unrelated USB stick that gets probed first and your intended disk shifts a letter with no warning — and a backup script with `/dev/sdb1` hardcoded quietly starts writing the wrong device. `udev` is the fix: it turns kernel device-discovery events into `/dev` nodes by running rules, and you can write a rule that recognises one specific physical device by an attribute it actually carries — a serial number — and hands it a name of your choosing.
 
 Three short parts; work them in order.
@@ -24,7 +33,9 @@ After this module you can:
 
 ## Before you start
 
-Assumed: Chapter 3's automatic-versus-explicit load idea (udev is what fires those automatic loads), a Linux shell, `sudo`, and reading `ls -l` symlink output. There is no dedicated playground; every command block states the shell and privilege it assumes. The rule examples are safe to write and reload on any host — they only add symlinks — though you need a real second disk to see one match.
+Assumed: Chapter 3's automatic-versus-explicit load idea (udev is what fires those automatic loads), a Linux shell, `sudo`, and reading `ls -l` symlink output.
+
+The playground (callout above) is a throwaway Ubuntu 24.04 VM with a **spare 1 GiB disk `/dev/vdc`, serial `BACKUPWD42`**, attached so you have a real device to write a rule for (`vda` is the OS disk, `vdb` the cloud-init disk). Get a shell with `astrona ssh astro-udev-stable-naming`. The **Try it** checkpoints in Parts 1–3 run there; every command block also states the shell and privilege it assumes.
 
 ## Where this fits
 

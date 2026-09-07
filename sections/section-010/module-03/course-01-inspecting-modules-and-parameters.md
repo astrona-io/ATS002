@@ -53,6 +53,27 @@ cat /sys/module/dummy/parameters/numdummies
 
 `/sys/module/<name>/` also carries `refcnt` (same number `lsmod` shows), `holders/` (the dependent modules), and `initstate` (`live`).
 
+> [!TIP]
+> **Try it — inspect before you load.** On the playground host (`astrona ssh astro-kernel-modules-lab`):
+>
+> ```bash
+> lsmod | head -3
+> modinfo -p dummy
+> modinfo -F depends dummy
+> ```
+>
+> Expect something like:
+>
+> ```text
+> Module                  Size  Used by
+> nf_tables             229376  1
+> ...
+> numdummies:Number of dummy pseudo devices (int)
+>
+> ```
+>
+> `modinfo -p` shows `dummy` accepts exactly one parameter, `numdummies`, an `int`. `depends` is blank — nothing has to load first. Now you know the real name to pass, instead of guessing.
+
 > [!WARNING]
 > - **Guessing a parameter name.** A misspelled `key=` on `modprobe` may be silently dropped, not rejected. `modinfo -p` first, every time.
 > - **Assuming a config file reflects the loaded state.** `/sys/module/<name>/parameters/` is what the module is running with now; a `.conf` under `/etc` is only what a *future* load will use (Part 3).

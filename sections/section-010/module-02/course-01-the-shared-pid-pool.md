@@ -49,6 +49,25 @@ ps -eLf | wc -l
 
 `-L` is the flag that matters: it prints **one line per thread**, not per process, so the count is the true number of tasks competing for the pool. Compare that to `sysctl -n kernel.pid_max`. Close to the ceiling → this part's problem. Far below it → the ceiling in Part 2 that is actually clamping you is a narrower one.
 
+> [!TIP]
+> **Try it — pool size vs. what's running.** On the playground host (`astrona ssh astro-process-limits-ceilings`):
+>
+> ```bash
+> sysctl -n kernel.pid_max
+> ps -e | wc -l          # processes
+> ps -eLf | wc -l        # processes AND threads
+> ```
+>
+> Expect something like:
+>
+> ```text
+> 4194304
+> 142
+> 380
+> ```
+>
+> The thread count (`-eLf`) is well above the process count — every one of those extra lines is a slot from the same pool. On this idle VM both are a rounding error against `pid_max`, so a "cannot fork" here would point at Part 2's narrower ceilings, not this one.
+
 > [!WARNING]
 > - **Trusting `top`'s task count.** The summary line counts processes; a thread-heavy workload's real task count comes from `ps -eLf | wc -l`.
 > - **Reading `Cannot allocate memory` as OOM.** `fork()` returns `EAGAIN` on PID exhaustion and glibc renders it with that string. Check `free -m` and the OOM-killer lines in `dmesg` before concluding it is memory.

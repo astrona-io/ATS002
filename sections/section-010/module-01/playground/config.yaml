@@ -1,0 +1,28 @@
+# sysctl live-kernel playground — a clean sandbox, no task, no grading.
+metadata:
+  name: "sysctl-live-kernel"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Nothing to build — procps and systemd are already present. Just prints a hint."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 15
+      display: false
+      sshPasswordAuth: false

@@ -1,0 +1,28 @@
+# systemd service-debugging playground — a clean sandbox, no task, no grading.
+metadata:
+  name: "systemd-service-debugging"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Installs apache2, then holds port 80 with a tiny listener so 'systemctl start apache2' fails with Address already in use — a real, reproducible failed unit to diagnose."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 15
+      display: false
+      sshPasswordAuth: false

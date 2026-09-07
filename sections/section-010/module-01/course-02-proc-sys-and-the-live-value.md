@@ -38,6 +38,25 @@ cat /proc/sys/net/ipv4/ip_forward
 
 `sysctl` is doing exactly that `open`/`read` under the hood, plus formatting. The top-level directories group the tunables by area: `kernel/` (identity, `pid_max`, `panic`), `net/` (per-protocol, per-interface networking), `vm/` (paging, `swappiness`, overcommit), `fs/` (`file-max`, inotify), `dev/`. `sysctl -a` dumps the whole tree; `sysctl -a --pattern 'net.ipv4.conf.*'` filters it.
 
+> [!TIP]
+> **Try it — the name and the path are the same file.** On the playground host:
+>
+> ```bash
+> sysctl net.ipv4.ip_forward
+> cat /proc/sys/net/ipv4/ip_forward
+> sysctl -n net.ipv4.ip_forward
+> ```
+>
+> Expect something like:
+>
+> ```text
+> net.ipv4.ip_forward = 0
+> 0
+> 0
+> ```
+>
+> Line 1 is the human form (`key = value`); lines 2 and 3 are the bare value — one via the procfs path, one via `sysctl -n`. All three asked the kernel the same question. The bare forms are what you redirect into a file.
+
 ## `-n` gives the bare value; the default gives `key = value`
 
 The default output — `net.ipv4.ip_forward = 0` — is for a human reading a terminal. Pipe it into a file that is supposed to hold *just* the number and the ` = ` is garbage. `-n` (`--values`) prints the value with no key:
@@ -57,6 +76,25 @@ On a minimal container or rescue image with no `procps` package there is no `sys
 ## "Live" means in-memory — not what a file says
 
 The single most important property: **`sysctl -n` reports the kernel's current in-memory value, obtained by asking the kernel, not by reading a config file.** If someone ran `sysctl -w net.ipv4.ip_forward=1` earlier in the session and saved it nowhere, `sysctl -n` still returns `1`, because that is what the kernel is actually doing right now. Config files under `/etc` describe what the value *should* be set to at boot; they are not consulted on a read. Part 3 is entirely about that gap.
+
+> [!TIP]
+> **Try it — read reports the kernel, not a file.** On the host:
+>
+> ```bash
+> grep -rs ip_forward /etc/sysctl.conf /etc/sysctl.d/ /usr/lib/sysctl.d/ || echo '(no config file mentions it)'
+> sudo sysctl -w net.ipv4.ip_forward=1
+> sysctl -n net.ipv4.ip_forward
+> ```
+>
+> Expect something like:
+>
+> ```text
+> (no config file mentions it)
+> net.ipv4.ip_forward = 1
+> 1
+> ```
+>
+> No file on disk says `ip_forward = 1`, yet `sysctl -n` returns `1` — because it asked the running kernel, which you just changed. Set it back with `sudo sysctl -w net.ipv4.ip_forward=0` before the next section.
 
 ## The same instinct elsewhere: timezone
 

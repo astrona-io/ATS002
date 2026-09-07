@@ -59,6 +59,30 @@ udevadm info --attribute-walk --name=/dev/sdc
 
 The two values that matter for Part 2: **`ATTRS{serial}`** (baked into the hardware) and **`SUBSYSTEM=="block"`** (scopes a rule to block devices, so the same ancestry chain does not also match unrelated subsystem nodes).
 
+> [!TIP]
+> **Try it — flat dump vs. ancestry walk.** The playground attached a spare disk `/dev/vdc` with serial `BACKUPWD42`. On the host (`astrona ssh astro-udev-stable-naming`):
+>
+> ```bash
+> lsblk -o NAME,SIZE,SERIAL
+> udevadm info --query=all --name=/dev/vdc | grep -E 'ID_SERIAL|DEVLINKS'
+> udevadm info --attribute-walk --name=/dev/vdc | grep -E 'KERNEL==|SUBSYSTEM==|ATTR\{serial\}|ATTRS\{serial\}'
+> ```
+>
+> Expect something like:
+>
+> ```text
+> vda   15G
+> vdb  366K
+> vdc    1G BACKUPWD42
+> E: ID_SERIAL=BACKUPWD42
+> E: DEVLINKS=/dev/disk/by-id/virtio-BACKUPWD42 ...
+>     KERNEL=="vdc"
+>     SUBSYSTEM=="block"
+>     ATTR{serial}=="BACKUPWD42"
+> ```
+>
+> For this virtio disk the serial sits on the device's own node (`ATTR{serial}`, and as the `ID_SERIAL` property). On real SCSI/SATA hardware `--attribute-walk` is where you would find it one level up as `ATTRS{serial}` — the walk is the mode that reaches parent nodes.
+
 > [!WARNING]
 > - **Matching on `/dev/sdX` or `KERNEL=="sdc"`.** That is the enumeration-order name — the exact thing you are trying to stop depending on.
 > - **Looking for the serial only at the leaf.** Use `--attribute-walk`; `ATTRS{}` on a parent is where serials usually are. A flat `--query=all` can miss it entirely.

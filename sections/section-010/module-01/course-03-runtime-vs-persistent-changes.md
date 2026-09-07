@@ -31,6 +31,25 @@ The lifecycle of a `-w`-only change:
 
 As an analogy (flagged): `sysctl -w` is writing on a whiteboard — fully real and readable now, but nobody photographed it and the board is wiped at reboot. Where it breaks down: a whiteboard keeps your writing until someone erases it; the kernel value is reconstructed from scratch on every boot, so "nobody changed it back" is not why it reverts — it is rebuilt from the config files regardless.
 
+> [!TIP]
+> **Try it — a `-w` change leaves no trace on disk.** On the host:
+>
+> ```bash
+> sudo sysctl -w vm.swappiness=10
+> sysctl -n vm.swappiness
+> sudo grep -rs swappiness /etc/sysctl.d/ /etc/sysctl.conf || echo '(nothing persisted)'
+> ```
+>
+> Expect something like:
+>
+> ```text
+> vm.swappiness = 10
+> 10
+> (nothing persisted)
+> ```
+>
+> The live value changed; no file recorded it. A reboot would restore whatever the config (or the compiled default, `60`) says. This is the "non-persistent" half of the exam objective.
+
 ## Persistence: a file the boot process re-reads
 
 To survive a reboot the setting must live in a `*.conf` file that the boot-time sysctl step reads. Drop it in `/etc/sysctl.d/`:
@@ -57,6 +76,28 @@ sudo sysctl --system
 ```
 
 Within the merged set, files are ordered by filename lexically across all directories, and a later name overrides an earlier one for any key it sets. That is why the convention is a numeric prefix: `99-ip-forward.conf` sorts after `10-network.conf`, so `99-` wins a conflict. `20-` beats `10-`; `99-` beats everything normal.
+
+> [!TIP]
+> **Try it — make it stick, and see which file won.** On the host:
+>
+> ```bash
+> echo 'vm.swappiness = 10' | sudo tee /etc/sysctl.d/99-swappiness.conf
+> echo 'vm.swappiness = 42' | sudo tee /etc/sysctl.d/10-swappiness.conf
+> sudo sysctl --system 2>&1 | grep swappiness
+> sysctl -n vm.swappiness
+> ```
+>
+> Expect something like:
+>
+> ```text
+> * Applying /etc/sysctl.d/10-swappiness.conf ...
+> vm.swappiness = 42
+> * Applying /etc/sysctl.d/99-swappiness.conf ...
+> vm.swappiness = 10
+> 10
+> ```
+>
+> Both files were read, in lexical order; `99-` was applied last, so `10` is the live value — not `42` from the numerically-lower, alphabetically-earlier file. `sysctl --system` also made it reboot-proof. Clean up: `sudo rm /etc/sysctl.d/{10,99}-swappiness.conf`.
 
 ```bash
 sysctl --system 2>&1 | grep ip_forward      # shows which file set the final value

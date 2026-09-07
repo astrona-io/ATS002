@@ -1,5 +1,14 @@
 # Chapter 2: Process Limits — pid_max, ulimit, and the Three Ceilings
 
+<!-- astrona:playground -->
+> [!NOTE]
+> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS002/tree/main/sections/section-010/module-02/playground)
+>
+> ```sh
+> astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-02/playground
+> astrona destroy process-limits-ceilings
+> ```
+
 When a Linux workload starts spawning processes and threads aggressively and begins getting `fork: retry: Resource temporarily unavailable`, there is not one limit in its way — there are three, enforced by three different kernel subsystems, completely independently of each other. Raising only one is the most common way an incident goes quiet for an hour and then comes back. This module walks all three: the machine-wide task pool (`kernel.pid_max`), the per-user cap (`ulimit -u` / `RLIMIT_NPROC`), and the per-service cgroup cap (`TasksMax=`) — how to tell which one is clamping, how to raise each so it sticks, and the fixed order to check them in.
 
 Three short parts; work them in order.
@@ -24,7 +33,9 @@ After this module you can:
 
 ## Before you start
 
-Assumed: Chapter 1 (`sysctl -w` vs `/etc/sysctl.d/` + `sysctl --system`), a Linux shell, `sudo`, and the idea of a systemd service. Familiarity with soft vs hard resource limits helps but is introduced here. There is no dedicated playground; every command block states the shell, user, and privilege it assumes, and runs on any systemd Linux host.
+Assumed: Chapter 1 (`sysctl -w` vs `/etc/sysctl.d/` + `sysctl --system`), a Linux shell, `sudo`, and the idea of a systemd service. Familiarity with soft vs hard resource limits helps but is introduced here.
+
+The playground (callout above) is a throwaway Ubuntu 24.04 VM with a `dataproc` user and a demo `data-ingest.service` running at `TasksMax=64`, so all three ceilings have something concrete to inspect. Get a shell with `astrona ssh astro-process-limits-ceilings`. The **Try it** checkpoints in Parts 1–3 run there; every command block also states the shell, user, and privilege it assumes.
 
 ## Where this fits
 

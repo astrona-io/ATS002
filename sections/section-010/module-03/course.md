@@ -1,5 +1,14 @@
 # Chapter 3: Kernel Modules — Loading, Parameters, and Blacklisting
 
+<!-- astrona:playground -->
+> [!NOTE]
+> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS002/tree/main/sections/section-010/module-03/playground)
+>
+> ```sh
+> astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-03/playground
+> astrona destroy kernel-modules-lab
+> ```
+
 Most of what a running kernel can do was not compiled into the kernel image — it is loaded on demand as **modules**: device drivers, filesystems, protocol handlers. A module is kernel configuration applied at runtime, and like the sysctl values in Chapter 1 it can be tuned with parameters, made to load automatically at boot, or explicitly suppressed so it never auto-loads even with its hardware present. This module covers all of that, and the one distinction every blacklist question turns on: the difference between an *automatic* load and an *explicit* one.
 
 Three short parts; work them in order.
@@ -24,7 +33,9 @@ After this module you can:
 
 ## Before you start
 
-Assumed: Chapter 1 (`/proc` and `/sys` as live-value filesystems, the `/etc/*.d/` persistent-config pattern), a Linux shell, and `sudo`. There is no dedicated playground; every command block states the shell and privilege it assumes, and the `dummy` / `pcspkr` examples are safe to run on any ordinary Linux host.
+Assumed: Chapter 1 (`/proc` and `/sys` as live-value filesystems, the `/etc/*.d/` persistent-config pattern), a Linux shell, and `sudo`.
+
+The playground (callout above) is a throwaway Ubuntu 24.04 VM with its **own real kernel**, so `modprobe` genuinely loads and unloads modules. Nothing is loaded at start. Get a shell with `astrona ssh astro-kernel-modules-lab`. The **Try it** checkpoints in Parts 1–3 use the always-available `dummy` module (the text keeps `pcspkr` as the real-world blacklist example; it may not exist for a VM kernel). Every command block also states the shell and privilege it assumes.
 
 ## Where this fits
 

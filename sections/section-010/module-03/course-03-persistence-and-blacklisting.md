@@ -49,6 +49,26 @@ cat /sys/module/dummy/parameters/numdummies
 
 The bare `modprobe dummy` reads `/etc/modprobe.d/dummy.conf` for its `options`. Seeing `2` come back proves the file — not your earlier command line — is driving the value.
 
+> [!TIP]
+> **Try it — the two files, and the reboot-free proof.** On the host:
+>
+> ```bash
+> echo 'dummy'                      | sudo tee /etc/modules-load.d/dummy.conf
+> echo 'options dummy numdummies=2' | sudo tee /etc/modprobe.d/dummy.conf
+> sudo modprobe -r dummy 2>/dev/null; sudo modprobe dummy     # bare load — no numdummies= typed
+> cat /sys/module/dummy/parameters/numdummies
+> ```
+>
+> Expect something like:
+>
+> ```text
+> dummy
+> options dummy numdummies=2
+> 2
+> ```
+>
+> `modules-load.d` would load it at boot; `modprobe.d` supplied `numdummies=2` to a load that never mentioned it. The `2` is proof the config, not a command line, is in charge — without waiting for a reboot.
+
 ## Blacklisting: blocks the automatic path only
 
 Opposite request: `pcspkr` (the PC-speaker beep driver) beeps on every kernel warning and must never auto-load again, even though its hardware is present.
@@ -81,6 +101,28 @@ lsmod | grep pcspkr        # absent → the blacklist is holding the automatic p
 ```
 
 `udevadm trigger` re-fires synthetic `add`/`change` uevents for already-present hardware — the closest thing to "reboot and let auto-detection run again" without restarting.
+
+> [!TIP]
+> **Try it — blacklist blocks auto, not explicit.** `pcspkr` may not exist for this VM kernel, so use `dummy` to see the mechanism. On the host:
+>
+> ```bash
+> echo 'blacklist dummy' | sudo tee /etc/modprobe.d/bl-dummy.conf
+> sudo modprobe -r dummy 2>/dev/null
+> modprobe --showconfig | grep -i 'blacklist dummy'
+> sudo modprobe dummy && echo "explicit load STILL WORKS"
+> lsmod | grep '^dummy'
+> ```
+>
+> Expect something like:
+>
+> ```text
+> blacklist dummy
+> blacklist dummy
+> explicit load STILL WORKS
+> dummy                  16384  0
+> ```
+>
+> The blacklist is registered, yet `modprobe dummy` by name loads it fine — a `blacklist` line only stops the *automatic*, uevent-driven load path. To block the explicit path too you would write `install dummy /bin/false`. Clean up: `sudo rm /etc/modprobe.d/bl-dummy.conf /etc/modprobe.d/dummy.conf /etc/modules-load.d/dummy.conf`.
 
 ## Early-boot modules and the initramfs
 

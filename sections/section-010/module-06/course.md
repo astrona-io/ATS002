@@ -1,5 +1,14 @@
 # Chapter 6: Debugging a Service That Won't Start with systemctl and journalctl
 
+<!-- astrona:playground -->
+> [!NOTE]
+> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS002/tree/main/sections/section-010/module-06/playground)
+>
+> ```sh
+> astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-06/playground
+> astrona destroy systemd-service-debugging
+> ```
+
 Someone tells you "the web server is down." You run `systemctl start apache2`, the shell pauses, and hands back `Job for apache2.service failed`. No stack trace, no obvious cause. But nothing here is mysterious: `systemd` ran the service, watched it fail, recorded the exit code, and captured every line the process wrote on its way down. All of it is already on the machine. This module is about reading that record in the right order instead of guessing at config files.
 
 Two tools do the work, and they sit at different layers. `systemctl` — *system control* — is a client of `systemd` running as PID 1; it reports what **state** a unit is in and why. `journalctl` — *journal control* — queries the **journal**, the structured store of everything every unit printed plus PID 1's own messages about starting and stopping them. The contrast to keep in mind: `systemctl status` is the verdict (ten lines, already summarised); `journalctl -u` is the full evidence. Read the verdict, then the evidence, then change a file — in that order.
@@ -29,7 +38,7 @@ After this module you can:
 
 Assumed: comfort with a Linux shell and `sudo`, editing a text config file, and the idea that `systemd` manages long-running services. Chapter 5 (`strace`) is useful adjacent context — it diagnoses a *running* process; this module diagnoses one that will not start or stay started — but it is not a prerequisite.
 
-There is no dedicated playground for this module yet. Every command block states the shell and privilege it assumes; run them against any `systemd` host with a service you can safely stop and start (`apache2` on Debian/Ubuntu, `httpd` on RHEL-family). A graded lab — `apache2` rigged to fail one of the four ways — is planned at `labs/section-010/module-06/lab-01`.
+The playground (callout above) is a throwaway Ubuntu 24.04 VM where **`apache2` is already `failed`** — a helper unit holds TCP 80, so it cannot bind — giving you a real failed unit with a genuine journal trail. Get a shell with `astrona ssh astro-systemd-service-debugging`. The **Try it** checkpoints in Parts 1–4 run there; every command block also states the shell and privilege it assumes. A graded lab is planned at `labs/section-010/module-06/lab-01`.
 
 ## Where this fits
 

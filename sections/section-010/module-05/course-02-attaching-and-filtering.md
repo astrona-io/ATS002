@@ -40,7 +40,28 @@ sudo strace -p 1235 -e trace=kill
 | `%network` | `socket`, `connect`, `bind`, `sendto`, … |
 | `%desc` | file-descriptor ops: `read`, `write`, `close`, `dup`, … |
 
-With `-e trace=kill` the terminal stays silent until a `kill()` actually fires. Useful companions:
+With `-e trace=kill` the terminal stays silent until a `kill()` actually fires.
+
+> [!TIP]
+> **Try it — attach and filter.** `collector2` sends itself a signal every ~10 s. On the host:
+>
+> ```bash
+> cat /proc/sys/kernel/yama/ptrace_scope
+> sudo strace -p "$(pgrep -f collector2)" -e trace=kill -tt
+> ```
+>
+> Expect something like (after up to ~10 s):
+>
+> ```text
+> 1
+> strace: Process 733 attached
+> 10:22:41.512  kill(733, SIGCONT)   = 0
+> 10:22:51.514  kill(733, SIGCONT)   = 0
+> ```
+>
+> `ptrace_scope` is `1`, which is why the attach needs `sudo`. The terminal is silent between firings — everything except `kill()` is filtered out. `Ctrl-C` to detach (the process then runs full-speed again).
+
+Useful companions:
 
 - **`-f`** — also trace children/threads the target spawns (`clone`). Essential for a multi-threaded or forking target.
 - **`-tt`** — wall-clock timestamp (microseconds) on each line; **`-T`** — time spent in each call.

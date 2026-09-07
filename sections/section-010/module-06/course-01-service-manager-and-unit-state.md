@@ -120,6 +120,31 @@ systemctl --failed
 
 On this Ubuntu image the web server unit is `apache2`; on RHEL-family systems it is `httpd`. Every `systemctl` subcommand takes the unit name with or without the `.service` suffix.
 
+> [!TIP]
+> **Try it — read a real failed unit.** In the playground `apache2` is already `failed`. On the host (`astrona ssh astro-systemd-service-debugging`):
+>
+> ```bash
+> systemctl status apache2
+> systemctl is-active apache2; systemctl is-enabled apache2; systemctl is-failed apache2
+> systemctl --failed
+> ```
+>
+> Expect something like:
+>
+> ```text
+> × apache2.service - The Apache HTTP Server
+>      Active: failed (Result: exit-code) since ...
+>     Process: ... ExecStart=/usr/sbin/apachectl start (code=exited, status=1/FAILURE)
+> ...
+> failed
+> disabled
+> failed
+>   UNIT            ... ACTIVE SUB    DESCRIPTION
+> × apache2.service ... failed failed The Apache HTTP Server
+> ```
+>
+> `Active: failed (Result: exit-code)` — the process ran and returned non-zero. `is-active`/`is-enabled`/`is-failed` each print one word. The embedded lines under `status` are a tail, not the whole log — Part 3 gets the rest.
+
 > [!WARNING]
 > The lines under a `systemctl status` report are a **truncated tail**, not "the logs". If the root-cause message scrolled past more than ~10 lines before the final failure, it is not shown here — go to `journalctl -u` (Part 3). Treating the `status` tail as complete is how people miss a cause that is sitting one screen up in the journal.
 

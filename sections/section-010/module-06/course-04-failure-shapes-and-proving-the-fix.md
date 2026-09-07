@@ -60,6 +60,23 @@ LISTEN 0      511          0.0.0.0:80        0.0.0.0:*     users:(("nginx",pid=3
 
 `-l` listening sockets, `-t` TCP, `-n` numeric ports (no `:http`), `-p` the owning process. Here `nginx` (pid 3901) holds `:80`. Stop it, reassign one of the two services, or (if it is a stale duplicate) clean it up — then restart apache2.
 
+> [!TIP]
+> **Try it — journal names the symptom, `ss` names the culprit.** The playground's `apache2` fails with exactly this shape. On the host:
+>
+> ```bash
+> systemctl status apache2 | grep -i 'bind\|address'
+> sudo ss -ltnp 'sport = :80'
+> ```
+>
+> Expect something like:
+>
+> ```text
+> ... (98)Address already in use: AH00072: make_sock: could not bind to address [::]:80
+> LISTEN 0 5 0.0.0.0:80 0.0.0.0:* users:(("socat",pid=812,fd=5))
+> ```
+>
+> A `socat` process (the playground's `port80-hog.service`) is holding `:80`. The next checkpoint clears it and proves the fix.
+
 ## Shape 3 — a dependency failed, or readiness timed out
 
 Two sub-cases, both showing as `Result: timeout` or `Failed to start` with no program error of its own:
@@ -143,6 +160,29 @@ systemctl is-active  apache2            # active
 ```
 
 A unit can be `active` but `disabled` (running now, gone after reboot — the classic "I only ran `start`"), or `enabled` but `inactive` (symlink present, will start next boot, not running yet). `enable --now` / `disable --now` set both together.
+
+> [!TIP]
+> **Try it — fix, verify, and make it stick.** Following straight on from the port checkpoint:
+>
+> ```bash
+> sudo systemctl stop port80-hog.service        # free :80
+> sudo systemctl restart apache2                 # config-level fix -> just restart
+> systemctl is-active apache2
+> systemctl is-enabled apache2
+> sudo systemctl enable --now apache2
+> systemctl is-enabled apache2
+> ```
+>
+> Expect something like:
+>
+> ```text
+> active
+> disabled
+> Created symlink /etc/systemd/system/multi-user.target.wants/apache2.service -> ...
+> enabled
+> ```
+>
+> After the restart it is `active` but still `disabled` — running now, gone after a reboot. `enable --now` creates the `.wants` symlink so it also comes up on boot. "Running and starts on boot" needs both, and `is-active` / `is-enabled` are the two separate checks.
 
 > [!WARNING]
 > Common pitfalls, one line each:

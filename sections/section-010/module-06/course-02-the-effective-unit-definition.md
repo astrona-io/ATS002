@@ -100,6 +100,28 @@ Type=forking
 
 `FragmentPath` = the base unit; `DropInPaths` = every fragment layered on it. If `DropInPaths` lists a file you did not expect, read it.
 
+> [!TIP]
+> **Try it — see the effective definition.** On the host:
+>
+> ```bash
+> systemctl cat apache2 | head -20
+> systemctl show apache2 -p FragmentPath -p DropInPaths -p ExecStart
+> ```
+>
+> Expect something like:
+>
+> ```text
+> # /usr/lib/systemd/system/apache2.service
+> [Unit]
+> Description=The Apache HTTP Server
+> ...
+> FragmentPath=/usr/lib/systemd/system/apache2.service
+> DropInPaths=/usr/lib/systemd/system/apache2.service.d/apache2-systemd.conf
+> ExecStart={ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl start ; ... }
+> ```
+>
+> `systemctl cat` shows the base plus every drop-in with its source path; `show -p` gives the computed values. Reading the vendor file alone would miss any `/etc/...d/` override.
+
 ## Editing, the safe way
 
 ```bash

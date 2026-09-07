@@ -50,6 +50,18 @@ Key types used above:
 
 `KERNEL=="sd*"` (the kernel name — avoid depending on it), `ACTION=="add"`, `ATTRS{idVendor}=="0781"` + `ATTRS{idProduct}=="5567"` (USB VID/PID when there is no serial), `ENV{ID_FS_UUID}=="…"`.
 
+> [!TIP]
+> **Try it — write the rule.** On the host, keyed on the serial the previous checkpoint found (this virtio disk exposes it as `ATTR{serial}`; the `ENV{ID_SERIAL}` form works too and is more portable):
+>
+> ```bash
+> sudo tee /etc/udev/rules.d/99-backup.rules > /dev/null <<'EOF'
+> SUBSYSTEM=="block", ENV{ID_SERIAL}=="BACKUPWD42", SYMLINK+="backup-drive"
+> EOF
+> cat /etc/udev/rules.d/99-backup.rules
+> ```
+>
+> Nothing happens yet — the file is on disk but udev has not re-read it and has not re-evaluated `/dev/vdc`. That is Part 3. Note the `==` on every condition and `+=` (not `=`) on `SYMLINK`, so the built-in `/dev/disk/by-id/` link is kept alongside your new name.
+
 > [!WARNING]
 > - **`=` where you meant `==`.** `SUBSYSTEM="block"` is an assignment, not a test; the rule silently stops filtering. Always `==` for conditions.
 > - **`ATTR{}` when the attribute is on a parent.** Use `ATTRS{}` (with S) for a serial/model that `--attribute-walk` showed under a *parent device*.

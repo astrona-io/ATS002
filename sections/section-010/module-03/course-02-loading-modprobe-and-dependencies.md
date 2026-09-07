@@ -68,6 +68,27 @@ cat /sys/module/dummy/parameters/numdummies
 
 If it still comes out as `2`, a config file is doing the work.
 
+> [!TIP]
+> **Try it — load with a parameter, live.** On the host:
+>
+> ```bash
+> sudo modprobe dummy numdummies=2
+> lsmod | grep dummy
+> cat /sys/module/dummy/parameters/numdummies
+> ip -br link show type dummy
+> ```
+>
+> Expect something like:
+>
+> ```text
+> dummy                  16384  0
+> 2
+> dummy0           DOWN           ...
+> dummy1           DOWN           ...
+> ```
+>
+> The module is loaded, `/sys/module/dummy/parameters/numdummies` confirms the value took, and two `dummyN` interfaces now exist. `sudo modprobe -r dummy` removes it again — this parameter was for this load only; nothing on disk remembers it.
+
 > [!WARNING]
 > - **`insmod` for anything with dependencies.** It will fail with `Unknown symbol in module`. Use `modprobe`, which resolves `modules.dep`.
 > - **Expecting a command-line `key=value` to persist.** It applies to that one load only. Persistence is a `/etc/modprobe.d/` `options` line (Part 3).

@@ -32,6 +32,27 @@ sudo udevadm trigger --subsystem-match=block
 
 `--reload-rules` alone runs cleanly, prints nothing, and looks like it worked — while doing nothing to the device you care about. Always follow it with `trigger` (or `udevadm trigger --action=add --name-match=sdc` for just the one device).
 
+> [!TIP]
+> **Try it — the two steps, and what each one does.** With `99-backup.rules` from Part 2 in place, on the host:
+>
+> ```bash
+> ls -l /dev/backup-drive 2>&1                       # not there yet
+> sudo udevadm control --reload-rules
+> ls -l /dev/backup-drive 2>&1                       # STILL not there — rule loaded, device not re-evaluated
+> sudo udevadm trigger --subsystem-match=block
+> ls -l /dev/backup-drive
+> ```
+>
+> Expect something like:
+>
+> ```text
+> ls: cannot access '/dev/backup-drive': No such file or directory
+> ls: cannot access '/dev/backup-drive': No such file or directory
+> lrwxrwxrwx 1 root root 3 ... /dev/backup-drive -> vdc
+> ```
+>
+> The symlink appears only after `trigger` — `--reload-rules` by itself changed nothing observable. That gap is the trap.
+
 ## Dry-run a rule before trusting it
 
 ```bash
@@ -39,6 +60,24 @@ udevadm test "$(udevadm info -q path -n /dev/sdc)" 2>&1 | grep -E 'SYMLINK|backu
 ```
 
 `udevadm test` runs the full rule processing for one device **without changing `/dev`**, printing every rule that matched and every property/symlink it would set. This is how you confirm a rule matches *before* `trigger` makes it real — invaluable when a rule silently does not fire.
+
+> [!TIP]
+> **Try it — dry-run the rule.** On the host:
+>
+> ```bash
+> udevadm test "$(udevadm info -q path -n /dev/vdc)" 2>&1 | grep -Ei '99-backup|SYMLINK|backup-drive'
+> ```
+>
+> Expect something like:
+>
+> ```text
+> Reading rules file: /etc/udev/rules.d/99-backup.rules
+> ... LINK 'backup-drive' /etc/udev/rules.d/99-backup.rules:1
+> ID_SERIAL=BACKUPWD42
+> DEVLINKS=/dev/disk/by-id/virtio-BACKUPWD42 /dev/backup-drive
+> ```
+>
+> The line naming your rule file and `LINK 'backup-drive'` confirms the rule matched and which line did it — no change to `/dev` was made. Use this to debug a rule that is not firing before reaching for `trigger`.
 
 ## Watch it live
 

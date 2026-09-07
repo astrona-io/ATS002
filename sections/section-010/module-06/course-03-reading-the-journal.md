@@ -103,6 +103,25 @@ Concrete. `journalctl -eu apache2` after a failed start:
 
 Seven lines, one cause. `no listening sockets`, `Unable to open logs`, `Control process exited`, `Failed with result`, `Failed to start` are all **downstream** of the first real error: `(98)Address already in use` on `:80`. Read a cascade top-down and stop at the first line that names a concrete fault — the rest is the process and the manager unwinding from it. Part 4 maps that first line to a fix.
 
+> [!TIP]
+> **Try it — read the cascade to its first error.** On the host:
+>
+> ```bash
+> journalctl -u apache2 -b --no-pager | tail -20
+> ```
+>
+> Expect something like:
+>
+> ```text
+> ... systemd[1]: Starting The Apache HTTP Server...
+> ... apachectl[…]: (98)Address already in use: AH00072: make_sock: could not bind to address [::]:80
+> ... apachectl[…]: no listening sockets available, shutting down
+> ... systemd[1]: apache2.service: Failed with result 'exit-code'.
+> ... systemd[1]: Failed to start The Apache HTTP Server.
+> ```
+>
+> Five-plus lines, one root cause. The bind failure on `:80` is the first concrete error; everything below it is apache and systemd unwinding. `Failed to start …` at the bottom is the least useful line.
+
 > [!WARNING]
 > - **`-p err` can hide the cause.** Plenty of daemons log their fatal reason at `warning` or `notice` and only the generic "exiting" at `err`. If `-p err` shows nothing useful, widen to `-p warning` or drop `-p` entirely.
 > - **An empty `-b -1` means "not retained", not "no errors".** Check `Storage=` before concluding the previous boot was fine.

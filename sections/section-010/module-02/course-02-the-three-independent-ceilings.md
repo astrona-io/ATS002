@@ -54,6 +54,25 @@ ulimit -Hu       # hard limit — the ceiling the soft one may be raised to with
 
 Soft vs hard: the soft limit is enforced; an unprivileged process may raise its own soft limit up to the hard limit but not above; root can raise the hard limit.
 
+> [!TIP]
+> **Try it — the per-user cap, for two different users.** On the host:
+>
+> ```bash
+> ulimit -u          # your shell's soft limit
+> ulimit -Hu         # the hard ceiling it could rise to
+> sudo -u dataproc bash -c 'ulimit -u'
+> ```
+>
+> Expect something like:
+>
+> ```text
+> 7877
+> 7877
+> 7877
+> ```
+>
+> This is `RLIMIT_NPROC` — counted against the real UID, shared across all of that user's sessions and services. It is nowhere near `kernel.pid_max` from the previous checkpoint: two entirely separate limits.
+
 ### Ceiling 3 — `TasksMax=` (per systemd unit)
 
 If the workload runs as a systemd service there is a third cap, in the cgroup layer:
@@ -69,6 +88,23 @@ TasksCurrent=4102
 ```
 
 `man systemd.resource-control` → `TasksMax=` counts every process **and thread** in the unit's cgroup (via the cgroup `pids` controller) — Part 1's "threads count too", enforced at unit scope. A unit with no explicit `TasksMax=` inherits `DefaultTasksMax=` from `/etc/systemd/system.conf`, which is commonly **15% of `kernel.pid_max`**, computed once at manager start. So raising `pid_max` nudges that default up — but not live-linked, and 15% of even a large `pid_max` is often still below what a genuinely thread-heavy unit needs.
+
+> [!TIP]
+> **Try it — a per-unit cap that is neither of the other two.** The playground's `data-ingest.service` was started with `TasksMax=64`. On the host:
+>
+> ```bash
+> systemctl show data-ingest.service -p TasksMax -p TasksCurrent -p DefaultTasksMax
+> ```
+>
+> Expect something like:
+>
+> ```text
+> TasksMax=64
+> TasksCurrent=1
+> DefaultTasksMax=629145
+> ```
+>
+> `TasksMax=64` is this unit's explicit cgroup cap — far below both `kernel.pid_max` (4194304) and `ulimit -u` (~7877), and below `DefaultTasksMax` (15% of `pid_max`) that a unit *without* its own setting would inherit. A workload in this unit hits `64` first, no matter how much room the other two ceilings have.
 
 ## Why "fixed it, broke again in an hour"
 

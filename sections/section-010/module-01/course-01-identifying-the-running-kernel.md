@@ -41,6 +41,25 @@ cat /proc/version                 # all three, plus the compiler, on one line
 
 Those `/proc/sys/kernel/*` files are the first hint of Part 2's model: the values `uname` prints are just sysctl parameters.
 
+> [!TIP]
+> **Try it — the same fact, three ways.** On the playground host (`astrona ssh astro-sysctl-live-kernel`):
+>
+> ```bash
+> uname -r
+> cat /proc/sys/kernel/osrelease
+> uname -v
+> ```
+>
+> Expect something like:
+>
+> ```text
+> 6.8.0-45-generic
+> 6.8.0-45-generic
+> #45-Ubuntu SMP PREEMPT_DYNAMIC Wed Sep  4 12:34:56 UTC 2025
+> ```
+>
+> The first two match exactly — `uname -r` is reading the same value as `/proc/sys/kernel/osrelease`. The third, `-v`, is a completely different string: the build banner. Version numbers vary by image; the point is that `-r` and `-v` are not the same field.
+
 ## Redirection creates the file, never the directory
 
 A task often says "write it to `/opt/course/1/kernel`." The instinct is:
@@ -60,6 +79,24 @@ cat /opt/course/1/kernel          # verify — always read it back
 ```
 
 `mkdir -p` creates every missing parent and does not error if the directory already exists, so it is safe to run unconditionally.
+
+> [!TIP]
+> **Try it — watch the redirect fail, then fix it.** On the host:
+>
+> ```bash
+> uname -r > /tmp/deep/kernel; echo "exit=$?"
+> mkdir -p /tmp/deep && uname -r > /tmp/deep/kernel && cat /tmp/deep/kernel
+> ```
+>
+> Expect something like:
+>
+> ```text
+> bash: /tmp/deep/kernel: No such file or directory
+> exit=1
+> 6.8.0-45-generic
+> ```
+>
+> The first line writes nothing and exits `1` because `/tmp/deep` does not exist — the shell could not open the target. `mkdir -p` first, then the redirect lands and reading it back confirms it.
 
 > [!WARNING]
 > Two ways this bites on a timed exam:

@@ -1,5 +1,14 @@
 # Chapter 1: Reading and Reshaping the Live Kernel with sysctl
 
+<!-- astrona:playground -->
+> [!NOTE]
+> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS002/tree/main/sections/section-010/module-01/playground)
+>
+> ```sh
+> astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-01/playground
+> astrona destroy sysctl-live-kernel
+> ```
+
 The Linux kernel exposes thousands of tunable values — how aggressively it swaps, whether it forwards packets, how large the process-ID pool is — and nearly all of them are readable, and most are writable, while the system runs. They live in one virtual filesystem, `/proc/sys`, and the friendly front end for reading and turning them is `sysctl`. The contrast that makes this a *topic* rather than a one-liner: a change you make with `sysctl -w` is real immediately and gone at the next reboot, while a change written into the right file under `/etc` is both immediate and permanent — and telling those apart is the whole exam objective.
 
 This module is split into three short parts; work them in order.
@@ -23,7 +32,9 @@ After this module you can:
 
 ## Before you start
 
-Assumed: a Linux shell, `sudo`, output redirection, and reading a plain text file. No prior kernel-tuning experience. There is no dedicated playground for this module; every command block states the shell and privilege it assumes and runs on any ordinary Linux host (the write examples need root and are harmless to try — `net.ipv4.ip_forward` on a non-router changes nothing you will notice).
+Assumed: a Linux shell, `sudo`, output redirection, and reading a plain text file. No prior kernel-tuning experience.
+
+The playground (callout above) is a throwaway Ubuntu 24.04 VM with its own real kernel, so the `sysctl -w` and drop-in examples genuinely change and persist kernel state. Get a shell with `astrona ssh astro-sysctl-live-kernel`. The **Try it** checkpoints in Parts 1–3 run there; every command block also states the shell and privilege it assumes, so the text stands alone without the VM.
 
 ## Where this fits
 

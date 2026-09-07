@@ -66,6 +66,22 @@ Two steps are non-optional and each does a distinct thing:
 
 `TasksMax=infinity` removes the per-unit cap entirely (falling back to ceilings 1 and 2). In production a large finite number is safer: it stops one runaway unit from consuming the whole machine's PID space, which is the safety rail `TasksMax=` exists to be.
 
+> [!TIP]
+> **Try it — override, and see why `daemon-reload` alone is not enough.** On the host, raise `data-ingest.service`'s cap with a drop-in written by hand (so the two steps are visible):
+>
+> ```bash
+> sudo mkdir -p /etc/systemd/system/data-ingest.service.d
+> printf '[Service]\nTasksMax=200000\n' | sudo tee /etc/systemd/system/data-ingest.service.d/override.conf
+> systemctl show data-ingest.service -p TasksMax           # still 64 — manager hasn't re-read
+> sudo systemctl daemon-reload
+> systemctl show data-ingest.service -p TasksMax           # now the PLAN says 200000
+> cat /sys/fs/cgroup/system.slice/data-ingest.service/pids.max   # but the live cgroup still says 64
+> sudo systemctl restart data-ingest.service
+> cat /sys/fs/cgroup/system.slice/data-ingest.service/pids.max   # now 200000
+> ```
+>
+> `daemon-reload` updated the plan; the running cgroup's `pids.max` did not change until `restart` created a fresh cgroup. That is why the fix is *both* commands.
+
 ## The triage order
 
 When "cannot fork" lands, check in this order — widest scope to narrowest — and check **all three**, because a fix at one level is masked until the real clamp also moves:

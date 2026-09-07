@@ -1,5 +1,14 @@
 # Chapter 5: Catching a Process in the Act with strace
 
+<!-- astrona:playground -->
+> [!NOTE]
+> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS002/tree/main/sections/section-010/module-05/playground)
+>
+> ```sh
+> astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-05/playground
+> astrona destroy strace-process-forensics
+> ```
+
 You are handed a process and told something in it is misbehaving, and you need proof — no source code, and the binary running now may not match anything in a repo. What you have is a live process, and Linux lets you stand next to it and watch every request it makes to the kernel. That tool is `strace`. This module is using it as a live-attach-and-filter instrument, plus the discipline that matters as much as the trace itself: resolving a process's real on-disk binary before you kill it, and never removing a path you guessed from its name.
 
 Three short parts; work them in order.
@@ -24,7 +33,9 @@ After this module you can:
 
 ## Before you start
 
-Assumed: a Linux shell, `sudo`, signals (`SIGTERM` / `SIGKILL`), and `/proc/PID/` basics from earlier chapters. `kernel.yama.ptrace_scope` is a sysctl (Chapter 1). There is no dedicated playground; every command block states the shell and privilege it assumes, and the techniques are safe to practise against a sleep loop or a test script you start yourself.
+Assumed: a Linux shell, `sudo`, signals (`SIGTERM` / `SIGKILL`), and `/proc/PID/` basics from earlier chapters. `kernel.yama.ptrace_scope` is a sysctl (Chapter 1).
+
+The playground (callout above) is a throwaway Ubuntu 24.04 VM running three demo services — **`collector1`, `collector2`, `collector3`** — where `collector2` makes a `kill()` syscall every ~10 s, so `strace -e trace=kill` catches something real. Get a shell with `astrona ssh astro-strace-process-forensics`. The **Try it** checkpoints in Parts 1–3 run there; every command block also states the shell and privilege it assumes.
 
 ## Where this fits
 

@@ -34,6 +34,27 @@ Two flags carry the weight:
 
 `pgrep` uses an extended regex, unanchored: `pgrep -a -f '^/usr/local/bin/collector[0-9]+$'` tightens it if the loose match is too broad.
 
+> [!TIP]
+> **Try it — name to confirmed PIDs.** On the playground host (`astrona ssh astro-strace-process-forensics`):
+>
+> ```bash
+> pgrep -a -f collector
+> ps -o pid,user,etimes,cmd -p "$(pgrep -f collector2)"
+> tr '\0' ' ' < /proc/"$(pgrep -f collector2)"/cmdline; echo
+> ```
+>
+> Expect something like:
+>
+> ```text
+> 731 /bin/bash /usr/local/bin/collector1
+> 733 /bin/bash /usr/local/bin/collector2
+> 735 /bin/bash /usr/local/bin/collector3
+> 733 root      612 /bin/bash /usr/local/bin/collector2
+> /bin/bash /usr/local/bin/collector2
+> ```
+>
+> `-f` matched the full command line, so `collector2` was found even though `comm` is `bash` (these are shell scripts). PIDs and `etimes` vary; the point is you now have one specific PID you have eyeballed, not a guess.
+
 ## Confirm before you act
 
 The pattern can over-match. Cross-check each candidate:

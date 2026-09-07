@@ -1,0 +1,28 @@
+# strace process-forensics playground — a clean sandbox, no task, no grading.
+metadata:
+  name: "strace-process-forensics"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Installs strace and starts three 'collector' background processes (one of which periodically sends a signal) so there is something to trace."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 15
+      display: false
+      sshPasswordAuth: false
