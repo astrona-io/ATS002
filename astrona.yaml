@@ -34,6 +34,18 @@ modules:
         path: sections/section-010/module-01/course.md
 
       - type: reading
+        title: "Module 1.1: Identifying the running kernel"
+        path: sections/section-010/module-01/course-01-identifying-the-running-kernel.md
+
+      - type: reading
+        title: "Module 1.2: /proc/sys and the live value"
+        path: sections/section-010/module-01/course-02-proc-sys-and-the-live-value.md
+
+      - type: reading
+        title: "Module 1.3: Runtime vs. persistent changes"
+        path: sections/section-010/module-01/course-03-runtime-vs-persistent-changes.md
+
+      - type: reading
         title: Question
         path: labs/section-010/module-01/lab-01/question.md
 
@@ -48,6 +60,18 @@ modules:
       - type: reading
         title: "Module 2: Process Limits — pid_max, ulimit, and the Three Ceilings"
         path: sections/section-010/module-02/course.md
+
+      - type: reading
+        title: "Module 2.1: The shared PID pool and confirming exhaustion"
+        path: sections/section-010/module-02/course-01-the-shared-pid-pool.md
+
+      - type: reading
+        title: "Module 2.2: The three independent ceilings"
+        path: sections/section-010/module-02/course-02-the-three-independent-ceilings.md
+
+      - type: reading
+        title: "Module 2.3: Raising each ceiling, in order"
+        path: sections/section-010/module-02/course-03-raising-each-ceiling-in-order.md
 
       - type: reading
         title: Question
@@ -66,6 +90,18 @@ modules:
         path: sections/section-010/module-03/course.md
 
       - type: reading
+        title: "Module 3.1: Inspecting modules and their parameters"
+        path: sections/section-010/module-03/course-01-inspecting-modules-and-parameters.md
+
+      - type: reading
+        title: "Module 3.2: Loading — modprobe, depmod, and the dependency graph"
+        path: sections/section-010/module-03/course-02-loading-modprobe-and-dependencies.md
+
+      - type: reading
+        title: "Module 3.3: Persistence and blacklisting"
+        path: sections/section-010/module-03/course-03-persistence-and-blacklisting.md
+
+      - type: reading
         title: Question
         path: labs/section-010/module-03/lab-01/question.md
 
@@ -82,6 +118,18 @@ modules:
         path: sections/section-010/module-04/course.md
 
       - type: reading
+        title: "Module 4.1: Device events, sysfs, and finding a stable identity"
+        path: sections/section-010/module-04/course-01-device-events-and-identity.md
+
+      - type: reading
+        title: "Module 4.2: Writing the rule — match keys vs. assignment keys"
+        path: sections/section-010/module-04/course-02-writing-the-rule.md
+
+      - type: reading
+        title: "Module 4.3: Applying, verifying, and using the rule"
+        path: sections/section-010/module-04/course-03-applying-verifying-and-using.md
+
+      - type: reading
         title: Question
         path: labs/section-010/module-04/lab-01/question.md
 
@@ -96,6 +144,18 @@ modules:
       - type: reading
         title: "Module 5: Catching a Process in the Act with strace"
         path: sections/section-010/module-05/course.md
+
+      - type: reading
+        title: "Module 5.1: From a name to the right PIDs"
+        path: sections/section-010/module-05/course-01-from-a-name-to-the-right-pids.md
+
+      - type: reading
+        title: "Module 5.2: Attaching and filtering the syscall stream"
+        path: sections/section-010/module-05/course-02-attaching-and-filtering.md
+
+      - type: reading
+        title: "Module 5.3: From confirmed process to safe cleanup"
+        path: sections/section-010/module-05/course-03-from-confirmed-process-to-safe-cleanup.md
 
       - type: reading
         title: Question

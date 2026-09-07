@@ -24,6 +24,9 @@ This section is divided into six highly focused, sequential modules. Each module
 
 ### 1. Reading and Reshaping the Live Kernel with sysctl
 *   **Module Reader:** **[Module 1: Reading and Reshaping the Live Kernel with sysctl](./module-01/course.md)**
+    1. [Identifying the running kernel](./module-01/course-01-identifying-the-running-kernel.md)
+    2. [/proc/sys and the live value](./module-01/course-02-proc-sys-and-the-live-value.md)
+    3. [Runtime vs. persistent changes](./module-01/course-03-runtime-vs-persistent-changes.md)
 *   **Practice Lab Sandbox:** **`labs/section-010/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -33,6 +36,9 @@ This section is divided into six highly focused, sequential modules. Each module
 
 ### 2. Process Limits — pid_max, ulimit, and the Three Ceilings
 *   **Module Reader:** **[Module 2: Process Limits — pid_max, ulimit, and the Three Ceilings](./module-02/course.md)**
+    1. [The shared PID pool and confirming exhaustion](./module-02/course-01-the-shared-pid-pool.md)
+    2. [The three independent ceilings](./module-02/course-02-the-three-independent-ceilings.md)
+    3. [Raising each ceiling, in order](./module-02/course-03-raising-each-ceiling-in-order.md)
 *   **Practice Lab Sandbox:** **`labs/section-010/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -42,6 +48,9 @@ This section is divided into six highly focused, sequential modules. Each module
 
 ### 3. Kernel Modules — Loading, Parameters, and Blacklisting
 *   **Module Reader:** **[Module 3: Kernel Modules — Loading, Parameters, and Blacklisting](./module-03/course.md)**
+    1. [Inspecting modules and their parameters](./module-03/course-01-inspecting-modules-and-parameters.md)
+    2. [Loading — modprobe, depmod, and the dependency graph](./module-03/course-02-loading-modprobe-and-dependencies.md)
+    3. [Persistence and blacklisting](./module-03/course-03-persistence-and-blacklisting.md)
 *   **Practice Lab Sandbox:** **`labs/section-010/module-03/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -51,6 +60,9 @@ This section is divided into six highly focused, sequential modules. Each module
 
 ### 4. udev — Giving a Device a Name It Can Keep
 *   **Module Reader:** **[Module 4: udev — Giving a Device a Name It Can Keep](./module-04/course.md)**
+    1. [Device events, sysfs, and finding a stable identity](./module-04/course-01-device-events-and-identity.md)
+    2. [Writing the rule — match keys vs. assignment keys](./module-04/course-02-writing-the-rule.md)
+    3. [Applying, verifying, and using the rule](./module-04/course-03-applying-verifying-and-using.md)
 *   **Practice Lab Sandbox:** **`labs/section-010/module-04/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -60,6 +72,9 @@ This section is divided into six highly focused, sequential modules. Each module
 
 ### 5. Catching a Process in the Act with strace
 *   **Module Reader:** **[Module 5: Catching a Process in the Act with strace](./module-05/course.md)**
+    1. [From a name to the right PIDs](./module-05/course-01-from-a-name-to-the-right-pids.md)
+    2. [Attaching and filtering the syscall stream](./module-05/course-02-attaching-and-filtering.md)
+    3. [From confirmed process to safe cleanup](./module-05/course-03-from-confirmed-process-to-safe-cleanup.md)
 *   **Practice Lab Sandbox:** **`labs/section-010/module-05/lab-01`**
 *   **Lab Run Command:**
     ```bash
