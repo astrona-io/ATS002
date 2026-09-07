@@ -110,6 +110,26 @@ modules:
         path: labs/section-010/module-05/lab-01
 
       - type: reading
+        title: "Module 6: Debugging a Service That Won't Start with systemctl and journalctl"
+        path: sections/section-010/module-06/course.md
+
+      - type: reading
+        title: "Module 6.1: The service manager and unit state"
+        path: sections/section-010/module-06/course-01-service-manager-and-unit-state.md
+
+      - type: reading
+        title: "Module 6.2: The effective unit definition"
+        path: sections/section-010/module-06/course-02-the-effective-unit-definition.md
+
+      - type: reading
+        title: "Module 6.3: Reading the journal"
+        path: sections/section-010/module-06/course-03-reading-the-journal.md
+
+      - type: reading
+        title: "Module 6.4: Failure shapes, and proving the fix"
+        path: sections/section-010/module-06/course-04-failure-shapes-and-proving-the-fix.md
+
+      - type: reading
         title: "Section 010 Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics"
         path: sections/section-010/quiz.md
 
@@ -287,6 +307,26 @@ modules:
       - type: reading
         title: "Module 1: AppArmor Profile Enforcement & the Other MAC System: SELinux"
         path: sections/section-040/module-01/course.md
+
+      - type: reading
+        title: "Module 1.1: Two gates — DAC, MAC, and which system you're on"
+        path: sections/section-040/module-01/course-01-two-gates-dac-mac-and-which-system.md
+
+      - type: reading
+        title: "Module 1.2: AppArmor — profiles, modes, and what's loaded"
+        path: sections/section-040/module-01/course-02-apparmor-profiles-and-modes.md
+
+      - type: reading
+        title: "Module 1.3: AppArmor — diagnosing and fixing a path denial"
+        path: sections/section-040/module-01/course-03-apparmor-diagnosing-and-fixing.md
+
+      - type: reading
+        title: "Module 1.4: SELinux — labels, contexts, and the AVC denial"
+        path: sections/section-040/module-01/course-04-selinux-labels-and-avc-denials.md
+
+      - type: reading
+        title: "Module 1.5: SELinux — persistent fixes and the AppArmor contrast"
+        path: sections/section-040/module-01/course-05-selinux-persistent-fixes-and-contrast.md
 
       - type: reading
         title: Question

@@ -21,6 +21,11 @@ This section has one module, deliberately built around two parts — a real hand
 
 ### 1. AppArmor Profile Enforcement & the Other MAC System: SELinux
 * **Module Reader:** **[Module 1: AppArmor Profile Enforcement & the Other MAC System: SELinux](./module-01/course.md)**
+    1. [Two gates — DAC, MAC, and which system you're on](./module-01/course-01-two-gates-dac-mac-and-which-system.md)
+    2. [AppArmor — profiles, modes, and what's loaded](./module-01/course-02-apparmor-profiles-and-modes.md)
+    3. [AppArmor — diagnosing and fixing a path denial](./module-01/course-03-apparmor-diagnosing-and-fixing.md)
+    4. [SELinux — labels, contexts, and the AVC denial](./module-01/course-04-selinux-labels-and-avc-denials.md)
+    5. [SELinux — persistent fixes and the AppArmor contrast](./module-01/course-05-selinux-persistent-fixes-and-contrast.md)
 * **Practice Lab Sandbox:** **`labs/section-040/module-01/lab-01`**
 * **Lab Run Command:**
     ```bash
