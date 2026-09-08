@@ -6,22 +6,18 @@ Parts 1–3 gave you the reading tools. This part is the pattern-match: almost e
 
 ## How a start job runs (so the shapes make sense)
 
-```
-  systemctl start apache2
-        │
-  ExecStartPre=  ──► non-zero? ──► failed (Result: exit-code)
-        │
-  fork + exec ExecStart=
-        │
-        ├─ Type=simple    : "active" the instant exec succeeds
-        ├─ Type=exec      : "active" once exec() completes
-        ├─ Type=forking   : "active" when the ORIGINAL process exits and a child remains
-        ├─ Type=notify    : "active" when the service sends sd_notify READY=1
-        └─ Type=oneshot   : "active"/"exited" when the process exits 0
-        │
-  readiness not reached within TimeoutStartSec=  ──► SIGTERM, then SIGKILL ──► failed (Result: timeout)
-        │
-  process exits non-zero later  ──► failed (Result: exit-code / signal)
+```mermaid
+flowchart TD
+    S["systemctl start apache2"] --> P["ExecStartPre="]
+    P -->|non-zero| F1["failed (Result: exit-code)"]
+    P -->|ok| X["fork + exec ExecStart="]
+    X --> T{"Type= decides when 'active'"}
+    T -->|simple / exec| A["active: exec succeeded"]
+    T -->|forking| A2["active: original process exits, child remains"]
+    T -->|notify| A3["active: service sends sd_notify READY=1"]
+    T -->|oneshot| A4["active / exited: process exits 0"]
+    X -->|readiness not reached in TimeoutStartSec=| F2["SIGTERM then SIGKILL → failed (Result: timeout)"]
+    A --> L["process exits non-zero later → failed (exit-code / signal)"]
 ```
 
 Every shape below is one of these arrows going wrong.

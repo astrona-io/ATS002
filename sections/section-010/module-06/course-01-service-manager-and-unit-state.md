@@ -10,17 +10,13 @@ Concrete: you run `systemctl restart apache2` and get a prompt back almost immed
 
 What happened underneath: `systemctl` opened a socket to **`systemd`, running as PID 1**, and submitted a **job** — "bring `apache2.service` to `active`". PID 1 did the work (ran the `ExecStart=` command, watched it, timed it), recorded the outcome, and `systemctl` printed a summary of that recorded outcome. `systemctl` itself started nothing and watched nothing.
 
-```
-  systemctl restart apache2
-        │  (D-Bus / private socket)
-        ▼
-  systemd (PID 1) ──► fork+exec ExecStart=  ──►  service process
-   the manager   ◄── exit status / watchdog / timeout
-        │
-        ▼
-   records: ActiveState, SubState, Result, Main PID, exit code
-        │
-  systemctl status / show / is-active  ── read those records back
+```mermaid
+flowchart TD
+    A["systemctl restart apache2"] -->|D-Bus / private socket| B["systemd, PID 1 — the manager"]
+    B -->|fork + exec ExecStart=| C["service process"]
+    C -->|exit status / watchdog / timeout| B
+    B --> D["records: ActiveState, SubState, Result, Main PID, exit code"]
+    D --> E["systemctl status / show / is-active — read the records back"]
 ```
 
 The practical consequence: **everything `systemctl status` shows you is a record PID 1 already wrote.** The service does not have to still be running for the diagnosis to be there. A unit that failed and exited 40 seconds ago still has its full outcome in the manager's memory (and the journal — Part 3).
@@ -29,19 +25,17 @@ The practical consequence: **everything `systemctl status` shows you is a record
 
 A service unit is always in exactly one **`ActiveState`**. The states and the moves between them:
 
-```
-                    start job
-   inactive ───────────────────────►  activating
-      ▲                                   │  ExecStartPre / ExecStart running
-      │ stop job completes                │
-      │                                   ▼
-  deactivating ◄───────────────────────  active   ◄───┐
-      │            stop job                │          │ (Type=notify: READY=1;
-      │                                    │          │  Type=forking: parent exits;
-      │  ExecStart failed, or             │          │  Type=simple: exec succeeded)
-      │  timeout, or killed               ▼          │
-      └──────────────────────────────►  failed ──────┘
-                                     (start job later)
+```mermaid
+stateDiagram-v2
+    [*] --> inactive
+    inactive --> activating: start job
+    activating --> active: readiness met (Type=simple/exec/forking/notify)
+    activating --> failed: ExecStart non-zero / timeout / killed
+    active --> deactivating: stop job
+    deactivating --> inactive
+    active --> failed: process exits non-zero later
+    failed --> activating: start job again / after reset-failed
+    failed --> [*]
 ```
 
 - **`inactive`** — not running, nothing wrong. The resting state.
