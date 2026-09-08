@@ -21,6 +21,9 @@ This section is divided into two modules, each paired with hands-on practice ins
 
 ### 1. Zypper Basic Package Operations
 *   **Module Reader:** **[Module 1: Zypper Basic Package Operations](./module-01/course.md)**
+    1. [Refresh, and the two questions — updates vs. patches](./module-01/course-01-refresh-updates-vs-patches.md)
+    2. [Applying the right one — zypper patch vs zypper update](./module-01/course-02-applying-the-right-one.md)
+    3. [Installing, removing, and reading history](./module-01/course-03-install-remove-history.md)
 *   **Associated Lab:** **`labs/section-070/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -30,6 +33,8 @@ This section is divided into two modules, each paired with hands-on practice ins
 
 ### 2. Zypper Package Information Lookup
 *   **Module Reader:** **[Module 2: Zypper Package Information Lookup](./module-02/course.md)**
+    1. [The three research questions — search, info, what-provides](./module-02/course-01-the-three-questions.md)
+    2. [Installed-only filtering, and the rpm fallback](./module-02/course-02-installed-only-and-rpm-fallback.md)
 *   **Associated Lab:** **`labs/section-070/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash

@@ -25,6 +25,9 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 1. RPM Low-Level Package Management
 *   **Module Reader:** **[Module 1: RPM Low-Level Package Management](./module-01/course.md)**
+    1. [What rpm knows, and inspecting a .rpm](./module-01/course-01-rpm-scope-and-inspecting.md)
+    2. [Installing directly, and ownership queries](./module-01/course-02-installing-and-ownership.md)
+    3. [Verifying integrity](./module-01/course-03-verifying-integrity.md)
 *   **Practice Lab Sandbox:** **`labs/section-060/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -34,6 +37,8 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 2. Rebuilding a Corrupted RPM Database
 *   **Module Reader:** **[Module 2: Rebuilding a Corrupted RPM Database](./module-02/course.md)**
+    1. [Recognising the symptom, and not assuming the backend](./module-02/course-01-recognising-the-symptom.md)
+    2. [Back up, rebuild, verify](./module-02/course-02-backup-rebuild-verify.md)
 *   **Practice Lab Sandbox:** **`labs/section-060/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -43,6 +48,8 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 3. DNF Basic Package Operations
 *   **Module Reader:** **[Module 3: DNF Basic Package Operations](./module-03/course.md)**
+    1. [The everyday dnf loop](./module-03/course-01-the-dnf-loop.md)
+    2. [Removing, and transactional history](./module-03/course-02-removing-and-history.md)
 *   **Practice Lab Sandbox:** **`labs/section-060/module-03/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -52,6 +59,8 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 4. DNF Package Information Lookup
 *   **Module Reader:** **[Module 4: DNF Package Information Lookup](./module-04/course.md)**
+    1. [Finding a package, and describing it](./module-04/course-01-search-and-describe.md)
+    2. [What would provide this, and cross-referencing rpm](./module-04/course-02-provides-and-cross-referencing.md)
 *   **Practice Lab Sandbox:** **`labs/section-060/module-04/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -61,6 +70,9 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 5. DNF Package Groups
 *   **Module Reader:** **[Module 5: DNF Package Groups](./module-05/course.md)**
+    1. [What a group is, and discovering what exists](./module-05/course-01-what-a-group-is-and-discovering.md)
+    2. [Inspecting membership, and installing](./module-05/course-02-inspecting-and-installing.md)
+    3. [Confirming what landed, and removing cleanly](./module-05/course-03-confirming-and-removing.md)
 *   **Practice Lab Sandbox:** **`labs/section-060/module-05/lab-01`**
 *   **Lab Run Command:**
     ```bash

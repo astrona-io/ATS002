@@ -21,6 +21,8 @@ This section is divided into two focused modules, each paired with a dedicated h
 
 ### 1. Per-User Cron Job Scheduling
 *   **Module Reader:** **[Module 1: Per-User Cron Job Scheduling](./module-01/course.md)**
+    1. [Where a cron job lives, and the format that follows](./module-01/course-01-where-a-cron-job-lives.md)
+    2. [Migrating a job safely](./module-01/course-02-migrating-a-job-safely.md)
 *   **Practice Lab Sandbox:** **`labs/section-020/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -30,6 +32,8 @@ This section is divided into two focused modules, each paired with a dedicated h
 
 ### 2. Docker Container Lifecycle
 *   **Module Reader:** **[Module 2: Docker Container Lifecycle](./module-02/course.md)**
+    1. [The container lifecycle, and stopping one cleanly](./module-02/course-01-the-container-lifecycle-and-stopping.md)
+    2. [Inspecting with --format, and launching with constraints](./module-02/course-02-inspecting-with-format.md)
 *   **Practice Lab Sandbox:** **`labs/section-020/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash

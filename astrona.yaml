@@ -225,6 +225,14 @@ modules:
         path: sections/section-020/module-01/course.md
 
       - type: reading
+        title: "Module 1.1: Where a cron job lives, and the format that follows"
+        path: sections/section-020/module-01/course-01-where-a-cron-job-lives.md
+
+      - type: reading
+        title: "Module 1.2: Migrating a job safely"
+        path: sections/section-020/module-01/course-02-migrating-a-job-safely.md
+
+      - type: reading
         title: Question
         path: labs/section-020/module-01/lab-01/question.md
 
@@ -239,6 +247,14 @@ modules:
       - type: reading
         title: "Module 2: Docker Container Lifecycle"
         path: sections/section-020/module-02/course.md
+
+      - type: reading
+        title: "Module 2.1: The container lifecycle, and stopping one cleanly"
+        path: sections/section-020/module-02/course-01-the-container-lifecycle-and-stopping.md
+
+      - type: reading
+        title: "Module 2.2: Inspecting with --format, and launching with constraints"
+        path: sections/section-020/module-02/course-02-inspecting-with-format.md
 
       - type: reading
         title: Question
@@ -285,6 +301,18 @@ modules:
       - type: reading
         title: "Module 1: Compile & Install From Source"
         path: sections/section-030/module-01/course.md
+
+      - type: reading
+        title: "Module 1.1: Unpacking the tarball, and the build pipeline"
+        path: sections/section-030/module-01/course-01-unpacking-and-the-build-pipeline.md
+
+      - type: reading
+        title: "Module 1.2: Discovering and choosing configure flags"
+        path: sections/section-030/module-01/course-02-discovering-and-choosing-flags.md
+
+      - type: reading
+        title: "Module 1.3: Building, installing, and verifying"
+        path: sections/section-030/module-01/course-03-building-installing-verifying.md
 
       - type: reading
         title: Question
@@ -435,6 +463,18 @@ modules:
         path: sections/section-050/module-01/course.md
 
       - type: reading
+        title: "Module 1.1: Scoped trust — keyrings and signed-by"
+        path: sections/section-050/module-01/course-01-scoped-trust.md
+
+      - type: reading
+        title: "Module 1.2: Adding the repository and confirming it registered"
+        path: sections/section-050/module-01/course-02-adding-the-repository.md
+
+      - type: reading
+        title: "Module 1.3: Installing an exact version, and locking it"
+        path: sections/section-050/module-01/course-03-exact-version-and-hold.md
+
+      - type: reading
         title: Question
         path: labs/section-050/module-01/lab-01/question.md
 
@@ -449,6 +489,18 @@ modules:
       - type: reading
         title: "Module 2: dpkg Low-Level Package Management"
         path: sections/section-050/module-02/course.md
+
+      - type: reading
+        title: "Module 2.1: What dpkg knows, and inspecting a .deb"
+        path: sections/section-050/module-02/course-01-dpkg-scope-and-inspecting-a-deb.md
+
+      - type: reading
+        title: "Module 2.2: Installing directly, and ownership queries"
+        path: sections/section-050/module-02/course-02-installing-and-ownership-queries.md
+
+      - type: reading
+        title: "Module 2.3: Status codes and recovering an interrupted package"
+        path: sections/section-050/module-02/course-03-status-codes-and-recovery.md
 
       - type: reading
         title: Question
@@ -467,6 +519,18 @@ modules:
         path: sections/section-050/module-03/course.md
 
       - type: reading
+        title: "Module 3.1: apt update is not apt upgrade"
+        path: sections/section-050/module-03/course-01-update-is-not-upgrade.md
+
+      - type: reading
+        title: "Module 3.2: Applying upgrades, and installing"
+        path: sections/section-050/module-03/course-02-applying-upgrades-and-installing.md
+
+      - type: reading
+        title: "Module 3.3: Removing cleanly"
+        path: sections/section-050/module-03/course-03-removing-cleanly.md
+
+      - type: reading
         title: Question
         path: labs/section-050/module-03/lab-01/question.md
 
@@ -483,6 +547,14 @@ modules:
         path: sections/section-050/module-04/course.md
 
       - type: reading
+        title: "Module 4.1: Finding a package, and describing it"
+        path: sections/section-050/module-04/course-01-finding-and-describing.md
+
+      - type: reading
+        title: "Module 4.2: Installed vs. candidate, and which source wins"
+        path: sections/section-050/module-04/course-02-installed-vs-candidate.md
+
+      - type: reading
         title: Question
         path: labs/section-050/module-04/lab-01/question.md
 
@@ -497,6 +569,14 @@ modules:
       - type: reading
         title: "Module 5: APT Package Groups & Bulk Operations"
         path: sections/section-050/module-05/course.md
+
+      - type: reading
+        title: "Module 5.1: One transaction, and finding a family by pattern"
+        path: sections/section-050/module-05/course-01-one-transaction-and-finding-a-family.md
+
+      - type: reading
+        title: "Module 5.2: Bulk actions across a matched set"
+        path: sections/section-050/module-05/course-02-bulk-actions-across-a-set.md
 
       - type: reading
         title: Question
@@ -546,6 +626,18 @@ modules:
         path: sections/section-060/module-01/course.md
 
       - type: reading
+        title: "Module 1.1: What rpm knows, and inspecting a .rpm"
+        path: sections/section-060/module-01/course-01-rpm-scope-and-inspecting.md
+
+      - type: reading
+        title: "Module 1.2: Installing directly, and ownership queries"
+        path: sections/section-060/module-01/course-02-installing-and-ownership.md
+
+      - type: reading
+        title: "Module 1.3: Verifying integrity"
+        path: sections/section-060/module-01/course-03-verifying-integrity.md
+
+      - type: reading
         title: Question
         path: labs/section-060/module-01/lab-01/question.md
 
@@ -560,6 +652,14 @@ modules:
       - type: reading
         title: "Module 2: Rebuilding a Corrupted RPM Database"
         path: sections/section-060/module-02/course.md
+
+      - type: reading
+        title: "Module 2.1: Recognising the symptom, and not assuming the backend"
+        path: sections/section-060/module-02/course-01-recognising-the-symptom.md
+
+      - type: reading
+        title: "Module 2.2: Back up, rebuild, verify"
+        path: sections/section-060/module-02/course-02-backup-rebuild-verify.md
 
       - type: reading
         title: Question
@@ -578,6 +678,14 @@ modules:
         path: sections/section-060/module-03/course.md
 
       - type: reading
+        title: "Module 3.1: The everyday dnf loop"
+        path: sections/section-060/module-03/course-01-the-dnf-loop.md
+
+      - type: reading
+        title: "Module 3.2: Removing, and transactional history"
+        path: sections/section-060/module-03/course-02-removing-and-history.md
+
+      - type: reading
         title: Question
         path: labs/section-060/module-03/lab-01/question.md
 
@@ -594,6 +702,14 @@ modules:
         path: sections/section-060/module-04/course.md
 
       - type: reading
+        title: "Module 4.1: Finding a package, and describing it"
+        path: sections/section-060/module-04/course-01-search-and-describe.md
+
+      - type: reading
+        title: "Module 4.2: What would provide this, and cross-referencing rpm"
+        path: sections/section-060/module-04/course-02-provides-and-cross-referencing.md
+
+      - type: reading
         title: Question
         path: labs/section-060/module-04/lab-01/question.md
 
@@ -608,6 +724,18 @@ modules:
       - type: reading
         title: "Module 5: DNF Package Groups"
         path: sections/section-060/module-05/course.md
+
+      - type: reading
+        title: "Module 5.1: What a group is, and discovering what exists"
+        path: sections/section-060/module-05/course-01-what-a-group-is-and-discovering.md
+
+      - type: reading
+        title: "Module 5.2: Inspecting membership, and installing"
+        path: sections/section-060/module-05/course-02-inspecting-and-installing.md
+
+      - type: reading
+        title: "Module 5.3: Confirming what landed, and removing cleanly"
+        path: sections/section-060/module-05/course-03-confirming-and-removing.md
 
       - type: reading
         title: Question
@@ -656,6 +784,18 @@ modules:
         path: sections/section-070/module-01/course.md
 
       - type: reading
+        title: "Module 1.1: Refresh, and the two questions — updates vs. patches"
+        path: sections/section-070/module-01/course-01-refresh-updates-vs-patches.md
+
+      - type: reading
+        title: "Module 1.2: Applying the right one — zypper patch vs zypper update"
+        path: sections/section-070/module-01/course-02-applying-the-right-one.md
+
+      - type: reading
+        title: "Module 1.3: Installing, removing, and reading history"
+        path: sections/section-070/module-01/course-03-install-remove-history.md
+
+      - type: reading
         title: Question
         path: labs/section-070/module-01/lab-01/question.md
 
@@ -670,6 +810,14 @@ modules:
       - type: reading
         title: "Module 2: Zypper Package Information Lookup"
         path: sections/section-070/module-02/course.md
+
+      - type: reading
+        title: "Module 2.1: The three research questions — search, info, what-provides"
+        path: sections/section-070/module-02/course-01-the-three-questions.md
+
+      - type: reading
+        title: "Module 2.2: Installed-only filtering, and the rpm fallback"
+        path: sections/section-070/module-02/course-02-installed-only-and-rpm-fallback.md
 
       - type: reading
         title: Question
@@ -719,6 +867,18 @@ modules:
         path: sections/section-080/module-01/course.md
 
       - type: reading
+        title: "Module 1.1: Why a bad fstab stops the boot, and how to reach a shell"
+        path: sections/section-080/module-01/course-01-why-it-wont-boot-and-reaching-a-shell.md
+
+      - type: reading
+        title: "Module 1.2: Mount the broken root, and get the tools in"
+        path: sections/section-080/module-01/course-02-mount-and-get-tools-in.md
+
+      - type: reading
+        title: "Module 1.3: chroot in, fix, prove, unmount"
+        path: sections/section-080/module-01/course-03-chroot-fix-prove-unmount.md
+
+      - type: reading
         title: Question
         path: labs/section-080/module-01/lab-01/question.md
 
@@ -733,6 +893,14 @@ modules:
       - type: reading
         title: "Module 2: Password Reset & Single-User Recovery"
         path: sections/section-080/module-02/course.md
+
+      - type: reading
+        title: "Module 2.1: Two doors — rd.break and init=/bin/bash"
+        path: sections/section-080/module-02/course-01-two-doors-rd-break-and-init.md
+
+      - type: reading
+        title: "Module 2.2: The chroot equivalent, and editing /etc/shadow directly"
+        path: sections/section-080/module-02/course-02-chroot-equivalent-and-shadow-edit.md
 
       - type: reading
         title: Question
@@ -751,6 +919,18 @@ modules:
         path: sections/section-080/module-03/course.md
 
       - type: reading
+        title: "Module 3.1: Two layers, not one, and identifying the target disk"
+        path: sections/section-080/module-03/course-01-two-layers-and-identifying-the-disk.md
+
+      - type: reading
+        title: "Module 3.2: Back up the partition table, and verify the backup"
+        path: sections/section-080/module-03/course-02-backup-and-verify.md
+
+      - type: reading
+        title: "Module 3.3: Simulate, restore, and verify both layers"
+        path: sections/section-080/module-03/course-03-simulate-restore-verify.md
+
+      - type: reading
         title: Question
         path: labs/section-080/module-03/lab-01/question.md
 
@@ -765,6 +945,18 @@ modules:
       - type: reading
         title: "Module 4: GRUB Corruption Recovery"
         path: sections/section-080/module-04/course.md
+
+      - type: reading
+        title: "Module 4.1: Two repairs, easy to confuse, and reading the symptom"
+        path: sections/section-080/module-04/course-01-two-repairs-and-the-symptom.md
+
+      - type: reading
+        title: "Module 4.2: The one-boot manual rescue from grub>"
+        path: sections/section-080/module-04/course-02-manual-rescue-from-grub.md
+
+      - type: reading
+        title: "Module 4.3: The durable repair — reinstall and regenerate"
+        path: sections/section-080/module-04/course-03-durable-repair.md
 
       - type: reading
         title: Question

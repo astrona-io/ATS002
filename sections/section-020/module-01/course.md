@@ -1,85 +1,29 @@
 # Per-User Cron Job Scheduling
 
-Think of a shared office mail room. A memo dropped into the general mail room has to carry a name on it — "Deliver to: Alice" — because the mail room itself doesn't belong to anyone in particular. But a memo you drop directly into Alice's own personal mailbox doesn't need her name written on it at all. The mailbox itself already tells you whose it is.
+A scheduled job can live in the shared, root-only cron area (`/etc/crontab`, `/etc/cron.d/*`) or in an individual account's own crontab (`crontab -e`). The two use different line formats — the shared area's lines carry a mandatory username field, the per-user lines do not — and confusing them makes a job fail silently at its scheduled time. This module covers reading and writing both, and the strict order for migrating a job from one to the other without it running twice.
 
-That is exactly the difference between system-wide cron and a per-user crontab. `/etc/crontab` and the drop-in files under `/etc/cron.d/` are the shared mail room — every line has to explicitly state which user account the command should run as. A per-user crontab, edited with `crontab -e`, is somebody's personal mailbox — ownership is implicit in whose file it is, so the line only needs the schedule and the command.
+Two short parts; work them in order.
 
-## Two Places a Job Can Live
+## How this module is organised
 
-A line in `/etc/crontab` or `/etc/cron.d/*` has six fields:
+1. **[Part 1 — Where a cron job lives, and the format that follows](./course-01-where-a-cron-job-lives.md)** — the sources the `cron` daemon scans, six-field system-wide lines vs five-field per-user lines, the field grammar (lists, ranges, steps, names, `@`-shortcuts), and the silent failure when the two formats are mixed.
+2. **[Part 2 — Migrating a job safely](./course-02-migrating-a-job-safely.md)** — `crontab -u <user> -e` and what it does under the hood, why hand-editing the spool file breaks trust, and the recreate → verify → delete → re-grep order that avoids both a coverage gap and a double-run race.
 
-```text
-30 20 * * * asset-manager /home/asset-manager/nightly-sync.sh
-```
+## Learning objectives
 
-Five time fields, then a mandatory **username field**, then the command. That username field is the whole reason system-wide cron files can be edited only by root (or root-owned drop-ins) — it's granting the file the power to run arbitrary commands as any account on the box.
+After this module you can:
 
-A per-user crontab line drops that field entirely:
+- **Name** the locations `cron` reads, and state which are root-only and why.
+- **Distinguish** a six-field system-wide cron line from a five-field per-user line, and convert one to the other.
+- **Read and write** the five time fields including lists, ranges, `*/N` steps, and named weekdays/months.
+- **Edit** another account's crontab with `sudo crontab -u <user> -e`, and explain why editing the spool file directly is unsafe.
+- **Migrate** a job between the two areas in an order that never leaves it unscheduled and never leaves it duplicated.
+- **Verify** ownership with `sudo crontab -u <user> -l` rather than by reading spool files.
 
-```text
-30 20 * * * /home/asset-manager/nightly-sync.sh
-```
+## Before you start
 
-Five fields and a command, nothing else. If you paste a system-wide line straight into a per-user crontab without stripping the username field, cron doesn't error out helpfully — it just treats `asset-manager` as the first word of the command and tries to execute a program by that name, which fails silently at 8:30pm with nobody watching.
+Assumed: a Linux shell, `sudo`, an `$EDITOR` you are comfortable in, and the idea that a daemon runs commands on a schedule. No prior cron experience. Every command block states the shell and privilege it assumes and runs on any host with `cron`/`crond` installed.
 
----
+## Where this fits
 
-## Editing Someone Else's Mailbox
-
-Plain `crontab -e`, run as root, edits *root's own* crontab. That is almost never what you want when you're migrating a job that belongs to a service account. To touch another user's crontab, you name it explicitly:
-
-```bash
-sudo crontab -u asset-manager -e
-```
-
-The `-u asset-manager` flag tells `crontab` to operate on the spool file belonging to that account — on Debian/Ubuntu that's `/var/spool/cron/crontabs/asset-manager` — rather than on root's. This requires privilege, which is exactly why the command is prefixed with `sudo`. Never hand-edit that spool file directly with a text editor; going around `crontab` skips its syntax validation and can leave behind a file with permissions cron refuses to trust.
-
-## Reading the Time Fields
-
-Cron's five time fields are, in order: minute, hour, day-of-month, month, day-of-week. A schedule for "11:15am every Monday and Thursday" reads as:
-
-```cron
-15 11 * * MON,THU bash /home/asset-manager/clean.sh
-```
-
-`15` is the minute, `11` is the hour on a 24-hour clock (so there's no am/pm ambiguity to get wrong), the day-of-month and month fields are `*` for "any," and the day-of-week field takes a comma-separated list, `MON,THU`. Cron also accepts numeric weekdays (`0`–`7`, where both `0` and `7` mean Sunday), but under exam pressure the named form is safer — you don't have to remember whether a particular cron implementation counts Monday as `1` or as `0`.
-
----
-
-## Migrating Without Duplicating
-
-Moving a job from a system-wide file into a per-user crontab is not complete until you delete the original. Cron has no concept of deduplication. If the same command is scheduled in two places, it runs twice, independently, at the same wall-clock time — and on a script that touches shared data, that's a race condition waiting to corrupt something.
-
-```bash
-sudo grep -rn "nightly-sync.sh" /etc/crontab /etc/cron.d/
-sudo rm /etc/cron.d/asset-cleanup
-```
-
-Grep first to confirm exactly where the job lives — it could be its own drop-in file under `/etc/cron.d/`, or a single line buried inside the shared `/etc/crontab`. Only after you've verified the per-user copy is correct should you remove the old source.
-
-## Proving Ownership
-
-The only verification that actually matters is what cron itself will execute:
-
-```bash
-sudo crontab -u asset-manager -l
-```
-
-```text
-30 20 * * * /home/asset-manager/nightly-sync.sh
-15 11 * * MON,THU bash /home/asset-manager/clean.sh
-```
-
-If a job doesn't show up here under the right user, it doesn't matter what you think you typed into an editor — it isn't owned by that account. Trust this output over reading raw spool files by hand.
-
----
-
-## Self-Check and Verification
-
-To prove your cron migration is correct:
-
-1. Locate the original system-wide job by grepping `/etc/crontab` and `/etc/cron.d/` for its time pattern.
-2. Recreate it as a per-user crontab line using `sudo crontab -u <user> -e`, with the username field stripped out.
-3. Add a second job to the same crontab using a comma-separated day-of-week list.
-4. Delete the original system-wide file or line, and re-grep to confirm no trace of it remains.
-5. Run `sudo crontab -u <user> -l` and confirm both jobs appear, exactly as intended, under the correct owner.
+This is the first module of the section. Per-user cron is the "who runs this" half of scheduled work; the container modules that follow are the "in what environment does this run" half. Both share the theme of the section capstone: a scheduled workload that must run as the right account, in the right place, exactly once.

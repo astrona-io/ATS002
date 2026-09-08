@@ -1,134 +1,30 @@
 # Compile & Install From Source
 
-Every package manager you have used so far — `apt`, `dnf`, `zypper` — is a promise: someone else already compiled this software correctly for your exact distribution, and all you have to do is ask for it by name. That promise breaks the moment you're handed a tarball. A vendor ships you an internal tool as `.tar.bz2`. A distro's repos simply don't carry the exact version — or the exact feature set — a task demands. When that happens, you fall back to the oldest install method in Unix: unpack the source, compile it yourself, and put the resulting binary exactly where it's supposed to live.
+Every package manager assumes someone already compiled the software correctly for your distribution. That assumption breaks when you are handed a source tarball — a vendor's internal tool, or a version the repos do not carry. Then you fall back to the oldest install method in Unix: unpack the source, run its build pipeline, and put the resulting binary exactly where the task says it must live — with the exact feature set the task specifies. This module covers each stage and, just as importantly, how to verify the result rather than trusting that the flags you passed did what you meant.
 
-Think of a distro package as a meal ordered from a restaurant menu — you pick an item, it arrives assembled. Compiling from source is cooking it yourself from a recipe card. You get exact control over every ingredient (which features are baked in) and exactly where the finished plate lands on the table (which directory the binary ends up in) — but you're also the one who has to read the recipe correctly, and nobody plates it for you if you get a step wrong.
+Three short parts; work them in order.
 
----
+## How this module is organised
 
-## Unpacking the Tarball Correctly
+1. **[Part 1 — Unpacking the tarball, and the build pipeline](./course-01-unpacking-and-the-build-pipeline.md)** — matching `tar`'s compression flag to the extension, and the `./configure` → `make` → `sudo make install` pipeline where each stage produces the next stage's input (and why there is no `man configure`).
+2. **[Part 2 — Discovering and choosing configure flags](./course-02-discovering-and-choosing-flags.md)** — `./configure --help` as the only flag reference, the two families it lists (installation-path flags vs feature toggles), and why `--bindir` beats `--prefix` when a task names an exact binary path.
+3. **[Part 3 — Building, installing, and verifying](./course-03-building-installing-verifying.md)** — `make` / `sudo make install` and the `DESTDIR` / `prefix=` staging options, then verifying the path (`command -v`, `file`) and the feature toggle (the tool's own version output) independently, and closing the filename gap.
 
-Source tarballs typically arrive compressed with one of two common algorithms, and `tar` needs to know which one to correctly unpack the archive:
+## Learning objectives
 
-```bash
-tar xjf links-2.14.tar.bz2
-```
+After this module you can:
 
-Break that flag cluster down: `x` means extract, `f` tells `tar` the very next argument is the archive filename to operate on, and `j` tells it the archive is compressed with bzip2 — which is exactly what the `.tar.bz2` extension signals. A `.tar.gz` (or `.tgz`) archive instead needs `-z` for gzip. Modern GNU `tar` can often auto-detect the compression format from the file's own magic bytes even if you omit the letter, but naming it explicitly is faster (it skips the detection step entirely) and is the safer habit if you ever find yourself on an older or non-GNU `tar` that doesn't auto-detect at all.
+- **Extract** a `.tar.bz2` / `.tar.gz` / `.tar.xz` tarball with the correct flags, and recognise a compression-mismatch failure.
+- **Explain** what `./configure`, `make`, and `make install` each do, and why running them out of order fails.
+- **Use** `./configure --help` to find the flags a task needs instead of guessing them.
+- **Distinguish** installation-path flags from feature toggles, and choose `--bindir` over `--prefix` for an exact path.
+- **Run** the build and install, using `DESTDIR` or a self-contained `--prefix` when appropriate.
+- **Verify** the installed binary's path and its compiled-in features from the artefact itself, and rename it only when the build did not already use the required name.
 
-Get the compression flag wrong — say, `-z` on a bzip2 file — and `tar` doesn't extract a broken set of files. It fails outright with a decompression error, because gzip's decompressor has no idea what to do with bzip2-format bytes.
+## Before you start
 
----
+Assumed: a Linux shell, `sudo`, `grep`, and a build toolchain present (`gcc`/`clang`, `make`, headers). No prior experience compiling software. Every command block states the directory and privilege it assumes. Builds can be slow — the examples use a small program (`links`) so the pipeline, not the wait, is the lesson.
 
-## The `./configure && make && make install` Pipeline
+## Where this fits
 
-Once the tarball is unpacked, you'll almost always find a `configure` script sitting at the top of the extracted directory. This three-stage pipeline is the backbone of source installs across a huge fraction of the Unix software world:
-
-```bash
-cd links-2.14
-./configure
-make
-sudo make install
-```
-
-Each stage does something distinct, and skipping one breaks the next:
-
-1. **`./configure`** inspects your build environment — which compiler is available, which libraries are installed, where you want things to end up — and generates a `Makefile` tailored specifically to this machine.
-2. **`make`** reads that freshly generated `Makefile` and compiles the source into a binary. If you run `make` before `./configure`, there's no `Makefile` yet for it to read, and you'll see something like:
-   ```
-   make: *** No targets specified and no makefile found.  Stop.
-   ```
-3. **`make install`** (usually run with `sudo`, since it's writing into system directories like `/usr/bin`) copies the freshly built binary — and often supporting files like man pages — into the locations `configure` was told to target.
-
-Here's the part that surprises people coming from package managers: a `configure` script is not a generic system tool with a `man` page. It's a project-specific shell script, generated by the project's own build system (commonly a tool called Autoconf), and every project's script accepts a different set of flags. There is no `man configure` — the only reliable reference is the script itself.
-
----
-
-## Discovering Flags Instead Of Guessing Them
-
-Since every `configure` script is different, the correct move is never to guess a flag name from memory. It's to ask the script directly:
-
-```bash
-./configure --help
-```
-
-This dumps every flag *this specific project's* `configure` accepts — a mix of a common baseline most Autoconf-based projects share, plus project-specific feature toggles unique to this piece of software. When a task gives you two very different kinds of requirements — "install to this exact path" and "turn off this specific feature" — grep the help output for both, rather than scrolling through it by eye:
-
-```bash
-./configure --help | grep -i bindir
-./configure --help | grep -i ipv6
-```
-
-Typical output for a project like this looks like:
-
-```
---bindir=DIR            user executables [EPREFIX/bin]
---disable-ipv6          disable IPv6 support
-```
-
-Two categories of flags are hiding in that `--help` output, and confusing them is the single most common way to lose points on a source-install task. One category controls **where things get installed** — `--prefix`, `--bindir`, and friends. The other controls **which features get compiled in** — `--enable-X` / `--disable-X` pairs. The first is about *paths*. The second is about *code that either exists in the binary or doesn't*.
-
----
-
-## Why `--prefix` Alone Isn't Precise Enough
-
-`--prefix` is the flag most people reach for first, and it's usually the wrong tool when a task demands an *exact* binary path.
-
-`--prefix` sets the root of the entire install tree. Everything — `bin/`, `share/`, `man/` — hangs off that one root directory. Pass `--prefix=/usr`, and the binary lands at `$prefix/bin/<whatever-the-project-calls-its-own-binary>` — which is not guaranteed to be `/usr/bin/links` if the project's internal binary name differs from what a task is asking for (it might still be named `links2`, matching the source tarball, unless the project explicitly renames its own output).
-
-`--bindir` sidesteps that ambiguity entirely. Instead of setting a root and hoping the binary subdirectory computes to what you want, `--bindir` pins the *exact* directory the binary gets copied into:
-
-```bash
-./configure --bindir=/usr/bin --disable-ipv6
-```
-
-Whenever a task specifies an exact path for the final binary, reach for the more specific directory flag rather than trusting `--prefix` alone to get you there.
-
----
-
-## Building, Installing, and Verifying
-
-With `configure` run, the rest of the pipeline follows:
-
-```bash
-make
-sudo make install
-```
-
-`configure`'s own output is worth reading as it runs — many projects print a summary of detected features and chosen install paths right near the end, which doubles as a free sanity check before you commit to the (potentially slow) `make` step.
-
-Passing the right flags to `configure` is not, by itself, proof that the task is done. You have to verify both halves of the requirement independently after the install finishes:
-
-```bash
-which links
-# /usr/bin/links
-
-file /usr/bin/links
-# /usr/bin/links: ELF 64-bit LSB executable, ...
-
-links -version
-# links 2.14 (compiled ...)
-# Features: ... (ipv6 should NOT be listed as enabled)
-```
-
-`which` confirms the binary resolves from `$PATH` at exactly the path you were asked for. `file` confirms it's a genuine compiled binary, not a stray script or symlink. And the tool's own `-version`/`--version` output is usually the most direct way to confirm a compiled-in feature toggle actually took effect — trust what the built artifact reports about itself over what you assume the flags you passed should have done.
-
-If the binary installed under its *original* project name instead of the name a task wants (`--bindir` controls the directory, not the filename — the `Makefile` decides the filename independently), a final rename closes the gap:
-
-```bash
-sudo mv /usr/bin/links2 /usr/bin/links   # only if the build didn't already name it correctly
-```
-
-Always check first. Many source trees already build a binary with the exact name you need, and blindly `mv`-ing a file that's already correct is a wasted, risk-bearing step.
-
----
-
-## Self-Check and Verification
-
-To prove you can handle a source install end to end:
-
-1. Extract a `.tar.bz2` source tarball with the correct `tar` flags.
-2. Run `./configure --help` and identify both a directory-placement flag and a feature-toggle flag relevant to your task.
-3. Run `./configure` with a precise `--bindir` (not just `--prefix`) and the feature flag you need disabled or enabled.
-4. Run `make`, then `sudo make install`.
-5. Verify the binary's exact path with `which`, confirm it's a real compiled binary with `file`, and confirm the feature toggle took effect using the tool's own version/build-info output.
+This module and the libvirt module are the section's two "assemble a raw building block yourself" skills — a tarball here, a disk image there — both demanding precise control over where the result lands and what it can do. The section capstone compiles a tool from source at an exact path with a feature disabled, then stands up a VM, in one maintenance window; the verification discipline from Part 3 is what makes the first half defensible.

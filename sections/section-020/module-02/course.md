@@ -1,79 +1,30 @@
 # Docker Container Lifecycle: Inspect, Stop, and Launch
 
-`docker inspect` on a busy container dumps a wall of JSON that can run past a hundred lines. Reading it by eye is like being handed a ship's entire cargo manifest when all you actually needed to know was which container the sunscreen is in. `docker inspect` without a format is for humans skimming the whole manifest. `docker inspect --format` is for asking one precise question and getting back exactly one answer — nothing more.
+Working with a container comes down to three skills: knowing which state it is in and how each verb moves it, stopping the process inside cleanly instead of just killing it, and pulling one precise fact out of the daemon's record instead of reading a wall of JSON. This module covers the lifecycle state machine, `docker stop` versus `docker kill`, the `docker inspect --format` template language, and launching a container with a verified resource ceiling.
 
-## Stopping a Container Gracefully
+Two short parts; work them in order.
 
-`docker stop` sends `SIGTERM` to the container's PID 1, waits up to a default ten-second grace period for it to exit cleanly, and only sends `SIGKILL` if it's still alive after that. This is the correct default whenever a task tells you to "stop" something.
+## How this module is organised
 
-```bash
-docker stop frontend_v1
-```
+1. **[Part 1 — The container lifecycle, and stopping one cleanly](./course-01-the-container-lifecycle-and-stopping.md)** — the created / running / paused / exited / dead state machine, why `docker stop` leaves a container `exited` rather than removed, the `SIGTERM` → grace period → `SIGKILL` mechanism, PID 1 signal handling, and when `docker kill` is the right call.
+2. **[Part 2 — Inspecting with `--format`, and launching with constraints](./course-02-inspecting-with-format.md)** — `docker inspect` as the daemon's full JSON record (create-time `.Config` vs runtime state), the Go-template language (`range`, `index`, `len`), per-network IP addresses, `docker run` with `--memory` and `-p`, and verifying limits from the daemon's record.
 
-`docker kill` skips straight to `SIGKILL` with no grace period at all. Reach for it only when a process is genuinely hung and ignoring termination signals — using it as your default is like unplugging a computer instead of shutting it down, every single time, just because it's faster.
+## Learning objectives
 
----
+After this module you can:
 
-## Reading the Manifest with `--format`
+- **Name** the container states and the verb that causes each transition, and explain why `stop` ≠ `rm`.
+- **Explain** what `docker stop` does signal by signal, and why a shell-form `CMD` makes it wait the full grace period.
+- **Choose** between `docker stop` and `docker kill`, and adjust the grace period with `-t`.
+- **Write** `docker inspect --format` templates using field paths, `range`, and `index`.
+- **Extract** a container's IP address whether it is on the default bridge or a user-defined network.
+- **Launch** a detached container with a memory limit and a port mapping, getting the `-p` direction right.
+- **Verify** the applied memory limit (in bytes) and port mapping from `docker inspect` / `docker ps`, not from the command you typed.
 
-`docker inspect --format` runs a Go template against the same JSON structure `docker inspect` would otherwise print in full, and prints only the field path you ask for.
+## Before you start
 
-```bash
-docker inspect --format '{{ .NetworkSettings.IPAddress }}' frontend_v2
-```
+Assumed: a Linux shell, the idea of a container as an isolated process, and basic JSON. Section 010's signal material (`SIGTERM` / `SIGKILL`) is useful background. Every command block states the context it assumes and runs against any Docker daemon you can reach (add `sudo` if your user is not in the `docker` group).
 
-`.NetworkSettings.IPAddress` holds the container's address when it's attached to the classic default bridge network. If that comes back empty, the container is very likely sitting on a custom, user-defined network instead — Docker only populates the top-level field for default-bridge containers, because once you're off the default bridge it tracks addresses per-network instead. The escape hatch is `range`, which iterates the `Networks` map without you needing to know the network's name in advance:
+## Where this fits
 
-```bash
-docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' frontend_v2
-```
-
-### Addressing Arrays Without Hardcoding
-
-A container's volume mounts live under `.Mounts`, a JSON array. If a task tells you a container "has one" mount, you still shouldn't hardcode an index you had to eyeball first — `index` addresses the array element generically:
-
-```bash
-docker inspect --format '{{ (index .Mounts 0).Destination }}' frontend_v2
-```
-
-`index .Mounts 0` grabs the first (and here, only) mount object; `.Destination` on that object is the in-container path. If you want to double-check the count before committing to an index, `{{ len .Mounts }}` answers that directly.
-
----
-
-## Launching With Constraints
-
-Starting a new container with an exact resource ceiling and a network mapping is one command with several flags stacked together:
-
-```bash
-docker run -d \
-  --name frontend_v3 \
-  --memory=30m \
-  -p 1234:80 \
-  nginx:alpine
-```
-
-`-d` detaches — the container runs in the background and you get your terminal back immediately instead of watching its stdout scroll by. `--name` fixes a human-readable name instead of a random one Docker would otherwise generate. `--memory=30m` caps the container's cgroup memory at 30 megabytes; if the process inside tries to exceed that ceiling, the kernel's OOM killer terminates it rather than letting memory usage grow unbounded. `-p 1234:80` maps host port 1234 to container port 80 — the left side of a `-p` mapping is always the host-facing port, the right side is what the process inside is actually listening on. Reverse them and you'll be knocking on a host port nothing is bound to.
-
-## Verifying What You Actually Built
-
-A command you typed correctly and a container that's actually configured the way you intended are two different things — a typo in `-p` or `--memory` fails silently from the shell's point of view. Always check the running state:
-
-```bash
-docker ps --filter "name=frontend_v3"
-docker inspect --format '{{ .HostConfig.Memory }}' frontend_v3
-docker stats --no-stream frontend_v3
-```
-
-`docker ps` with a name filter shows the PORTS column mapped as you expect. `docker inspect --format '{{ .HostConfig.Memory }}'` reports the memory ceiling in raw bytes (30 megabytes shows up as `31457280`). `docker stats --no-stream` gives you a single-shot snapshot of live memory usage against that limit, without leaving a continuously-updating pane open.
-
----
-
-## Self-Check and Verification
-
-To prove your container lifecycle work is correct:
-
-1. Stop a running container and confirm with `docker ps -a` that its STATUS shows `Exited`, not that it's been removed.
-2. Use `docker inspect --format` to extract a second container's IP address, falling back to the `range .NetworkSettings.Networks` form if the top-level field is empty.
-3. Use `index` against the `.Mounts` array to extract a volume mount destination without eyeballing raw JSON.
-4. Launch a new detached container with a memory limit and a port mapping in a single `docker run -d` command.
-5. Verify the memory limit and port mapping actually took effect using `docker inspect --format` and `docker ps`, not just by trusting the command you typed.
+This module is the "in what environment does it run" half of the section — cron (Module 1) schedules *who* runs a job, containers bound *how* it runs. The section capstone recovers a scheduled containerised workload, so carry forward both the "stop is not remove" distinction and the habit of verifying container config from the daemon's record.

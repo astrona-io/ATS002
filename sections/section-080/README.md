@@ -22,6 +22,9 @@ This section is divided into four focused modules, each paired with a dedicated 
 
 ### 1. Root-Filesystem Repair via chroot
 *   **Module Reader:** **[Module 1: Root-Filesystem Repair via chroot](./module-01/course.md)**
+    1. [Why a bad fstab stops the boot, and how to reach a shell](./module-01/course-01-why-it-wont-boot-and-reaching-a-shell.md)
+    2. [Mount the broken root, and get the tools in](./module-01/course-02-mount-and-get-tools-in.md)
+    3. [chroot in, fix, prove, unmount](./module-01/course-03-chroot-fix-prove-unmount.md)
 *   **Practice Lab Sandbox:** **`labs/section-080/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -31,6 +34,8 @@ This section is divided into four focused modules, each paired with a dedicated 
 
 ### 2. Password Reset & Single-User Recovery
 *   **Module Reader:** **[Module 2: Password Reset & Single-User Recovery](./module-02/course.md)**
+    1. [Two doors — rd.break and init=/bin/bash](./module-02/course-01-two-doors-rd-break-and-init.md)
+    2. [The chroot equivalent, and editing /etc/shadow directly](./module-02/course-02-chroot-equivalent-and-shadow-edit.md)
 *   **Practice Lab Sandbox:** **`labs/section-080/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -40,6 +45,9 @@ This section is divided into four focused modules, each paired with a dedicated 
 
 ### 3. Partition Table Backup & Recovery
 *   **Module Reader:** **[Module 3: Partition Table Backup & Recovery](./module-03/course.md)**
+    1. [Two layers, not one, and identifying the target disk](./module-03/course-01-two-layers-and-identifying-the-disk.md)
+    2. [Back up the partition table, and verify the backup](./module-03/course-02-backup-and-verify.md)
+    3. [Simulate, restore, and verify both layers](./module-03/course-03-simulate-restore-verify.md)
 *   **Practice Lab Sandbox:** **`labs/section-080/module-03/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -49,6 +57,9 @@ This section is divided into four focused modules, each paired with a dedicated 
 
 ### 4. GRUB Corruption Recovery
 *   **Module Reader:** **[Module 4: GRUB Corruption Recovery](./module-04/course.md)**
+    1. [Two repairs, easy to confuse, and reading the symptom](./module-04/course-01-two-repairs-and-the-symptom.md)
+    2. [The one-boot manual rescue from grub>](./module-04/course-02-manual-rescue-from-grub.md)
+    3. [The durable repair — reinstall and regenerate](./module-04/course-03-durable-repair.md)
 *   **Practice Lab Sandbox:** **`labs/section-080/module-04/lab-01`**
 *   **Lab Run Command:**
     ```bash

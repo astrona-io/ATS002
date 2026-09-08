@@ -21,6 +21,9 @@ This section is divided into two focused modules, each paired with a dedicated h
 
 ### 1. Compile & Install From Source
 *   **Module Reader:** **[Module 1: Compile & Install From Source](./module-01/course.md)**
+    1. [Unpacking the tarball, and the build pipeline](./module-01/course-01-unpacking-and-the-build-pipeline.md)
+    2. [Discovering and choosing configure flags](./module-01/course-02-discovering-and-choosing-flags.md)
+    3. [Building, installing, and verifying](./module-01/course-03-building-installing-verifying.md)
 *   **Practice Lab Sandbox:** **`labs/section-030/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash

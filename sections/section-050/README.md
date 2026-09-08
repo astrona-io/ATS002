@@ -25,6 +25,9 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 1. Third-Party Repositories & Package Pinning
 *   **Module Reader:** **[Module 1: Third-Party Repositories & Package Pinning](./module-01/course.md)**
+    1. [Scoped trust — keyrings and signed-by](./module-01/course-01-scoped-trust.md)
+    2. [Adding the repository and confirming it registered](./module-01/course-02-adding-the-repository.md)
+    3. [Installing an exact version, and locking it](./module-01/course-03-exact-version-and-hold.md)
 *   **Practice Lab Sandbox:** **`labs/section-050/module-01/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -34,6 +37,9 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 2. dpkg Low-Level Package Management
 *   **Module Reader:** **[Module 2: dpkg Low-Level Package Management](./module-02/course.md)**
+    1. [What dpkg knows, and inspecting a .deb](./module-02/course-01-dpkg-scope-and-inspecting-a-deb.md)
+    2. [Installing directly, and ownership queries](./module-02/course-02-installing-and-ownership-queries.md)
+    3. [Status codes and recovering an interrupted package](./module-02/course-03-status-codes-and-recovery.md)
 *   **Practice Lab Sandbox:** **`labs/section-050/module-02/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -43,6 +49,9 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 3. APT Basic Package Operations
 *   **Module Reader:** **[Module 3: APT Basic Package Operations](./module-03/course.md)**
+    1. [apt update is not apt upgrade](./module-03/course-01-update-is-not-upgrade.md)
+    2. [Applying upgrades, and installing](./module-03/course-02-applying-upgrades-and-installing.md)
+    3. [Removing cleanly](./module-03/course-03-removing-cleanly.md)
 *   **Practice Lab Sandbox:** **`labs/section-050/module-03/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -52,6 +61,8 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 4. APT Package Information Lookup
 *   **Module Reader:** **[Module 4: APT Package Information Lookup](./module-04/course.md)**
+    1. [Finding a package, and describing it](./module-04/course-01-finding-and-describing.md)
+    2. [Installed vs. candidate, and which source wins](./module-04/course-02-installed-vs-candidate.md)
 *   **Practice Lab Sandbox:** **`labs/section-050/module-04/lab-01`**
 *   **Lab Run Command:**
     ```bash
@@ -61,6 +72,8 @@ This section is divided into five highly focused, sequential modules. Each modul
 
 ### 5. APT Package Groups & Bulk Operations
 *   **Module Reader:** **[Module 5: APT Package Groups & Bulk Operations](./module-05/course.md)**
+    1. [One transaction, and finding a family by pattern](./module-05/course-01-one-transaction-and-finding-a-family.md)
+    2. [Bulk actions across a matched set](./module-05/course-02-bulk-actions-across-a-set.md)
 *   **Practice Lab Sandbox:** **`labs/section-050/module-05/lab-01`**
 *   **Lab Run Command:**
     ```bash
