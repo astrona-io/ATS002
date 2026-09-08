@@ -88,8 +88,12 @@ This section is divided into six highly focused, sequential modules. Each module
     2. [The effective unit definition](./module-06/course-02-the-effective-unit-definition.md)
     3. [Reading the journal](./module-06/course-03-reading-the-journal.md)
     4. [Failure shapes, and proving the fix](./module-06/course-04-failure-shapes-and-proving-the-fix.md)
-*   **Practice Lab Sandbox:** **`labs/section-010/module-06/lab-01`** *(to be added)*
-*   **Hands-on Objective:** Take a host where `apache2` fails to start, read `systemctl status` and `journalctl -xeu apache2` to find the root cause, fix it, and confirm the unit is both `active` now and `enabled` for boot.
+*   **Practice Lab Sandboxes** — four cases, one per failure shape:
+    1. **`labs/section-010/module-06/lab-01`** — bad `ExecStart` path (`status=203/EXEC`)
+    2. **`labs/section-010/module-06/lab-02`** — permission denied writing the state directory (non-root `User=`)
+    3. **`labs/section-010/module-06/lab-03`** — port already in use (`(98)Address already in use`)
+    4. **`labs/section-010/module-06/lab-04`** — failed `Requires=` dependency plus a `Restart=` flap that hit `start-limit-hit`
+*   **Hands-on Objective:** For each case, read `systemctl status` and `journalctl -xeu <unit>` to find the root cause, fix the actual fault (not by masking or stubbing the unit), and confirm the unit is both `active` now and `enabled` for boot.
 
 ### 7. Section Capstone Challenge
 *   **Comprehensive Challenge:** **`labs/section-010/capstone/lab-01` (Kernel, Process, Module & Device Runtime Management Capstone)**

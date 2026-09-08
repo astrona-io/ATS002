@@ -1,0 +1,35 @@
+metadata:
+  name: "ats-002-lab-017"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "service-debug-permission-setup"
+      description: "metricsd.service runs as User=metricsd and writes to /var/lib/metricsd, which is owned root:root mode 0755 - not writable by metricsd. The daemon exits 1 with 'Permission denied' every start. Unit is enabled, not active."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-metricsd-running-enabled-and-writing"
+      description: "Confirms metricsd.service is active and enabled, still runs as a non-root user, and can now write into its state directory (the permission/ownership problem was genuinely fixed)."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

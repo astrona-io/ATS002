@@ -190,6 +190,54 @@ modules:
         path: sections/section-010/module-06/course-04-failure-shapes-and-proving-the-fix.md
 
       - type: reading
+        title: Question
+        path: labs/section-010/module-06/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-06/lab-01/solution.md
+
+      - type: lab
+        title: "Service Won't Start: Bad ExecStart Path Lab"
+        path: labs/section-010/module-06/lab-01
+
+      - type: reading
+        title: Question
+        path: labs/section-010/module-06/lab-02/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-06/lab-02/solution.md
+
+      - type: lab
+        title: "Service Won't Start: Permission Denied Lab"
+        path: labs/section-010/module-06/lab-02
+
+      - type: reading
+        title: Question
+        path: labs/section-010/module-06/lab-03/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-06/lab-03/solution.md
+
+      - type: lab
+        title: "Service Won't Start: Port Already In Use Lab"
+        path: labs/section-010/module-06/lab-03
+
+      - type: reading
+        title: Question
+        path: labs/section-010/module-06/lab-04/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-06/lab-04/solution.md
+
+      - type: lab
+        title: "Service Won't Start: Failed Dependency & Restart Flap Lab"
+        path: labs/section-010/module-06/lab-04
+
+      - type: reading
         title: "Section 010 Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics"
         path: sections/section-010/quiz.md
 

@@ -1,0 +1,35 @@
+metadata:
+  name: "ats-002-lab-016"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "service-debug-bad-execstart-setup"
+      description: "Installs reportd (a small daemon) at /usr/local/sbin/reportd but ships reportd.service with ExecStart pointing at the wrong path /usr/local/bin/reportd, so the unit fails at start with status=203/EXEC. The unit is enabled but not active."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-reportd-running-and-enabled"
+      description: "Confirms reportd.service is active (running) and enabled for boot, and that it is genuinely writing its heartbeat file - i.e. the ExecStart path was corrected, not just the state forced."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

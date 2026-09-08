@@ -1,0 +1,35 @@
+metadata:
+  name: "ats-002-lab-019"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "service-debug-dependency-and-flap-setup"
+      description: "ingest.service Requires= ingest-db.service, which is broken (bad ExecStart) so ingest is pulled down with it. ingest also has Restart=always and has hit start-limit-hit. Neither unit is enabled. Candidate must fix ingest-db, reset-failed, start the chain, and enable both."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-ingest-chain-active-and-enabled"
+      description: "Confirms both ingest-db.service and ingest.service are active (running) and enabled for boot, that ingest is no longer in a start-limit / auto-restart flap, and that ingest is doing real work."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

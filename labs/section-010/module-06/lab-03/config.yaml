@@ -1,0 +1,35 @@
+metadata:
+  name: "ats-002-lab-018"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "service-debug-port-conflict-setup"
+      description: "webreport.service (an HTTP server on TCP 8080) fails to bind because portsquatter.service already holds 8080. webreport is enabled but failed with (98)Address already in use."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-webreport-serving-and-enabled"
+      description: "Confirms webreport.service is active and enabled, is the process listening on TCP 8080, answers an HTTP request there, and that the conflicting portsquatter service is no longer holding the port."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false
