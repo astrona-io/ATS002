@@ -44,14 +44,11 @@ sudo readlink -f /proc/1235/exe
 >
 > The real backing binary is `/bin/bash` — not "collector3", because these are scripts. And the instant the service stopped, `/proc/$P/` was gone; the resolve had to happen first. (`systemctl start collector3.service` to bring it back.)
 
-```
-  confirmed PID 1235
-        │
-   readlink -f /proc/1235/exe   ──►  capture  /usr/local/bin/collector2
-        │
-   kill 1235  (SIGTERM) ─ wait ─ kill -9 1235 if still alive
-        │
-   rm  /usr/local/bin/collector2      ← the captured path, not a guess
+```mermaid
+flowchart TD
+    P["confirmed PID 1235"] --> C["readlink -f /proc/1235/exe → capture /usr/local/bin/collector2"]
+    C --> K["kill 1235 (SIGTERM) — wait — kill -9 1235 if still alive"]
+    K --> RM["rm /usr/local/bin/collector2 — the captured path, not a guess"]
 ```
 
 ## Terminate: the escalation ladder

@@ -21,12 +21,11 @@ net.ipv4.ip_forward = 1
 
 The lifecycle of a `-w`-only change:
 
-```
-  boot ──► kernel reads /etc/sysctl.d/*, /run/…, /usr/lib/…  ──► value = config (or compiled default)
-                                                                        │
-                              sudo sysctl -w key=1  ──────────────────►  value = 1   (memory only)
-                                                                        │
-  reboot ─────────────────────────────────────────────────────────────► value = config (or default)   ← your 1 is gone
+```mermaid
+stateDiagram-v2
+    [*] --> ConfigValue: boot — kernel reads /etc/sysctl.d/*, /run, /usr/lib
+    ConfigValue --> LiveOverride: sudo sysctl -w key=1 (memory only, no file changed)
+    LiveOverride --> ConfigValue: reboot — value rebuilt from config / compiled default
 ```
 
 As an analogy (flagged): `sysctl -w` is writing on a whiteboard — fully real and readable now, but nobody photographed it and the board is wiped at reboot. Where it breaks down: a whiteboard keeps your writing until someone erases it; the kernel value is reconstructed from scratch on every boot, so "nobody changed it back" is not why it reverts — it is rebuilt from the config files regardless.

@@ -34,17 +34,11 @@ A **drop-in** is a `.conf` file in a directory named after the unit:
 
 The manager loads the base unit, then applies every `*.conf` in every `<unit>.d/` directory it found, **sorted lexically by filename** across all sources. Later files win on any setting they touch; settings they do not mention keep the base value.
 
-```
-  base unit (/usr/lib/.../apache2.service)
-        │  Type=forking
-        │  ExecStart=/usr/sbin/apachectl start
-        ▼
-  + 10-hardening.conf   PrivateTmp=true
-        ▼
-  + override.conf       Environment=APACHE_PORT=8080
-        ▼
-  = effective unit:  Type=forking, ExecStart=…apachectl start,
-                     PrivateTmp=true, Environment=APACHE_PORT=8080
+```mermaid
+flowchart TD
+    B["base unit (/usr/lib/.../apache2.service)<br/>Type=forking · ExecStart=/usr/sbin/apachectl start"] --> D1["+ 10-hardening.conf<br/>PrivateTmp=true"]
+    D1 --> D2["+ override.conf<br/>Environment=APACHE_PORT=8080"]
+    D2 --> EFF["= effective unit<br/>Type=forking · ExecStart=…apachectl start · PrivateTmp=true · Environment=APACHE_PORT=8080"]
 ```
 
 As an analogy (flagged): drop-ins are the CSS cascade for units — a later, more specific rule overrides an earlier one property-by-property, and anything it does not set is inherited. Where it breaks down: CSS has specificity weighting; systemd drop-ins are purely last-wins by sorted filename, so people prefix them `10-`, `20-` to control order.

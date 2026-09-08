@@ -14,17 +14,12 @@ virsh shutdown inventory-db
 
 What this actually does: it delivers an **ACPI power-button event** into the guest — the virtual equivalent of a human briefly pressing the physical power button on a desktop. It does **not** stop the VM. It asks the guest's own init system (systemd on most modern Linux) to notice that event and run its normal clean shutdown: stop services in order, flush and sync filesystem caches, unmount, then power off. Only after the guest does all that does QEMU exit and the domain reach `shut off`.
 
-```
-  virsh shutdown
-        │
-        ▼
-  ACPI power-button event ──► guest kernel ──► systemd catches it
-                                                   │
-                                       stop services, sync, unmount
-                                                   │
-                                              guest powers off
-                                                   │
-                                          QEMU exits ──► State: shut off
+```mermaid
+flowchart TD
+    S["virsh shutdown"] --> E["ACPI power-button event → guest kernel → systemd catches it"]
+    E --> C["stop services, sync, unmount"]
+    C --> P["guest powers off"]
+    P --> X["QEMU exits → State: shut off"]
 ```
 
 Because every step after the first depends on the **guest cooperating**, `shutdown` is **asynchronous**: the command returns immediately, before anything has actually stopped. You have to poll to see whether it worked:
@@ -72,15 +67,10 @@ virsh destroy inventory-db
 
 Despite the name, `destroy` **deletes nothing** — not the domain definition, not the disk image, not a byte of guest data on disk. What it does is immediately terminate the underlying `qemu-system-*` process (a signal to that process, not a request to the guest). The guest gets **no** chance to flush caches, sync filesystems, or stop services. It is the exact software equivalent of pulling the power cord out of a running physical machine.
 
-```
-  virsh destroy
-        │
-        ▼
-  kill the QEMU process ──► guest stops mid-instruction
-                              (no sync, no unmount)
-        │
-        ▼
-  State: shut off   (definition + disk untouched)
+```mermaid
+flowchart TD
+    D["virsh destroy"] --> K["kill the QEMU process → guest stops mid-instruction (no sync, no unmount)"]
+    K --> X["State: shut off (definition + disk untouched)"]
 ```
 
 `destroy` is **synchronous and unconditional**: by the time the command returns, the domain is `shut off`. It always works — there is no guest cooperation to fail.

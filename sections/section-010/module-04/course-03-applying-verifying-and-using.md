@@ -19,15 +19,11 @@ sudo udevadm trigger --subsystem-match=block
 
 `trigger` synthesises fresh `add`/`change` uevents for devices that are already present, forcing udev to run the **full rule chain — including your new rule — against them**. `--subsystem-match=block` scopes it so you are not re-triggering every settled device on the box.
 
-```
-  edit /etc/udev/rules.d/99-backup-drive.rules
-        │
-  udevadm control --reload-rules   → udevd now KNOWS the rule
-        │                            (but /dev/backup-drive still absent)
-  udevadm trigger --subsystem-match=block
-        │                          → udevd RE-RUNS rules against /dev/sdc
-        ▼
-  /dev/backup-drive , /dev/backup-drive1 appear
+```mermaid
+flowchart TD
+    E["edit /etc/udev/rules.d/99-backup-drive.rules"] --> R["udevadm control --reload-rules"]
+    R -->|udevd now knows the rule — but /dev/backup-drive still absent| T["udevadm trigger --subsystem-match=block"]
+    T -->|udevd re-runs the rule chain against /dev/sdc| L["/dev/backup-drive , /dev/backup-drive1 appear"]
 ```
 
 `--reload-rules` alone runs cleanly, prints nothing, and looks like it worked — while doing nothing to the device you care about. Always follow it with `trigger` (or `udevadm trigger --action=add --name-match=sdc` for just the one device).

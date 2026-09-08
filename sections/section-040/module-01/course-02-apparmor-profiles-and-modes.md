@@ -124,12 +124,12 @@ Every loaded profile is in exactly one mode:
 - **enforce** — the profile is a hard allow-list. Anything not permitted is **blocked** and logged. This is MAC doing its job.
 - **complain** — the profile still evaluates every access and **logs** what it *would* have denied, but **allows it anyway**. Nothing is blocked.
 
-```
-                aa-complain <program>
-     enforce ─────────────────────────────►  complain
-   (blocks +                                 (logs only,
-    logs)    ◄─────────────────────────────  allows all)
-                aa-enforce <program>
+```mermaid
+stateDiagram-v2
+    state "enforce — blocks + logs" as Enforce
+    state "complain — logs only, allows all" as Complain
+    Enforce --> Complain: aa-complain PROGRAM
+    Complain --> Enforce: aa-enforce PROGRAM
 ```
 
 `complain` exists for one legitimate job: watching what a program actually needs while you build its profile, without breaking it. It is **never a permanent fix**. A profile parked in `complain` will make a failing action "succeed" — but only because nothing is being checked, not because you closed the gap. Part 3's last checkpoint is about telling those two apart.

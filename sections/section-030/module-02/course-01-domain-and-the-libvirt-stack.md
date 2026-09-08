@@ -27,28 +27,11 @@ A domain has a **name** (`inventory-db`), a permanent **UUID**, and — only whi
 
 `virsh` is a thin client. It does almost nothing itself. The work is spread across three layers:
 
-```
-  you type:   virsh start inventory-db
-                     |
-                     v
-  +----------------------------------+
-  | virsh (CLI client)               |  parses the command, opens a
-  |                                  |  connection to a libvirt URI
-  +----------------------------------+
-                     | libvirt RPC (local socket by default)
-                     v
-  +----------------------------------+
-  | libvirtd / the modern split      |  reads the domain XML, decides
-  | virtqemud daemon                 |  what QEMU command line it implies,
-  |                                  |  tracks the domain's state
-  +----------------------------------+
-                     | fork + exec, then monitor socket
-                     v
-  +----------------------------------+
-  | qemu-system-x86_64 (one process  |  the actual virtual machine:
-  | per running domain)              |  emulates the hardware, runs the
-  |   + KVM kernel module            |  guest, KVM gives it real CPU
-  +----------------------------------+
+```mermaid
+flowchart TD
+    U["you type: virsh start inventory-db"] --> V["virsh — CLI client<br/>parses the command, opens a connection to a libvirt URI"]
+    V -->|libvirt RPC, local socket by default| D["libvirtd / the modern virtqemud daemon<br/>reads the domain XML, derives the QEMU command line, tracks state"]
+    D -->|fork + exec, then monitor socket| Q["qemu-system-x86_64 — one process per running domain<br/>emulates the hardware; KVM gives it real CPU"]
 ```
 
 Read that top to bottom every time something misbehaves. If `virsh list` shows a domain `running` but the guest is unreachable, the QEMU process is alive and the fault is inside the guest. If `virsh` itself hangs or errors, you have not reached the daemon yet and the guest state is irrelevant.

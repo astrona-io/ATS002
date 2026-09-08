@@ -17,19 +17,12 @@ cat /sys/module/dummy/parameters/numdummies      # -> 2
 
 ## `modprobe` vs `insmod`
 
-```
-  sudo modprobe dummy numdummies=2
-        │
-        ▼
-  read /lib/modules/$(uname -r)/modules.dep   ← built by depmod
-        │   "dummy needs: (nothing)"
-        │   "e.g. iwlmvm needs: iwlwifi, mac80211, cfg80211, …"
-        ▼
-  insmod each missing dependency, in order
-        ▼
-  insmod dummy.ko numdummies=2
-        ▼
-  kernel runs the module's init, applies parameters
+```mermaid
+flowchart TD
+    M["sudo modprobe dummy numdummies=2"] --> DEP["read /lib/modules/$(uname -r)/modules.dep (built by depmod)<br/>e.g. 'dummy needs: nothing'; 'iwlmvm needs: iwlwifi, mac80211, cfg80211, …'"]
+    DEP --> I1["insmod each missing dependency, in order"]
+    I1 --> I2["insmod dummy.ko numdummies=2"]
+    I2 --> INIT["kernel runs the module's init, applies parameters"]
 ```
 
 - **`insmod <file>.ko`** loads exactly the one file you name and **fails if a dependency is not already loaded** (`Unknown symbol` errors). It does no path resolution — you give it a full path.

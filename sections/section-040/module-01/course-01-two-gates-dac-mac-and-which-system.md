@@ -31,21 +31,13 @@ ls -l /srv/reports/q3.csv
 
 That something is the **second** gate — **Mandatory Access Control (MAC)**: a system-wide security policy, set by the administrator (or shipped by the distro), that the file's owner cannot override. It decides independently whether a process may touch a resource. Both gates must open for the action to succeed:
 
-```
-  process wants to open a file
-            │
-            ▼
-   ┌──────────────────┐   deny → EACCES ("Permission denied")
-   │  DAC: rwx / ACL  │──────────────────────────────────►
-   └────────┬─────────┘
-            │ allow
-            ▼
-   ┌──────────────────┐   deny → EACCES  (and an audit log line)
-   │  MAC: LSM policy │──────────────────────────────────►
-   └────────┬─────────┘
-            │ allow
-            ▼
-      open() succeeds
+```mermaid
+flowchart TD
+    R["process wants to open a file"] --> DAC{"DAC: rwx / ACL"}
+    DAC -->|deny| E1["EACCES — Permission denied"]
+    DAC -->|allow| MAC{"MAC: LSM policy"}
+    MAC -->|deny| E2["EACCES — Permission denied, plus an audit log line"]
+    MAC -->|allow| OK["open() succeeds"]
 ```
 
 The kernel checks DAC first, then hands the decision to a **Linux Security Module (LSM)** — the kernel framework MAC plugs into. If the LSM's policy denies, the syscall fails with the same `EACCES` / "Permission denied" that a DAC failure gives. The error text does not tell you which gate stopped you.

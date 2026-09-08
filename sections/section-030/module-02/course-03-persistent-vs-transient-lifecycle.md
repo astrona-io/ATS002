@@ -21,16 +21,13 @@ Restated as the rule to memorise: **`define` = register (and don't start); `crea
 
 ## The persistent lifecycle
 
-```
-                sudo virsh define d.xml
-   (nonexistent) ─────────────────────────►  defined, shut off
-        ▲                                        │   ▲
-        │ sudo virsh undefine d                  │   │ virsh shutdown / destroy
-        │ (only from shut off)                   │   │ (Part 5)
-        │                                    virsh start
-        │                                        │   │
-        └──────────────── defined, shut off ◄────┘   │
-                                    running ─────────┘
+```mermaid
+stateDiagram-v2
+    state "defined, shut off" as ShutOff
+    [*] --> ShutOff: sudo virsh define d.xml
+    ShutOff --> running: virsh start
+    running --> ShutOff: virsh shutdown / virsh destroy (Part 5)
+    ShutOff --> [*]: sudo virsh undefine (only from shut off)
 ```
 
 Key properties:
@@ -42,13 +39,10 @@ Key properties:
 
 ## The transient lifecycle
 
-```
-                sudo virsh create d.xml
-   (nonexistent) ─────────────────────────►  running (in-daemon-memory only)
-        ▲                                        │
-        │                                        │ shutdown / destroy / crash / host reboot
-        │                                        ▼
-        └────────────────────────────────  (nonexistent again — definition gone)
+```mermaid
+stateDiagram-v2
+    [*] --> running: sudo virsh create d.xml (in daemon memory only)
+    running --> [*]: shutdown / destroy / crash / host reboot — definition gone
 ```
 
 Key properties:

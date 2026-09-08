@@ -8,14 +8,10 @@
 
 When the kernel discovers a device, it emits a **uevent** — a small message on a netlink socket — and populates the device's directory under **`/sys`** (sysfs) with its attributes. `udevd` (systemd's `systemd-udevd`) listens for those uevents, runs its **rules** against the device, and creates the node under `/dev` plus any symlinks the rules ask for.
 
-```
-  kernel discovers device
-        │  uevent (netlink) + /sys/devices/.../<dev> populated
-        ▼
-  systemd-udevd  ── runs /etc/udev/rules.d/ + /usr/lib/udev/rules.d/ in order
-        │
-        ▼
-  /dev/sdc  created   +   any SYMLINK+= names   +   ENV{} properties set
+```mermaid
+flowchart TD
+    K["kernel discovers device"] -->|uevent on a netlink socket + /sys/devices/.../&lt;dev&gt; populated| U["systemd-udevd — runs /etc/udev/rules.d/ + /usr/lib/udev/rules.d/ in order"]
+    U --> N["/dev/sdc created + any SYMLINK+= names + ENV{} properties set"]
 ```
 
 The kernel name (`sdc`) reflects enumeration order and nothing else. Plug in an unrelated USB stick that gets probed first and your intended disk can shift from `sdc` to `sdd` with no message anywhere. A script with `/dev/sdc1` hardcoded then operates on the wrong disk, silently.
