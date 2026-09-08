@@ -26,7 +26,9 @@ This section has one module, deliberately built around two parts — a real hand
     3. [AppArmor — diagnosing and fixing a path denial](./module-01/course-03-apparmor-diagnosing-and-fixing.md)
     4. [SELinux — labels, contexts, and the AVC denial](./module-01/course-04-selinux-labels-and-avc-denials.md)
     5. [SELinux — persistent fixes and the AppArmor contrast](./module-01/course-05-selinux-persistent-fixes-and-contrast.md)
-* **Practice Lab Sandbox:** **`labs/section-040/module-01/lab-01`**
+* **Practice Lab Sandboxes:**
+    1. **`labs/section-040/module-01/lab-01`** — a *write* denial: `appservice` blocked writing its relocated log dir
+    2. **`labs/section-040/module-01/lab-02`** — a *read* denial: `credsync` blocked reading its relocated API key (`denied_mask="r"`)
 * **Lab Run Command:**
     ```bash
     astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-040/module-01/lab-01

@@ -39,7 +39,10 @@ This section is divided into six highly focused, sequential modules. Each module
     1. [The shared PID pool and confirming exhaustion](./module-02/course-01-the-shared-pid-pool.md)
     2. [The three independent ceilings](./module-02/course-02-the-three-independent-ceilings.md)
     3. [Raising each ceiling, in order](./module-02/course-03-raising-each-ceiling-in-order.md)
-*   **Practice Lab Sandbox:** **`labs/section-010/module-02/lab-01`**
+*   **Practice Lab Sandboxes:**
+    1. **`labs/section-010/module-02/lab-01`** — raise all three ceilings (`pid_max`, `ulimit -u`, `TasksMax=`) persistently
+    2. **`labs/section-010/module-02/lab-02`** — *diagnosis:* only `ulimit -u` is the clamp; raise only that one
+    3. **`labs/section-010/module-02/lab-03`** — *diagnosis:* only the unit's `TasksMax=` is the clamp; raise only that one
 *   **Lab Run Command:**
     ```bash
     astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-010/module-02/lab-01
@@ -88,11 +91,13 @@ This section is divided into six highly focused, sequential modules. Each module
     2. [The effective unit definition](./module-06/course-02-the-effective-unit-definition.md)
     3. [Reading the journal](./module-06/course-03-reading-the-journal.md)
     4. [Failure shapes, and proving the fix](./module-06/course-04-failure-shapes-and-proving-the-fix.md)
-*   **Practice Lab Sandboxes** — four cases, one per failure shape:
+*   **Practice Lab Sandboxes:**
     1. **`labs/section-010/module-06/lab-01`** — bad `ExecStart` path (`status=203/EXEC`)
     2. **`labs/section-010/module-06/lab-02`** — permission denied writing the state directory (non-root `User=`)
     3. **`labs/section-010/module-06/lab-03`** — port already in use (`(98)Address already in use`)
     4. **`labs/section-010/module-06/lab-04`** — failed `Requires=` dependency plus a `Restart=` flap that hit `start-limit-hit`
+    5. **`labs/section-010/module-06/lab-05`** — configure `journald` for persistent, size-bounded logging
+    6. **`labs/section-010/module-06/lab-06`** — set the default boot target (`systemctl set-default multi-user.target`)
 *   **Hands-on Objective:** For each case, read `systemctl status` and `journalctl -xeu <unit>` to find the root cause, fix the actual fault (not by masking or stubbing the unit), and confirm the unit is both `active` now and `enabled` for boot.
 
 ### 7. Section Capstone Challenge

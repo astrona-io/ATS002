@@ -25,7 +25,9 @@ This section is divided into four focused modules, each paired with a dedicated 
     1. [Why a bad fstab stops the boot, and how to reach a shell](./module-01/course-01-why-it-wont-boot-and-reaching-a-shell.md)
     2. [Mount the broken root, and get the tools in](./module-01/course-02-mount-and-get-tools-in.md)
     3. [chroot in, fix, prove, unmount](./module-01/course-03-chroot-fix-prove-unmount.md)
-*   **Practice Lab Sandbox:** **`labs/section-080/module-01/lab-01`**
+*   **Practice Lab Sandboxes:**
+    1. **`labs/section-080/module-01/lab-01`** — a mistyped UUID in `/etc/fstab`
+    2. **`labs/section-080/module-01/lab-02`** — a wrong filesystem *type* in `/etc/fstab` (`ext4` where the partition is `xfs`)
 *   **Lab Run Command:**
     ```bash
     astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/module-01/lab-01

@@ -1,0 +1,35 @@
+metadata:
+  name: "ats-002-lab-042"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-042-apparmor-read-denial-setup"
+      description: "The credsync daemon now reads its API key from /etc/credsync/api.key (relocated from /var/lib/credsync/). Its AppArmor profile, in enforce mode, only permits the old path - so every read of the new key is denied with denied_mask=\"r\"."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-credsync-read-allowed-and-enforcing"
+      description: "Confirms the credsync profile is loaded in enforce mode, the daemon can now read /etc/credsync/api.key (it writes a ready marker only when the read succeeds), and no fresh apparmor DENIED entries for credsync appear."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

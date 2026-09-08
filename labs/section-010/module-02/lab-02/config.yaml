@@ -1,0 +1,35 @@
+metadata:
+  name: "ats-002-lab-012b"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-012b-single-ceiling-ulimit"
+      description: "kernel.pid_max is already generous (4194304) and data-ingest.service already has TasksMax=infinity. Only the dataproc user's RLIMIT_NPROC (ulimit -u) is clamped low. The task is to DIAGNOSE that only one ceiling is the limit, and raise only that one."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-ulimit-raised-and-others-left-alone"
+      description: "Confirms dataproc's ulimit -u is raised and persisted; that kernel.pid_max and the unit's TasksMax were left at their already-generous values; and that no student-added file needlessly raised pid_max (which was never the limiting ceiling)."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

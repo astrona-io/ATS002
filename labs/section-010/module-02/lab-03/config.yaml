@@ -1,0 +1,35 @@
+metadata:
+  name: "ats-002-lab-012c"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-012c-single-ceiling-tasksmax"
+      description: "kernel.pid_max is already generous and dataproc's ulimit -u is already high. Only data-ingest.service's own TasksMax=64 cgroup cap is clamping. The task is to diagnose that and raise only the unit override, applying it to the running unit."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-tasksmax-raised-and-others-left-alone"
+      description: "Confirms data-ingest.service's TasksMax is raised and applied to the running unit; that kernel.pid_max and dataproc's ulimit -u were left at their already-generous values and no student file needlessly raised them."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

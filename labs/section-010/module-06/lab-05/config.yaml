@@ -1,0 +1,35 @@
+metadata:
+  name: "ats-002-lab-016e"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-016e-journald-volatile-setup"
+      description: "journald is left at its default (Storage=auto with no /var/log/journal, i.e. volatile - logs lost on reboot) and with no size cap. The task is to make the journal persistent and bounded."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-journald-persistent-and-bounded"
+      description: "Confirms /var/log/journal exists, journald config sets Storage=persistent and a SystemMaxUse cap of 200M or less, the setting was applied (journald restarted), and current on-disk usage is within the cap."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

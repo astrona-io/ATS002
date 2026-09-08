@@ -1,0 +1,40 @@
+metadata:
+  name: "ats-002-lab-023"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-023-systemd-timers-setup"
+      description: "Provides two maintenance scripts (/usr/local/sbin/report.sh, /usr/local/sbin/dbclean.sh) and one existing system-wide cron job that runs dbclean.sh every 6 hours - to be converted to a systemd timer."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-report-timer"
+      description: "Confirms report.timer + report.service exist, the timer is enabled and active, activates report.service, uses OnCalendar Mon,Thu 11:15, and has Persistent=true."
+      type: "file"
+      source: "validation/validate-report-timer.sh"
+
+    - name: "verify-cron-converted-to-timer"
+      description: "Confirms the dbclean cron job was removed and replaced by an enabled, active systemd timer running dbclean.sh every 6 hours, activating a dbclean service."
+      type: "file"
+      source: "validation/validate-cron-converted.sh"
+
+teardown:
+  keepCluster: false

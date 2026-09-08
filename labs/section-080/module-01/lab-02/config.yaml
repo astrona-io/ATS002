@@ -1,0 +1,37 @@
+metadata:
+  name: "ats-002-lab-085"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    extraDisks:
+      - sizeGB: 2
+        serial: "lab085-data002"
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-085-setup"
+      description: "Builds a disposable 'data-002' stand-in disk: a root partition carrying its own /etc/fstab, and a data partition formatted xfs - but the fstab entry declares the wrong filesystem type (ext4). mount -a fails with 'wrong fs type, bad superblock'. The device/UUID in the entry is correct; only the type field is wrong."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-fstype-fixed"
+      description: "Confirms /etc/fstab on the stand-in disk's root partition now declares the data partition's real filesystem type (xfs), matching blkid, so a boot-time mount -a would succeed."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

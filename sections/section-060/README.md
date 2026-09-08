@@ -39,7 +39,9 @@ This section is divided into five highly focused, sequential modules. Each modul
 *   **Module Reader:** **[Module 2: Rebuilding a Corrupted RPM Database](./module-02/course.md)**
     1. [Recognising the symptom, and not assuming the backend](./module-02/course-01-recognising-the-symptom.md)
     2. [Back up, rebuild, verify](./module-02/course-02-backup-rebuild-verify.md)
-*   **Practice Lab Sandbox:** **`labs/section-060/module-02/lab-01`**
+*   **Practice Lab Sandboxes:**
+    1. **`labs/section-060/module-02/lab-01`** — genuine sqlite rpmdb corruption: back up and `rpm --rebuilddb`
+    2. **`labs/section-060/module-02/lab-02`** — a corruption *look-alike*: `dnf check` fails, but it is an unmet dependency, not the database — do **not** rebuild
 *   **Lab Run Command:**
     ```bash
     astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-02/lab-01

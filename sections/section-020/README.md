@@ -8,16 +8,17 @@ Both topics look deceptively simple from the outside — "just add a line to a f
 
 ## What You Will Master
 
-By completing this section, you will acquire three core operational capabilities:
+By completing this section, you will acquire four core operational capabilities:
 *   **Per-User Job Scheduling:** How to distinguish system-wide cron sources from per-user crontabs, migrate a job between them without creating a duplicate-execution bug, and express compound day-of-week schedules correctly.
 *   **Container Metadata Extraction:** How to use `docker inspect --format` with Go templates to pull a single, precise fact — an IP address, a mount path — out of a container's metadata instead of eyeballing raw JSON.
 *   **Constrained Container Launches:** How to start a new detached container with an exact memory ceiling and a host-to-container port mapping, and verify both took effect.
+*   **systemd Timers:** How to build a `.timer` + `.service` pair, express a schedule with `OnCalendar=`, enable cron-style catch-up with `Persistent=`, and convert a cron job to a timer.
 
 ---
 
 ## The Learning & Lab Path
 
-This section is divided into two focused modules, each paired with a dedicated hands-on practice lab, and concluded with a Section Capstone Challenge that requires both skills working together:
+This section is divided into three focused modules, each paired with a dedicated hands-on practice lab, and concluded with a Section Capstone Challenge that requires both skills working together:
 
 ### 1. Per-User Cron Job Scheduling
 *   **Module Reader:** **[Module 1: Per-User Cron Job Scheduling](./module-01/course.md)**
@@ -41,7 +42,19 @@ This section is divided into two focused modules, each paired with a dedicated h
     ```
 *   **Hands-on Objective:** Stop a running container, extract another container's IP address and volume mount destination using `docker inspect --format`, and launch a new detached container with a hard memory limit and a host-to-container port mapping.
 
-### 3. Section Capstone Challenge
+### 3. systemd Timers
+*   **Module Reader:** **[Module 3: systemd Timers](./module-03/course.md)**
+    1. [The timer and service pair](./module-03/course-01-the-timer-and-service-pair.md)
+    2. [Schedule expressions](./module-03/course-02-schedule-expressions.md)
+    3. [Timers vs. cron, and operating them](./module-03/course-03-timers-vs-cron-and-operating.md)
+*   **Practice Lab Sandbox:** **`labs/section-020/module-03/lab-01`**
+*   **Lab Run Command:**
+    ```bash
+    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/module-03/lab-01
+    ```
+*   **Hands-on Objective:** Create a `.service` + `.timer` pair that runs a maintenance script `OnCalendar=Mon,Thu 11:15` with `Persistent=true`, then convert an existing `/etc/cron.d/` job to an equivalent 6-hourly timer and remove the cron line.
+
+### 4. Section Capstone Challenge
 *   **Comprehensive Challenge:** **`labs/section-020/capstone/lab-01` (Scheduled Container Recovery)**
 *   **Lab Run Command:**
     ```bash

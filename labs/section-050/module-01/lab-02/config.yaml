@@ -1,0 +1,35 @@
+metadata:
+  name: "ats-002-lab-051b"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-051b-apt-pinning-setup"
+      description: "Ensures curl is installed and the release + updates pockets are both enabled, so curl has a higher version in noble-updates than in the noble release pocket. The task is to PIN curl (via /etc/apt/preferences.d/) so the release-pocket version is always preferred."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-curl-pinned-to-release"
+      description: "Confirms an /etc/apt/preferences.d/ file pins curl to the noble release pocket at a priority above the default 500, and apt-cache policy shows the release-pocket version (not noble-updates) as the Candidate."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

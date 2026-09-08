@@ -28,7 +28,9 @@ This section is divided into five highly focused, sequential modules. Each modul
     1. [Scoped trust — keyrings and signed-by](./module-01/course-01-scoped-trust.md)
     2. [Adding the repository and confirming it registered](./module-01/course-02-adding-the-repository.md)
     3. [Installing an exact version, and locking it](./module-01/course-03-exact-version-and-hold.md)
-*   **Practice Lab Sandbox:** **`labs/section-050/module-01/lab-01`**
+*   **Practice Lab Sandboxes:**
+    1. **`labs/section-050/module-01/lab-01`** — add a signed third-party repo, install an exact version, `apt-mark hold` it
+    2. **`labs/section-050/module-01/lab-02`** — APT *pinning* (not a hold): `/etc/apt/preferences.d/` so a chosen pocket's version is preferred
 *   **Lab Run Command:**
     ```bash
     astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-01/lab-01

@@ -20,7 +20,7 @@ To make learning intuitive, digestible, and robust, this curriculum is built aro
 
 ## Complete Curriculum & Lab Mapping
 
-The training series is divided into **8 main sections** containing **27 highly focused modules**, **30 targeted lab sandboxes**, and **8 comprehensive Section Capstone Challenges**:
+The training series is divided into **8 main sections** containing **28 highly focused modules**, **39 targeted lab sandboxes**, and **8 comprehensive Section Capstone Challenges**:
 
 | Section & Domain | Module & Chapter Reader | Practice Lab Sandbox | astrona CLI Run Command |
 | :--- | :--- | :--- | :--- |
@@ -33,6 +33,7 @@ The training series is divided into **8 main sections** containing **27 highly f
 | | **Section Capstone Challenge** | **[capstone](labs/section-010/capstone/lab-01)** | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-010/capstone/lab-01` |
 | **020: Scheduled & Container Workloads** | [M1: Per-User Cron](sections/section-020/module-01/course.md) | [lab](labs/section-020/module-01/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/module-01/lab-01` |
 | | [M2: Docker Lifecycle](sections/section-020/module-02/course.md) | [lab](labs/section-020/module-02/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/module-02/lab-01` |
+| | [M3: systemd Timers](sections/section-020/module-03/course.md) | [lab](labs/section-020/module-03/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/module-03/lab-01` |
 | | **Section Capstone Challenge** | **[capstone](labs/section-020/capstone/lab-01)** | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/capstone/lab-01` |
 | **030: Building & Virtualizing** | [M1: Compile From Source](sections/section-030/module-01/course.md) | [lab](labs/section-030/module-01/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-01/lab-01` |
 | | [M2: libvirt VM Lifecycle](sections/section-030/module-02/course.md) | [lab](labs/section-030/module-02/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-02/lab-01` |

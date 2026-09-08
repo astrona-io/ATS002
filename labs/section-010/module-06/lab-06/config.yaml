@@ -1,0 +1,35 @@
+metadata:
+  name: "ats-002-lab-016f"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-016f-boot-target-setup"
+      description: "Sets the default systemd boot target to graphical.target (and installs a placeholder so it resolves), and marks a demo service enabled only in graphical.target. The task is to set the default target to multi-user.target."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-default-target-multi-user"
+      description: "Confirms systemctl get-default reports multi-user.target and /etc/systemd/system/default.target points at it."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

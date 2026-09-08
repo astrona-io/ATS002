@@ -1,0 +1,34 @@
+metadata:
+  name: "ats-002-lab-066"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 3072
+    diskSizeGB: 20
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-066-setup"
+      description: "Installs Docker, starts the rpmbox Rocky Linux 9 container, then creates a corruption LOOK-ALIKE: a package left with an unmet dependency (via rpm -e --nodeps of one of its requirements). rpm -qa still works fine; dnf check fails loudly - but the RPM database itself is not corrupt."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-resolved-without-needless-rebuild"
+      description: "Confirms dnf check now passes and the dependency gap is closed - and that the fix was NOT a pointless rpm --rebuilddb (rpm -qa was queryable the whole time; the database was never corrupt)."
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false

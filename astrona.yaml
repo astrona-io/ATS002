@@ -86,6 +86,30 @@ modules:
         path: labs/section-010/module-02/lab-01
 
       - type: reading
+        title: Question
+        path: labs/section-010/module-02/lab-02/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-02/lab-02/solution.md
+
+      - type: lab
+        title: "Process Limits: Diagnose the Single Clamp (ulimit -u) Lab"
+        path: labs/section-010/module-02/lab-02
+
+      - type: reading
+        title: Question
+        path: labs/section-010/module-02/lab-03/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-02/lab-03/solution.md
+
+      - type: lab
+        title: "Process Limits: Diagnose the Single Clamp (TasksMax) Lab"
+        path: labs/section-010/module-02/lab-03
+
+      - type: reading
         title: "Module 3: Kernel Modules — Loading, Parameters, and Blacklisting"
         path: sections/section-010/module-03/course.md
 
@@ -238,6 +262,30 @@ modules:
         path: labs/section-010/module-06/lab-04
 
       - type: reading
+        title: Question
+        path: labs/section-010/module-06/lab-05/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-06/lab-05/solution.md
+
+      - type: lab
+        title: "Configure journald: Persistent & Bounded Lab"
+        path: labs/section-010/module-06/lab-05
+
+      - type: reading
+        title: Question
+        path: labs/section-010/module-06/lab-06/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-06/lab-06/solution.md
+
+      - type: lab
+        title: "Set the Default Boot Target Lab"
+        path: labs/section-010/module-06/lab-06
+
+      - type: reading
         title: "Section 010 Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics"
         path: sections/section-010/quiz.md
 
@@ -315,6 +363,34 @@ modules:
       - type: lab
         title: "Docker Container Lifecycle Lab"
         path: labs/section-020/module-02/lab-01
+
+      - type: reading
+        title: "Module 3: systemd Timers"
+        path: sections/section-020/module-03/course.md
+
+      - type: reading
+        title: "Module 3.1: The timer and service pair"
+        path: sections/section-020/module-03/course-01-the-timer-and-service-pair.md
+
+      - type: reading
+        title: "Module 3.2: Schedule expressions"
+        path: sections/section-020/module-03/course-02-schedule-expressions.md
+
+      - type: reading
+        title: "Module 3.3: Timers vs. cron, and operating them"
+        path: sections/section-020/module-03/course-03-timers-vs-cron-and-operating.md
+
+      - type: reading
+        title: Question
+        path: labs/section-020/module-03/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-020/module-03/lab-01/solution.md
+
+      - type: lab
+        title: "systemd Timers Lab"
+        path: labs/section-020/module-03/lab-01
 
       - type: reading
         title: "Section 020 Knowledge Check: Scheduled & Containerized Workloads"
@@ -477,6 +553,18 @@ modules:
         path: labs/section-040/module-01/lab-01
 
       - type: reading
+        title: Question
+        path: labs/section-040/module-01/lab-02/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-040/module-01/lab-02/solution.md
+
+      - type: lab
+        title: "AppArmor: Repair a Read Denial Lab"
+        path: labs/section-040/module-01/lab-02
+
+      - type: reading
         title: "Section 040 Knowledge Check: Mandatory Access Control — SELinux & AppArmor"
         path: sections/section-040/quiz.md
 
@@ -533,6 +621,18 @@ modules:
       - type: lab
         title: "Third-Party Repositories & Package Pinning Lab"
         path: labs/section-050/module-01/lab-01
+
+      - type: reading
+        title: Question
+        path: labs/section-050/module-01/lab-02/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-050/module-01/lab-02/solution.md
+
+      - type: lab
+        title: "APT Pinning (not a hold) Lab"
+        path: labs/section-050/module-01/lab-02
 
       - type: reading
         title: "Module 2: dpkg Low-Level Package Management"
@@ -720,6 +820,18 @@ modules:
       - type: lab
         title: "Rebuilding a Corrupted RPM Database Lab"
         path: labs/section-060/module-02/lab-01
+
+      - type: reading
+        title: Question
+        path: labs/section-060/module-02/lab-02/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-060/module-02/lab-02/solution.md
+
+      - type: lab
+        title: "RPM Database: Corruption Look-Alike Lab"
+        path: labs/section-060/module-02/lab-02
 
       - type: reading
         title: "Module 3: DNF Basic Package Operations"
@@ -937,6 +1049,18 @@ modules:
       - type: lab
         title: "Root-Filesystem Repair via chroot Lab"
         path: labs/section-080/module-01/lab-01
+
+      - type: reading
+        title: Question
+        path: labs/section-080/module-01/lab-02/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-080/module-01/lab-02/solution.md
+
+      - type: lab
+        title: "chroot Repair: Wrong fstab Filesystem Type Lab"
+        path: labs/section-080/module-01/lab-02
 
       - type: reading
         title: "Module 2: Password Reset & Single-User Recovery"
