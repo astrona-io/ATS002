@@ -487,6 +487,30 @@ modules:
         path: labs/section-030/module-02/lab-01
 
       - type: reading
+        title: Question
+        path: labs/section-030/module-02/lab-02/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-030/module-02/lab-02/solution.md
+
+      - type: lab
+        title: "Transient to Persistent Domain Lab"
+        path: labs/section-030/module-02/lab-02
+
+      - type: reading
+        title: Question
+        path: labs/section-030/module-02/lab-03/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-030/module-02/lab-03/solution.md
+
+      - type: lab
+        title: "Reconfigure a Persistent Domain Lab"
+        path: labs/section-030/module-02/lab-03
+
+      - type: reading
         title: "Section 030 Knowledge Check: Building & Virtualizing Systems"
         path: sections/section-030/quiz.md
 

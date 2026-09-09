@@ -20,7 +20,7 @@ To make learning intuitive, digestible, and robust, this curriculum is built aro
 
 ## Complete Curriculum & Lab Mapping
 
-The training series is divided into **8 main sections** containing **28 highly focused modules**, **39 targeted lab sandboxes**, and **8 comprehensive Section Capstone Challenges**:
+The training series is divided into **8 main sections** containing **28 highly focused modules**, **41 targeted lab sandboxes**, and **8 comprehensive Section Capstone Challenges**:
 
 | Section & Domain | Module & Chapter Reader | Practice Lab Sandbox | astrona CLI Run Command |
 | :--- | :--- | :--- | :--- |
@@ -36,7 +36,7 @@ The training series is divided into **8 main sections** containing **28 highly f
 | | [M3: systemd Timers](sections/section-020/module-03/course.md) | [lab](labs/section-020/module-03/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/module-03/lab-01` |
 | | **Section Capstone Challenge** | **[capstone](labs/section-020/capstone/lab-01)** | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/capstone/lab-01` |
 | **030: Building & Virtualizing** | [M1: Compile From Source](sections/section-030/module-01/course.md) | [lab](labs/section-030/module-01/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-01/lab-01` |
-| | [M2: libvirt VM Lifecycle](sections/section-030/module-02/course.md) | [lab](labs/section-030/module-02/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-02/lab-01` |
+| | [M2: libvirt VM Lifecycle](sections/section-030/module-02/course.md) | [lab-01](labs/section-030/module-02/lab-01) · [lab-02](labs/section-030/module-02/lab-02) · [lab-03](labs/section-030/module-02/lab-03) | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-02/lab-01` |
 | | **Section Capstone Challenge** | **[capstone](labs/section-030/capstone/lab-01)** | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/capstone/lab-01` |
 | **040: Mandatory Access Control** | [M1: AppArmor & SELinux](sections/section-040/module-01/course.md) | [lab](labs/section-040/module-01/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-040/module-01/lab-01` |
 | | **Section Capstone Challenge** | **[capstone](labs/section-040/capstone/lab-01)** | `astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-040/capstone/lab-01` |

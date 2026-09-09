@@ -1,0 +1,34 @@
+metadata:
+  name: "ats-002-lab-034"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 20
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-034-setup"
+      description: "Installs libvirt/QEMU, starts libvirtd with the default NAT network, stages an empty 2G qcow2 at /var/lib/libvirt/images/web-db.qcow2, and defines the persistent domain 'web-db' under-provisioned (512 MiB memory, 1 vCPU) and left shut off"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-web-db-reconfigured"
+      description: "Confirms web-db has 2048 MiB memory and 2 vCPUs in BOTH its persistent (inactive) config and its running state, is running, stays persistent, and keeps its original disk and default-network attachment"
+      type: "file"
+      source: "validation/validate-completed.sh"
+
+teardown:
+  keepCluster: false
