@@ -24,10 +24,10 @@ This section is divided into three focused modules, each paired with a dedicated
 *   **Module Reader:** **[Module 1: Per-User Cron Job Scheduling](./module-01/course.md)**
     1. [Where a cron job lives, and the format that follows](./module-01/course-01-where-a-cron-job-lives.md)
     2. [Migrating a job safely](./module-01/course-02-migrating-a-job-safely.md)
-*   **Practice Lab Sandbox:** **`labs/section-020/module-01/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-020/module-01/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/module-01/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/module-01/labs/lab-01
     ```
 *   **Hands-on Objective:** Migrate a system-wide cronjob on `data-001` into a per-user crontab owned by `asset-manager`, add a new twice-weekly job with a compound day-of-week schedule, and remove the original system-wide entry so the job no longer fires twice.
 
@@ -35,10 +35,10 @@ This section is divided into three focused modules, each paired with a dedicated
 *   **Module Reader:** **[Module 2: Docker Container Lifecycle](./module-02/course.md)**
     1. [The container lifecycle, and stopping one cleanly](./module-02/course-01-the-container-lifecycle-and-stopping.md)
     2. [Inspecting with --format, and launching with constraints](./module-02/course-02-inspecting-with-format.md)
-*   **Practice Lab Sandbox:** **`labs/section-020/module-02/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-020/module-02/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/module-02/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/module-02/labs/lab-01
     ```
 *   **Hands-on Objective:** Stop a running container, extract another container's IP address and volume mount destination using `docker inspect --format`, and launch a new detached container with a hard memory limit and a host-to-container port mapping.
 
@@ -47,18 +47,18 @@ This section is divided into three focused modules, each paired with a dedicated
     1. [The timer and service pair](./module-03/course-01-the-timer-and-service-pair.md)
     2. [Schedule expressions](./module-03/course-02-schedule-expressions.md)
     3. [Timers vs. cron, and operating them](./module-03/course-03-timers-vs-cron-and-operating.md)
-*   **Practice Lab Sandbox:** **`labs/section-020/module-03/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-020/module-03/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/module-03/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/module-03/labs/lab-01
     ```
 *   **Hands-on Objective:** Create a `.service` + `.timer` pair that runs a maintenance script `OnCalendar=Mon,Thu 11:15` with `Persistent=true`, then convert an existing `/etc/cron.d/` job to an equivalent 6-hourly timer and remove the cron line.
 
 ### 4. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/section-020/capstone/lab-01` (Scheduled Container Recovery)**
+*   **Comprehensive Challenge:** **`sections/section-020/capstone/labs/lab-01` (Scheduled Container Recovery)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-020/capstone/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/capstone/labs/lab-01
     ```
 *   **Hands-on Objective:** Connect the dots. Retire a decommissioned container that is squatting on a needed port, launch its constrained replacement, and schedule a per-user cron job that automatically restarts the new container if it ever stops.
 

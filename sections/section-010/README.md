@@ -27,10 +27,10 @@ This section is divided into six highly focused, sequential modules. Each module
     1. [Identifying the running kernel](./module-01/course-01-identifying-the-running-kernel.md)
     2. [/proc/sys and the live value](./module-01/course-02-proc-sys-and-the-live-value.md)
     3. [Runtime vs. persistent changes](./module-01/course-03-runtime-vs-persistent-changes.md)
-*   **Practice Lab Sandbox:** **`labs/section-010/module-01/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-010/module-01/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-010/module-01/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-01/labs/lab-01
     ```
 *   **Hands-on Objective:** Write the running kernel's release, a live `sysctl` parameter, and the system timezone into `/opt/course/`, using the tool and flag that gives you a clean, script-friendly value every time.
 
@@ -40,12 +40,12 @@ This section is divided into six highly focused, sequential modules. Each module
     2. [The three independent ceilings](./module-02/course-02-the-three-independent-ceilings.md)
     3. [Raising each ceiling, in order](./module-02/course-03-raising-each-ceiling-in-order.md)
 *   **Practice Lab Sandboxes:**
-    1. **`labs/section-010/module-02/lab-01`** — raise all three ceilings (`pid_max`, `ulimit -u`, `TasksMax=`) persistently
-    2. **`labs/section-010/module-02/lab-02`** — *diagnosis:* only `ulimit -u` is the clamp; raise only that one
-    3. **`labs/section-010/module-02/lab-03`** — *diagnosis:* only the unit's `TasksMax=` is the clamp; raise only that one
+    1. **`sections/section-010/module-02/labs/lab-01`** — raise all three ceilings (`pid_max`, `ulimit -u`, `TasksMax=`) persistently
+    2. **`sections/section-010/module-02/labs/lab-02`** — *diagnosis:* only `ulimit -u` is the clamp; raise only that one
+    3. **`sections/section-010/module-02/labs/lab-03`** — *diagnosis:* only the unit's `TasksMax=` is the clamp; raise only that one
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-010/module-02/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-02/labs/lab-01
     ```
 *   **Hands-on Objective:** Diagnose a batch job failing with `fork: retry: Resource temporarily unavailable`, then raise and persist all three independent ceilings that could be capping it — `kernel.pid_max`, the workload user's `ulimit -u`, and the systemd unit's `TasksMax=`.
 
@@ -54,10 +54,10 @@ This section is divided into six highly focused, sequential modules. Each module
     1. [Inspecting modules and their parameters](./module-03/course-01-inspecting-modules-and-parameters.md)
     2. [Loading — modprobe, depmod, and the dependency graph](./module-03/course-02-loading-modprobe-and-dependencies.md)
     3. [Persistence and blacklisting](./module-03/course-03-persistence-and-blacklisting.md)
-*   **Practice Lab Sandbox:** **`labs/section-010/module-03/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-010/module-03/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-010/module-03/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-03/labs/lab-01
     ```
 *   **Hands-on Objective:** Load the `dummy` module with `numdummies=2` so it persists identically across every future reboot, then permanently blacklist the noisy `pcspkr` module and confirm the block holds against a simulated hardware re-detection pass.
 
@@ -66,10 +66,10 @@ This section is divided into six highly focused, sequential modules. Each module
     1. [Device events, sysfs, and finding a stable identity](./module-04/course-01-device-events-and-identity.md)
     2. [Writing the rule — match keys vs. assignment keys](./module-04/course-02-writing-the-rule.md)
     3. [Applying, verifying, and using the rule](./module-04/course-03-applying-verifying-and-using.md)
-*   **Practice Lab Sandbox:** **`labs/section-010/module-04/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-010/module-04/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-010/module-04/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-04/labs/lab-01
     ```
 *   **Hands-on Objective:** Find a backup disk's stable `ATTRS{serial}` attribute and write a custom udev rule that creates persistent `/dev/backup-drive` and `/dev/backup-drive1` symlinks, immune to kernel device-letter reassignment.
 
@@ -78,10 +78,10 @@ This section is divided into six highly focused, sequential modules. Each module
     1. [From a name to the right PIDs](./module-05/course-01-from-a-name-to-the-right-pids.md)
     2. [Attaching and filtering the syscall stream](./module-05/course-02-attaching-and-filtering.md)
     3. [From confirmed process to safe cleanup](./module-05/course-03-from-confirmed-process-to-safe-cleanup.md)
-*   **Practice Lab Sandbox:** **`labs/section-010/module-05/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-010/module-05/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-010/module-05/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-05/labs/lab-01
     ```
 *   **Hands-on Objective:** Attach `strace` to three candidate processes, filter for the forbidden `kill()` syscall, resolve the confirmed offender's real executable via `/proc/PID/exe`, and terminate and remove only that process — leaving every innocent process untouched.
 
@@ -92,19 +92,19 @@ This section is divided into six highly focused, sequential modules. Each module
     3. [Reading the journal](./module-06/course-03-reading-the-journal.md)
     4. [Failure shapes, and proving the fix](./module-06/course-04-failure-shapes-and-proving-the-fix.md)
 *   **Practice Lab Sandboxes:**
-    1. **`labs/section-010/module-06/lab-01`** — bad `ExecStart` path (`status=203/EXEC`)
-    2. **`labs/section-010/module-06/lab-02`** — permission denied writing the state directory (non-root `User=`)
-    3. **`labs/section-010/module-06/lab-03`** — port already in use (`(98)Address already in use`)
-    4. **`labs/section-010/module-06/lab-04`** — failed `Requires=` dependency plus a `Restart=` flap that hit `start-limit-hit`
-    5. **`labs/section-010/module-06/lab-05`** — configure `journald` for persistent, size-bounded logging
-    6. **`labs/section-010/module-06/lab-06`** — set the default boot target (`systemctl set-default multi-user.target`)
+    1. **`sections/section-010/module-06/labs/lab-01`** — bad `ExecStart` path (`status=203/EXEC`)
+    2. **`sections/section-010/module-06/labs/lab-02`** — permission denied writing the state directory (non-root `User=`)
+    3. **`sections/section-010/module-06/labs/lab-03`** — port already in use (`(98)Address already in use`)
+    4. **`sections/section-010/module-06/labs/lab-04`** — failed `Requires=` dependency plus a `Restart=` flap that hit `start-limit-hit`
+    5. **`sections/section-010/module-06/labs/lab-05`** — configure `journald` for persistent, size-bounded logging
+    6. **`sections/section-010/module-06/labs/lab-06`** — set the default boot target (`systemctl set-default multi-user.target`)
 *   **Hands-on Objective:** For each case, read `systemctl status` and `journalctl -xeu <unit>` to find the root cause, fix the actual fault (not by masking or stubbing the unit), and confirm the unit is both `active` now and `enabled` for boot.
 
 ### 7. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/section-010/capstone/lab-01` (Kernel, Process, Module & Device Runtime Management Capstone)**
+*   **Comprehensive Challenge:** **`sections/section-010/capstone/labs/lab-01` (Kernel, Process, Module & Device Runtime Management Capstone)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-010/capstone/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/capstone/labs/lab-01
     ```
 *   **Hands-on Objective:** Respond to one integrated runaway-telemetry incident: audit live kernel state to a file, raise a fork ceiling a workload is hitting, load and persist a kernel module while permanently blacklisting a noisy one, give a newly attached disk a stable udev name, and diagnose and terminate a hung process caught blocked in `pause()` via `strace`.
 

@@ -28,10 +28,10 @@ This section is divided into five highly focused, sequential modules. Each modul
     1. [What rpm knows, and inspecting a .rpm](./module-01/course-01-rpm-scope-and-inspecting.md)
     2. [Installing directly, and ownership queries](./module-01/course-02-installing-and-ownership.md)
     3. [Verifying integrity](./module-01/course-03-verifying-integrity.md)
-*   **Practice Lab Sandbox:** **`labs/section-060/module-01/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-060/module-01/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-01/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-01/labs/lab-01
     ```
 *   **Hands-on Objective:** Inspect a standalone `.rpm` file before installing it, install it directly with `rpm`, answer file-ownership questions in both directions, and verify that its installed files still match what the package originally recorded.
 
@@ -40,11 +40,11 @@ This section is divided into five highly focused, sequential modules. Each modul
     1. [Recognising the symptom, and not assuming the backend](./module-02/course-01-recognising-the-symptom.md)
     2. [Back up, rebuild, verify](./module-02/course-02-backup-rebuild-verify.md)
 *   **Practice Lab Sandboxes:**
-    1. **`labs/section-060/module-02/lab-01`** — genuine sqlite rpmdb corruption: back up and `rpm --rebuilddb`
-    2. **`labs/section-060/module-02/lab-02`** — a corruption *look-alike*: `dnf check` fails, but it is an unmet dependency, not the database — do **not** rebuild
+    1. **`sections/section-060/module-02/labs/lab-01`** — genuine sqlite rpmdb corruption: back up and `rpm --rebuilddb`
+    2. **`sections/section-060/module-02/labs/lab-02`** — a corruption *look-alike*: `dnf check` fails, but it is an unmet dependency, not the database — do **not** rebuild
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-02/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-02/labs/lab-01
     ```
 *   **Hands-on Objective:** Confirm a genuinely corrupted, real sqlite-backed RPM database (not a dependency conflict or a disk-space problem), back it up, rebuild it, and verify the system is back to a clean, queryable state.
 
@@ -52,10 +52,10 @@ This section is divided into five highly focused, sequential modules. Each modul
 *   **Module Reader:** **[Module 3: DNF Basic Package Operations](./module-03/course.md)**
     1. [The everyday dnf loop](./module-03/course-01-the-dnf-loop.md)
     2. [Removing, and transactional history](./module-03/course-02-removing-and-history.md)
-*   **Practice Lab Sandbox:** **`labs/section-060/module-03/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-060/module-03/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-03/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-03/labs/lab-01
     ```
 *   **Hands-on Objective:** Run a realistic `dnf` maintenance pass — check and apply upgrades, install and remove packages, clean up orphaned dependencies, and use `dnf history` to undo and redo a transaction.
 
@@ -63,10 +63,10 @@ This section is divided into five highly focused, sequential modules. Each modul
 *   **Module Reader:** **[Module 4: DNF Package Information Lookup](./module-04/course.md)**
     1. [Finding a package, and describing it](./module-04/course-01-search-and-describe.md)
     2. [What would provide this, and cross-referencing rpm](./module-04/course-02-provides-and-cross-referencing.md)
-*   **Practice Lab Sandbox:** **`labs/section-060/module-04/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-060/module-04/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-04/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-04/labs/lab-01
     ```
 *   **Hands-on Objective:** Research packages entirely read-only — find a candidate package by keyword, pull full metadata without installing it, determine what package would provide a missing command, and list installed packages by naming pattern.
 
@@ -75,18 +75,18 @@ This section is divided into five highly focused, sequential modules. Each modul
     1. [What a group is, and discovering what exists](./module-05/course-01-what-a-group-is-and-discovering.md)
     2. [Inspecting membership, and installing](./module-05/course-02-inspecting-and-installing.md)
     3. [Confirming what landed, and removing cleanly](./module-05/course-03-confirming-and-removing.md)
-*   **Practice Lab Sandbox:** **`labs/section-060/module-05/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-060/module-05/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/module-05/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-05/labs/lab-01
     ```
 *   **Hands-on Objective:** Discover a repository-published package group, inspect its real mandatory/default/optional membership before installing it, install and confirm it, then remove it cleanly — while reasoning precisely about which packages the removal does and doesn't touch.
 
 ### 6. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/section-060/capstone/lab-01` (RPM/DNF Package Management Capstone)**
+*   **Comprehensive Challenge:** **`sections/section-060/capstone/labs/lab-01` (RPM/DNF Package Management Capstone)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-060/capstone/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/capstone/labs/lab-01
     ```
 *   **Hands-on Objective:** Connect the dots on an overnight incident — diagnose and repair a genuinely corrupted RPM database, inspect and install a standalone RPM staged before the incident, then discover, inspect, and install a full `dnf` package group to finish setting the host up as a build server.
 

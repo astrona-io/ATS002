@@ -29,11 +29,11 @@ This section is divided into five highly focused, sequential modules. Each modul
     2. [Adding the repository and confirming it registered](./module-01/course-02-adding-the-repository.md)
     3. [Installing an exact version, and locking it](./module-01/course-03-exact-version-and-hold.md)
 *   **Practice Lab Sandboxes:**
-    1. **`labs/section-050/module-01/lab-01`** — add a signed third-party repo, install an exact version, `apt-mark hold` it
-    2. **`labs/section-050/module-01/lab-02`** — APT *pinning* (not a hold): `/etc/apt/preferences.d/` so a chosen pocket's version is preferred
+    1. **`sections/section-050/module-01/labs/lab-01`** — add a signed third-party repo, install an exact version, `apt-mark hold` it
+    2. **`sections/section-050/module-01/labs/lab-02`** — APT *pinning* (not a hold): `/etc/apt/preferences.d/` so a chosen pocket's version is preferred
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-01/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-01/labs/lab-01
     ```
 *   **Hands-on Objective:** Add a vendor's third-party APT repository using the modern `signed-by` keyring approach (no `apt-key`), install an exact pinned version of its `nginx` package, and hold it so a routine upgrade cannot move it.
 
@@ -42,10 +42,10 @@ This section is divided into five highly focused, sequential modules. Each modul
     1. [What dpkg knows, and inspecting a .deb](./module-02/course-01-dpkg-scope-and-inspecting-a-deb.md)
     2. [Installing directly, and ownership queries](./module-02/course-02-installing-and-ownership-queries.md)
     3. [Status codes and recovering an interrupted package](./module-02/course-03-status-codes-and-recovery.md)
-*   **Practice Lab Sandbox:** **`labs/section-050/module-02/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-050/module-02/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-02/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-02/labs/lab-01
     ```
 *   **Hands-on Objective:** Inspect a standalone `.deb` file before installing it, install it directly with `dpkg -i`, answer file-ownership questions in both directions, and recover an unrelated package left stuck in a half-configured state.
 
@@ -54,10 +54,10 @@ This section is divided into five highly focused, sequential modules. Each modul
     1. [apt update is not apt upgrade](./module-03/course-01-update-is-not-upgrade.md)
     2. [Applying upgrades, and installing](./module-03/course-02-applying-upgrades-and-installing.md)
     3. [Removing cleanly](./module-03/course-03-removing-cleanly.md)
-*   **Practice Lab Sandbox:** **`labs/section-050/module-03/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-050/module-03/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-03/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-03/labs/lab-01
     ```
 *   **Hands-on Objective:** Run a realistic maintenance pass — refresh the index, preview and apply upgrades, install a new package, then fully purge an unneeded one (including its configuration and orphaned dependencies).
 
@@ -65,10 +65,10 @@ This section is divided into five highly focused, sequential modules. Each modul
 *   **Module Reader:** **[Module 4: APT Package Information Lookup](./module-04/course.md)**
     1. [Finding a package, and describing it](./module-04/course-01-finding-and-describing.md)
     2. [Installed vs. candidate, and which source wins](./module-04/course-02-installed-vs-candidate.md)
-*   **Practice Lab Sandbox:** **`labs/section-050/module-04/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-050/module-04/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-04/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-04/labs/lab-01
     ```
 *   **Hands-on Objective:** Research packages entirely read-only — search by keyword, pull full metadata, confirm installed-versus-candidate version and source repository, and list installed/upgradable packages by pattern.
 
@@ -76,18 +76,18 @@ This section is divided into five highly focused, sequential modules. Each modul
 *   **Module Reader:** **[Module 5: APT Package Groups & Bulk Operations](./module-05/course.md)**
     1. [One transaction, and finding a family by pattern](./module-05/course-01-one-transaction-and-finding-a-family.md)
     2. [Bulk actions across a matched set](./module-05/course-02-bulk-actions-across-a-set.md)
-*   **Practice Lab Sandbox:** **`labs/section-050/module-05/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-050/module-05/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/module-05/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-05/labs/lab-01
     ```
 *   **Hands-on Objective:** Install a build toolchain as one atomic transaction, find an entire installed package family by naming pattern, and hold that whole family together ahead of a risky upgrade.
 
 ### 6. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/section-050/capstone/lab-01` (New App Server Onboarding)**
+*   **Comprehensive Challenge:** **`sections/section-050/capstone/labs/lab-01` (New App Server Onboarding)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-050/capstone/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/capstone/labs/lab-01
     ```
 *   **Hands-on Objective:** Connect the dots on a freshly provisioned server — trust and pin a vendor repository, recover a package stuck mid-install, install a toolchain and bulk-hold a package family, and research a package to answer a specific onboarding question.
 

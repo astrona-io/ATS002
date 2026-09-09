@@ -26,11 +26,11 @@ This section is divided into four focused modules, each paired with a dedicated 
     2. [Mount the broken root, and get the tools in](./module-01/course-02-mount-and-get-tools-in.md)
     3. [chroot in, fix, prove, unmount](./module-01/course-03-chroot-fix-prove-unmount.md)
 *   **Practice Lab Sandboxes:**
-    1. **`labs/section-080/module-01/lab-01`** — a mistyped UUID in `/etc/fstab`
-    2. **`labs/section-080/module-01/lab-02`** — a wrong filesystem *type* in `/etc/fstab` (`ext4` where the partition is `xfs`)
+    1. **`sections/section-080/module-01/labs/lab-01`** — a mistyped UUID in `/etc/fstab`
+    2. **`sections/section-080/module-01/labs/lab-02`** — a wrong filesystem *type* in `/etc/fstab` (`ext4` where the partition is `xfs`)
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/module-01/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-01/labs/lab-01
     ```
 *   **Hands-on Objective:** Mount a disposable second disk representing a broken system's root filesystem, bind-mount `/dev`, `/proc`, and `/sys` into it, `chroot` in, fix a mistyped UUID in `/etc/fstab`, and prove the fix with `mount -a`.
 
@@ -38,10 +38,10 @@ This section is divided into four focused modules, each paired with a dedicated 
 *   **Module Reader:** **[Module 2: Password Reset & Single-User Recovery](./module-02/course.md)**
     1. [Two doors — rd.break and init=/bin/bash](./module-02/course-01-two-doors-rd-break-and-init.md)
     2. [The chroot equivalent, and editing /etc/shadow directly](./module-02/course-02-chroot-equivalent-and-shadow-edit.md)
-*   **Practice Lab Sandbox:** **`labs/section-080/module-02/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-080/module-02/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/module-02/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-02/labs/lab-01
     ```
 *   **Hands-on Objective:** Practice the chroot-based half of the real recovery mechanic — mount a disposable disk representing a locked-out system, chroot in, and reset the root account's password hash in `/etc/shadow`.
 
@@ -50,10 +50,10 @@ This section is divided into four focused modules, each paired with a dedicated 
     1. [Two layers, not one, and identifying the target disk](./module-03/course-01-two-layers-and-identifying-the-disk.md)
     2. [Back up the partition table, and verify the backup](./module-03/course-02-backup-and-verify.md)
     3. [Simulate, restore, and verify both layers](./module-03/course-03-simulate-restore-verify.md)
-*   **Practice Lab Sandbox:** **`labs/section-080/module-03/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-080/module-03/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/module-03/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-03/labs/lab-01
     ```
 *   **Hands-on Objective:** Back up a secondary GPT disk's partition table with `sgdisk --backup`, verify the backup, wipe the table with `sgdisk --zap-all`, restore it with `sgdisk --load-backup`, and confirm the filesystems inside are still intact.
 
@@ -62,18 +62,18 @@ This section is divided into four focused modules, each paired with a dedicated 
     1. [Two repairs, easy to confuse, and reading the symptom](./module-04/course-01-two-repairs-and-the-symptom.md)
     2. [The one-boot manual rescue from grub>](./module-04/course-02-manual-rescue-from-grub.md)
     3. [The durable repair — reinstall and regenerate](./module-04/course-03-durable-repair.md)
-*   **Practice Lab Sandbox:** **`labs/section-080/module-04/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-080/module-04/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/module-04/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-04/labs/lab-01
     ```
 *   **Hands-on Objective:** Recover from a missing `/boot/grub/grub.cfg` on a VM whose next reboot would otherwise fail — reinstall GRUB's boot-sector code with `grub-install` and regenerate a fresh, working configuration with `update-grub`.
 
 ### 5. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/section-080/capstone/lab-01` (System Disaster Recovery Integration)**
+*   **Comprehensive Challenge:** **`sections/section-080/capstone/labs/lab-01` (System Disaster Recovery Integration)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-080/capstone/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/capstone/labs/lab-01
     ```
 *   **Hands-on Objective:** A bad night on call. Restore a secondary disk's partition table from an existing backup and confirm its filesystems survived, then reinstall and regenerate a stale GRUB configuration on the primary disk before the next scheduled reboot happens.
 

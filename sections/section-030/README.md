@@ -24,10 +24,10 @@ This section is divided into two focused modules, each paired with a dedicated h
     1. [Unpacking the tarball, and the build pipeline](./module-01/course-01-unpacking-and-the-build-pipeline.md)
     2. [Discovering and choosing configure flags](./module-01/course-02-discovering-and-choosing-flags.md)
     3. [Building, installing, and verifying](./module-01/course-03-building-installing-verifying.md)
-*   **Practice Lab Sandbox:** **`labs/section-030/module-01/lab-01`**
+*   **Practice Lab Sandbox:** **`sections/section-030/module-01/labs/lab-01`**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-01/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-01/labs/lab-01
     ```
 *   **Hands-on Objective:** Extract a `.tar.bz2` source tarball staged on the host, discover the project's install-location and IPv6 feature-toggle flags by reading `./configure --help`, then build and install the binary so it lands at the exact path `/usr/bin/links` with IPv6 support compiled out.
 
@@ -39,21 +39,21 @@ This section is divided into two focused modules, each paired with a dedicated h
     4.  [Autostart and reading a domain's true state](./module-02/course-04-autostart-and-reading-true-state.md)
     5.  [Graceful shutdown vs. hard power-off](./module-02/course-05-graceful-shutdown-vs-hard-destroy.md)
 *   **Practice Lab Sandboxes:**
-    1. **`labs/section-030/module-02/lab-01`** — define a new persistent KVM domain `inventory-db` around an existing qcow2 disk (2048 MiB, 2 vCPUs, default NAT network), configure autostart, then demonstrate a graceful `virsh shutdown` and a hard `virsh destroy`.
-    2. **`labs/section-030/module-02/lab-02`** — a domain is running but **transient** (`virsh create`, no definition on disk); promote it to persistent in place with `virsh define`, without stopping it, then enable autostart and prove it now survives a `virsh destroy`.
-    3. **`labs/section-030/module-02/lab-03`** — an existing persistent domain is under-provisioned (512 MiB, 1 vCPU); raise it to 2048 MiB / 2 vCPU in the **persistent** config (`virsh edit`, or `virsh set*` with `--config`), start it, and verify with `virsh dominfo`.
+    1. **`sections/section-030/module-02/labs/lab-01`** — define a new persistent KVM domain `inventory-db` around an existing qcow2 disk (2048 MiB, 2 vCPUs, default NAT network), configure autostart, then demonstrate a graceful `virsh shutdown` and a hard `virsh destroy`.
+    2. **`sections/section-030/module-02/labs/lab-02`** — a domain is running but **transient** (`virsh create`, no definition on disk); promote it to persistent in place with `virsh define`, without stopping it, then enable autostart and prove it now survives a `virsh destroy`.
+    3. **`sections/section-030/module-02/labs/lab-03`** — an existing persistent domain is under-provisioned (512 MiB, 1 vCPU); raise it to 2048 MiB / 2 vCPU in the **persistent** config (`virsh edit`, or `virsh set*` with `--config`), start it, and verify with `virsh dominfo`.
 *   **Lab Run Commands:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-02/lab-01
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-02/lab-02
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/module-02/lab-03
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-02/labs/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-02/labs/lab-02
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-02/labs/lab-03
     ```
 
 ### 3. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`labs/section-030/capstone/lab-01` (New Toolchain, New Host)**
+*   **Comprehensive Challenge:** **`sections/section-030/capstone/labs/lab-01` (New Toolchain, New Host)**
 *   **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-030/capstone/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/capstone/labs/lab-01
     ```
 *   **Hands-on Objective:** Connect the dots. Compile and install a build-status reporting tool from source at a precise path with a feature disabled, then define, autostart, and stand up a persistent libvirt domain for a new internal service — a single maintenance window that touches both a build pipeline and a hypervisor.
 

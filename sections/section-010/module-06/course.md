@@ -38,7 +38,7 @@ After this module you can:
 
 Assumed: comfort with a Linux shell and `sudo`, editing a text config file, and the idea that `systemd` manages long-running services. Chapter 5 (`strace`) is useful adjacent context — it diagnoses a *running* process; this module diagnoses one that will not start or stay started — but it is not a prerequisite.
 
-The playground (callout above) is a throwaway Ubuntu 24.04 VM where **`apache2` is already `failed`** — a helper unit holds TCP 80, so it cannot bind — giving you a real failed unit with a genuine journal trail. Get a shell with `astrona ssh astro-systemd-service-debugging`. The **Try it** checkpoints in Parts 1–4 run there; every command block also states the shell and privilege it assumes. A graded lab is planned at `labs/section-010/module-06/lab-01`.
+The playground (callout above) is a throwaway Ubuntu 24.04 VM where **`apache2` is already `failed`** — a helper unit holds TCP 80, so it cannot bind — giving you a real failed unit with a genuine journal trail. Get a shell with `astrona ssh astro-systemd-service-debugging`. The **Try it** checkpoints in Parts 1–4 run there; every command block also states the shell and privilege it assumes. A graded lab is planned at `sections/section-010/module-06/labs/lab-01`.
 
 ## Where this fits
 

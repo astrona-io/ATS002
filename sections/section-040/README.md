@@ -27,19 +27,19 @@ This section has one module, deliberately built around two parts — a real hand
     4. [SELinux — labels, contexts, and the AVC denial](./module-01/course-04-selinux-labels-and-avc-denials.md)
     5. [SELinux — persistent fixes and the AppArmor contrast](./module-01/course-05-selinux-persistent-fixes-and-contrast.md)
 * **Practice Lab Sandboxes:**
-    1. **`labs/section-040/module-01/lab-01`** — a *write* denial: `appservice` blocked writing its relocated log dir
-    2. **`labs/section-040/module-01/lab-02`** — a *read* denial: `credsync` blocked reading its relocated API key (`denied_mask="r"`)
+    1. **`sections/section-040/module-01/labs/lab-01`** — a *write* denial: `appservice` blocked writing its relocated log dir
+    2. **`sections/section-040/module-01/labs/lab-02`** — a *read* denial: `credsync` blocked reading its relocated API key (`denied_mask="r"`)
 * **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-040/module-01/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-040/module-01/labs/lab-01
     ```
 * **Hands-on Objective:** On `web-srv1`, diagnose why the `appservice` daemon — reconfigured to log to `/srv/applogs` — fails to write there despite fully correct DAC permissions, find the denial in the audit trail, close the gap in its AppArmor profile, and confirm the fix survives with the profile genuinely back in `enforce` mode.
 
 ### 2. Section Capstone Challenge
-* **Comprehensive Challenge:** **`labs/section-040/capstone/lab-01` (Two Services, Two Denials)**
+* **Comprehensive Challenge:** **`sections/section-040/capstone/labs/lab-01` (Two Services, Two Denials)**
 * **Lab Run Command:**
     ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c labs/section-040/capstone/lab-01
+    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-040/capstone/labs/lab-01
     ```
 * **Hands-on Objective:** Connect the dots across two independent services. Repair `logshipper`, whose profile blocks a *write* to its relocated log directory, and separately repair `metrics-agent`, whose profile blocks a *read* of its relocated credentials file — diagnosing and fixing each AppArmor denial from its own audit trail, with both profiles left genuinely enforcing at the end.
 
