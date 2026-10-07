@@ -56,6 +56,7 @@ modules:
       - type: lab
         title: "sysctl Live Kernel State Lab"
         path: sections/section-010/module-01/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 2: Process Limits — pid_max, ulimit, and the Three Ceilings"
@@ -84,6 +85,7 @@ modules:
       - type: lab
         title: "Process & Thread Ceilings Lab"
         path: sections/section-010/module-02/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -96,6 +98,7 @@ modules:
       - type: lab
         title: "Process Limits: Diagnose the Single Clamp (ulimit -u) Lab"
         path: sections/section-010/module-02/labs/lab-02
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -108,6 +111,7 @@ modules:
       - type: lab
         title: "Process Limits: Diagnose the Single Clamp (TasksMax) Lab"
         path: sections/section-010/module-02/labs/lab-03
+        difficulty: intermediate
 
       - type: reading
         title: "Module 3: Kernel Modules — Loading, Parameters, and Blacklisting"
@@ -136,6 +140,7 @@ modules:
       - type: lab
         title: "Kernel Module Loading & Blacklisting Lab"
         path: sections/section-010/module-03/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 4: udev — Giving a Device a Name It Can Keep"
@@ -164,6 +169,7 @@ modules:
       - type: lab
         title: "Stable Device Naming with udev Lab"
         path: sections/section-010/module-04/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 5: Catching a Process in the Act with strace"
@@ -192,6 +198,7 @@ modules:
       - type: lab
         title: "Process Forensics with strace Lab"
         path: sections/section-010/module-05/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 6: Debugging a Service That Won't Start with systemctl and journalctl"
@@ -224,6 +231,7 @@ modules:
       - type: lab
         title: "Service Won't Start: Bad ExecStart Path Lab"
         path: sections/section-010/module-06/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -236,6 +244,7 @@ modules:
       - type: lab
         title: "Service Won't Start: Permission Denied Lab"
         path: sections/section-010/module-06/labs/lab-02
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -248,6 +257,7 @@ modules:
       - type: lab
         title: "Service Won't Start: Port Already In Use Lab"
         path: sections/section-010/module-06/labs/lab-03
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -260,6 +270,7 @@ modules:
       - type: lab
         title: "Service Won't Start: Failed Dependency & Restart Flap Lab"
         path: sections/section-010/module-06/labs/lab-04
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -272,6 +283,7 @@ modules:
       - type: lab
         title: "Configure journald: Persistent & Bounded Lab"
         path: sections/section-010/module-06/labs/lab-05
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -284,6 +296,7 @@ modules:
       - type: lab
         title: "Set the Default Boot Target Lab"
         path: sections/section-010/module-06/labs/lab-06
+        difficulty: intermediate
 
       - type: reading
         title: "Section 010 Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics"
@@ -300,6 +313,7 @@ modules:
       - type: lab
         title: "Kernel, Process, Module & Device Runtime Management Capstone Lab"
         path: sections/section-010/capstone/labs/lab-01
+        difficulty: advanced
 
   - id: module-020
     title: "Section 020: Scheduled & Containerized Workloads"
@@ -339,6 +353,7 @@ modules:
       - type: lab
         title: "Per-User Cron Job Scheduling Lab"
         path: sections/section-020/module-01/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 2: Docker Container Lifecycle"
@@ -363,6 +378,7 @@ modules:
       - type: lab
         title: "Docker Container Lifecycle Lab"
         path: sections/section-020/module-02/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 3: systemd Timers"
@@ -391,6 +407,7 @@ modules:
       - type: lab
         title: "systemd Timers Lab"
         path: sections/section-020/module-03/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Section 020 Knowledge Check: Scheduled & Containerized Workloads"
@@ -407,6 +424,7 @@ modules:
       - type: lab
         title: "Scheduled Container Recovery Capstone Lab"
         path: sections/section-020/capstone/labs/lab-01
+        difficulty: advanced
 
   - id: module-030
     title: "Section 030: Building & Virtualizing Systems"
@@ -449,6 +467,7 @@ modules:
       - type: lab
         title: "Compile & Install From Source Lab"
         path: sections/section-030/module-01/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 2: libvirt Virtual Machine Lifecycle"
@@ -485,6 +504,7 @@ modules:
       - type: lab
         title: "libvirt Virtual Machine Lifecycle Lab"
         path: sections/section-030/module-02/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -497,6 +517,7 @@ modules:
       - type: lab
         title: "Transient to Persistent Domain Lab"
         path: sections/section-030/module-02/labs/lab-02
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -509,6 +530,7 @@ modules:
       - type: lab
         title: "Reconfigure a Persistent Domain Lab"
         path: sections/section-030/module-02/labs/lab-03
+        difficulty: intermediate
 
       - type: reading
         title: "Section 030 Knowledge Check: Building & Virtualizing Systems"
@@ -525,6 +547,7 @@ modules:
       - type: lab
         title: "New Toolchain, New Host Capstone Lab"
         path: sections/section-030/capstone/labs/lab-01
+        difficulty: advanced
 
   - id: module-040
     title: "Section 040: Mandatory Access Control — SELinux & AppArmor"
@@ -575,6 +598,7 @@ modules:
       - type: lab
         title: "AppArmor Profile Enforcement Lab"
         path: sections/section-040/module-01/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -587,6 +611,7 @@ modules:
       - type: lab
         title: "AppArmor: Repair a Read Denial Lab"
         path: sections/section-040/module-01/labs/lab-02
+        difficulty: intermediate
 
       - type: reading
         title: "Section 040 Knowledge Check: Mandatory Access Control — SELinux & AppArmor"
@@ -603,6 +628,7 @@ modules:
       - type: lab
         title: "Two Services, Two Denials Capstone Lab"
         path: sections/section-040/capstone/labs/lab-01
+        difficulty: advanced
 
   - id: module-050
     title: "Section 050: Debian Package Management: Repositories, dpkg & APT"
@@ -645,6 +671,7 @@ modules:
       - type: lab
         title: "Third-Party Repositories & Package Pinning Lab"
         path: sections/section-050/module-01/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -657,6 +684,7 @@ modules:
       - type: lab
         title: "APT Pinning (not a hold) Lab"
         path: sections/section-050/module-01/labs/lab-02
+        difficulty: intermediate
 
       - type: reading
         title: "Module 2: dpkg Low-Level Package Management"
@@ -685,6 +713,7 @@ modules:
       - type: lab
         title: "dpkg Low-Level Package Management Lab"
         path: sections/section-050/module-02/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 3: APT Basic Package Operations"
@@ -713,6 +742,7 @@ modules:
       - type: lab
         title: "APT Basic Package Operations Lab"
         path: sections/section-050/module-03/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 4: APT Package Information Lookup"
@@ -737,6 +767,7 @@ modules:
       - type: lab
         title: "APT Package Information Lookup Lab"
         path: sections/section-050/module-04/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 5: APT Package Groups & Bulk Operations"
@@ -761,6 +792,7 @@ modules:
       - type: lab
         title: "APT Package Groups & Bulk Operations Lab"
         path: sections/section-050/module-05/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Section 050 Knowledge Check: Debian Package Management"
@@ -777,6 +809,7 @@ modules:
       - type: lab
         title: "New App Server Onboarding Capstone Lab"
         path: sections/section-050/capstone/labs/lab-01
+        difficulty: advanced
 
   - id: module-060
     title: "Section 060: RPM/DNF Package Management: rpm, dnf & Package Groups"
@@ -820,6 +853,7 @@ modules:
       - type: lab
         title: "RPM Low-Level Package Management Lab"
         path: sections/section-060/module-01/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 2: Rebuilding a Corrupted RPM Database"
@@ -844,6 +878,7 @@ modules:
       - type: lab
         title: "Rebuilding a Corrupted RPM Database Lab"
         path: sections/section-060/module-02/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -856,6 +891,7 @@ modules:
       - type: lab
         title: "RPM Database: Corruption Look-Alike Lab"
         path: sections/section-060/module-02/labs/lab-02
+        difficulty: intermediate
 
       - type: reading
         title: "Module 3: DNF Basic Package Operations"
@@ -880,6 +916,7 @@ modules:
       - type: lab
         title: "DNF Basic Package Operations Lab"
         path: sections/section-060/module-03/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 4: DNF Package Information Lookup"
@@ -904,6 +941,7 @@ modules:
       - type: lab
         title: "DNF Package Information Lookup Lab"
         path: sections/section-060/module-04/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 5: DNF Package Groups"
@@ -932,6 +970,7 @@ modules:
       - type: lab
         title: "DNF Package Groups Lab"
         path: sections/section-060/module-05/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Section 060 Knowledge Check: RPM/DNF Package Management"
@@ -948,6 +987,7 @@ modules:
       - type: lab
         title: "RPM/DNF Package Management Capstone Lab"
         path: sections/section-060/capstone/labs/lab-01
+        difficulty: advanced
 
   - id: module-070
     title: "Section 070: SUSE Package Management: Zypper"
@@ -990,6 +1030,7 @@ modules:
       - type: lab
         title: "Zypper Basic Package Operations Lab"
         path: sections/section-070/module-01/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 2: Zypper Package Information Lookup"
@@ -1014,6 +1055,7 @@ modules:
       - type: lab
         title: "Zypper Package Information Lookup Lab"
         path: sections/section-070/module-02/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Section 070 Knowledge Check: SUSE Package Management: Zypper"
@@ -1030,6 +1072,7 @@ modules:
       - type: lab
         title: "Zypper Research-Then-Act Capstone Lab"
         path: sections/section-070/capstone/labs/lab-01
+        difficulty: advanced
 
   - id: module-080
     title: "Section 080: System Disaster Recovery"
@@ -1073,6 +1116,7 @@ modules:
       - type: lab
         title: "Root-Filesystem Repair via chroot Lab"
         path: sections/section-080/module-01/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: Question
@@ -1085,6 +1129,7 @@ modules:
       - type: lab
         title: "chroot Repair: Wrong fstab Filesystem Type Lab"
         path: sections/section-080/module-01/labs/lab-02
+        difficulty: intermediate
 
       - type: reading
         title: "Module 2: Password Reset & Single-User Recovery"
@@ -1109,6 +1154,7 @@ modules:
       - type: lab
         title: "Password Reset & Single-User Recovery Lab"
         path: sections/section-080/module-02/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 3: Partition Table Backup & Recovery"
@@ -1137,6 +1183,7 @@ modules:
       - type: lab
         title: "Partition Table Backup & Recovery Lab"
         path: sections/section-080/module-03/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Module 4: GRUB Corruption Recovery"
@@ -1165,6 +1212,7 @@ modules:
       - type: lab
         title: "GRUB Corruption Recovery Lab"
         path: sections/section-080/module-04/labs/lab-01
+        difficulty: intermediate
 
       - type: reading
         title: "Section 080 Knowledge Check: System Disaster Recovery"
@@ -1181,6 +1229,7 @@ modules:
       - type: lab
         title: "System Disaster Recovery Integration Capstone Lab"
         path: sections/section-080/capstone/labs/lab-01
+        difficulty: advanced
 
   - id: module-090
     title: "LFCS Operations Deployment Domain Certification Quiz"
