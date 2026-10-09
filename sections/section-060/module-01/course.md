@@ -1,30 +1,43 @@
-# Chapter 1: RPM Low-Level Package Management
+# RPM Low-Level Package Management
 
-When `dnf install` finishes, a quieter tool did the work: `rpm` unpacked the files and wrote them into a local database under `/var/lib/rpm`. `dnf` is the network-and-dependency layer; `rpm` is the one-file-at-a-time installer with no concept of a repository. Most days you never call it directly — until someone hands you a standalone `.rpm`, or you need to check whether an installed package's files have drifted from what was recorded. This module operates at that lower level: inspect a `.rpm` before trusting it, install it, ask ownership questions both ways, and verify integrity.
+Astronaut, on a Red Hat family ship (Rocky Linux, RHEL, Fedora) every piece of software arrives as a **package**: a supply crate with a parts list, a version and a list of the crates it needs. When `dnf install` finishes, a quieter tool did the real work. `rpm` unpacked the files and wrote them into a local database under `/var/lib/rpm`.
 
-Three short parts; work them in order.
-
-## How this module is organised
-
-1. **[Part 1 — What `rpm` knows, and inspecting a `.rpm` before you trust it](./course-01-rpm-scope-and-inspecting.md)** — the "one thing, no repository" model, and `rpm -qip` / `-qlp` / `-qp --requires` to read a `.rpm` file's header — with the `-p` modifier that decides file vs. installed database.
-2. **[Part 2 — Installing directly, and ownership queries in both directions](./course-02-installing-and-ownership.md)** — `rpm -ivh` and why it *refuses* on a missing dependency (unlike `dpkg -i`), `dnf install ./file.rpm` as the practical alternative, and `-qf` (file → package) / `-ql` (package → files) with the `-p` flag table.
-3. **[Part 3 — Verifying integrity](./course-03-verifying-integrity.md)** — `rpm -V` and its nine-column per-attribute codes (`S`, `5`, `T`, …), the `c` config marker that changes how you read them, and `--requires` vs `--provides`.
+`dnf` is the quartermaster: it talks to supply depots and orders every crate a package needs. `rpm` is the loading crew: it unpacks the one crate it is handed and knows nothing about depots. Most days you never call `rpm` yourself. You need it when someone hands you a single `.rpm` file, or when you must check whether an installed package's files have changed since install. This module works at that lower level.
 
 ## Learning objectives
 
 After this module you can:
 
-- **State** what `rpm` operates on, and use `-p` correctly to switch between a `.rpm` file and the installed database.
-- **Inspect** a `.rpm` file's metadata, file list, and declared requirements without changing the system.
-- **Install** a standalone `.rpm`, and explain why `rpm -ivh` refuses a missing dependency and `dnf install ./file.rpm` does not.
-- **Map** a file to its owning package (`rpm -qf`) and a package to its files (`rpm -ql`).
-- **Read** `rpm -V` output — the per-attribute codes and the file-type marker — and tell a benign config edit from an integrity concern.
-- **Explain** how `--provides` capabilities drive dependency resolution independent of package names.
+- Say what `rpm` works on, and use `-p` correctly to switch between a `.rpm` file and the installed database.
+- Inspect a `.rpm` file's details, file list and declared needs without changing the system.
+- Install a single `.rpm` file, and explain why `rpm -ivh` refuses a missing dependency while `dnf install ./file.rpm` does not.
+- Find the package that owns a file (`rpm -qf`) and the files that belong to a package (`rpm -ql`).
+- Read `rpm -V` output, its per-attribute letters and its file-type marker, and tell a harmless configuration edit from a real integrity problem.
+- Explain how `--provides` capabilities drive dependency resolution, separate from package names.
 
 ## Before you start
 
-Assumed: a Linux shell, `sudo`, and Debian's `dpkg` module as useful contrast. This repo's only VM is Ubuntu 24.04, so the lab bootstrap runs a real Rocky Linux 9 container named **`rpmbox`**; get a shell with `docker exec -it rpmbox bash` and run every `rpm` command from there. Everything inside is a genuine Rocky 9 userspace and RPM database — nothing simulated.
+Check that you have the knowledge and the tools this module expects.
 
-## Where this fits
+### What you should already know
 
-This is the RPM-family counterpart to the Debian `dpkg` module. The `-p` file-vs-name distinction and `rpm -V` integrity reading are exactly what the section builds on — the rpmdb-rebuild module assumes you can tell a database-layer failure from a package-layer one.
+- **How to use a Linux shell.** You can type commands, read their output and use `sudo`.
+- **What a package is.** A file that holds a program, its files and a list of what it needs. On Debian and Ubuntu that is a `.deb` handled by `dpkg`; on the Red Hat family it is a `.rpm` handled by `rpm`.
+
+### What you need
+
+There is no playground for this module. The lab machines run Ubuntu 24.04, and `rpm` is not Ubuntu's package tool. So every mission in this module starts a real Rocky Linux 9 **container** named `rpmbox` on the Ubuntu machine. A container is a sealed pod docked to the ship: it has its own files and tools but shares the ship's reactor core (the kernel). Inside `rpmbox`, `rpm`, `dnf` and the RPM database are all real.
+
+You open a shell inside it with `docker exec -it rpmbox bash`, and you run every `rpm` command there. Any Rocky Linux 9 machine works for the examples too. The mission at the end of this module gives you the exact commands to start one.
+
+## How this module is laid out
+
+1. [What rpm Knows and Inspecting a .rpm File](./course-01-rpm-scope-and-inspecting.md): the "one crate at a time" model, and reading a `.rpm` file's header with `rpm -qip`, `-qlp` and `-qp --requires`.
+2. [Installing Directly and Ownership Queries](./course-02-installing-and-ownership.md): `rpm -ivh`, why it refuses a missing dependency, `dnf install ./file.rpm`, and the two ownership questions `-qf` and `-ql`.
+3. [Verifying Integrity](./course-03-verifying-integrity.md): `rpm -V` and its nine attribute letters, the `c` configuration marker, and `--requires` against `--provides`.
+   - Mission: [RPM Low-Level Package Management Lab](./labs/lab-01/question.md)
+4. [Wrap-Up: Mission Debrief](./course-04-wrap-up.md)
+
+## Why this matters
+
+Sooner or later a vendor hands you a single `.rpm` that lives in no depot. If you install it blind, you do not know where it writes or what it needs. And when a server behaves strangely, `rpm -V` tells you in seconds whether any packaged file was changed since install. Both are everyday administrator skills, and the exam tests them directly.

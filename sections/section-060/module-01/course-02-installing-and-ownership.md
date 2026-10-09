@@ -1,36 +1,54 @@
-# Part 2 — Installing directly, and ownership queries in both directions
+# Installing Directly and Ownership Queries
 
-> Prerequisite: [Part 1 — What `rpm` knows, and inspecting a `.rpm` before you trust it](./course-01-rpm-scope-and-inspecting.md). Next: [Part 3 — Verifying integrity](./course-03-verifying-integrity.md).
+Astronaut, you have read the label on the crate. Now you load it, and then you answer the two questions every incident asks: "which crate did this file come from?" and "which files came out of this crate?" This part shows where `rpm`'s lack of repository knowledge stops it, and the small table that keeps file and package queries apart.
 
-`rpm -ivh` installs a standalone `.rpm` and shows exactly where `rpm`'s lack of repository awareness stops it — differently from Debian's `dpkg`. Then the two ownership questions every incident asks, and the flag table that keeps file-path and package-name queries straight.
+## Installing a single .rpm file
 
-## `rpm -ivh` refuses on a missing dependency
+`rpm` can install a `.rpm` file straight from disk. What it cannot do is fetch anything that file needs. That one limit decides which install command you pick.
+
+### rpm -ivh
+
+Install the file you inspected:
 
 ```bash
 # shell: inside rpmbox, root
 sudo rpm -ivh /home/candidate/downloads/logship-agent-2.1.0-1.x86_64.rpm
 ```
 
-`-i` install, `-v` verbose, `-h` the `#####` hash progress bar. If every declared dependency is present, it finishes clean.
+`-i` means install, `-v` means verbose, and `-h` prints a progress bar of `#` marks. If every declared dependency is already present, the install finishes cleanly.
 
-If a dependency is **missing**, `rpm` cannot fetch it — no repository — and, unlike `dpkg -i` on Debian which unpacks and leaves things half-configured, `rpm` **refuses the whole transaction** and names the exact missing capability:
+Inside `rpmbox` you are already the root user, so `sudo` is not needed there. The commands keep `sudo` because on a real server you log in as a normal user. If the container answers `sudo: command not found`, run the same command without `sudo`.
+
+### When a dependency is missing
+
+If a dependency is **missing**, `rpm` cannot fetch it, because it knows no repository. It also does not install half the package. It **refuses the whole transaction** and names the exact missing capability:
 
 ```text
 error: Failed dependencies:
 	libwrap.so.0()(64bit) is needed by logship-agent-2.1.0-1.x86_64
 ```
 
-So outside a drill focused on raw `rpm`, the practical command for a standalone file is:
+This output is an example of what the refusal looks like. The `logship-agent` package in the mission only needs `bash` and `coreutils`, which are already there, so its install succeeds.
+
+Debian's `dpkg -i` behaves differently: it unpacks the package and leaves it half-configured. `rpm` leaves the system exactly as it was.
+
+### dnf install with a local file
+
+Outside a drill that is about raw `rpm`, the practical command for a single file is:
 
 ```bash
 sudo dnf install ./logship-agent-2.1.0-1.x86_64.rpm
 ```
 
-Given a **local file path** (note the `./`), `dnf` installs that exact file *and* resolves and fetches any missing dependencies from its configured repos — something bare `rpm -i` structurally cannot do.
+Given a **local file path** (note the `./`), `dnf` installs that exact file. It also works out any missing dependencies and fetches them from its configured repositories, something bare `rpm -i` cannot do. If you are replacing a package that is already installed, `rpm -ivh` stops with "already installed"; `rpm -U` (upgrade) is the option for that.
 
-## Ownership, both directions
+## Ownership in both directions
 
-### File → package
+Once packages are on board, two questions come up again and again. Both go to the RPM database, so neither one takes `-p`.
+
+### File to package
+
+You found a file and want to know whose it is before you touch it:
 
 ```bash
 rpm -qf /usr/bin/python3
@@ -40,38 +58,36 @@ rpm -qf /usr/bin/python3
 python3-3.9.18-1.el9.x86_64
 ```
 
-`-qf` (`--file`) — **no `-p`** — searches every installed package's file list for that path and prints the owning package's full name-version-release. The direction you reach for when you found a mystery file and need to know whose it is before touching it.
+`-qf` (long form `--file`) searches every installed package's file list for that path. It prints the owner's full name, version and release.
 
-### Package → files
+### Package to files
+
+The other way round, from a package name to its files:
 
 ```bash
 rpm -ql logship-agent
 ```
 
-`-ql` — **no `-p`** — the inverse: given an installed package **name**, list every path it placed. Run it *before* removing a package.
+`-ql` takes an installed package **name** and lists every path it placed. Run it before you remove a package, so you know what will go.
 
-### The `-p` table
+## The -p table
+
+Whether `p` is in the flags or not is the easiest thing to get wrong under time pressure. This table keeps the five queries apart:
 
 | Query | Argument | Reads |
 |---|---|---|
 | `rpm -qip` | a `.rpm` **file** | header metadata, before install |
 | `rpm -qlp` | a `.rpm` **file** | file list, before install |
-| `rpm -qi` | an installed **package name** | header metadata from the DB |
+| `rpm -qi` | an installed **package name** | header metadata from the database |
 | `rpm -ql` | an installed **package name** | package → files |
 | `rpm -qf` | a **file path** on disk | file → owning package |
 
-The presence or absence of `p` is the single easiest thing to fumble under time pressure. `-qip`/`-qlp` inspect a file; `-qi`/`-ql`/`-qf` hit the database.
+`-qip` and `-qlp` inspect a file. `-qi`, `-ql` and `-qf` ask the database.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Expecting `rpm -ivh` to pull a missing dependency** → it refuses the transaction entirely. Use `dnf install ./file.rpm` for auto-resolution.
-> - **`rpm -qf` with a package name / `rpm -ql` with a path** → opposite arguments; `-qf` takes a path, `-ql` takes a name.
-> - **Adding `-p` to `-qf` or `-ql`** → those query the installed DB; `-p` makes no sense and errors.
-> - **`rpm -ivh` on an already-installed package** → "already installed". Use `-U` (upgrade) if replacing.
-
-> *`rpm -ivh` installs one `.rpm` and refuses outright on a missing dependency (use `dnf install ./file.rpm` to auto-resolve); `-qf` maps a file path → package, `-ql` maps a package name → files, and `-p` only belongs on file-based queries.*
-
-## Reference
-
-- `man rpm` — `-i` / `-U` / `-F` install modes, `-qf`, `-ql`, `--test`.
-- `man dnf` — `install <local-file>.rpm` with dependency resolution against configured repos.
-- `man rpm` "QUERY OPTIONS" — the full matrix of what `-p` does and does not apply to.
+> - **Expecting `rpm -ivh` to fetch a missing dependency.** It refuses the whole transaction. Use `dnf install ./file.rpm` when you want dependencies resolved for you.
+> - **Giving `rpm -qf` a package name, or `rpm -ql` a path.** They take opposite arguments: `-qf` takes a path, `-ql` takes a name.
+> - **Adding `-p` to `-qf` or `-ql`.** Those ask the installed database, so `-p` makes no sense there and gives an error.
+> - **Running `rpm -ivh` on a package that is already installed.** It stops with "already installed". Use `-U` (upgrade) to replace it.

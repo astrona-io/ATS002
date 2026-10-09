@@ -1,23 +1,27 @@
-# Part 3 — Verifying integrity
+# Verifying Integrity
 
-> Prerequisite: [Part 2 — Installing directly, and ownership queries in both directions](./course-02-installing-and-ownership.md). Next: [Section 060 quiz](../quiz.md).
+Astronaut, loading a crate is not the end of the story. Files change after install. Sometimes that is a normal configuration edit, and sometimes it is something to worry about. `rpm -V` compares every file of a package with what the quartermaster's ledger recorded at install time. This part teaches you to read its short codes, and to read what a package needs and offers from the installed side.
 
-Installing a package is not the end. Files drift — a legitimate config edit, or something worth worrying about. `rpm -V` answers "has anything changed since install?", and reading its compact per-attribute codes is the skill. This part also covers the `--requires` / `--provides` pair from the installed side.
+## rpm -V: compare with the install-time record
 
-## `rpm -V` — verify against what was recorded
+`rpm -V` (verify) checks each file of an installed package against the size, checksum, owner, time and other details the RPM database stored when the package was installed.
+
+### Run a verify
 
 ```bash
 # shell: inside rpmbox
 rpm -V logship-agent
 ```
 
-**Clean output is no output at all.** `rpm -V` prints a line only for a file that fails one or more checks:
+**Clean output is no output at all.** `rpm -V` prints a line only for a file that fails one or more checks. A changed file looks like this:
 
 ```text
 S.5....T.  c /etc/logship-agent/agent.conf
 ```
 
-Nine columns, one per attribute compared against the install-time record. `.` = unchanged; a letter = changed:
+### Read the nine columns
+
+The first field has nine columns, one per attribute. A `.` means "unchanged" and a letter means "changed":
 
 | Col | Letter | Attribute |
 |---|---|---|
@@ -29,36 +33,65 @@ Nine columns, one per attribute compared against the install-time record. `.` = 
 | 6 | `U` | **U**ser / owner differs |
 | 7 | `G` | **G**roup differs |
 | 8 | `T` | m**T**ime differs |
-| 9 | `P` | **P**ie / capabilities differ |
+| 9 | `P` | ca**P**abilities differ |
 
-After the codes, a **file-type marker**: `c` config, `d` doc, `l` license, `g` ghost, `(nothing)` = a normal file.
+After the codes comes a **file-type marker**: `c` for a configuration file, `d` for documentation, `l` for a license, `g` for a ghost file (one the package owns but does not ship), and nothing at all for a normal file.
 
-Reading the example: `S`, `5`, `T` changed on a file marked `c`. A config file that was edited — expected, harmless. **The exact same `S.5....T.` on a binary under `/usr/bin` with no `c` marker** would be a serious integrity flag: an unflagged executable should never differ from what was installed.
+### What the example means
 
-Verify the whole system: `rpm -Va` (slow; lots of legitimate `c` lines).
+In the example, the size (`S`), checksum (`5`) and modification time (`T`) changed on a file marked `c`. Someone edited a configuration file. That is expected and harmless.
+
+**The exact same `S.5....T.` on a program under `/usr/bin` with no `c` marker** is a serious warning. A program that is not a configuration file should never differ from what was installed. The marker after the codes is what changes how you read them.
+
+To check every installed package at once, run `rpm -Va`. It is slow and prints many harmless `c` lines.
 
 ## Dependencies from the installed side
+
+Every package lists what it needs and what it offers. Once a package is installed, you can read both lists from the RPM database.
+
+### --requires and --provides
 
 ```bash
 rpm -q --requires logship-agent
 rpm -q --provides logship-agent
 ```
 
-- **`--requires`** — every capability the package needs to function (library sonames, other packages, `rpmlib()` features).
-- **`--provides`** — every capability the package *offers* to satisfy other packages' `Requires:`.
+- **`--requires`** lists every **capability** the package needs to work. A capability is a named thing a package can offer or need: a library file name, another package, or an `rpmlib()` feature of `rpm` itself.
+- **`--provides`** lists every capability the package *offers* to meet other packages' `Requires:` lines.
 
-They are **not symmetric**. A package's provided capabilities need not match its own name — other packages' dependency resolution keys off exactly this `--provides` list, which is why a packager cares about it. Example: `python3` provides `python(abi) = 3.9`, and dozens of packages `Require:` that string, not the name `python3`.
+### Capabilities are not package names
+
+The two lists are not mirror images, and a package's capabilities do not have to match its own name. `dnf` and `rpm` resolve dependencies by these capability strings, not by package names. For example, `python3` provides `python(abi) = 3.9`, and many packages require that string, not the name `python3`.
+
+To go the other way round, `rpm -q --whatprovides <capability>` names the installed package that offers a capability, and `rpm -q --whatrequires <capability>` names the installed packages that need it.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Reading `rpm -V` output as "the package is broken"** → it only means *something differs from install time*. On a `c` config file, that is normal.
-> - **Ignoring `S.5....T.` on an unflagged binary** → that *is* alarming — investigate. The file-type marker after the codes is what changes the interpretation.
-> - **Expecting output from a clean `rpm -V`** → silence is success. No line = every checked attribute matches.
-> - **Assuming `--provides` mirrors the package name** → capabilities are independent strings; dependency resolution uses them, not the name.
+> - **Reading `rpm -V` output as "the package is broken".** It only means *something differs from install time*. On a `c` configuration file, that is normal.
+> - **Ignoring `S.5....T.` on a program with no marker.** That *is* alarming. Investigate it. The marker after the codes changes the meaning.
+> - **Expecting output from a clean `rpm -V`.** Silence is success. No line means every checked attribute matches.
+> - **Assuming `--provides` repeats the package name.** Capabilities are separate strings, and dependency resolution uses them, not the name.
 
-> *`rpm -V` prints one line per drifted file with a per-attribute code (`S` size, `5` checksum, `T` mtime, …) and a type marker (`c` = config); the same codes are benign on a `c` file and alarming on an unmarked binary — and `--provides` lists capabilities other packages depend on, which need not match the package name.*
+## Your mission: RPM Low-Level Package Management Lab
 
-## Reference
+You can now inspect a `.rpm` file, install it with `rpm`, answer ownership questions both ways and verify a package against its install-time record. The mission hands you a standalone `.rpm` and asks you to do all of that on a real Rocky Linux 9 container.
 
-- `man rpm` "VERIFY OPTIONS" — the full nine-column legend and the file-type markers.
-- `man rpm` — `--requires`, `--provides`, `--conflicts`, `--obsoletes`; `--whatprovides` / `--whatrequires`.
-- `rpm -Va` and `rpmverify` — whole-system verification and the standalone verify tool.
+Start the mission and open a terminal on it:
+
+```sh
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-01/labs/lab-01
+astrona ssh ats-002-lab-061
+```
+
+On the lab machine, open a shell inside the `rpmbox` container with `docker exec -it rpmbox bash`. Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-060/module-01/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-002-lab-061
+```

@@ -1,10 +1,12 @@
-# Part 2 — What would provide this, and cross-referencing `rpm`
+# Provides Lookups and Cross-Checking with rpm
 
-> Prerequisite: [Part 1 — Finding a package, and describing it](./course-01-search-and-describe.md). Next: [Section 060 quiz](../quiz.md).
+Astronaut, a script fails because a command is missing, and you need to know which crate to order. `dnf provides` answers "which package would I install to get this file or command?", a question `rpm -qf` cannot answer at all. This part shows that lookup, how to list installed packages by pattern, and when to trust `rpm` over `dnf`.
 
-`dnf provides` answers a question `rpm -qf` structurally cannot: "what package would I install to get this file or command?" This part is that lookup, listing installed packages by pattern, and when to trust `rpm` over `dnf`.
+## dnf provides: search the whole catalogue
 
-## `dnf provides` — repo-wide, install-state-independent
+`dnf provides` (also spelled `dnf whatprovides`) searches **every configured repository's catalogue** for a package that places a file at a path, or offers a matching capability. It does not matter whether anything is installed.
+
+### Look up a path
 
 ```bash
 # shell: inside the rpmbox container
@@ -18,48 +20,79 @@ Matched from:
 Filename    : /usr/sbin/ip
 ```
 
-`dnf provides` (alias `dnf whatprovides`) searches **every configured repository's metadata** for any package that declares it places a file at that path, or declares a matching capability — **independent of whether anything is installed**.
+`Repo : @System` means the matching copy is already installed on this machine. For a package that is not installed, that line names the repository that offers it instead.
 
-The structural contrast with `rpm -qf` (Module 1): `rpm -qf` searches only the *local installed database*. It can answer "what already-installed thing owns this file", never "what would I need to install to get it". `dnf provides` answers the second.
+### Why rpm -qf cannot do this
 
-If unsure of the exact path (`/usr/bin` vs `/usr/sbin`, symlinked or not):
+`rpm -qf` searches only the *local installed database*. It can answer "which installed package owns this file?", never "what would I need to install to get it?". `dnf provides` answers the second question, because it reads the repository catalogue.
+
+### Look up a command name with a glob
+
+If you are not sure of the exact path (`/usr/bin` or `/usr/sbin`, a link or not), match any directory:
 
 ```bash
 dnf provides '*/ip'
 ```
 
-The leading `*/` glob matches any directory prefix — more robust than guessing a precise path when you only know the command name.
+The leading `*/` matches any directory in front of the name. That is more robust than guessing a precise path when you only know the command name. Keep the quotes, so the shell passes the pattern to `dnf` unchanged.
 
 ## Listing installed packages by pattern
+
+Sometimes the question is "which packages of this family are on board?".
+
+### Anchor the pattern
 
 ```bash
 dnf list installed | grep '^python3-'
 ```
 
-Anchoring with **`^`** matches the start of the package-name column, not anywhere the string might appear (a version string, a repo name). Precise instead of noisy.
+The **`^`** anchors the match to the start of the line, which is the package-name column. Without it, `grep` also matches the string in the middle of other names or in a version or repository column. The anchor makes the result precise instead of noisy.
 
-## When to cross-reference `rpm` instead
+## When to cross-check with rpm instead
+
+`dnf` and `rpm` read different sources, so they answer different questions.
+
+### Which tool reads what
 
 ```mermaid
-flowchart TD
-    Q["question is about..."] --> A["what is AVAILABLE out there / what would provide X"]
-    Q --> B["what is ACTUALLY installed here, right now"]
-    A --> DNF["dnf info / dnf provides — reads repo metadata cache (needs a populated cache, could be stale)"]
-    B --> RPM["rpm -qi / rpm -qf — reads /var/lib/rpm directly (no network, always current)"]
+flowchart TB
+    Q["your question"] -->|"what is available"| DNF["dnf info, dnf provides"]
+    Q -->|"what is installed"| RPM["rpm -qi, rpm -qf"]
+    DNF -->|"reads"| C["repository catalogue"]
+    RPM -->|"reads"| DB["RPM database"]
 ```
 
-`dnf info` / `dnf provides` reflect `dnf`'s repository metadata cache — needs a populated cache and could be stale. `rpm -qi` / `rpm -qf` read the local RPM database: zero network dependency, always exactly what is on this system now. Complementary, not redundant: `dnf` for "what is available", `rpm` for "what is actually installed here".
+The diagram shows that `dnf info` and `dnf provides` read the repository catalogue, while `rpm -qi` and `rpm -qf` read the local RPM database under `/var/lib/rpm`.
+
+The catalogue must be downloaded first and can be out of date. The RPM database needs no network and always shows exactly what is on this ship right now. The two are partners, not copies: use `dnf` for "what is available" and `rpm` for "what is actually installed here". For scripts, `dnf repoquery --whatprovides` and `dnf repoquery --file` give the same answers as `dnf provides` in a form that is easier to process.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Reaching for `rpm -qf` to find an *uninstalled* package's file** → it only searches installed packages. Use `dnf provides`.
-> - **`grep 'python3-'` without `^`** → matches `libpython3-...` and mid-string hits. Anchor it.
-> - **Trusting `dnf provides` with an empty/stale cache** → run `dnf makecache` (or `--refresh`) first.
-> - **Guessing an exact path for `dnf provides`** → use `'*/name'` when you only know the command name.
+> - **Using `rpm -qf` to find the file of a package that is not installed.** It only searches installed packages. Use `dnf provides`.
+> - **Using `grep 'python3-'` without `^`.** It also matches names such as `libpython3-...` and hits in the middle of a line. Anchor it.
+> - **Trusting `dnf provides` with an empty or old catalogue.** Run `dnf makecache` (or add `--refresh`) first.
+> - **Guessing an exact path for `dnf provides`.** Use `'*/name'` when you only know the command name.
 
-> *`dnf provides <path-or-glob>` searches repository metadata to answer "what would I install to get this" (which `rpm -qf` cannot — it only knows installed packages); use `dnf` for what is available and `rpm -qi`/`-qf` for what is genuinely installed.*
+## Your mission: DNF Package Information Lookup Lab
 
-## Reference
+You can now search the catalogue, read a package's details, find which package provides a command and list installed packages by pattern. The mission asks you to research four questions without installing anything, and to save each answer in a file.
 
-- `man dnf` — `provides` / `whatprovides`, `list installed`; glob matching.
-- `man rpm` — `-qf`, `-qi`; reading the local database with no network.
-- `dnf repoquery --whatprovides` / `--file` — the scriptable equivalent for automation.
+Start the mission and open a terminal on it:
+
+```sh
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-04/labs/lab-01
+astrona ssh ats-002-lab-064
+```
+
+On the lab machine, open a shell inside the `rpmbox` container with `docker exec -it rpmbox bash`. Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-060/module-04/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-002-lab-064
+```

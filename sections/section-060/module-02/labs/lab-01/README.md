@@ -1,20 +1,41 @@
-# section-060 / module-02: Rebuilding a Corrupted RPM Database Sandbox
+# Rebuilding a Corrupted RPM Database Lab
 
-Welcome to the Module 2 targeted practice sandbox. In this lab, you will diagnose real RPM database corruption, back it up safely, and rebuild it.
+Welcome aboard, astronaut. The quartermaster's ledger on this ship, the RPM database, was damaged overnight. You will confirm the damage, make a safe copy, rebuild the ledger and prove that `rpm` and `dnf` both work again.
 
-## Important: This Lab Runs Inside a Container
+## Where you work
 
-This repository's only VM image is Ubuntu 24.04 — there is no Rocky Linux/RHEL VM available. Bootstrap installs Docker on the Ubuntu VM and starts a long-lived, privileged Rocky Linux 9 container named `rpmbox`, and then genuinely corrupts its real, sqlite-backed RPM database file before you ever connect. All of this lab's work happens **inside that container**, not on the Ubuntu host itself.
+The lab machine runs Ubuntu 24.04, so the lab starts a real Rocky Linux 9 container named `rpmbox` on it. The lab's setup then really damages that container's `sqlite` database file before you connect. All the work in this lab happens **inside that container**, not on the Ubuntu machine itself.
 
-Get a shell inside it with:
+Open a shell inside it with:
+
 ```bash
 docker exec -it rpmbox bash
 ```
 
-The corruption is real — not simulated error text. `rpm -qa` inside `rpmbox` will genuinely fail until you repair it.
+The damage is real, not printed error text: `rpm -qa` inside `rpmbox` fails until you repair it.
 
 ## Launching the Lab
-Run the following command in your terminal to boot the QEMU VM:
+
+Run this command to start the virtual machine:
+
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-02/labs/lab-01
+```
+
+Open a terminal on it:
+
+```bash
+astrona ssh ats-002-lab-062
+```
+
+When you think you have finished, send it for grading:
+
+```bash
+astrona submit -c sections/section-060/module-02/labs/lab-01
+```
+
+When you are done, remove the lab:
+
+```bash
+astrona destroy ats-002-lab-062
 ```

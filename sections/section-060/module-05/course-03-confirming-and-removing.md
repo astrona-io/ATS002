@@ -1,42 +1,55 @@
-# Part 3 — Confirming what landed, and removing cleanly
+# Confirming and Removing a Group
 
-> Prerequisite: [Part 2 — Inspecting membership, and installing](./course-02-inspecting-and-installing.md). Next: [Section 060 quiz](../quiz.md).
-
-After a group install, confirm the set landed. And before removing a group, understand precisely what `dnf group remove` does — because it is driven by `dnf`'s own tracking, not by raw group membership, and that distinction has a concrete consequence.
+Astronaut, after a group install you check that the bundle really landed. Before you remove a group, you need to know exactly what `dnf group remove` takes with it. It follows `dnf`'s own records of what the group installed, not the group's member list, and that difference has a concrete result.
 
 ## Confirm what landed
+
+Two read-only commands show the group from both sides: its members and its installed status.
+
+### Read the members again
 
 ```bash
 # shell: inside the rpmbox container
 dnf group info "Development Tools"
 ```
 
-Run the exact Part 2 inspection again. Post-install, each currently-installed member is marked with an installed-indicator, so you can visually confirm the mandatory/default set landed and see whether any optional members are present too.
+This is the same `dnf group info` you run before an install. After the install, each member that is now installed carries an installed marker, so you can see that the mandatory and default members landed and whether any optional members are there too.
+
+### List the installed groups
 
 ```bash
 dnf group list installed
 ```
 
-Filters the group listing to groups `dnf` currently considers installed — the group-level analogue of `dnf list installed`. `"Development Tools"` should now appear.
+This shows only the groups `dnf` considers installed, the group-level match for `dnf list installed`. `"Development Tools"` should now appear.
 
-## `dnf group remove` — tracking, not membership
+## dnf group remove follows records, not membership
+
+When a group is installed, `dnf` records which packages that transaction brought in for the group. The removal uses that record.
+
+### Run the removal
 
 ```bash
 sudo dnf group remove "Development Tools"
 ```
 
-Read the semantics before running this on anything you care about: by default `dnf` removes packages it **tracked as installed specifically as part of this group installation** — *not* every package the group's metadata lists as a member.
+Read what this does before you run it on anything you care about. By default, `dnf` removes the packages it **recorded as installed for this group**, *not* every package the group's definition lists as a member.
+
+### Who stays and who goes
 
 ```mermaid
-flowchart TD
-    R["dnf group remove 'Development Tools'"] --> Q{"was this package installed BY the Part 2 group install?"}
-    Q -->|yes, e.g. gcc — new in that transaction| REM["removed — dnf tracked it as belonging to the group"]
-    Q -->|no, e.g. automake — already present beforehand for an unrelated reason| KEEP["kept — treated as independently owned, group member or not"]
+flowchart TB
+    R["dnf group remove"] -->|"installed by the group"| REM["removed: gcc"]
+    R -->|"there before the group"| KEEP["kept: automake"]
 ```
 
-Concrete: `automake` was already installed on this host, for an unrelated reason, **before** the Part 2 group install. `automake` is also a member of `"Development Tools"`. `dnf group remove` does **not** remove `automake` — a package present before the group install is independently owned. If it genuinely needs to go too, that is a separate `dnf remove automake`.
+The diagram shows the two cases: a package the group install brought in is removed, and a package that was already installed before the group install is kept.
 
-The inverse holds cleanly: `gcc`, freshly installed *because of* the Part 2 transaction and not present before, **is** removed by the group removal, because `dnf` tracked it as belonging to that transaction.
+A concrete case: `automake` was already installed on this ship, for an unrelated reason, **before** the group install. `automake` is also a member of `"Development Tools"`. `dnf group remove` does **not** remove `automake`, because a package that was there before the group install belongs to nobody's group. If it really has to go too, that is a separate `dnf remove automake`.
+
+The other way round works just as cleanly. `gcc` was not there before and was installed *because of* the group install. So the group removal **does** remove it, because `dnf` recorded it as part of the group.
+
+If the records ever look wrong, `dnf history` shows which transaction installed a given package, and `dnf group mark install` or `dnf group mark remove` change the group records by hand without installing or removing anything.
 
 ## Audit after removal
 
@@ -44,18 +57,35 @@ The inverse holds cleanly: `gcc`, freshly installed *because of* the Part 2 tran
 dnf group list installed
 ```
 
-Confirm `"Development Tools"` no longer appears — the same audit command from above, run again after removal, the group-level equivalent of re-checking `rpm -q` after removing a single package.
+Confirm that `"Development Tools"` no longer appears. It is the same check as above, run again after the removal: the group-level version of checking `rpm -q` after you remove one package.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Expecting `dnf group remove` to strip every group member** → it removes only what `dnf` recorded as installed *by* that group transaction.
-> - **Assuming a pre-existing package leaves with the group** → it does not (`automake` survives). Remove it explicitly if needed.
-> - **Assuming a group-pulled package survives** → it does not (`gcc` goes). Reinstall it explicitly if something else now needs it.
-> - **Skipping the post-removal `dnf group list installed`** → confirm the group is actually gone, not just that the command exited.
+> - **Expecting `dnf group remove` to strip every group member.** It removes only what `dnf` recorded as installed *by* that group.
+> - **Assuming a package that was there before leaves with the group.** It does not (`automake` stays). Remove it yourself if needed.
+> - **Assuming a package the group brought in survives.** It does not (`gcc` goes). Install it again yourself if something else now needs it.
+> - **Skipping the final `dnf group list installed`.** Confirm the group is really gone, not just that the command finished.
 
-> *`dnf group remove` removes only the packages `dnf` tracked as installed by that group's install transaction — a package present beforehand (`automake`) survives, one pulled in by the group (`gcc`) does not — so verify with `dnf group list installed` and remove any stragglers explicitly.*
+## Your mission: DNF Package Groups Lab
 
-## Reference
+You can now find a group, read its tiers, install it, confirm it and predict what its removal takes. The mission asks you to run that whole cycle with `"Development Tools"` on a ship where `automake` was installed beforehand, and to find out for yourself which packages survive.
 
-- `man dnf` — `group remove`, `group list installed`, `group mark install/remove` (adjust tracking manually).
-- `dnf history` — cross-check which transaction installed a given package if the group tracking is ambiguous.
-- Fedora docs, "groups vs environments" — `dnf environment` for the larger meta-groups built from groups.
+Start the mission and open a terminal on it:
+
+```sh
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-05/labs/lab-01
+astrona ssh ats-002-lab-065
+```
+
+On the lab machine, open a shell inside the `rpmbox` container with `docker exec -it rpmbox bash`. Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-060/module-05/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-002-lab-065
+```

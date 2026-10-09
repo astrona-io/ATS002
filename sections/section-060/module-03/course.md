@@ -1,28 +1,39 @@
-# Chapter 3: DNF Basic Package Operations
+# DNF Basic Package Operations
 
-LFCS expects fluency with the everyday `dnf` lifecycle on RHEL/Fedora-family systems: check what is upgradable, apply upgrades, install something new, retire something no longer needed. `dnf` folds metadata refresh into most commands, which changes the model slightly from APT's explicit two-step `update` / `upgrade` — and `dnf` has one capability APT has no real equivalent for: a genuinely transactional history that can undo an entire past operation as a unit.
+Astronaut, on a Red Hat family ship the quartermaster is `dnf`. It orders supply crates (packages) from supply depots (repositories), along with every crate they depend on. The exam expects you to run its everyday loop without thinking: check what can be upgraded, apply the upgrades, install something new and retire something no longer needed.
 
-Two short parts; work them in order.
-
-## How this module is organised
-
-1. **[Part 1 — The everyday `dnf` loop](./course-01-the-dnf-loop.md)** — `dnf check-update` (exit `100`), automatic metadata refresh (no `apt update` step), `dnf upgrade` as one solver-computed plan, and `dnf install` (with the EPEL habit).
-2. **[Part 2 — Removing, and transactional history](./course-02-removing-and-history.md)** — `dnf remove` and RPM's automatic per-file `%config` → `.rpmsave` handling, `dnf autoremove` for orphans, and `dnf history` / `history undo` to reverse a whole past transaction atomically.
+`dnf` refreshes the depot catalogue by itself inside most commands, so it has no separate "update the catalogue" step like Debian's `apt update`. It also has one tool Debian's `apt` has no real match for: a transaction history that can undo a whole past operation as one unit.
 
 ## Learning objectives
 
 After this module you can:
 
-- **Report** available updates with `dnf check-update` and interpret its exit codes.
-- **Explain** why there is no separate `update` step and no `full-upgrade` split in `dnf`.
-- **Install** and **remove** packages, and predict what happens to a modified `%config` file on removal.
-- **Clean up** orphaned dependencies with `dnf autoremove` as a distinct step.
-- **Inspect** transaction history with `dnf history` / `history info` and reverse a whole transaction with `dnf history undo`.
+- Report available updates with `dnf check-update` and read its exit codes.
+- Explain why `dnf` has no separate catalogue-update step and no `full-upgrade` split.
+- Install and remove packages, and predict what happens to an edited `%config` file on removal.
+- Clean up dependencies nothing needs any more with `dnf autoremove`, as a separate step.
+- Read the transaction log with `dnf history` and `dnf history info`, and reverse a whole transaction with `dnf history undo`.
 
 ## Before you start
 
-Assumed: a Linux shell, `sudo`, and the Debian `apt` module as contrast. This repo's only VM is Ubuntu 24.04, so the lab runs a real Rocky Linux 9 container **`rpmbox`** with EPEL enabled — `docker exec -it rpmbox bash`, and run every command there.
+Check that you have the knowledge and the tools this module expects.
 
-## Where this fits
+### What you should already know
 
-This is the RPM-family everyday loop, the counterpart to the Debian `apt` basic-operations module. `dnf history undo` in particular is the recovery tool the section capstone expects when a transaction bundled in more than intended.
+- **How to use a Linux shell.** You can run commands with `sudo` and read their output.
+- **What a package and a repository are.** A package is a file that holds a program and a list of what it needs. A repository is a server that offers packages to download.
+
+### What you need
+
+There is no playground for this module. The lab machines run Ubuntu 24.04, so the mission starts a real Rocky Linux 9 **container** named `rpmbox` on the Ubuntu machine, with the extra EPEL repository already enabled. A container is a sealed pod docked to the ship, with its own tools and its own package database. You open a shell inside it with `docker exec -it rpmbox bash` and run every command there. Any Rocky Linux 9 machine works for the examples too.
+
+## How this module is laid out
+
+1. [The Everyday dnf Loop](./course-01-the-dnf-loop.md): `dnf check-update` and its exit code `100`, the automatic catalogue refresh, `dnf upgrade` as one plan, and `dnf install` with the EPEL habit.
+2. [Removing and Transaction History](./course-02-removing-and-history.md): `dnf remove` and how RPM handles `%config` files, `dnf autoremove` for leftovers, and `dnf history undo` to reverse a whole transaction.
+   - Mission: [DNF Basic Package Operations Lab](./labs/lab-01/question.md)
+3. [Wrap-Up: Mission Debrief](./course-03-wrap-up.md)
+
+## Why this matters
+
+Routine package maintenance is most of an administrator's package work. Doing it in the right order, and cleaning up after yourself, keeps a server predictable. When a transaction pulls in more than anyone wanted, `dnf history undo` puts the ship back exactly as it was, in one step.

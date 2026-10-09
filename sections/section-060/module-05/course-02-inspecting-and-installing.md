@@ -1,24 +1,30 @@
-# Part 2 — Inspecting membership, and installing
+# Inspecting and Installing a Group
 
-> Prerequisite: [Part 1 — What a group is, and discovering what exists](./course-01-what-a-group-is-and-discovering.md). Next: [Part 3 — Confirming, and removing cleanly](./course-03-confirming-and-removing.md).
+Astronaut, never order a bundle without reading its packing list. A group's members sit in three tiers, and the third tier does not behave the way most people assume under pressure. This part shows how to read `dnf group info` and choose the right install command.
 
-Never install a group blind. Its membership has three tiers, and the third one behaves differently from what most people assume under pressure. This part is reading `dnf group info` and choosing the right install command.
+## The three member tiers
 
-## The three membership tiers
+`dnf group info` reads the group's definition from the catalogue and prints it. It installs nothing, and it shows exactly what a plain install *would* bring in.
+
+### Read a group's members
 
 ```bash
 # shell: inside the rpmbox container
 dnf group info "Development Tools"
 ```
 
-Prints the description, then three clearly separated sections:
+It prints a description and then three clearly separated lists: Mandatory Packages, Default Packages and Optional Packages.
+
+### What each tier means
 
 ```mermaid
-flowchart TD
-    G["dnf group install '<group>'"] --> M["Mandatory packages<br/>always installed; cannot be excluded"]
-    G --> D["Default packages<br/>installed by default; can be explicitly excluded"]
-    G -.NOT included by plain install.-> O["Optional packages<br/>only with --with-optional, or named explicitly"]
+flowchart TB
+    G["dnf group install"] -->|"always"| M["Mandatory"]
+    G -->|"by default"| D["Default"]
+    G -.->|"only with --with-optional"| O["Optional"]
 ```
+
+The diagram shows that a plain group install brings in the Mandatory and Default members, while Optional members come only with `--with-optional` or when you name them yourself.
 
 | Tier | Plain `dnf group install`? | Notes |
 |---|---|---|
@@ -26,36 +32,36 @@ flowchart TD
 | **Default** | yes | can be excluded explicitly |
 | **Optional** | **no** | a real member for completeness/discoverability, but not installed unless named or `--with-optional` is passed |
 
-The trap: seeing a package under **Optional Packages** and assuming a plain group install brings it along. It does not.
+The trap: you see a package under **Optional Packages** and assume a plain group install brings it along. It does not.
 
-`dnf group info` is a **pure read** of repository metadata — it installs nothing, and is the command that shows exactly what a plain install *would* bring in.
+## Installing a group
 
-## Installing
+One command installs the whole bundle, as one transaction.
+
+### dnf group install
 
 ```bash
 sudo dnf group install "Development Tools"
 ```
 
-Resolves and installs every **mandatory and default** member as one transaction — the equivalent of typing all those package names into one `dnf install`, except the list came from the metadata you just inspected, not memory.
+`dnf` works out and installs every **mandatory and default** member in one transaction. It is like typing all those package names into one `dnf install`, except the list comes from the catalogue you just read, not from memory. Inside `rpmbox` you are already the root user; if the container answers `sudo: command not found`, run the command without `sudo`.
+
+### Adding the optional tier
 
 ```bash
 sudo dnf group install "Development Tools" --with-optional
 ```
 
-`--with-optional` also pulls in the optional tier. It is **never** the default.
+`--with-optional` also pulls in the Optional tier. It is **never** the default.
 
-Quote the group name if it contains spaces. A group can also be referenced by its ID (`dnf group list ids`), e.g. `dnf group install "@Development Tools"` or the id form — useful in scripts.
+### Quoting and group IDs
+
+Put the group name in quotes when it contains spaces; otherwise the shell splits it into separate arguments. You can also use the group's ID from `dnf group list ids`, or put `@` in front of a group name or ID anywhere a package name is expected, for example `dnf group install "@Development Tools"`. Both forms are handy in scripts. To leave one Default member out, add `--exclude=<package>` to the install.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Assuming Optional-tier packages install with a plain group install** → they do not. Name them, or use `--with-optional`.
-> - **Installing a group without `dnf group info` first** → you commit to a package set you never reviewed.
-> - **Unquoted group names with spaces** → the shell splits them into separate arguments. Quote, or use the group ID.
-> - **`--with-optional` as a habit** → it can pull in a large optional tier; use it only when you actually want those members.
-
-> *A group has Mandatory (always), Default (yes, excludable), and Optional (only with `--with-optional` or by name) tiers; `dnf group info "<group>"` reads them without installing, and `dnf group install "<group>"` brings in mandatory + default only.*
-
-## Reference
-
-- `man dnf` — `group info`, `group install`, `--with-optional`, `--exclude`.
-- Fedora comps docs — the semantics of `<packagereq type="mandatory|default|optional">`.
-- `dnf group install "@group-id"` — the `@`-prefixed group reference usable anywhere a package name is expected.
+> - **Assuming Optional members come with a plain group install.** They do not. Name them, or use `--with-optional`.
+> - **Installing a group without running `dnf group info` first.** You commit to a set of packages you never reviewed.
+> - **Leaving a group name with spaces unquoted.** The shell splits it into separate arguments. Quote it, or use the group ID.
+> - **Using `--with-optional` out of habit.** It can pull in a large Optional tier. Use it only when you really want those members.

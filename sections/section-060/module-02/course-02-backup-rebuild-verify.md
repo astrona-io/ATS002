@@ -1,10 +1,27 @@
-# Part 2 — Back up, rebuild, verify
+# Back Up, Rebuild, Verify
 
-> Prerequisite: [Part 1 — Recognising the symptom, and not assuming the backend](./course-01-recognising-the-symptom.md). Next: [Section 060 quiz](../quiz.md).
+Astronaut, you have confirmed that the ledger itself is damaged. The repair has three steps, and the first one is never optional: copy the ledger, rebuild it, then prove it works with the same `dnf` checks that were failing before.
 
-Confirmed corruption. The repair is three steps and the first one is non-negotiable: back up the database, rebuild it, then verify with `dnf`'s own transaction-check machinery — the thing that was failing in the first place.
+## The repair at a glance
 
-## Back up `/var/lib/rpm` first
+Here is the whole repair in order, before the details:
+
+```mermaid
+flowchart TB
+    S["confirmed corruption"] -->|"cp -a"| B["backup copy"]
+    B -->|"rpm --rebuilddb"| R["rebuilt database"]
+    R -->|"rpm -qa"| V1["clean package list"]
+    V1 -->|"dnf check"| V2["consistent set"]
+    V2 -->|"dnf check-update"| OK["repaired"]
+```
+
+The diagram shows the order: copy `/var/lib/rpm` to a dated backup folder, rebuild with `rpm --rebuilddb`, then check with `rpm -qa`, `dnf check` and `dnf check-update`, each one testing a little more of the system.
+
+## Back up /var/lib/rpm first
+
+The RPM database is the **only record of what is installed**. If the rebuild makes things worse, or your diagnosis was wrong, the backup is your one way back to the current broken-but-known state without a full system restore.
+
+### Make the copy
 
 ```bash
 # shell: inside rpmbox, root
@@ -12,66 +29,89 @@ sudo cp -a /var/lib/rpm /var/lib/rpm.bak-$(date +%s)
 ls -d /var/lib/rpm.bak-*
 ```
 
-`-a` (archive) preserves permissions, ownership, timestamps, and symlinks exactly. This database is the **single authoritative record of what is installed**. If the rebuild makes things worse, or the diagnosis was wrong, this backup is the only way back to the current broken-but-known state without a full system restore. It costs seconds; skipping it risks a system with *no* usable record of its own installed packages.
+`-a` (archive) keeps permissions, ownership, timestamps and links exactly as they are. `$(date +%s)` adds the current time in seconds, so every backup gets its own name. The copy costs seconds. Skipping it risks a ship with *no* usable record of its own crates.
+
+Inside `rpmbox` you are already the root user. If the container answers `sudo: command not found`, run the same command without `sudo`.
 
 ## Rebuild
+
+`rpm` itself does the repair. It reads the package headers still stored in the database and builds fresh lookup structures from them.
+
+### Run the rebuild
 
 ```bash
 sudo rpm --rebuilddb
 ```
 
-`--rebuilddb` reconstructs the database's **index and lookup structures from the header data already in the existing database**, discarding the corrupted indexing and building it fresh. It repairs **database consistency** — not package files. If a package's actual installed files were deleted or damaged, `--rebuilddb` does nothing for that; that is a `dnf reinstall <pkg>` (or `rpm -ivh --replacepkgs`) problem, a different fix for a different failure.
+`--rebuilddb` throws away the damaged indexes and builds them again from the header data in the existing database. It repairs **the database's consistency**, not package files. If a package's installed files were deleted or damaged, `--rebuilddb` does nothing for that. That is a job for `dnf reinstall <pkg>` (or `rpm -ivh --replacepkgs`): a different fix for a different failure.
 
-Some RPM releases split database maintenance into a separate binary:
+### The rpmdb command
+
+Some RPM releases move database maintenance into a separate program called `rpmdb`:
 
 ```bash
 command -v rpmdb && sudo rpmdb --rebuilddb
 ```
 
-Either performs the same underlying repair.
+`command -v rpmdb` checks whether the program exists, and only then runs it. Either command does the same repair.
 
-```mermaid
-flowchart TD
-    S["confirmed rpmdb corruption (Part 1)"] --> B["sudo cp -a /var/lib/rpm /var/lib/rpm.bak-$(date +%s)"]
-    B --> R["sudo rpm --rebuilddb  (rebuilds indexes from header data)"]
-    R --> V1["rpm -qa | wc -l  → clean, plausible count"]
-    V1 --> V2["sudo dnf check  → installed-set consistency OK"]
-    V2 --> V3["sudo dnf check-update  → full transaction check completes"]
-    V3 --> OK["repaired"]
-```
+## Verify end to end
 
-## Verify — end to end
+One clean command is not proof. Check from three angles, from the simplest read to a full `dnf` pass.
+
+### rpm -qa
 
 ```bash
 rpm -qa | wc -l
 ```
 
-Should complete with **no interleaved error lines** and a plausible package count.
+This must finish with **no error lines mixed in** and a believable package count.
+
+### dnf check
 
 ```bash
 sudo dnf check
 ```
 
-Validates the installed-package set for internal consistency using the rebuilt database — confirming not just that `rpm -qa` works but that `dnf`'s transaction-check machinery (the thing originally failing) is healthy.
+`dnf check` tests the installed package set for internal consistency, using the rebuilt database. It proves more than `rpm -qa` does: `dnf`'s own checking code, which was failing in the first place, now works.
+
+### dnf check-update
 
 ```bash
 sudo dnf check-update
 ```
 
-A full transaction-check pass that completes normally, rather than failing at a database stage, is your independent end-to-end confirmation.
+This runs a full pass against the repositories. If it completes normally instead of failing at a database step, you have an independent end-to-end confirmation.
 
-Once verified and stable for a while, the `*.bak-*` copy can be removed — but not before.
+Once the system has been stable for a while, you can delete the `*.bak-*` copy, but not before.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Skipping the backup "because the rebuild will obviously work"** → if it does not, or the diagnosis was wrong, there is no rollback. `cp -a` costs seconds.
-> - **`cp` without `-a`** → loses modes/ownership/timestamps; the backup may not be restorable as-is.
-> - **Expecting `--rebuilddb` to restore missing package files** → it only rebuilds indexing from headers. Deleted files need `dnf reinstall`.
-> - **Calling it fixed after `rpm -qa` alone** → run `dnf check` and `dnf check-update` too; `dnf`'s check machinery was the original failure point.
+> - **Skipping the backup "because the rebuild will obviously work".** If it does not, or the diagnosis was wrong, there is no way back. `cp -a` costs seconds.
+> - **Using `cp` without `-a`.** The copy loses permissions, owners and timestamps, and may not work as a restore.
+> - **Expecting `--rebuilddb` to bring back missing package files.** It only rebuilds the indexes from the headers. Deleted files need `dnf reinstall`.
+> - **Calling it fixed after `rpm -qa` alone.** Run `dnf check` and `dnf check-update` too. `dnf`'s checks were the original point of failure.
 
-> *Back up with `cp -a` to `/var/lib/rpm.bak-<ts>`, run `rpm --rebuilddb` (rebuilds indexes from existing header data — not package files), then verify with `rpm -qa | wc -l`, `dnf check`, and `dnf check-update` completing cleanly.*
+## Your mission: Rebuilding a Corrupted RPM Database Lab
 
-## Reference
+You can now back up the RPM database, rebuild it and prove the repair with `rpm` and `dnf`. The mission gives you a container whose real `sqlite` database file was damaged overnight: confirm the damage, back it up, rebuild it and leave both `rpm -qa` and `dnf check` clean.
 
-- `man rpm` — `--rebuilddb`, `--initdb`; what is reconstructed and what is not.
-- `man dnf` — `check`, `check-update`; the installed-set and transaction consistency checks.
-- `man cp` — `-a` / `--archive` for a faithful copy of the database directory.
+Start the mission and open a terminal on it:
+
+```sh
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-02/labs/lab-01
+astrona ssh ats-002-lab-062
+```
+
+On the lab machine, open a shell inside the `rpmbox` container with `docker exec -it rpmbox bash`. Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-060/module-02/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-002-lab-062
+```

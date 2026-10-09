@@ -1017,13 +1017,13 @@ modules:
         title: "RPM Low-Level Package Management"
         path: sections/section-060/module-01/course.md
       - type: reading
-        title: "What `rpm` knows, and inspecting a `.rpm` before you trust it"
+        title: "What rpm Knows and Inspecting a .rpm File"
         path: sections/section-060/module-01/course-01-rpm-scope-and-inspecting.md
       - type: reading
-        title: "Installing directly, and ownership queries in both directions"
+        title: "Installing Directly and Ownership Queries"
         path: sections/section-060/module-01/course-02-installing-and-ownership.md
       - type: reading
-        title: "Verifying integrity"
+        title: "Verifying Integrity"
         path: sections/section-060/module-01/course-03-verifying-integrity.md
       - type: reading
         title: Question
@@ -1046,13 +1046,35 @@ modules:
           - name: "rpm(8) manual page"
             url: https://rpm-software-management.github.io/rpm/man/rpm.8.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-060/module-01/course-04-wrap-up.md
+      - type: reading
         title: "Rebuilding a Corrupted RPM Database"
         path: sections/section-060/module-02/course.md
       - type: reading
-        title: "Recognising the symptom, and not assuming the backend"
+        title: "Recognising a Broken RPM Database"
         path: sections/section-060/module-02/course-01-recognising-the-symptom.md
       - type: reading
-        title: "Back up, rebuild, verify"
+        title: Question
+        path: sections/section-060/module-02/labs/lab-02/question.md
+      - type: lab
+        title: "RPM Database: Corruption Look-Alike Lab"
+        path: sections/section-060/module-02/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: rpm-packages
+        task_kind: troubleshooting
+        tags: [rpm-database, dependency-check, dnf, rpm]
+        learning_goals:
+          - Read dnf check errors and tell a broken dependency from a corrupt database
+          - Fix the missing dependency without rebuilding the database
+        resources:
+          - name: "DNF command reference: check"
+            url: https://dnf.readthedocs.io/en/latest/command_ref.html#check-command
+          - name: "rpm(8) manual page"
+            url: https://rpm-software-management.github.io/rpm/man/rpm.8.html
+      - type: reading
+        title: "Back Up, Rebuild, Verify"
         path: sections/section-060/module-02/course-02-backup-rebuild-verify.md
       - type: reading
         title: Question
@@ -1074,32 +1096,16 @@ modules:
           - name: "DNF command reference"
             url: https://dnf.readthedocs.io/en/latest/command_ref.html
       - type: reading
-        title: Question
-        path: sections/section-060/module-02/labs/lab-02/question.md
-      - type: lab
-        title: "RPM Database: Corruption Look-Alike Lab"
-        path: sections/section-060/module-02/labs/lab-02
-        difficulty: intermediate
-        estimated_duration: 20m
-        topic: rpm-packages
-        task_kind: troubleshooting
-        tags: [rpm-database, dependency-check, dnf, rpm]
-        learning_goals:
-          - Read dnf check errors and tell a broken dependency from a corrupt database
-          - Fix the missing dependency without rebuilding the database
-        resources:
-          - name: "DNF command reference: check"
-            url: https://dnf.readthedocs.io/en/latest/command_ref.html#check-command
-          - name: "rpm(8) manual page"
-            url: https://rpm-software-management.github.io/rpm/man/rpm.8.html
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-060/module-02/course-03-wrap-up.md
       - type: reading
         title: "DNF Basic Package Operations"
         path: sections/section-060/module-03/course.md
       - type: reading
-        title: "The everyday `dnf` loop"
+        title: "The Everyday dnf Loop"
         path: sections/section-060/module-03/course-01-the-dnf-loop.md
       - type: reading
-        title: "Removing, and transactional history"
+        title: "Removing and Transaction History"
         path: sections/section-060/module-03/course-02-removing-and-history.md
       - type: reading
         title: Question
@@ -1121,13 +1127,16 @@ modules:
           - name: "DNF command reference: history"
             url: https://dnf.readthedocs.io/en/latest/command_ref.html#history-command
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-060/module-03/course-03-wrap-up.md
+      - type: reading
         title: "DNF Package Information Lookup"
         path: sections/section-060/module-04/course.md
       - type: reading
-        title: "Finding a package, and describing it"
+        title: "Finding and Describing a Package"
         path: sections/section-060/module-04/course-01-search-and-describe.md
       - type: reading
-        title: "What would provide this, and cross-referencing `rpm`"
+        title: "Provides Lookups and Cross-Checking with rpm"
         path: sections/section-060/module-04/course-02-provides-and-cross-referencing.md
       - type: reading
         title: Question
@@ -1150,16 +1159,19 @@ modules:
           - name: "DNF command reference: provides"
             url: https://dnf.readthedocs.io/en/latest/command_ref.html#provides-command
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-060/module-04/course-03-wrap-up.md
+      - type: reading
         title: "DNF Package Groups"
         path: sections/section-060/module-05/course.md
       - type: reading
-        title: "What a group is, and discovering what exists"
+        title: "What a Group Is and Finding One"
         path: sections/section-060/module-05/course-01-what-a-group-is-and-discovering.md
       - type: reading
-        title: "Inspecting membership, and installing"
+        title: "Inspecting and Installing a Group"
         path: sections/section-060/module-05/course-02-inspecting-and-installing.md
       - type: reading
-        title: "Confirming what landed, and removing cleanly"
+        title: "Confirming and Removing a Group"
         path: sections/section-060/module-05/course-03-confirming-and-removing.md
       - type: reading
         title: Question
@@ -1179,6 +1191,9 @@ modules:
         resources:
           - name: "DNF command reference: group"
             url: https://dnf.readthedocs.io/en/latest/command_ref.html#group-command
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-060/module-05/course-04-wrap-up.md
       - type: reading
         title: "Section 060 Knowledge Check: RPM/DNF Package Management"
         path: sections/section-060/quiz.md
