@@ -423,10 +423,10 @@ modules:
         title: "Per-User Cron Job Scheduling"
         path: sections/section-020/module-01/course.md
       - type: reading
-        title: "Where a cron job lives, and the format that follows"
+        title: "Where A Cron Job Lives"
         path: sections/section-020/module-01/course-01-where-a-cron-job-lives.md
       - type: reading
-        title: "Migrating a job safely"
+        title: "Migrating A Job Safely"
         path: sections/section-020/module-01/course-02-migrating-a-job-safely.md
       - type: reading
         title: Question
@@ -449,14 +449,20 @@ modules:
           - name: "crontab(1) manual page"
             url: https://man7.org/linux/man-pages/man1/crontab.1.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-020/module-01/course-03-wrap-up.md
+      - type: reading
         title: "Docker Container Lifecycle: Inspect, Stop, and Launch"
         path: sections/section-020/module-02/course.md
       - type: reading
-        title: "The container lifecycle, and stopping one cleanly"
+        title: "The Container Lifecycle And Stopping Cleanly"
         path: sections/section-020/module-02/course-01-the-container-lifecycle-and-stopping.md
       - type: reading
-        title: "Inspecting with `--format`, and launching with constraints"
+        title: "Inspecting With --format"
         path: sections/section-020/module-02/course-02-inspecting-with-format.md
+      - type: reading
+        title: "Launching With Limits"
+        path: sections/section-020/module-02/course-03-launching-with-limits.md
       - type: reading
         title: Question
         path: sections/section-020/module-02/labs/lab-01/question.md
@@ -478,17 +484,23 @@ modules:
           - name: "docker container inspect"
             url: https://docs.docker.com/reference/cli/docker/container/inspect/
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-020/module-02/course-04-wrap-up.md
+      - type: reading
         title: "systemd Timers"
         path: sections/section-020/module-03/course.md
       - type: reading
-        title: "The timer and service pair"
+        title: "The Timer And Service Pair"
         path: sections/section-020/module-03/course-01-the-timer-and-service-pair.md
       - type: reading
-        title: "Schedule expressions"
+        title: "Schedule Expressions"
         path: sections/section-020/module-03/course-02-schedule-expressions.md
       - type: reading
-        title: "Timers vs. cron, and operating them"
-        path: sections/section-020/module-03/course-03-timers-vs-cron-and-operating.md
+        title: "Converting A Cron Job To A Timer"
+        path: sections/section-020/module-03/course-03-converting-cron-to-a-timer.md
+      - type: reading
+        title: "Operating Timers"
+        path: sections/section-020/module-03/course-04-operating-timers.md
       - type: reading
         title: Question
         path: sections/section-020/module-03/labs/lab-01/question.md
@@ -509,6 +521,9 @@ modules:
             url: https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html
           - name: "systemd.time: calendar events"
             url: https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-020/module-03/course-05-wrap-up.md
       - type: reading
         title: "Section 020 Knowledge Check: Scheduled & Containerized Workloads"
         path: sections/section-020/quiz.md

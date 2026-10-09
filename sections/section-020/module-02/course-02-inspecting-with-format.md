@@ -1,97 +1,78 @@
-# Part 2 — Inspecting with `--format`, and launching with constraints
+# Inspecting With --format
 
-> Prerequisite: [Part 1 — The container lifecycle, and stopping one cleanly](./course-01-the-container-lifecycle-and-stopping.md). Next: [Section 020 quiz](../quiz.md).
+Astronaut, the Docker engine keeps a full record of every pod it has docked. `docker inspect` prints that whole record as JSON (a text format of nested names and values). `--format` runs a small template over the same record and gives back one answer. This part covers what the record holds, the template language, and how to pull out an IP address and a mount path.
 
-`docker inspect` prints the daemon's entire record of a container as JSON — creation config and live runtime state together. `--format` runs a template over that same structure and returns one answer. This part is the template language, the fields that matter, launching a container with resource limits, and verifying the limits actually took.
+The examples use a running container named `web_demo`. Use any container you have, and add `sudo` if your user is not in the `docker` group.
 
-## What `docker inspect` is showing you
+## What `docker inspect` shows you
+
+Start with the whole record, so you know what you are searching:
 
 ```bash
-docker inspect frontend_v2        # the full JSON — a hundred-plus lines
+docker inspect web_demo        # the full JSON, a hundred lines or more
 ```
 
-The document has two halves worth knowing apart:
+### Two halves of the record
 
-- **`.Config`** — what you asked for at *create* time: `Image`, `Env`, `Cmd`, `ExposedPorts`, `Labels`. Immutable for the life of the container.
-- **`.State`, `.NetworkSettings`, `.Mounts`, `.HostConfig`** — *runtime* facts the daemon maintains: current status, PID, IP addresses, resolved mounts, applied resource limits.
+The record has two halves that are worth telling apart:
 
-Reading it by eye is like being handed a ship's whole cargo manifest to find one crate. `--format` is asking the one question.
+- **`.Config`** is what you asked for when the container was created: `Image`, `Env`, `Cmd`, `ExposedPorts`, `Labels`. It does not change while the container exists.
+- **`.State`, `.NetworkSettings`, `.Mounts` and `.HostConfig`** hold the facts the Docker engine keeps up to date while the container runs: its current status, its PID, its IP addresses, its mounts and the resource limits it applied.
+
+Reading the whole record by eye is like reading a ship's full cargo manifest to find one crate. `--format` lets you ask for exactly that crate.
 
 ## The `--format` template language
 
-`--format` is Go's `text/template` run against the inspect JSON. The pieces you need:
+`--format` uses Go's `text/template` language and runs it against the inspect JSON. Go is the programming language Docker is written in. You only need a handful of pieces.
+
+### The pieces you need
 
 | Syntax | Does |
 |---|---|
-| `{{ .Field.Sub }}` | walk the struct — `.NetworkSettings.IPAddress` |
-| `{{ range .Map }} … {{ end }}` | iterate an array or map without naming keys |
-| `{{ index .Arr 0 }}` | the Nth element of an array |
-| `{{ len .Arr }}` | length |
-| `{{ json .Field }}` | dump that subtree as JSON |
-| `{{ printf "%s" .X }}` | format |
+| `{{ .Field.Sub }}` | walks into the record, for example `.NetworkSettings.IPAddress` |
+| `{{ range .Map }} … {{ end }}` | goes through every item of a list or map without naming the keys |
+| `{{ index .Arr 0 }}` | picks item number N of a list (counting from 0) |
+| `{{ len .Arr }}` | counts the items |
+| `{{ json .Field }}` | prints that part of the record as JSON |
+| `{{ printf "%s" .X }}` | formats a value |
+
+### Read an IP address
+
+Ask for the container's IP address directly:
 
 ```bash
-docker inspect --format '{{ .NetworkSettings.IPAddress }}' frontend_v2
+docker inspect --format '{{ .NetworkSettings.IPAddress }}' web_demo
 ```
 
-`.NetworkSettings.IPAddress` is populated **only for containers on the default bridge network**. Off the default bridge, Docker tracks addresses per-network and this top-level field is empty. The network-name-agnostic form:
+Docker fills `.NetworkSettings.IPAddress` **only for containers on the default bridge network**. On any other network, Docker keeps one address per network, and this top-level field is empty. This form works whatever the network is called:
 
 ```bash
-docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' frontend_v2
+docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' web_demo
 ```
 
-`range` over the `Networks` map visits each attached network's entry; `.IPAddress` inside the loop is that network's address. Works whether the container is on `bridge`, `my-app-net`, or several at once.
+`range` visits the entry for each network the container is attached to, and `.IPAddress` inside the loop is that network's address. It works whether the container is on `bridge`, on `my-app-net`, or on several networks at once.
 
-### Addressing arrays without hardcoding an index you eyeballed
+## Reading a list without guessing
 
-Volume mounts are `.Mounts`, a JSON array. Even when a task says "the container has one mount", do not hardcode `0` after counting by eye — address it generically:
+Some parts of the record are lists. Volume mounts are `.Mounts`, a JSON list with one entry per mount. A mount is a hatch between the pod and one of the ship's cargo holds: a folder on the host that the container sees at a path of its own.
+
+### Count first, then pick
+
+Even when a task says "the container has one mount", do not pick an item you counted by eye. Count the list first, then pick the item by its position:
 
 ```bash
-docker inspect --format '{{ (index .Mounts 0).Destination }}' frontend_v2
-docker inspect --format '{{ len .Mounts }}' frontend_v2          # check the count first
+docker inspect --format '{{ len .Mounts }}' web_demo             # check the count first
+docker inspect --format '{{ (index .Mounts 0).Destination }}' web_demo
 ```
 
-`index .Mounts 0` returns the first mount object; `.Destination` on it is the in-container path.
+`index .Mounts 0` returns the first mount entry. `.Destination` on that entry is the path inside the container. `.Source` would be the folder on the host.
 
-## Launching with an exact ceiling
+> [!TIP]
+> To save a value for later, send the `--format` output straight to a file with `>`. Redirection does not create missing folders, so create the folder with `mkdir -p` first.
 
-```bash
-docker run -d \
-  --name frontend_v3 \
-  --memory=30m \
-  -p 1234:80 \
-  nginx:alpine
-```
-
-- **`-d`** — detach; the container runs in the background, you get the prompt back.
-- **`--name frontend_v3`** — a fixed name instead of a random `adjective_scientist`.
-- **`--memory=30m`** — caps the container's cgroup memory at 30 MiB. Exceed it and the kernel OOM-killer terminates the process inside rather than letting it grow. Stored internally in **bytes**.
-- **`-p 1234:80`** — maps **host** port 1234 → **container** port 80. Left is always host-facing, right is what the process inside listens on. Reversed, you publish a host port nothing is bound to.
-
-## Verify the running state, not the command you typed
-
-A typo in `-p` or `--memory` fails silently from the shell's side. Check what the daemon actually built:
-
-```bash
-docker ps --filter 'name=frontend_v3'
-docker inspect --format '{{ .HostConfig.Memory }}' frontend_v3
-docker stats --no-stream frontend_v3
-```
-
-- `docker ps --filter` — the `PORTS` column shows `0.0.0.0:1234->80/tcp` if the mapping took.
-- `{{ .HostConfig.Memory }}` — the limit in bytes: 30 MiB is `31457280` (`30 × 1024 × 1024`). `0` means no limit was applied.
-- `docker stats --no-stream` — one-shot snapshot of live usage against the limit, no continuously-updating pane.
+## Common pitfalls
 
 > [!WARNING]
-> - **Reversed `-p` mapping.** `-p 80:1234` publishes host 80 → container 1234; nothing listens there. Host port is always on the left.
-> - **`.NetworkSettings.IPAddress` empty and assuming no network.** It is only set on the default bridge; use `range .NetworkSettings.Networks`.
-> - **Reading `.HostConfig.Memory` as MiB.** It is bytes — `31457280`, not `30`. Convert before calling it a mismatch.
-> - **Hardcoding `index .Mounts 0` without `len .Mounts`.** Confirm the array shape first; a template that assumes an element that is not there errors.
-
-> *`docker inspect` is the daemon's full JSON record (create-time `.Config` plus runtime `.State`/`.NetworkSettings`/`.HostConfig`); `--format` runs a Go template over it — use `range` for per-network addresses, `index`/`len` for arrays, and verify `--memory` (bytes) and `-p` (host:container) from that record, not from the command line.*
-
-## Reference
-
-- `docker inspect --help` and Go `text/template` docs — `range`, `index`, `len`, `json`, `printf`.
-- `docker run --help` — `--memory`, `--cpus`, `-p`, `-d`, `--name`, `--init`.
-- `docker stats --help` / `docker ps --help` — `--no-stream`, `--filter`, `--format` (same template engine).
+> - **An empty `.NetworkSettings.IPAddress`, read as "no network".** It is only set on the default bridge. Use `range .NetworkSettings.Networks`.
+> - **Using `index .Mounts 0` without `len .Mounts`.** Check the shape of the list first. A template that asks for an item that is not there fails with an error.
+> - **Mixing up `.Destination` and `.Source`.** The destination is the path inside the container; the source is the folder on the host.

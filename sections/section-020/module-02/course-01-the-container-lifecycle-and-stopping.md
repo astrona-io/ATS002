@@ -1,76 +1,91 @@
-# Part 1 — The container lifecycle, and stopping one cleanly
+# The Container Lifecycle And Stopping Cleanly
 
-> Prerequisite: [module landing page](./course.md). Next: [Part 2 — Inspecting with `--format`](./course-02-inspecting-with-format.md).
+Astronaut, a **container** is a sealed pod docked to your ship. It has its own crew and its own air, but it shares the ship's reactor core, the Linux kernel. It is built from a **container image**, a sealed crate with a ready-to-run module inside. The Docker engine (`dockerd`) is the docking bay crew: it docks, starts and stops the pods when you give orders with the `docker` command.
 
-Every `docker` verb moves a container between a small set of states, and "stop" is two different operations depending on whether you want the process inside to shut down cleanly or just die. This part is the state machine and the signal mechanics behind `docker stop` versus `docker kill`.
+Every `docker` order moves a container between a small set of states. "Stop" can mean two different things: let the crew inside finish up and leave, or throw them out of the airlock at once. This part covers the states and the signals behind `docker stop` and `docker kill`.
 
-## The container state machine
+## The container states
 
-`docker run` is not one action — it is **create** then **start**. A container is always in exactly one state:
+`docker run` is not one action. It is **create** followed by **start**. At any moment a container is in exactly one state.
+
+### How the orders move a container
+
+Each arrow below is one `docker` order, or something that happens on its own:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> created: docker create (or the create half of docker run)
-    created --> running: docker start / docker run
-    running --> paused: docker pause
-    paused --> running: docker unpause
-    running --> exited: process exits, or docker stop / docker kill
-    exited --> running: docker start
-    exited --> [*]: docker rm
-    running --> dead: daemon could not clean up (rare)
-    dead --> [*]: docker rm -f
+flowchart TB
+    N["image"] -->|"docker create"| C["created"]
+    C -->|"docker start"| R["running"]
+    R -->|"docker pause"| P["paused"]
+    P -->|"docker unpause"| R
+    R -->|"docker stop or kill"| X["exited"]
+    X -->|"docker start"| R
+    X -->|"docker rm"| G["removed"]
+    R -->|"cleanup failed"| D["dead"]
+    D -->|"docker rm -f"| G
 ```
 
-- **created** — filesystem and config exist, no process yet.
-- **running** — PID 1 inside the container is alive.
-- **paused** — every process frozen via the cgroup freezer; still resident, no CPU.
-- **exited** — the process is gone; the container, its writable layer, and its config remain. `docker ps -a` shows it; `docker start` revives it; only `docker rm` deletes it.
-- **dead** — the daemon failed to tear it down; needs `docker rm -f`.
+The diagram shows that `docker run` is the create and start steps together, and that a container also moves to `exited` when its main process ends by itself. Only `docker rm` takes a container away for good.
 
-The distinction that trips people: **`docker stop` leaves the container in `exited`, not gone.** "Stop" and "remove" are separate verbs. A task that says "stop the container" is satisfied by `STATUS = Exited` in `docker ps -a` — removing it would be doing extra, possibly destructive, work.
+### What each state means
 
-## `docker stop` — ask, then insist
+- **created**: the filesystem and the settings exist, but no process runs yet.
+- **running**: the main process inside the container, PID 1, is alive. PID 1 is the crew badge number of the first crew member in the pod; every other process inside starts from it.
+- **paused**: the kernel freezes every process through the cgroup freezer. The processes stay in memory but get no CPU time. A cgroup (control group) is the kernel's way to group processes and set limits on them.
+- **exited**: the process is gone, but the container, its writable layer and its settings remain. `docker ps -a` shows it, `docker start` brings it back, and only `docker rm` deletes it.
+- **dead**: `dockerd` failed to clean the container up. It needs `docker rm -f`.
+
+### Stop is not remove
+
+The point that trips people up: **`docker stop` leaves the container in `exited`, not gone.** "Stop" and "remove" are separate orders. If a task says "stop the container", `STATUS` showing `Exited` in `docker ps -a` is the right result. Removing it as well does extra work the task did not ask for, and you cannot undo it.
+
+## `docker stop`: ask first, then insist
+
+A **signal** is a short order the kernel delivers to a process. `SIGTERM` means "finish up and leave"; the process can catch it and shut down cleanly. `SIGKILL` means "out of the airlock now"; the kernel ends the process, and it cannot refuse.
+
+### What `docker stop` sends
+
+Stop a container named `web_demo` like this (add `sudo` if your user is not in the `docker` group):
 
 ```bash
-# shell: host with docker; user in the docker group or via sudo
-docker stop frontend_v1
+docker stop web_demo
 ```
 
+The Docker engine then works through these steps:
+
+```mermaid
+flowchart TB
+    S["docker stop"] -->|"SIGTERM"| P["PID 1"]
+    P -->|"exits in time"| E["exited"]
+    P -->|"still alive"| K["SIGKILL"]
+    K -->|"kernel ends it"| E
 ```
-  docker stop
-        │  SIGTERM → container PID 1
-        ▼
-  wait up to --time seconds (default 10)
-        │
-        ├─ process exited?  ──► state: exited (clean)
-        └─ still alive after the timeout?  ──► SIGKILL ──► state: exited (forced)
-```
 
-`docker stop` sends **`SIGTERM`** to the container's **PID 1**, waits the grace period (`--time` / `-t`, default 10s), and only then sends **`SIGKILL`**. This is the correct default for "stop": a well-behaved process catches `SIGTERM`, flushes, and exits inside the window.
+The diagram shows the two ways to `exited`. `dockerd` sends `SIGTERM` to the container's PID 1 and waits for the grace period (`--time` or `-t`, 10 seconds by default). If the process is still alive after that, `dockerd` sends `SIGKILL`. A well-behaved program catches `SIGTERM`, saves its work and exits inside the window, so this is the right default for "stop".
 
-Two things determine whether the clean path actually works:
+### When the clean path fails
 
-- **PID 1 must handle signals.** A container started as `CMD ["nginx"]` (exec form) has `nginx` as PID 1 and it handles `SIGTERM`. A container started as `CMD nginx` (shell form) has `/bin/sh -c nginx` as PID 1 — and a bare `sh` does **not** forward `SIGTERM` to its child, so `docker stop` waits the full 10s then `SIGKILL`s. `docker run --init` inserts a tiny init (`tini`) as PID 1 to forward signals and reap zombies.
-- **The grace period must be long enough** for the app's shutdown. Databases and queue workers often need `docker stop -t 30` or more.
+Two things decide whether the clean shutdown really happens:
 
-## `docker kill` — straight to SIGKILL
+- **PID 1 must handle signals.** A container started with `CMD ["nginx"]` (the exec form) has `nginx` as PID 1, and `nginx` handles `SIGTERM`. A container started with `CMD nginx` (the shell form) has `/bin/sh -c nginx` as PID 1. A bare `sh` does **not** pass `SIGTERM` on to its child, so `docker stop` waits the full 10 seconds and then sends `SIGKILL`. `docker run --init` puts a tiny init program (`tini`) in as PID 1. It passes signals on and cleans up finished child processes.
+- **The grace period must be long enough** for the program to shut down. Databases and queue workers often need `docker stop -t 30` or more.
+
+## `docker kill`: straight to SIGKILL
+
+Sometimes a container hangs and ignores `SIGTERM`. Then you skip the polite step.
+
+### Send a signal at once
 
 ```bash
-docker kill frontend_v1          # SIGKILL now, no grace period
-docker kill --signal=HUP frontend_v1   # or send an arbitrary signal
+docker kill web_demo                 # SIGKILL now, no grace period
+docker kill --signal=HUP web_demo    # or send any signal you name
 ```
 
-`docker kill` skips the grace period entirely and delivers `SIGKILL` (or the `--signal` you name) immediately. `SIGKILL` cannot be caught, so the process gets no chance to flush or checkpoint. Reach for it only when a container is genuinely hung and ignoring `SIGTERM` — using it as the default is unplugging the machine instead of shutting it down, every time.
+`docker kill` skips the grace period and delivers `SIGKILL` (or the `--signal` you name) straight away. The process cannot catch `SIGKILL`, so it gets no chance to save its work. Use it only when a container really hangs and ignores `SIGTERM`. Using it as your default is like cutting the power to a station instead of shutting it down, every time.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Assuming `docker stop` removes the container.** It moves it to `exited`; `docker ps -a` still lists it. Removal is `docker rm`.
-> - **`docker stop` hanging for the full 10s on a shell-form `CMD`.** `/bin/sh` does not forward `SIGTERM`. Use exec-form `CMD`, or `docker run --init`.
-> - **Defaulting to `docker kill`.** No clean shutdown; risks data loss for stateful containers. `docker stop` first, longer `-t` if needed.
-
-> *`docker run` = create + start; `docker stop` sends `SIGTERM` to PID 1, waits `--time` (default 10s), then `SIGKILL`, leaving the container `exited` (not removed); `docker kill` is immediate `SIGKILL` — the escalation, not the default.*
-
-## Reference
-
-- `docker stop --help` / `docker kill --help` — `--time`/`-t`, `--signal`.
-- `man 7 signal` — `SIGTERM` (catchable, the polite request) vs `SIGKILL` (kernel-enforced).
-- Docker docs, "Run multiple processes in a container" / `--init` — why PID 1 signal handling matters and what `tini` does.
+> - **Thinking `docker stop` removes the container.** It moves it to `exited`, and `docker ps -a` still lists it. Removing is `docker rm`.
+> - **`docker stop` hanging for the full 10 seconds on a shell-form `CMD`.** `/bin/sh` does not pass `SIGTERM` on. Use the exec form of `CMD`, or `docker run --init`.
+> - **Using `docker kill` by default.** There is no clean shutdown, so a container that holds data can lose it. Use `docker stop` first, with a longer `-t` if needed.

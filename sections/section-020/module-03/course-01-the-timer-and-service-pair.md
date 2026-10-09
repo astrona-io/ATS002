@@ -1,15 +1,18 @@
-# Part 1 — The timer and service pair
+# The Timer And Service Pair
 
-> Prerequisite: [module landing page](./course.md). Next: [Part 2 — Schedule expressions](./course-02-schedule-expressions.md).
+Astronaut, systemd is the ship's duty officer: it starts every station, watches it and restarts it. A **systemd timer** is an alarm clock on the duty officer's desk that starts one station on schedule. Unlike a cron line, a timer is not a job on its own. It is one unit that *starts another unit*. Getting that two-unit link right, and knowing which unit to enable, is the base for everything else about timers.
 
-A systemd timer is not a self-contained job like a cron line — it is one unit that *activates another*. Getting the two-unit relationship right, and knowing which one to enable, is the whole foundation of this module.
+## A timer starts the service with the same name
 
-## A timer activates a service of the same name
+A **unit** is anything systemd manages, described by a **unit file** (the duty card for one station). A scheduled job needs two of them: a `.service` that says what to run, and a `.timer` that says when.
 
-Concrete: you want `/usr/local/sbin/backup.sh` to run every night. You write **two** unit files:
+### A nightly backup as two unit files
+
+Say you want `/usr/local/sbin/backup.sh` to run every night. You write **two** unit files.
+
+Save this as `/etc/systemd/system/nightly-backup.service`:
 
 ```ini
-# /etc/systemd/system/nightly-backup.service
 [Unit]
 Description=Nightly backup
 
@@ -18,8 +21,9 @@ Type=oneshot
 ExecStart=/usr/local/sbin/backup.sh
 ```
 
+Save this as `/etc/systemd/system/nightly-backup.timer`:
+
 ```ini
-# /etc/systemd/system/nightly-backup.timer
 [Unit]
 Description=Run the nightly backup
 
@@ -31,36 +35,53 @@ Persistent=true
 WantedBy=timers.target
 ```
 
-The rule: **`nightly-backup.timer` activates `nightly-backup.service`** — same base name, different suffix. When the timer fires, it does the equivalent of `systemctl start nightly-backup.service`.
+`Type=oneshot` tells systemd that the service runs one command to the end and then stops, which is what a scheduled job does. `OnCalendar=*-*-* 02:30:00` means every day at 02:30.
 
+### The naming rule
+
+The rule: **`nightly-backup.timer` starts `nightly-backup.service`**. Same base name, different suffix. When the timer fires, systemd does the same as `systemctl start nightly-backup.service`.
+
+```mermaid
+flowchart TB
+    B["timers.target"] -->|"pulls in at boot"| T["nightly-backup.timer"]
+    T -->|"time elapses"| S["nightly-backup.service"]
+    S -->|"ExecStart"| J["backup.sh"]
 ```
-  timers.target  (reached at boot)
-        │  pulls in every enabled *.timer
-        ▼
-  nightly-backup.timer   ──[Timer] elapses──►  systemctl start nightly-backup.service
-        │                                              │
-   [Install] WantedBy=timers.target              Type=oneshot ExecStart=…
-```
 
-To pair a timer with a differently-named service, set `Unit=` in the `[Timer]` section explicitly. Without it, the base-name match is automatic.
+The diagram shows the chain. At boot, `timers.target` pulls in every enabled `.timer` unit, because each one says `WantedBy=timers.target`. When the time in `[Timer]` comes round, the timer starts its service, and the service runs the command in `ExecStart=`.
 
-## Enable and start the *timer*, never the service
+To pair a timer with a service that has a different name, set `Unit=` in the `[Timer]` section. Without it, the base-name match happens on its own.
 
-```bash
-# shell: any systemd host, root
-sudo systemctl daemon-reload           # after creating/editing unit files
+## Enable and start the timer, never the service
+
+Now tell systemd about the two files and arm the alarm clock. This is where most mistakes happen: you enable the timer, not the service.
+
+### Load and arm the timer
+
+Apply it:
+
+```sh
+sudo systemctl daemon-reload
 sudo systemctl enable --now nightly-backup.timer
 ```
 
-- **`enable`** creates the symlink under `timers.target.wants/` so the timer is armed on every boot.
-- **`--now`** also starts it this session.
-- You enable the **`.timer`**. The `.service` stays `inactive (dead)` between runs — that is correct; it is `oneshot` and only runs when the timer (or you) starts it. Enabling the `.service` itself would try to run it at every boot, which is not what a schedule means.
+- **`daemon-reload`** tells the duty officer to read the duty cards again, so systemd sees the new files. Run it after you create or edit any unit file.
+- **`enable`** creates a link under `timers.target.wants/`, so the timer is armed on every boot.
+- **`--now`** also starts the timer right away, in this session.
 
-`systemctl status nightly-backup.timer` shows when it last fired and when it fires next. `systemctl status nightly-backup.service` shows the result of the last run.
+You enable the **`.timer`**. The `.service` stays `inactive (dead)` between runs. That is correct: it is `oneshot` and only runs when the timer (or you) starts it. If you enabled the `.service` itself, systemd would try to run it at every boot, which is not what a schedule means.
 
-## `systemctl list-timers` — the operational view
+`systemctl status nightly-backup.timer` shows when the timer last fired and when it fires next. `systemctl status nightly-backup.service` shows the result of the last run.
 
-```bash
+## `systemctl list-timers`: the overview
+
+One command shows every armed timer, when it fires next and which service it starts.
+
+### Read the table
+
+Then check the result:
+
+```sh
 systemctl list-timers
 ```
 
@@ -69,22 +90,18 @@ NEXT                        LEFT       LAST                        PASSED    UNI
 Wed 2026-09-09 02:30:00 UTC  14h left   Tue 2026-09-08 02:30:00 UTC  9h ago    nightly-backup.timer   nightly-backup.service
 ```
 
-- **NEXT / LEFT** — when it next fires.
-- **LAST / PASSED** — when it last fired.
-- **ACTIVATES** — the service it starts. Confirm this column matches the service you intended.
+This sample shows only the line for the new timer. Your machine also lists the timers Ubuntu ships with, and prints its own dates.
 
-`systemctl list-timers --all` also shows disabled timers. This command is the fastest check that a timer you set up is actually armed and pointing at the right service.
+- **NEXT and LEFT** say when the timer fires next.
+- **LAST and PASSED** say when it fired last.
+- **ACTIVATES** names the service it starts. Check that this column shows the service you meant.
+
+`systemctl list-timers --all` also shows timers that are not active. This command is the fastest check that a timer is armed and points at the right service.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Enabling the `.service` instead of the `.timer`** → the job runs once at every boot and never on schedule. Enable the `.timer`.
-> - **Forgetting `systemctl daemon-reload`** after writing the unit files → systemd does not see them yet; `enable` fails with "Unit … not found".
-> - **The `.timer` has no `[Install]` section** → `systemctl enable` has nothing to link; it will not survive a reboot. Add `WantedBy=timers.target`.
-> - **Base names do not match and no `Unit=`** → the timer fires but activates nothing (or the wrong unit). Match the names, or set `Unit=` explicitly.
-
-> *A `*.timer` unit activates the `*.service` of the same base name (or the one named in `Unit=`); you `systemctl enable --now` the **timer**, the service stays dormant between runs, and `systemctl list-timers` shows NEXT/LAST and which service each timer ACTIVATES.*
-
-## Reference
-
-- `man systemd.timer` — the `[Timer]` section, the base-name activation rule, `Unit=`.
-- `man systemd.service` — `Type=oneshot` and why a scheduled job is usually oneshot.
-- `man systemctl` — `list-timers`, `enable`/`disable`, `daemon-reload`.
+> - **Enabling the `.service` instead of the `.timer`.** The job runs once at every boot and never on schedule. Enable the `.timer`.
+> - **Forgetting `systemctl daemon-reload`** after writing the unit files. systemd does not see them yet, and `enable` fails with "Unit … not found".
+> - **A `.timer` with no `[Install]` section.** `systemctl enable` has nothing to link, so the timer does not survive a reboot. Add `WantedBy=timers.target`.
+> - **Base names that do not match, and no `Unit=`.** The timer fires but starts nothing, or the wrong unit. Match the names, or set `Unit=`.

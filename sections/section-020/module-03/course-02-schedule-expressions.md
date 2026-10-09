@@ -1,10 +1,14 @@
-# Part 2 — Schedule expressions
+# Schedule Expressions
 
-> Prerequisite: [Part 1 — The timer and service pair](./course-01-the-timer-and-service-pair.md). Next: [Part 3 — Timers vs. cron, and operating them](./course-03-timers-vs-cron-and-operating.md).
+Astronaut, the time written on the alarm clock goes in the `[Timer]` section of the `.timer` unit. There are two families of trigger. **Wall-clock** triggers (`OnCalendar=`) fire at a time of day, like "Monday at 11:15". **Monotonic** triggers (`OnBootSec=` and the others) fire a fixed time after an event, like "15 minutes after boot". This part covers both, how to test a schedule, and the settings for missed runs and spread-out start times.
 
-The `[Timer]` section has two families of trigger: **wall-clock** (`OnCalendar=`) and **relative/monotonic** (`OnBootSec=` and friends). This part is both, the calendar syntax, and the flags that decide catch-up behaviour and jitter.
+The lines below are pieces of a `[Timer]` section, not whole files. The `#` notes on the right are for reading only. systemd treats a line as a comment only when it starts with `#`, so leave those notes out of a real unit file.
 
-## `OnCalendar=` — wall-clock schedules
+## `OnCalendar=`: wall-clock schedules
+
+`OnCalendar=` is the setting you will use most. It takes a calendar time, much like the time fields of a cron line.
+
+### Examples first
 
 ```ini
 [Timer]
@@ -16,9 +20,11 @@ OnCalendar=*-*-* *:0/15:00       # every 15 minutes
 OnCalendar=hourly                # shortcut: *-*-* *:00:00
 ```
 
-The full form is `DayOfWeek Year-Month-Day Hour:Minute:Second`. Any field can be `*` (any), a list (`Mon,Thu`), a range (`Mon..Fri`), or a step (`0/15` = 0,15,30,…). Named shortcuts: `minutely`, `hourly`, `daily`, `weekly`, `monthly`, `yearly`, `quarterly`.
+The full form is `DayOfWeek Year-Month-Day Hour:Minute:Second`. Any field can be `*` (any value), a list (`Mon,Thu`), a range (`Mon..Fri`) or a step (`0/15` means 0, 15, 30, 45). The named shortcuts are `minutely`, `hourly`, `daily`, `weekly`, `monthly`, `yearly` and `quarterly`. If one timer has several `OnCalendar=` lines, it fires at each of them.
 
-**Always test an expression before trusting it:**
+### Test an expression before you trust it
+
+`systemd-analyze calendar` reads an expression the same way systemd will, and tells you when it fires next:
 
 ```bash
 systemd-analyze calendar 'Mon,Thu 11:15'
@@ -32,26 +38,36 @@ Normalized form: Mon,Thu *-*-* 11:15:00
        From now: 2 days left
 ```
 
-If it prints "Failed to parse", the expression is wrong — fix it here, not by waiting for a missed run. Multiple `OnCalendar=` lines in one timer are additive (it fires at each).
+The dates in this sample are an example; your machine prints its own next date and time. The line to check is `Normalized form`: it shows how systemd understood your expression. If the tool prints "Failed to parse", the expression is wrong. Fix it now, not after a missed run. Add `--iterations=5` to see the next five times it fires.
 
-Timezone: `OnCalendar` is interpreted in the system timezone unless you append `UTC` or a zone. Keep this in mind on a box whose timezone differs from where the schedule was written.
+### Time zones
 
-## Monotonic triggers — relative to an event
+`OnCalendar=` follows the system time zone, unless you add `UTC` or a zone name at the end. Keep this in mind on a machine whose time zone differs from the place where the schedule was written. `timedatectl` shows the machine's time zone.
+
+## Monotonic triggers: relative to an event
+
+A monotonic trigger counts time from something that happened on the ship, not from the clock on the wall.
+
+### The family
 
 ```ini
 [Timer]
 OnBootSec=15min           # 15 min after boot
 OnStartupSec=10min        # 10 min after systemd itself started (≈ boot, but not on reload)
 OnActiveSec=5min          # 5 min after the timer unit is activated
-OnUnitActiveSec=1h        # 1 h after the timer's own service last finished
+OnUnitActiveSec=1h        # 1 h after the timer's own service last started
 OnUnitInactiveSec=30min   # 30 min after the service last went inactive
 ```
 
-`OnUnitActiveSec=` is how you build "run every hour, measured from the end of the last run" — self-spacing, so a slow run does not pile up on the next. Combine `OnBootSec=` + `OnUnitActiveSec=` for "first run 15 min after boot, then every hour".
+`OnUnitActiveSec=` repeats a job: "run again one hour after the service last started". `OnUnitInactiveSec=` counts from the moment the last run ended instead, so a slow run pushes the next one back. Combine `OnBootSec=` with `OnUnitActiveSec=` for "first run 15 minutes after boot, then every hour".
 
-Accepted time units: `us`, `ms`, `s`, `min`, `h`, `d`, `w`, `month`, `year` — and combinations like `1h 30min`.
+The time units systemd accepts are `us`, `ms`, `s`, `min`, `h`, `d`, `w`, `month` and `year`, and you can combine them, as in `1h 30min`.
 
-## Catch-up and jitter
+## Missed runs and spread-out start times
+
+Three more settings decide what happens when the ship was off, and how exactly the alarm rings.
+
+### Catch-up, random delay and accuracy
 
 ```ini
 [Timer]
@@ -61,20 +77,15 @@ RandomizedDelaySec=1h      # spread the actual fire time randomly across a 1h wi
 AccuracySec=1min           # how tightly to hit the target (default 1min; lower = more wakeups)
 ```
 
-- **`Persistent=true`** — systemd records the last real run time on disk. If a scheduled run was missed because the machine was off (or asleep), it fires **once, immediately** after the next boot. This is the anacron-equivalent behaviour; without it, a missed run is simply skipped.
-- **`RandomizedDelaySec=`** — adds a random offset up to that value, so a fleet of identical machines does not all hit a backup server at exactly 02:30.
-- **`AccuracySec=`** — systemd batches timer wakeups for power efficiency; the default 1-minute slack is fine for almost everything. Set it small only for genuinely time-critical jobs.
+- **`Persistent=true`**: systemd writes the time of the last real run to disk. If a run was missed because the machine was off or asleep, the timer fires **once, straight away** after the next boot. This is what anacron does for cron. Without it, a missed run is simply skipped.
+- **`RandomizedDelaySec=`**: adds a random delay up to that value, so a fleet of identical machines does not hit a backup server at exactly 02:30.
+- **`AccuracySec=`**: systemd groups timer wake-ups together to save power. The default of one minute is fine for almost everything. Set it lower only for jobs where the exact second matters.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Untested `OnCalendar=`** → a typo (`Mon,Thur` instead of `Mon,Thu`, or `11.15`) parses to nothing or the wrong time. Run `systemd-analyze calendar '<expr>'` first.
-> - **Expecting cron-style catch-up by default** → systemd timers *skip* a missed run unless `Persistent=true` is set.
-> - **`OnCalendar` on a box with a surprising timezone** → the schedule follows the system timezone; append `UTC` if that matters. Check `timedatectl`.
-> - **Every machine firing at the exact same second** → add `RandomizedDelaySec=` for anything hitting a shared resource.
-
-> *`OnCalendar=` takes `DoW Y-M-D H:M:S` (fields `*`/list/range/step, plus shortcuts like `daily`) — test it with `systemd-analyze calendar` — while `OnBootSec=`/`OnUnitActiveSec=` are monotonic; `Persistent=true` gives cron-style catch-up and `RandomizedDelaySec=` spreads load.*
-
-## Reference
-
-- `man systemd.time` — the full calendar and timespan grammar, every shortcut, timezone handling.
-- `systemd-analyze calendar '<expr>' --iterations=5` — preview the next several fire times.
-- `man systemd.timer` — `Persistent=`, `RandomizedDelaySec=`, `AccuracySec=`, `WakeSystem=`.
+> - **An untested `OnCalendar=`.** A typo (`Mon,Thur` instead of `Mon,Thu`, or `11.15`) parses to nothing or to the wrong time. Run `systemd-analyze calendar '<expression>'` first.
+> - **Expecting catch-up by default.** systemd timers *skip* a missed run unless `Persistent=true` is set.
+> - **`OnCalendar=` on a machine with an unexpected time zone.** The schedule follows the system time zone. Add `UTC` if that matters, and check with `timedatectl`.
+> - **Every machine firing at the same second.** Add `RandomizedDelaySec=` to anything that hits a shared resource.
+> - **A `#` note at the end of a unit file line.** systemd reads it as part of the value. Put comments on their own line.

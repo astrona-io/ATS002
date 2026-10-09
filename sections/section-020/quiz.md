@@ -1,6 +1,6 @@
 # Section 020 Knowledge Check: Scheduled & Containerized Workloads
 
-Test your understanding of system-wide versus per-user cron scheduling, cron's day-of-week syntax, `docker stop` versus `docker kill`, and extracting precise facts from `docker inspect` with Go templates.
+Astronaut, test what you know before you take on the capstone. The questions cover system-wide and per-user cron jobs, `docker stop` and `docker kill`, and pulling exact facts out of `docker inspect` with Go templates.
 
 ---
 
@@ -18,10 +18,10 @@ You are migrating a job off `/etc/cron.d/data-sync`, which currently reads `45 3
 
 **Correct Answer: B**
 
-*   **Why B is correct:** A system-wide cron line has six fields — five time fields plus a mandatory username field — while a per-user crontab line has only five time fields plus the command, because ownership is already implicit in whose crontab file it is. Pasting a six-field system-wide line into a per-user crontab without stripping the username field doesn't produce a helpful error; cron simply treats the leftover username as the first token of the command and tries to execute a program by that name, which fails silently at the scheduled time with nobody watching.
+*   **Why B is correct:** A system-wide cron line has six fields: five time fields plus a required username field. A per-user crontab line has only the five time fields and then the command, because the owner is already clear from whose crontab it is. If you paste a six-field line into a per-user crontab and keep the username, you get no helpful error. Cron treats the leftover username as the first word of the command and tries to run a program with that name. That fails silently at the scheduled time, with nobody watching.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because `etl-runner` is not a valid executable name in `$PATH`, so the "command" cron actually tries to run fails.
-    *   *Option C* is incorrect because this is a semantically wrong command, not a syntax error — `crontab` validates field structure, not whether the resulting command line makes sense.
+    *   *Option C* is incorrect because the line has a wrong command, not a syntax error. `crontab` checks the structure of the fields, not whether the command makes sense.
     *   *Option D* is incorrect because nothing in this scenario schedules the job to run under two different accounts; it was moved, not duplicated.
 </details>
 
@@ -39,17 +39,17 @@ You are logged in as root and need to add a new job to the `dataproc` service ac
 
 **Correct Answer: B**
 
-*   **Why B is correct:** The `-u <user>` flag tells `crontab` to operate on the spool file belonging to that specific account rather than the caller's own. Because this targets a different, non-root user's crontab, it requires privilege — hence the `sudo` prefix — and `-e` is what opens it for editing.
+*   **Why B is correct:** The `-u <user>` option tells `crontab` to work on that account's spool file instead of your own. Working on another account's crontab needs root rights, which is why the command starts with `sudo`. `-e` opens the crontab for editing.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because plain `crontab -e`, run as root, edits *root's own* crontab — not `dataproc`'s. This is the single most common mistake when migrating a job to a service account.
     *   *Option C* is incorrect because hand-editing the spool file directly bypasses `crontab`'s syntax validation and can leave behind a file with permissions or formatting cron refuses to trust.
-    *   *Option D* is incorrect because it's missing `-e` (or `-l`) — without an action flag, `crontab` waits on stdin for a complete crontab file to install, which is not the same as opening an editor.
+    *   *Option D* is incorrect because it is missing `-e` (or `-l`). Without an action option, `crontab` waits for a complete crontab file on standard input (stdin) to install, which is not the same as opening an editor.
 </details>
 
 ---
 
 ### Question 3
-After migrating a job from `/etc/cron.d/asset-cleanup` into `asset-manager`'s per-user crontab, an admin notices duplicate log entries appearing every night at 8:30pm. What is the most likely cause, and the correct fix?
+After migrating a job from `/etc/cron.d/asset-cleanup` into `asset-manager`'s per-user crontab, an administrator notices duplicate log entries appearing every night at 8:30pm. What is the most likely cause, and the correct fix?
 *   **A)** The minute field needs to be offset slightly to avoid a scheduling collision.
 *   **B)** The original `/etc/cron.d/asset-cleanup` file was never deleted, so the same command is now scheduled from two independent sources; delete the original file.
 *   **C)** Cron always executes any newly added job twice on its first scheduled run.
@@ -60,7 +60,7 @@ After migrating a job from `/etc/cron.d/asset-cleanup` into `asset-manager`'s pe
 
 **Correct Answer: B**
 
-*   **Why B is correct:** Cron has no concept of deduplication. If an identical command is scheduled in both a system-wide file and a per-user crontab, it runs twice, independently, at the same wall-clock time. A migration is not complete until the original source is deleted (or its line removed) and re-verified with a grep to confirm no trace remains.
+*   **Why B is correct:** Cron never removes duplicates. If the same command is scheduled in a system-wide file and in a per-user crontab, it runs twice, once from each, at the same time. A move is not finished until you delete the original file (or remove its line) and search again with `grep` to confirm that nothing is left.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because offsetting the time doesn't address the root cause — two independent schedules — it just staggers the duplicate runs instead of eliminating one.
     *   *Option C* is incorrect; cron does not have any built-in "run once extra on first fire" behavior.
@@ -102,7 +102,7 @@ You run `docker inspect --format '{{ .NetworkSettings.IPAddress }}' web_v2` and 
 
 **Correct Answer: B**
 
-*   **Why B is correct:** Docker only populates the top-level `.NetworkSettings.IPAddress` field for containers attached to the classic default bridge network. Once a container is on a custom user-defined network, Docker tracks its address per-network instead, under `.NetworkSettings.Networks.<network-name>.IPAddress`. The `range` form iterates that map without requiring you to know the network's name in advance, which is why it's the safer, more general template to reach for.
+*   **Why B is correct:** Docker only fills the top-level `.NetworkSettings.IPAddress` field for containers on the default bridge network. When a container is on a network you created, Docker keeps its address per network instead, under `.NetworkSettings.Networks.<network-name>.IPAddress`. The `range` form goes through that map without you needing to know the network's name, so it is the safer template to use.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because the scenario states the container is running and reachable — the empty field is a template-path issue, not a container-state issue.
     *   *Option C* is incorrect; `docker inspect` does not gate JSON fields behind privilege escalation, and an unprivileged user with Docker socket access sees the same data root would.

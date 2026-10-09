@@ -1,71 +1,40 @@
 # Section 020: Scheduled & Containerized Workloads
 
-Welcome to the operational heart of day-to-day system administration. Provisioning a server once is easy. Keeping it running correctly, night after night, without a human sitting at the keyboard, is the real job. In this section, we cover the two mechanisms you will lean on constantly to make that happen: the cron daemon, which fires off commands on a schedule whether or not anyone is watching, and Docker, which packages an application and its dependencies into a single, controllable unit you can start, stop, inspect, and constrain at will.
+Astronaut, setting up a server once is easy. Keeping it running correctly, night after night, with nobody at the console, is the real job. This section covers the tools you will use for that every day: scheduled jobs that start on their own, and containers you can start, stop, inspect and limit.
 
-Both topics look deceptively simple from the outside — "just add a line to a file" and "just run a container" — but each hides sharp edges that trip up administrators who haven't drilled the mechanics. Cron has two competing places to define a job, and picking the wrong one silently misattributes ownership or causes a job to fire twice. Docker containers carry a wall of JSON metadata, and pulling a single fact out of it correctly, under time pressure, is a skill in its own right.
+Both topics look simple from the outside: "just add a line to a file" and "just run a container". Both hide sharp edges. Cron has two places to define a job, and the wrong one runs the job as the wrong account or runs it twice. A container's record is a wall of JSON, and pulling one fact out of it quickly, under time pressure, is a skill of its own.
 
----
+## What you will learn
 
-## What You Will Master
+By the end of this section you can:
 
-By completing this section, you will acquire four core operational capabilities:
-*   **Per-User Job Scheduling:** How to distinguish system-wide cron sources from per-user crontabs, migrate a job between them without creating a duplicate-execution bug, and express compound day-of-week schedules correctly.
-*   **Container Metadata Extraction:** How to use `docker inspect --format` with Go templates to pull a single, precise fact — an IP address, a mount path — out of a container's metadata instead of eyeballing raw JSON.
-*   **Constrained Container Launches:** How to start a new detached container with an exact memory ceiling and a host-to-container port mapping, and verify both took effect.
-*   **systemd Timers:** How to build a `.timer` + `.service` pair, express a schedule with `OnCalendar=`, enable cron-style catch-up with `Persistent=`, and convert a cron job to a timer.
+- **Schedule jobs per user.** Tell the system-wide cron files from per-user crontabs, move a job between them without running it twice, and write schedules such as "Monday and Thursday at 11:15".
+- **Read a container's record.** Use `docker inspect --format` to pull one exact fact, such as an IP address or a mount path, out of the Docker engine's record.
+- **Launch containers with limits.** Start a detached container with an exact memory limit and a port mapping, and prove both took effect.
+- **Use systemd timers.** Build a `.timer` and `.service` pair, write a schedule with `OnCalendar=`, catch up missed runs with `Persistent=`, and convert a cron job to a timer.
 
----
+## The modules
 
-## The Learning & Lab Path
+Work through the modules in order. Each one ends with a graded mission that runs on its own training ship.
 
-This section is divided into three focused modules, each paired with a dedicated hands-on practice lab, and concluded with a Section Capstone Challenge that requires both skills working together:
+1. [Per-User Cron Job Scheduling](./module-01/course.md): where cron jobs live, the six-field and five-field line formats, and moving a job safely into a service account's crontab.
+2. [Docker Container Lifecycle: Inspect, Stop, and Launch](./module-02/course.md): container states, `docker stop` and `docker kill`, `docker inspect --format`, and launching a container with a memory limit and a port mapping.
+3. [systemd Timers](./module-03/course.md): the timer and service pair, schedule expressions, converting a cron job, and running timers day to day.
 
-### 1. Per-User Cron Job Scheduling
-*   **Module Reader:** **[Module 1: Per-User Cron Job Scheduling](./module-01/course.md)**
-    1. [Where a cron job lives, and the format that follows](./module-01/course-01-where-a-cron-job-lives.md)
-    2. [Migrating a job safely](./module-01/course-02-migrating-a-job-safely.md)
-*   **Practice Lab Sandbox:** **`sections/section-020/module-01/labs/lab-01`**
-*   **Lab Run Command:**
-    ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/module-01/labs/lab-01
-    ```
-*   **Hands-on Objective:** Migrate a system-wide cronjob on `data-001` into a per-user crontab owned by `asset-manager`, add a new twice-weekly job with a compound day-of-week schedule, and remove the original system-wide entry so the job no longer fires twice.
+## Knowledge check and capstone
 
-### 2. Docker Container Lifecycle
-*   **Module Reader:** **[Module 2: Docker Container Lifecycle](./module-02/course.md)**
-    1. [The container lifecycle, and stopping one cleanly](./module-02/course-01-the-container-lifecycle-and-stopping.md)
-    2. [Inspecting with --format, and launching with constraints](./module-02/course-02-inspecting-with-format.md)
-*   **Practice Lab Sandbox:** **`sections/section-020/module-02/labs/lab-01`**
-*   **Lab Run Command:**
-    ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/module-02/labs/lab-01
-    ```
-*   **Hands-on Objective:** Stop a running container, extract another container's IP address and volume mount destination using `docker inspect --format`, and launch a new detached container with a hard memory limit and a host-to-container port mapping.
+When you have finished the modules, test yourself with the [section quiz](./quiz.md).
 
-### 3. systemd Timers
-*   **Module Reader:** **[Module 3: systemd Timers](./module-03/course.md)**
-    1. [The timer and service pair](./module-03/course-01-the-timer-and-service-pair.md)
-    2. [Schedule expressions](./module-03/course-02-schedule-expressions.md)
-    3. [Timers vs. cron, and operating them](./module-03/course-03-timers-vs-cron-and-operating.md)
-*   **Practice Lab Sandbox:** **`sections/section-020/module-03/labs/lab-01`**
-*   **Lab Run Command:**
-    ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/module-03/labs/lab-01
-    ```
-*   **Hands-on Objective:** Create a `.service` + `.timer` pair that runs a maintenance script `OnCalendar=Mon,Thu 11:15` with `Persistent=true`, then convert an existing `/etc/cron.d/` job to an equivalent 6-hourly timer and remove the cron line.
+Then take on the capstone, Scheduled Container Recovery. It joins the skills of the section: you retire an old container that holds a port, launch its replacement with limits, and schedule a per-user cron job that starts the new container again if it ever stops. Start it and open a terminal on it:
 
-### 4. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`sections/section-020/capstone/labs/lab-01` (Scheduled Container Recovery)**
-*   **Lab Run Command:**
-    ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/capstone/labs/lab-01
-    ```
-*   **Hands-on Objective:** Connect the dots. Retire a decommissioned container that is squatting on a needed port, launch its constrained replacement, and schedule a per-user cron job that automatically restarts the new container if it ever stops.
+```bash
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/capstone/labs/lab-01
+astrona ssh ats-002-lab-020
+```
 
----
+Read the task in [`question.md`](./capstone/labs/lab-01/question.md). When you think you are done, send it for grading, and remove it afterwards:
 
-## Ready for Assessment?
-
-Test your theoretical knowledge and diagnostic reasoning before tackling the practical lab missions:
-
-*   **[Take the Section 020 Knowledge Check Quiz](./quiz.md)**
+```bash
+astrona submit -c sections/section-020/capstone/labs/lab-01
+astrona destroy ats-002-lab-020
+```

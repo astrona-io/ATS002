@@ -1,31 +1,45 @@
 # systemd Timers
 
-Cron is one way to run a command on a schedule; **systemd timers** are the other, and the LFCS objective names both ("set up systemd services and timers"). A timer is a pair of units — a `.timer` that carries the schedule and a `.service` it activates — and in exchange for that extra structure you get journal logging, dependency ordering, resource limits, missed-run catch-up, and per-run status that cron has no answer for. This module covers the two-unit model, the calendar and monotonic schedule syntax, and how to convert a cron job to a timer and operate it.
+Astronaut, cron is one way to run a command on a schedule. **systemd timers** are the other, and the LFCS exam names both ("set up systemd services and timers"). systemd is the ship's duty officer, and a timer is an alarm clock on its desk that starts one station on schedule.
 
-Three short parts; work them in order.
-
-## How this module is organised
-
-1. **[Part 1 — The timer and service pair](./course-01-the-timer-and-service-pair.md)** — a `.timer` activates the `.service` of the same base name, you `enable --now` the *timer* not the service, and `systemctl list-timers` is the operational view.
-2. **[Part 2 — Schedule expressions](./course-02-schedule-expressions.md)** — `OnCalendar=` wall-clock syntax (tested with `systemd-analyze calendar`), the monotonic `OnBootSec=`/`OnUnitActiveSec=` family, and `Persistent=` / `RandomizedDelaySec=` for catch-up and jitter.
-3. **[Part 3 — Timers vs. cron, and operating them](./course-03-timers-vs-cron-and-operating.md)** — when to pick a timer, converting a cron line to a `.service` + `.timer`, forcing a run, checking results in the journal, and `enable-linger` for user timers.
+A timer is a pair of units: a `.timer` that holds the schedule and a `.service` that it starts. For that extra file you get logging in the journal, ordering between jobs, resource limits, catch-up for missed runs and a status for every run, which cron cannot give you. This module covers the two-unit model, the schedule syntax, converting a cron job to a timer, and running timers day to day.
 
 ## Learning objectives
 
 After this module you can:
 
-- **Write** a `.service` + `.timer` unit pair and explain which unit you enable and why.
-- **Read** `systemctl list-timers` — NEXT, LAST, and the ACTIVATES column.
-- **Express** a schedule with `OnCalendar=` and verify it with `systemd-analyze calendar`.
-- **Choose** between a wall-clock (`OnCalendar=`) and a monotonic (`OnBootSec=`/`OnUnitActiveSec=`) trigger.
-- **Enable** cron-style catch-up with `Persistent=true` and spread load with `RandomizedDelaySec=`.
-- **Convert** a cron job to a timer, removing the cron line so it does not fire twice.
-- **Verify** a scheduled run's result with `systemctl status` / `is-failed` and `journalctl -u <service>`.
+- Write a `.service` and `.timer` unit pair, and explain which unit you enable and why.
+- Read `systemctl list-timers`: the NEXT, LAST and ACTIVATES columns.
+- Write a schedule with `OnCalendar=` and test it with `systemd-analyze calendar`.
+- Choose between a wall-clock trigger (`OnCalendar=`) and a monotonic one (`OnBootSec=`, `OnUnitActiveSec=`).
+- Turn on catch-up for missed runs with `Persistent=true`, and spread load with `RandomizedDelaySec=`.
+- Convert a cron job to a timer, and remove the cron line so the job does not run twice.
+- Check the result of a scheduled run with `systemctl status`, `systemctl is-failed` and `journalctl -u <service>`.
 
 ## Before you start
 
-Assumed: a Linux shell, `sudo`, basic systemd unit-file syntax, and Module 1's cron material (this module is the systemd counterpart). Every command block states the shell and privilege it assumes and runs on any systemd host.
+Check that you have the knowledge and the tools this module expects.
 
-## Where this fits
+### What you should already know
 
-This is the third module of the section — cron (Module 1) and timers here are the two scheduling mechanisms, and containers (Module 2) are the workload they most often schedule. The section capstone restarts a stopped container on a schedule; doing that with a `.timer` + `Restart=`-style watchdog service, rather than a cron loop, is the more idiomatic systemd approach and uses everything in this module.
+- **How to work in a shell.** You can type commands, use `sudo`, and save a file with a terminal editor.
+- **What a systemd service is.** A service is a program systemd starts and watches, described by a unit file with sections such as `[Unit]` and `[Service]`.
+- **What a cron line looks like.** A per-user cron line has five time fields (minute, hour, day of month, month, day of week) and then the command, for example `0 22 * * * /usr/local/sbin/backup.sh`.
+
+### What you need
+
+- A terminal on an Ubuntu 24.04 machine, if you want to try the examples in the parts. Any machine that runs systemd works.
+- Or a running lab machine: the mission in this module gives you the exact commands to start it and open a terminal on it.
+
+## How this module is laid out
+
+1. [The Timer And Service Pair](./course-01-the-timer-and-service-pair.md): a `.timer` starts the `.service` with the same base name, you `enable --now` the timer and not the service, and `systemctl list-timers` shows what is armed.
+2. [Schedule Expressions](./course-02-schedule-expressions.md): the `OnCalendar=` syntax tested with `systemd-analyze calendar`, the monotonic `OnBootSec=` and `OnUnitActiveSec=` family, and `Persistent=` and `RandomizedDelaySec=` for catch-up and spread.
+3. [Converting A Cron Job To A Timer](./course-03-converting-cron-to-a-timer.md): when to choose a timer, mapping a cron schedule to `OnCalendar=`, and removing the cron line.
+4. [Operating Timers](./course-04-operating-timers.md): forcing a run, reading results in the journal, `OnFailure=`, and `enable-linger` for user timers.
+   - Mission: [systemd Timers Lab](./labs/lab-01/README.md)
+5. [Wrap-Up: Mission Debrief](./course-05-wrap-up.md)
+
+## Why this matters
+
+On a modern Ubuntu machine, many of the system's own scheduled jobs are already timers, not cron lines. The exam can ask you to build a timer from scratch or to move a cron job into one. A timer that is enabled the wrong way, or a cron line left behind, fails without any error, so you need to know how to check the result.
