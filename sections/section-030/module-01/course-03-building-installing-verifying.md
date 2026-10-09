@@ -1,10 +1,12 @@
-# Part 3 — Building, installing, and verifying
+# Building, Installing And Verifying
 
-> Prerequisite: [Part 2 — Discovering and choosing configure flags](./course-02-discovering-and-choosing-flags.md). Next: [Section 030 quiz](../quiz.md).
-
-With `configure` run correctly the rest is mechanical — but "the flags were right" is not proof the task is done. This part is the build-and-install step, the staging options worth knowing, and verifying **both** halves of a requirement (path *and* feature) from the built artefact itself.
+Astronaut, once `configure` has written the fitting plan, building the part and bolting it into place is the easy bit. But "I passed the right flags" does not prove the job is done. This part covers the build and install, a few install options worth knowing, and how to check **both** halves of a requirement, the path *and* the feature, on the built program itself.
 
 ## Build and install
+
+Two commands do the work here. `make` reads the `Makefile` and calls the compiler. `make install` copies the result into place.
+
+### Run the build
 
 ```bash
 # shell: inside the source dir
@@ -12,19 +14,23 @@ make
 sudo make install
 ```
 
-`configure` prints a **summary** near the end of its run on many projects — detected features, chosen install paths. Read it before committing to a slow `make`; it is a free sanity check that the flags landed.
+On many projects, `configure` prints a **summary** near the end of its run, with the features it found and the install paths it chose. Read it before you start a slow `make`. It is a free check that your flags landed.
 
-Two install options that show up in real work:
+### Three ways to install
 
-- **`sudo make install`** — copies straight into the live system directories `configure` targeted.
-- **`make install DESTDIR=/tmp/stage`** — copies into `/tmp/stage/usr/bin/...` instead, a *staging* tree. Used by packagers to build a package without touching the real system. `DESTDIR` is prepended to every path; `--bindir` etc. are relative to it.
-- **`make install prefix=/opt/links`** — some Makefiles let you override the prefix at install time without re-running `configure`.
+You will meet these install options in real work:
 
-Uninstalling a source build is not guaranteed — `make uninstall` exists only if the project wrote that target. This is why `--prefix=/usr/local` (or `/opt/<name>`) is the safe default: everything is under one removable root.
+- **`sudo make install`** copies straight into the live system folders that `configure` chose.
+- **`make install DESTDIR=/tmp/stage`** copies into `/tmp/stage/usr/bin/...` instead. This is a *staging* tree, a practice copy of the folders. People who build packages use it to collect the files without touching the real system. `make` puts `DESTDIR` in front of every path, so `--bindir` and the other folders land inside it.
+- **`make install prefix=/opt/links`** works on some Makefiles. It changes the prefix at install time without running `configure` again.
 
-## Verify both halves, from the artefact
+Removing a source build is not always possible. `make uninstall` exists only if the project wrote that target. That is why `--prefix=/usr/local` (or `/opt/<name>`) is the safe default: everything sits under one folder that you can remove.
 
-Passing `--bindir=/usr/bin --disable-ipv6` is not evidence. Check each requirement independently after `make install`:
+## Verify both halves, on the built program
+
+Passing `--bindir=/usr/bin --disable-ipv6` is not proof. After `make install`, check each requirement on its own.
+
+### Three checks
 
 ```bash
 # 1. exact path — does it resolve from $PATH at the path asked for?
@@ -41,31 +47,59 @@ links -version
 # Features: ...   (ipv6 must NOT appear as enabled)
 ```
 
-- **`command -v`** (or `which`) confirms the path. Use the exact string the task gave.
-- **`file`** confirms it is a genuine ELF binary — a source build gone wrong can leave a wrapper script or a broken symlink.
-- **The tool's own `--version` / `-version` / `--help`** is the most direct proof a compiled-in toggle worked. Trust what the built artefact says about itself over what you assume the flags did. Some tools instead expose build info via `ldd` (linked libraries — `ldd /usr/bin/links | grep -i inet6` would show whether an IPv6 library is even linked).
+The output lines in the comments are shortened.
+
+### What each check proves
+
+Each command answers one question, and each one asks a different part of the system:
+
+- **`command -v`** (or `which`) asks bash which file it would run for that name. It confirms the path. Use the exact path the task gave.
+- **`file`** reads the first bytes of the file and confirms it is a real ELF binary (ELF is the format of compiled Linux programs). A source build gone wrong can leave a wrapper script or a broken link instead.
+- **The program's own `--version`, `-version` or `--help`** is the most direct proof that a built-in switch worked. Trust what the built program says about itself over what you think the flags did. Some programs do not report their features. Then `ldd` can help: it lists the shared libraries a binary uses (`ldd /usr/bin/links | grep -i inet6` would show whether an IPv6 library is even linked).
 
 ## Closing the filename gap
 
-`--bindir` fixed the **directory**; the **filename** is the `Makefile`'s choice. If the build installed `/usr/bin/links2` but the task wants `/usr/bin/links`:
+`--bindir` fixed the **folder**, but the `Makefile` chooses the **file name**. Say the build installed `/usr/bin/links2`, but the task wants `/usr/bin/links`:
 
 ```bash
 ls -l /usr/bin/links /usr/bin/links2 2>&1     # check FIRST
 sudo mv /usr/bin/links2 /usr/bin/links        # only if it is not already correct
 ```
 
-Many source trees already produce the exact name — `mv`-ing a file that is already right is a wasted, risk-bearing step. Always `ls` first.
+Many source trees already build the exact name. Moving a file that is already right is a wasted step that can only cause trouble, so always run `ls` first.
+
+> [!TIP]
+> Make "check the result on the system itself" an exam habit. After any install, ask the built program and the file system, not your memory of the flags you typed.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Treating "I passed the flags" as done.** Verify the path with `command -v`/`file` and the feature with the tool's own version output — independently.
-> - **`mv`-ing the binary without checking.** `--bindir` controls the directory, not the filename; the project may already name it correctly. `ls` first.
-> - **Assuming `make uninstall` exists.** It only does if the project wrote it. Prefer a self-contained `--prefix` (`/usr/local`, `/opt/<name>`) so removal is `rm -rf` of one tree.
-> - **Reading `configure`'s summary as the final proof.** It reports intent; the installed binary reports reality. Check the artefact.
+> - **Treating "I passed the flags" as done.** Verify the path with `command -v` and `file`, and the feature with the program's own version output, each on its own.
+> - **`mv`-ing the binary without checking.** `--bindir` controls the folder, not the file name; the project may already use the right name. `ls` first.
+> - **Assuming `make uninstall` exists.** It only does if the project wrote it. Prefer a single install folder (`/usr/local`, `/opt/<name>`) so removal is `rm -rf` of one tree.
+> - **Reading `configure`'s summary as the final proof.** It reports what you asked for; the installed binary reports what you got. Check the binary.
 
-> *After `make && sudo make install`, verify the path with `command -v`/`file` and the feature toggle with the tool's own `--version`/build info — separately — and only `mv` the binary to the required name after `ls` confirms the build did not already use it.*
+> *After `make && sudo make install`, verify the path with `command -v` and `file`, and the feature switch with the program's own version output, each on its own. Only rename the binary after `ls` shows the build did not already use the required name.*
 
-## Reference
+## Your mission: Compile & Install From Source Lab
 
-- `man make` — `DESTDIR`, `prefix=` overrides, `install` / `uninstall` targets.
-- `man file` — confirming an ELF executable versus a script or data.
-- `man ldd` — which shared libraries a binary is linked against, when a feature toggle maps to a library.
+You can now unpack a source tarball, find the flags you need, build and install a program, and prove the result on the program itself. The mission asks you to build a terminal web browser from source so it lands at an exact path with one feature switched off.
+
+Start the mission and open a terminal on it:
+
+```sh
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-01/labs/lab-01
+astrona ssh ats-002-lab-031
+```
+
+Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-030/module-01/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-002-lab-031
+```

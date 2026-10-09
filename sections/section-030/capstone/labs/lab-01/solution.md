@@ -1,10 +1,14 @@
-# Solution Guide: New Toolchain, New Host
+# Solution Walkthrough
 
-This capstone connects both halves of Section 030: build a tool from source with an exact install path and a disabled feature, then define and start a libvirt domain for that tool to report on.
+This capstone joins two skills: build a tool from source with an exact install path and one feature switched off, then define and start a libvirt domain for that tool to report on. After each half you can run `astrona submit -c sections/section-030/capstone/labs/lab-01` from your own computer and watch more checks turn green.
+
+Several commands below run `virsh` without `sudo`. As a normal user, `virsh` may connect to the private `qemu:///session` instance and not see `build-agent`. If that happens, put `sudo` in front, or run `export LIBVIRT_DEFAULT_URI=qemu:///system` once in your shell first.
 
 ---
 
-## Part 1: Compile and Install `vmreport`
+## Build and install `vmreport`
+
+The first half is a source build: unpack, find the flags, configure, build, install, and check the result on the program itself.
 
 ### Step 1: Extract the source tarball
 
@@ -14,7 +18,9 @@ tar xzf vmreport-1.0.tar.gz
 cd vmreport-1.0
 ```
 
-This tarball is `.tar.gz`, not `.tar.bz2` — `-z` selects gzip decompression, not `-j` (which is for bzip2). Always check the extension rather than reusing the last flag combination you typed from muscle memory.
+This tarball is `.tar.gz`, not `.tar.bz2`, so `-z` (gzip) is the right flag, not `-j` (bzip2). Always check the extension instead of reusing the last flags you typed from habit.
+
+The `/tools` folder belongs to root. If `tar` reports "Permission denied" because your user cannot write there, run the `tar` command with `sudo`, or unpack it into your home folder with `tar xzf /tools/vmreport-1.0.tar.gz -C ~` and `cd ~/vmreport-1.0`. The build works the same from either place.
 
 ### Step 2: Discover the available configure flags
 
@@ -28,13 +34,15 @@ This tarball is `.tar.gz`, not `.tar.bz2` — `-z` selects gzip decompression, n
 --enable-color          enable ANSI color output (default)
 ```
 
+This output is shortened to the three lines that matter. The full help text also lists `--prefix` and the section headings.
+
 ### Step 3: Run configure with both requirements
 
 ```bash
 ./configure --bindir=/usr/local/bin --disable-color
 ```
 
-`--bindir=/usr/local/bin` pins the exact directory the task requires, rather than trusting `--prefix` alone. `--disable-color` is the feature flag this headless monitoring pipeline needs turned off.
+`--bindir=/usr/local/bin` sets the exact folder the task asks for, instead of trusting `--prefix` alone. `--disable-color` is the feature switch the monitoring pipeline needs turned off.
 
 ### Step 4: Build and install
 
@@ -42,6 +50,8 @@ This tarball is `.tar.gz`, not `.tar.bz2` — `-z` selects gzip decompression, n
 make
 sudo make install
 ```
+
+`make` builds the program from the `Makefile` that `./configure` wrote. `sudo make install` copies it into `/usr/local/bin`, which belongs to root.
 
 ### Step 5: Verify
 
@@ -57,9 +67,13 @@ vmreport -version
 # Features: color=disabled
 ```
 
+If you submit now, the check on the `vmreport` binary passes. The domain checks still fail.
+
 ---
 
-## Part 2: Define and Start the `build-agent` Domain
+## Define and start the `build-agent` domain
+
+The second half is a libvirt lifecycle task: define the domain persistently, turn on autostart, and start it.
 
 ### Step 1: Confirm libvirtd is running and the disk image is staged
 
@@ -83,7 +97,7 @@ sudo virt-install \
   --noautoconsole
 ```
 
-`--import` wraps libvirt management around the existing (empty) disk image rather than trying to boot install media. This host may not have hardware-accelerated KVM available, since it's itself a virtualized guest — `virt-install` falls back to software emulation automatically in that case, and the domain still reaches a `running` state.
+`--import` wraps libvirt management around the existing (empty) disk image instead of booting installation media. This host is itself a virtual machine, so hardware-accelerated KVM may be missing. `virt-install` then falls back to software emulation by itself, and the domain still reaches the `running` state.
 
 ### Step 3: Confirm persistence and configure autostart
 
@@ -95,7 +109,7 @@ virsh dominfo build-agent | grep -i autostart
 # Autostart:      enable
 ```
 
-### Step 4: Confirm the domain's actual resources and state
+### Step 4: Confirm the domain's real resources and state
 
 ```bash
 virsh dominfo build-agent
@@ -112,11 +126,11 @@ Persistent:     yes
 Autostart:      enable
 ```
 
-2048 MiB reports as `2097152 KiB` (2048 × 1024) — trust `dominfo`'s own units over assumption.
+This output is shortened: the real report also has lines such as `UUID` and `OS Type`. 2048 MiB shows as `2097152 KiB` (2048 × 1024). Trust the units `dominfo` gives, not your assumption.
 
 ---
 
-## Part 3: Close the Loop — Run `vmreport` Against the Real Domain
+## Close the loop: run `vmreport` against the real domain
 
 ```bash
 sudo vmreport build-agent
@@ -126,21 +140,25 @@ sudo vmreport build-agent
 vmreport: domain 'build-agent' state=running
 ```
 
-`vmreport` shells out to `virsh dominfo build-agent` internally and extracts the `State:` line — this is the payoff of Part 1 and Part 2 landing correctly together: a tool built from source, at the exact path required, now reporting live on a domain defined and started with `virsh`/`virt-install`. If either half of this capstone is wrong — the binary missing, misnamed, or built with the wrong feature toggle; the domain not defined, not started, or attached to the wrong network — this final command either fails outright or reports a state other than `running`.
+`vmreport` runs `virsh dominfo build-agent` itself and picks out the `State:` line. It runs with `sudo` so that `virsh` reaches the system instance, where `build-agent` lives. This is where both halves meet: a tool built from source, at the exact path required, now reports live on a domain you defined and started. If either half is wrong (the binary missing, misnamed or built with the wrong feature switch; the domain not defined, not started or on the wrong network), this last command fails or reports a state other than `running`.
+
+Submit now. Every check should pass.
 
 ---
 
-## A Note on Shutdown Semantics (For Your Own Understanding)
+## A note on shutdown (for your own understanding)
 
-Although this capstone's grading only requires the domain to end up `running`, it's worth remembering why `virsh shutdown` and `virsh destroy` are not interchangeable, since a follow-up maintenance task could easily ask you to bring `build-agent` back down cleanly:
+The grader only needs the domain to end up `running`. Still, remember why `virsh shutdown` and `virsh destroy` are not the same, because a later maintenance task could ask you to bring `build-agent` down cleanly:
 
-- `virsh shutdown build-agent` sends an ACPI power-button event into the guest and waits for it to cooperate — appropriate for a guest with a real OS installed that can catch the signal and shut down cleanly.
-- `virsh destroy build-agent` immediately halts the underlying QEMU process with no cleanup opportunity — the only option that works against a hung guest, or (as with this disk image) a guest with no OS installed to respond to `shutdown` in the first place.
+- `virsh shutdown build-agent` sends an ACPI power-button event into the guest and waits for it to cooperate. It is right for a guest with a real operating system that can catch the event and shut down cleanly.
+- `virsh destroy build-agent` ends the QEMU process at once, with no cleanup. It is the only option that works on a hung guest, or on a guest with no operating system to answer `shutdown`, like this disk image.
+
+If you try either one here, run `sudo virsh start build-agent` afterwards, because the grader checks that the domain is running.
 
 ## Command Summary
 
 ```bash
-# Part 1: compile and install vmreport
+# Build and install vmreport
 cd /tools
 tar xzf vmreport-1.0.tar.gz
 cd vmreport-1.0
@@ -151,7 +169,7 @@ make
 sudo make install
 vmreport -version
 
-# Part 2: define and start build-agent
+# Define and start build-agent
 sudo virt-install \
   --name build-agent \
   --memory 2048 \
@@ -165,6 +183,6 @@ sudo virt-install \
 sudo virsh autostart build-agent
 virsh dominfo build-agent
 
-# Part 3: close the loop
+# Close the loop
 sudo vmreport build-agent
 ```

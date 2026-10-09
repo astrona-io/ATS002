@@ -1,66 +1,47 @@
 # Section 030: Building & Virtualizing Systems
 
-Welcome to Section 030. Distro package managers cover most of a system administrator's day-to-day needs — until they don't. Sometimes the software you need only ships as a source tarball, with no distro package at all. Sometimes the workload itself needs to be an entire second operating system, isolated from the host at the kernel level, not just a process namespace away. This section covers both situations: compiling and installing software directly from source when a package manager can't help you, and standing up and managing full virtual machines with libvirt when a container isn't isolated enough.
+Welcome, astronaut. Package managers cover most of a system administrator's daily needs, but not all of them. Sometimes the software you need only comes as a source tarball, a kit of parts with no ready-made package. Sometimes the workload needs a whole second operating system, kept apart from the host by its own kernel, not just a container. This section covers both: building and installing software from source, and running full virtual machines with libvirt.
 
-These two skills look unrelated on the surface — one is about a build pipeline, the other about a hypervisor — but they share a common thread. Both hand you a raw building block (a source tarball, a disk image) and require you to assemble it correctly yourself, with precise control over exactly where it lands and exactly what capabilities it ends up with. Get either wrong, and the mistake isn't cosmetic: a binary installed at the wrong path silently fails the task that needed it there, and a VM defined the wrong way can vanish entirely the moment it's stopped.
+The two skills look unrelated, but they have one thing in common. Each hands you a raw building block, a source tarball or a disk image, and you must put it together yourself, with exact control over where it lands and what it can do. Mistakes here are not cosmetic. A binary installed at the wrong path fails the task that needed it there, and a virtual machine defined the wrong way can vanish the moment it stops.
 
----
+## What you will learn
 
-## What You Will Master
+By the end of this section you can:
 
-By completing this section, you will acquire three core deployment capabilities:
-*   **Source Build Pipelines:** How to unpack a tarball correctly, discover a project-specific `configure` script's install-location and feature-toggle flags by reading its own `--help` output, and verify both landed as intended after `make install`.
-*   **libvirt Domain Lifecycle:** How to define a persistent KVM domain around an existing disk image with `virt-install --import`, and why persistent (`define`) and transient (`create`) domains behave completely differently the moment they stop.
-*   **Graceful vs. Hard VM Shutdown:** How to distinguish `virsh shutdown` (an ACPI request the guest can ignore) from `virsh destroy` (an immediate, unconditional power-off), and when each is the correct call.
+- **Build software from source:** unpack a tarball correctly, find a project's install-path and feature flags with its own `./configure --help`, and prove after `make install` that both landed as intended.
+- **Manage the libvirt domain lifecycle:** define a persistent domain around an existing disk image with `virt-install --import`, and explain why persistent (`define`) and transient (`create`) domains behave so differently once they stop.
+- **Stop virtual machines the right way:** tell `virsh shutdown` (a request the guest can ignore) from `virsh destroy` (an immediate power-off), and know when each is right.
 
----
+## The modules
 
-## The Learning & Lab Path
+The section has two modules. Each one ends with graded missions right after the parts they practise.
 
-This section is divided into two focused modules, each paired with a dedicated hands-on practice lab, and concluded with a Section Capstone Challenge that requires both skills working together:
+### Compile & Install From Source
 
-### 1. Compile & Install From Source
-*   **Module Reader:** **[Module 1: Compile & Install From Source](./module-01/course.md)**
-    1. [Unpacking the tarball, and the build pipeline](./module-01/course-01-unpacking-and-the-build-pipeline.md)
-    2. [Discovering and choosing configure flags](./module-01/course-02-discovering-and-choosing-flags.md)
-    3. [Building, installing, and verifying](./module-01/course-03-building-installing-verifying.md)
-*   **Practice Lab Sandbox:** **`sections/section-030/module-01/labs/lab-01`**
-*   **Lab Run Command:**
-    ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-01/labs/lab-01
-    ```
-*   **Hands-on Objective:** Extract a `.tar.bz2` source tarball staged on the host, discover the project's install-location and IPv6 feature-toggle flags by reading `./configure --help`, then build and install the binary so it lands at the exact path `/usr/bin/links` with IPv6 support compiled out.
+[Compile & Install From Source](./module-01/course.md) teaches the `tar`, `./configure`, `make` and `make install` steps, how to choose the right flags, and how to check the installed program. Its mission asks you to build a terminal web browser from source to an exact path with IPv6 switched off. This module has no playground.
 
-### 2. libvirt Virtual Machine Lifecycle
-*   **Module Reader:** **[Module 2: libvirt Virtual Machine Lifecycle](./module-02/course.md)**
-    1.  [The domain and the libvirt stack](./module-02/course-01-domain-and-the-libvirt-stack.md)
-    2.  [Defining a domain around an existing disk](./module-02/course-02-defining-around-an-existing-disk.md)
-    3.  [Persistent vs. transient — the domain lifecycle](./module-02/course-03-persistent-vs-transient-lifecycle.md)
-    4.  [Autostart and reading a domain's true state](./module-02/course-04-autostart-and-reading-true-state.md)
-    5.  [Graceful shutdown vs. hard power-off](./module-02/course-05-graceful-shutdown-vs-hard-destroy.md)
-*   **Practice Lab Sandboxes:**
-    1. **`sections/section-030/module-02/labs/lab-01`** — define a new persistent KVM domain `inventory-db` around an existing qcow2 disk (2048 MiB, 2 vCPUs, default NAT network), configure autostart, then demonstrate a graceful `virsh shutdown` and a hard `virsh destroy`.
-    2. **`sections/section-030/module-02/labs/lab-02`** — a domain is running but **transient** (`virsh create`, no definition on disk); promote it to persistent in place with `virsh define`, without stopping it, then enable autostart and prove it now survives a `virsh destroy`.
-    3. **`sections/section-030/module-02/labs/lab-03`** — an existing persistent domain is under-provisioned (512 MiB, 1 vCPU); raise it to 2048 MiB / 2 vCPU in the **persistent** config (`virsh edit`, or `virsh set*` with `--config`), start it, and verify with `virsh dominfo`.
-*   **Lab Run Commands:**
-    ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-02/labs/lab-01
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-02/labs/lab-02
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-02/labs/lab-03
-    ```
+### libvirt Virtual Machine Lifecycle
 
-### 3. Section Capstone Challenge
-*   **Comprehensive Challenge:** **`sections/section-030/capstone/labs/lab-01` (New Toolchain, New Host)**
-*   **Lab Run Command:**
-    ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/capstone/labs/lab-01
-    ```
-*   **Hands-on Objective:** Connect the dots. Compile and install a build-status reporting tool from source at a precise path with a feature disabled, then define, autostart, and stand up a persistent libvirt domain for a new internal service — a single maintenance window that touches both a build pipeline and a hypervisor.
+[libvirt Virtual Machine Lifecycle](./module-02/course.md) teaches the libvirt layers, the domain XML, `virt-install --import`, persistent versus transient domains, autostart, `virsh dominfo`, and `shutdown` versus `destroy`. It comes with a playground, the `libvirt-vm-lifecycle` hangar, and three missions: make a transient domain persistent, give a domain more memory and CPUs for good, and define a new domain from scratch.
 
----
+## Section capstone: New Toolchain, New Host
 
-## Ready for Assessment?
+The capstone joins both skills in one maintenance window. You build a reporting tool from source at an exact path with one feature switched off, then define, autostart and start a persistent libvirt domain, and finally use the tool to report on the domain.
 
-Test your theoretical knowledge and diagnostic reasoning before tackling the practical lab missions:
+Start it and open a terminal on it:
 
-*   **[Take the Section 030 Knowledge Check Quiz](./quiz.md)**
+```bash
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/capstone/labs/lab-01
+astrona ssh ats-002-lab-030
+```
+
+Read the task in [`question.md`](./capstone/labs/lab-01/question.md). When you think you are done, send it for grading, and remove it afterwards:
+
+```bash
+astrona submit -c sections/section-030/capstone/labs/lab-01
+astrona destroy ats-002-lab-030
+```
+
+## Ready for assessment?
+
+Test your knowledge and your reasoning before the capstone with the [knowledge check quiz](./quiz.md).

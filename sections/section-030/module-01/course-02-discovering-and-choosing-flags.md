@@ -1,17 +1,21 @@
-# Part 2 — Discovering and choosing configure flags
+# Discovering And Choosing Configure Flags
 
-> Prerequisite: [Part 1 — Unpacking the tarball, and the build pipeline](./course-01-unpacking-and-the-build-pipeline.md). Next: [Part 3 — Building, installing, and verifying](./course-03-building-installing-verifying.md).
-
-Because every `configure` script is different, you never guess a flag from memory — you ask the script. This part is `./configure --help`, the two distinct families of flag it lists, and why `--prefix` is the wrong tool when a task names an exact binary path.
+Astronaut, every kit of parts comes with its own fitting plan, and no two plans take the same options. So you never guess a `configure` flag from memory. You ask the script itself. This part shows how to ask with `./configure --help`, the two kinds of flag it lists, and why `--prefix` is the wrong tool when a task names an exact path for the binary.
 
 ## Ask the script
+
+A **flag** is an option you pass to a command, such as `--bindir=/usr/bin`. A `configure` script prints every flag it accepts when you run it with `--help`.
+
+### Read the help, then filter it
+
+Run this inside the unpacked source folder:
 
 ```bash
 # shell: inside the extracted source dir, unprivileged
 ./configure --help
 ```
 
-This prints every flag *this project's* `configure` accepts: a common Autoconf baseline plus project-specific toggles. When a task gives two unrelated requirements — "install to this exact path" **and** "turn off this feature" — grep for each rather than scrolling:
+This prints every flag that *this project's* `configure` accepts. You get a common Autoconf base set plus the switches this project adds. A task often has two separate requirements, such as "install to this exact path" **and** "turn off this feature". Search for each one with `grep` instead of scrolling:
 
 ```bash
 ./configure --help | grep -i bindir
@@ -23,24 +27,28 @@ This prints every flag *this project's* `configure` accepts: a common Autoconf b
 --disable-ipv6          disable IPv6 support
 ```
 
+This output is shortened: a real help text often lists the matching `--enable-ipv6` line too. The first line is a path flag. The second line switches off IPv6 (Internet Protocol version 6, the newer form of network address) in the built program.
+
 ## Two families of flag — do not mix them up
 
-The single most common way to lose points on a source-install task is treating a path flag as a feature flag or vice versa.
+The most common way to lose points on a source install is to treat a path flag as a feature flag, or the other way round. The table puts the two families side by side.
 
 | Family | Answers | Examples | What it changes |
 |---|---|---|---|
 | **Installation paths** | *where does the output go?* | `--prefix`, `--exec-prefix`, `--bindir`, `--sbindir`, `--libdir`, `--mandir`, `--datadir`, `--sysconfdir` | which directory files are copied into — nothing about the binary's contents |
 | **Feature toggles** | *what code is compiled in?* | `--enable-X` / `--disable-X`, `--with-LIB` / `--without-LIB` | whether a capability exists in the binary at all |
 
-`--disable-ipv6` produces a binary that *cannot* do IPv6 — the code is not in it. `--bindir=/usr/bin` produces the same binary, placed in a specific directory. Different axes entirely.
+`--disable-ipv6` builds a binary that *cannot* use IPv6, because that code is not in it. `--bindir=/usr/bin` builds the same binary as before and only places it in a different folder. These are two different questions.
 
-`--with-X` / `--without-X` usually gate an optional **library** dependency (`--with-ssl`, `--without-zlib`); `--enable-X` / `--disable-X` usually gate a **built-in feature**. Projects are not perfectly consistent — read the `--help` line.
+`--with-X` and `--without-X` usually switch an optional **library** on or off (`--with-ssl`, `--without-zlib`). `--enable-X` and `--disable-X` usually switch a **built-in feature** on or off. Projects do not always follow this, so read the `--help` line.
 
 ## Why `--prefix` alone is not precise enough
 
-`--prefix` is the flag people reach for first, and it is the wrong one when a task demands an *exact* binary path.
+`--prefix` is the flag people reach for first. It is the wrong one when a task demands an *exact* path for the binary. This section shows why, and which flag to use instead.
 
-`--prefix` sets the **root** of the whole install tree. Every subdirectory is computed from it:
+### How `--prefix` decides the folders
+
+`--prefix` sets the **root** of the whole install tree. `configure` works out every folder below it from that root:
 
 ```
   --prefix=/usr/local            (the default)
@@ -50,28 +58,26 @@ The single most common way to lose points on a source-install task is treating a
         └── share/man/ ← $prefix/share/man
 ```
 
-So `--prefix=/usr` puts the binary at `/usr/bin/<name-the-project-uses-for-its-own-binary>` — which is **not guaranteed** to be `/usr/bin/links`. The project might name its output `links2` (matching the tarball) unless it explicitly renames it. `--prefix` gets you the right directory only if the project's binary name already matches what you were asked for.
+So `--prefix=/usr` puts the binary at `/usr/bin/<name-the-project-uses-for-its-own-binary>`. That is **not always** `/usr/bin/links`. The project might name its output `links2`, after the tarball, unless it renames it on purpose. `--prefix` only gives you the right result if the project's binary name already matches the one you were asked for.
 
-`--bindir` removes that dependency — it pins the exact directory, independent of `--prefix`:
+### Pin the folder with `--bindir`
+
+`--bindir` sets the exact folder for programs, whatever `--prefix` says:
 
 ```bash
 ./configure --bindir=/usr/bin --disable-ipv6
 ```
 
-Now the binary is copied into `/usr/bin` regardless of what `--prefix` computes. (The *filename* is still the project's choice — Part 3 covers closing that last gap.)
+Now `make install` copies the binary into `/usr/bin`, whatever folder `--prefix` would have given. The *file name* is still the project's choice, so you check it after the install.
 
-**Rule:** when a task names an exact path for the final binary, use the specific directory flag (`--bindir`, `--sbindir`, `--mandir`) — do not trust `--prefix` to compute it.
+**Rule:** when a task names an exact path for the final binary, use the flag for that exact folder (`--bindir`, `--sbindir`, `--mandir`). Do not trust `--prefix` to work it out.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Guessing a flag name.** Every `configure` is different; an unknown `--enable-foo` may be silently ignored. `./configure --help | grep` first.
-> - **Using `--prefix` when the task names an exact binary path.** `$prefix/bin/<name>` is computed and the `<name>` may not be what you expect. Use `--bindir`.
-> - **Confusing `--disable-X` with a path flag.** One removes code, the other moves files. A task that says "without IPv6" wants `--disable-ipv6`, not a directory change.
-> - **Assuming `--with-` and `--enable-` are interchangeable.** They usually gate different things (optional library vs built-in feature). Read the help line.
+> - **Guessing a flag name.** Every `configure` is different; an unknown `--enable-foo` may only give a warning that is easy to miss. `./configure --help | grep` first.
+> - **Using `--prefix` when the task names an exact binary path.** `$prefix/bin/<name>` is worked out for you, and the `<name>` may not be what you expect. Use `--bindir`.
+> - **Confusing `--disable-X` with a path flag.** One removes code, the other moves files. A task that says "without IPv6" wants `--disable-ipv6`, not a folder change.
+> - **Assuming `--with-` and `--enable-` are interchangeable.** They usually switch different things (an optional library or a built-in feature). Read the help line.
 
-> *`./configure --help` is the only flag reference; it lists path flags (`--prefix`, `--bindir`, …) that decide where files go and feature flags (`--enable/--disable/--with/--without`) that decide what is compiled in — and for an exact binary path use `--bindir`, not `--prefix`.*
-
-## Reference
-
-- `./configure --help` in the source tree — the authoritative, per-project flag list.
-- GNU Coding Standards, "Directory Variables" — what every standard `--*dir` flag defaults to and how they derive from `--prefix`/`--exec-prefix`.
-- GNU Autoconf manual, "Package Options" vs "Optional Features" — the `--with`/`--without` vs `--enable`/`--disable` conventions.
+> *`./configure --help` is the only flag reference. It lists path flags (`--prefix`, `--bindir`, and others) that decide where files go, and feature flags (`--enable`, `--disable`, `--with`, `--without`) that decide what is built in. For an exact binary path, use `--bindir`, not `--prefix`.*

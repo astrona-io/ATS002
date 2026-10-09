@@ -1,13 +1,10 @@
-# Solution Guide: Reconfigure a Persistent Domain
+# Solution Walkthrough
 
-Changing a domain's memory or vCPU count has a scope trap. `virsh setmem`
-and `virsh setvcpus` default to `--live` (or `--current`), which touches
-only the **running** QEMU process — the change is gone on the next full
-power-off. To make it stick you must write it into the **persistent XML**,
-either with `--config` on those commands or by editing the XML directly.
+Changing a domain's memory or number of virtual CPUs has a scope trap. With no scope flag, `virsh setmem` and `virsh setvcpus` use `--current`, which means the domain's current state. On a running domain that is only the **running** QEMU process, and the change is gone at the next full power-off. To make a change stick, you must write it into the **persistent XML**, either with `--config` on those commands or by editing the XML directly.
 
-This domain is shut off, so there is no live instance to change anyway —
-the persistent config is the only thing to edit.
+This domain is shut off, so there is no live instance to change anyway. The persistent configuration is the only thing to edit, and `--config` makes that target explicit.
+
+Several commands below run `virsh` without `sudo`. As a normal user, `virsh` may connect to the private `qemu:///session` instance and not see `web-db`. If that happens, put `sudo` in front, or run `export LIBVIRT_DEFAULT_URI=qemu:///system` once in your shell first.
 
 ---
 
@@ -24,6 +21,8 @@ Max memory:     524288 KiB      (512 MiB)
 Persistent:     yes
 ```
 
+This output is shortened to the lines that matter, and the `(512 MiB)` note was added by hand.
+
 ```bash
 virsh dumpxml --inactive web-db | grep -E '<memory|<currentMemory|<vcpu'
 ```
@@ -34,13 +33,11 @@ virsh dumpxml --inactive web-db | grep -E '<memory|<currentMemory|<vcpu'
 <vcpu placement='static'>1</vcpu>
 ```
 
-Note there are **two** memory elements. `<memory>` is the maximum;
-`<currentMemory>` is the amount actually given to the guest (the balloon
-target). Raising only `<memory>` leaves the guest still capped at 512 MiB.
+There are **two** memory elements. `<memory>` is the maximum. `<currentMemory>` is the amount actually given to the guest (the balloon target). Raising only `<memory>` leaves the guest capped at 512 MiB.
 
 ---
 
-## Step 2a: The direct route — `virsh edit`
+## Step 2a: The direct route with `virsh edit`
 
 ```bash
 sudo virsh edit web-db
@@ -54,14 +51,11 @@ Change all three lines:
 <vcpu placement='static'>2</vcpu>
 ```
 
-`2097152 = 2048 * 1024`. Save and exit; `virsh` validates and writes the
-persistent definition. Because the `<vcpu>` element has no `current='...'`
-attribute, setting its text to `2` sets both the maximum and the active
-count to 2.
+`2097152 = 2048 * 1024`. Save and exit. `virsh` checks the XML and writes the persistent definition. The `<vcpu>` element has no `current='...'` attribute, so setting its text to `2` sets both the maximum and the active count to 2.
 
-## Step 2b: The command route — `virsh set* --config`
+## Step 2b: The command route with `virsh set* --config`
 
-Equivalent, without an editor. Order matters: raise the maximum first.
+This does the same without an editor. The order matters: raise the maximum first.
 
 ```bash
 sudo virsh setvcpus  web-db 2       --config --maximum
@@ -70,12 +64,11 @@ sudo virsh setmaxmem web-db 2048M   --config
 sudo virsh setmem    web-db 2048M   --config
 ```
 
-- `setvcpus --maximum` raises the ceiling; without it, `setvcpus 2` is
-  rejected because 2 exceeds the current max of 1.
-- `setmaxmem` sets `<memory>`; `setmem` sets `<currentMemory>`. You need
-  both, for the same reason as in Step 2a.
-- `--config` = write the persistent XML. Leave it off and you would be
-  trying to resize a domain that is not even running.
+- `setvcpus --maximum` raises the ceiling. Without it, `setvcpus 2` is rejected, because 2 is more than the current maximum of 1.
+- `setmaxmem` sets `<memory>` and `setmem` sets `<currentMemory>`. You need both, for the same reason as in Step 2a.
+- `--config` means "write the persistent XML". On this shut-off domain the default `--current` would land there too, but on a running domain it would only change the live one. `--config` makes the change permanent in every case.
+
+You only need one of the two routes. If you run `astrona submit -c sections/section-030/module-02/labs/lab-03` from your own computer now, the grader still fails: the domain is not running yet.
 
 ---
 
@@ -94,8 +87,7 @@ Used memory:    2097152 KiB
 Persistent:     yes
 ```
 
-Confirm the persistent config also holds the new values (this is what
-survives a reboot):
+Confirm that the persistent configuration also holds the new values. This is what survives a reboot:
 
 ```bash
 virsh dumpxml --inactive web-db | grep -E '<memory|<currentMemory|<vcpu'
@@ -107,9 +99,9 @@ virsh dumpxml --inactive web-db | grep -E '<memory|<currentMemory|<vcpu'
 <vcpu placement='static'>2</vcpu>
 ```
 
-> `virsh setmem web-db 2048M` on its own changes the running domain and
-> nothing else. Reboot the host and the domain is back to 512 MiB. `--config`
-> (or `virsh edit`) is the difference between "for now" and "for good".
+Run `astrona submit -c sections/section-030/module-02/labs/lab-03` again. Every check should pass now.
+
+On a running domain, `virsh setmem web-db 2048M` on its own changes the running domain and nothing else. Reboot the host and the domain is back to 512 MiB. `--config` (or `virsh edit`) is the difference between "for now" and "for good".
 
 ---
 

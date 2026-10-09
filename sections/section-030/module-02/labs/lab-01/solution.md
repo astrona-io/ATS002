@@ -1,6 +1,8 @@
-# Solution Guide: libvirt Virtual Machine Lifecycle
+# Solution Walkthrough
 
-This guide shows you how to define a persistent KVM domain around an existing disk image, enable autostart, and understand the difference between a graceful shutdown and a hard power-off.
+This walkthrough defines a persistent domain around an existing disk image, turns on autostart, and shows the difference between a graceful shutdown and a hard power-off. After the steps that change the machine, you can run `astrona submit` from your own computer to see how far the grader agrees.
+
+Several commands below run `virsh` without `sudo`. As a normal user, `virsh` may connect to the private `qemu:///session` instance and not see `inventory-db` at all. If that happens, put `sudo` in front, or run `export LIBVIRT_DEFAULT_URI=qemu:///system` once in your shell first.
 
 ---
 
@@ -11,7 +13,7 @@ sudo systemctl status libvirtd
 ls -lh /var/lib/libvirt/images/inventory-db.qcow2
 ```
 
-`virsh` talks to the `libvirtd` daemon over a local socket — if it isn't running, every `virsh`/`virt-install` command fails to connect before you even reach domain-specific errors.
+`virsh` talks to the `libvirtd` daemon over a local socket. If the daemon is not running, every `virsh` and `virt-install` command fails to connect before it even reaches the domain.
 
 ---
 
@@ -30,11 +32,11 @@ sudo virt-install \
   --noautoconsole
 ```
 
-`--import` tells `virt-install` to skip the install-media boot path entirely and treat `--disk` as already bootable — the right tool for wrapping libvirt management around an existing image rather than installing a fresh OS. `--network network=default` attaches to libvirt's built-in NAT network. `--graphics none --noautoconsole` keep this headless and non-blocking.
+`--import` tells `virt-install` to skip installation media and treat `--disk` as a disk that can already boot. That is the right tool for wrapping libvirt around an existing image instead of installing a new operating system. `--network network=default` connects the domain to libvirt's built-in NAT network. `--graphics none --noautoconsole` keep it without a screen and give you your prompt back at once.
 
-This disk image has no OS installed inside it — that's expected for this lab. `virt-install` still successfully defines the domain and launches the underlying QEMU process; libvirt reports it as `running` regardless of whether an OS is present to boot, since domain lifecycle state is about the QEMU process, not what's happening inside the guest.
+This disk image has no operating system on it, and that is expected in this lab. `virt-install` still defines the domain and starts the QEMU process. libvirt reports the domain as `running` whether or not an operating system boots inside, because the domain's state is about the QEMU process, not about what happens in the guest.
 
-**Note:** since this host is itself a virtualized guest, hardware-accelerated KVM (`/dev/kvm`) may not be available. `virt-install` automatically falls back to software (TCG) emulation in that case — no special flag is required, and the domain lifecycle transitions (defined → running → shut off) work correctly either way, just without hardware-accelerated performance.
+This host is itself a virtual machine, so hardware acceleration through `/dev/kvm` may be missing. `virt-install` then falls back to software emulation (TCG) by itself. You need no extra flag, and the lifecycle steps (defined, running, shut off) work the same, only slower.
 
 ---
 
@@ -50,7 +52,7 @@ virsh list --all
  1    inventory-db   running
 ```
 
-Because `virt-install` performs a persistent define by default, `inventory-db` stays in `virsh list --all` even after it's shut off. Confirm the underlying XML was actually written to the persistent store:
+`virt-install` defines domains persistently by default, so `inventory-db` stays in `virsh list --all` even after it is shut off. Confirm that the XML was really written to the persistent store:
 
 ```bash
 sudo ls /etc/libvirt/qemu/inventory-db.xml
@@ -64,16 +66,18 @@ sudo ls /etc/libvirt/qemu/inventory-db.xml
 sudo virsh autostart inventory-db
 ```
 
-This marks the domain to start automatically when `libvirtd` starts (normally at host boot), by creating a symlink under `/etc/libvirt/qemu/autostart/` pointing back at the domain's XML. Verify:
+This marks the domain to start whenever `libvirtd` starts, which normally happens at host boot. libvirt does it by creating a symlink under `/etc/libvirt/qemu/autostart/` that points back at the domain's XML. Verify:
 
 ```bash
 virsh dominfo inventory-db | grep -i autostart
 # Autostart:      enable
 ```
 
+Now run `astrona submit -c sections/section-030/module-02/labs/lab-01` from your own computer. Every check should pass.
+
 ---
 
-## Step 5: Confirm it's running and check actual allocated resources
+## Step 5: Confirm it's running and check the real resources
 
 ```bash
 virsh dominfo inventory-db
@@ -90,7 +94,7 @@ Persistent:     yes
 Autostart:      enable
 ```
 
-`dominfo` is the authoritative source for the domain's actual configuration — 2048 MiB shows up as `2097152 KiB` (2048 × 1024).
+This output is shortened: the real report also has lines such as `UUID` and `OS Type`. `dominfo` is the trusted source for the domain's real settings. 2048 MiB shows up as `2097152 KiB` (2048 × 1024).
 
 ---
 
@@ -100,13 +104,13 @@ Autostart:      enable
 virsh shutdown inventory-db
 ```
 
-This sends an ACPI power-button event into the guest, asking its OS to run a clean shutdown sequence. Watch the state transition:
+This sends an ACPI power-button event into the guest and asks its operating system to run a clean shutdown. Watch the state:
 
 ```bash
 watch -n1 virsh list --all
 ```
 
-Because this disk has no guest OS installed to catch the ACPI signal, the domain will most likely **never** transition to `shut off` on its own — it will sit at `running` indefinitely, which is itself the practical lesson: `shutdown` is a *request*, not a guarantee, and a guest with no ACPI handling (or none at all, as here) simply never acts on it.
+This disk has no operating system to catch the ACPI event, so the domain will most likely **never** reach `shut off` by itself. It stays `running`. That is the lesson: `shutdown` is a *request*, not a guarantee, and a guest with no ACPI handling (or, as here, no operating system at all) never acts on it. Press `Ctrl+C` to leave `watch`.
 
 Escalate to a hard power-off:
 
@@ -114,15 +118,15 @@ Escalate to a hard power-off:
 virsh destroy inventory-db
 ```
 
-`destroy` does not delete the domain's definition or disk image — it immediately halts the underlying QEMU process, the software equivalent of pulling the power cord. Unlike `shutdown`, this transitions the domain to `shut off` immediately, with no grace period, because it doesn't depend on anything inside the guest cooperating.
+`destroy` does not delete the domain's definition or its disk image. The libvirt daemon ends the QEMU process at once, the software version of pulling the power cord. Unlike `shutdown`, the domain is `shut off` immediately, because nothing inside the guest has to cooperate.
 
-**The semantic difference:** `shutdown` asks the guest OS to clean up (flush disk caches, unmount filesystems, stop services) before powering off — appropriate when the guest is responsive and you can afford to wait. `destroy` is an unconditional hard stop with no cleanup opportunity for the guest — appropriate when the guest is hung, unresponsive, or has no OS installed to respond in the first place, exactly the situation here. Both leave the domain in the same final `shut off` state, but only one gave the (nonexistent, in this lab's case) guest a chance to shut down cleanly first.
+**The difference:** `shutdown` asks the guest to clean up first (write cached data to disk, unmount filesystems, stop services) and then power off. Use it when the guest responds and you can wait. `destroy` is a hard stop with no cleanup. Use it when the guest is hung, does not respond, or, as here, has no operating system to respond. Both leave the domain in the same `shut off` state, but only `shutdown` gives the guest a chance to stop cleanly.
 
 ```bash
 virsh start inventory-db
 ```
 
-Because the domain is persistently defined, `virsh start` works at any point after either kind of stop.
+Because the domain is persistently defined, `virsh start` works after either kind of stop.
 
 ---
 
@@ -146,6 +150,8 @@ virsh destroy inventory-db
 virsh list --all
 # immediately "shut off" -- no grace period, unlike shutdown
 ```
+
+The grader does not mind whether the domain ends up running or shut off. It checks the definition, the size, the network and autostart.
 
 ## Command Summary
 
