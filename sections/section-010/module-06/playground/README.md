@@ -3,28 +3,26 @@
 - **ID:** PLAYGROUND
 - **Slug:** systemd-service-debugging
 - **Author:** Paris Nakita Kejser
-- **Type:** Astrona playground — clean environment, no task, no grading
+- **Type:** Astrona playground: a clean training ship, no task, no grading
 
-
-
-A single sandbox environment that spins up, runs OS prep, and stays running so
-you can explore the module's topic on a clean machine. Nothing to submit.
+This playground is one training ship (an Ubuntu 24.04 virtual machine) where `apache2` has already failed to start, because another unit holds port 80. It starts, runs its setup script once, and then waits for you, so you can practise reading `systemctl status` and `journalctl` on a real failed service. There is nothing to submit.
 
 ## Run it
 
+Start the playground, open a terminal on it, and remove it when you are done:
+
 ```sh
-astrona run -c .
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-06/playground
+astrona ssh systemd-service-debugging
 astrona destroy systemd-service-debugging
 ```
 
-`astrona destroy` takes the environment name (`metadata.name` = `systemd-service-debugging`), not
-the config path. `astrona submit` and `astrona test` do not apply — there is no
-grading.
+`astrona ssh` and `astrona destroy` take the playground's name (`metadata.name` = `systemd-service-debugging`), not its folder path. The `astro-` prefix in front of the name, as in `astrona ssh astro-systemd-service-debugging`, is optional. `astrona submit` and `astrona test` do not apply, because there is no grading.
 
 ## Layout
 
 | Path | Purpose |
 | --- | --- |
-| `config.yaml` | Environment definition (runtime + bootstrap only) |
-| `bootstrap/prepare.sh` | OS prep run once at startup |
-| `docs/overview.md` | What the environment contains and ideas to try |
+| `config.yaml` | Playground definition (virtual machine and setup only) |
+| `bootstrap/prepare.sh` | Setup script that runs once at startup |
+| `docs/overview.md` | What the playground contains and ideas to try |

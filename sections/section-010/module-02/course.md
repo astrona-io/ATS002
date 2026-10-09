@@ -1,42 +1,54 @@
-# Chapter 2: Process Limits — pid_max, ulimit, and the Three Ceilings
+# Process Limits — pid_max, ulimit, and the Three Ceilings
 
-<!-- astrona:playground -->
-> [!NOTE]
-> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS002/tree/main/sections/section-010/module-02/playground)
->
-> ```sh
-> astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-02/playground
-> astrona destroy process-limits-ceilings
-> ```
+Astronaut, a busy ship needs many hands. When a Linux workload starts lots of processes and threads, it can suddenly fail with `fork: retry: Resource temporarily unavailable`. There is not one limit in its way. There are three, and three different parts of the system enforce them, completely apart from each other. Raising only one of them is the most common way an incident goes quiet for an hour and then comes back.
 
-When a Linux workload starts spawning processes and threads aggressively and begins getting `fork: retry: Resource temporarily unavailable`, there is not one limit in its way — there are three, enforced by three different kernel subsystems, completely independently of each other. Raising only one is the most common way an incident goes quiet for an hour and then comes back. This module walks all three: the machine-wide task pool (`kernel.pid_max`), the per-user cap (`ulimit -u` / `RLIMIT_NPROC`), and the per-service cgroup cap (`TasksMax=`) — how to tell which one is clamping, how to raise each so it sticks, and the fixed order to check them in.
-
-Three short parts; work them in order.
-
-## How this module is organised
-
-1. **[Part 1 — The shared PID pool and confirming exhaustion](./course-01-the-shared-pid-pool.md)** — why every thread costs a slot from the same pool as processes, what `kernel.pid_max` actually means, PID wraparound, and the `free` / `top` / `ps -eLf` check that confirms the failure is PID exhaustion and not memory or CPU.
-2. **[Part 2 — The three independent ceilings](./course-02-the-three-independent-ceilings.md)** — each ceiling side by side: what enforces it, what scope it covers (machine / real UID / unit cgroup), where its persistent setting lives, and why a `fork()` must clear all three.
-3. **[Part 3 — Raising each ceiling, in order](./course-03-raising-each-ceiling-in-order.md)** — live and persistent change for each (sysctl drop-in; `limits.d` + why an open session keeps its old limit; `systemctl edit` + `daemon-reload` + restart), and the global → per-user → per-unit triage method.
+This module walks through all three: the machine-wide pool of task numbers (`kernel.pid_max`), the per-user cap (`ulimit -u`, also called `RLIMIT_NPROC`), and the per-service cap (`TasksMax=`). You learn how to tell which one is holding the workload back, how to raise each one so the change lasts, and the fixed order to check them in.
 
 ## Learning objectives
 
 After this module you can:
 
-- **Explain** why a multi-threaded process consumes many PID-pool slots, not one, and read `kernel.pid_max` as one greater than the highest PID.
+- **Explain** why a process with many threads uses many slots of the PID pool, not one, and read `kernel.pid_max` as one more than the highest PID.
 - **Confirm** that a "cannot fork" failure is PID exhaustion rather than memory or CPU pressure.
-- **Name** the three independent ceilings, the subsystem that enforces each, and the scope each applies to.
-- **Predict** which ceiling is clamping a workload from its user, its unit, and the system-wide task count.
-- **Raise** each ceiling both live and persistently, using the correct file family for each.
-- **Explain** why editing `/etc/security/limits.d/` does not change an already-open session, and why a `TasksMax=` override needs `daemon-reload` and a restart.
-- **Apply** the global → per-user → per-unit triage order so a fix does not resurface.
+- **Name** the three independent ceilings, the part of the system that enforces each, and how far each one reaches.
+- **Predict** which ceiling is holding a workload back from its user, its unit and the number of tasks on the machine.
+- **Raise** each ceiling both live and permanently, using the right kind of file for each.
+- **Explain** why editing `/etc/security/limits.d/` does not change a session that is already open, and why a `TasksMax=` override needs `daemon-reload` and a restart.
+- **Apply** the order "whole machine, then user, then service" so that a fix does not come back.
 
 ## Before you start
 
-Assumed: Chapter 1 (`sysctl -w` vs `/etc/sysctl.d/` + `sysctl --system`), a Linux shell, `sudo`, and the idea of a systemd service. Familiarity with soft vs hard resource limits helps but is introduced here.
+Check that you have what this module expects before you begin.
 
-The playground (callout above) is a throwaway Ubuntu 24.04 VM with a `dataproc` user and a demo `data-ingest.service` running at `TasksMax=64`, so all three ceilings have something concrete to inspect. Get a shell with `astrona ssh astro-process-limits-ceilings`. The **Try it** checkpoints in Parts 1–3 run there; every command block also states the shell, user, and privilege it assumes.
+### What you should already know
 
-## Where this fits
+- **How kernel parameters work.** `sysctl -w` changes a value in the running kernel only. A file under `/etc/sysctl.d/` plus `sudo sysctl --system` changes it now and on every boot.
+- **How to use a Linux shell** with `sudo`.
+- **What a systemd service is.** It is a program that systemd starts and watches, described by a unit file.
 
-This module is the second in the section and reuses Chapter 1's "live value vs. persistent config" model three times over — once per ceiling, each with its own file family. It is also the first place the section's recurring "fixed one layer, the problem moved to the next" pattern appears explicitly. The section capstone stages a workload hitting exactly this failure mode and expects the layered diagnosis, not a single `pid_max` bump.
+It helps if you know the difference between soft and hard resource limits, but the parts explain it.
+
+### What is in your playground
+
+Your playground is a training ship: one Ubuntu 24.04 virtual machine with a user called `dataproc` and a demo service, `data-ingest.service`, running with `TasksMax=64`. So each of the three ceilings has something real to look at. It is a throwaway machine with no task and no grading, so experiment freely.
+
+Start it, then open a terminal on it with `astrona ssh astro-process-limits-ceilings`:
+
+<!-- astrona:playground -->
+
+Every command block in the parts also says which shell, which user and which rights it expects.
+
+## How this module is laid out
+
+1. [The Shared PID Pool](./course-01-the-shared-pid-pool.md): why every thread takes a slot from the same pool as processes, what `kernel.pid_max` means, how PID numbers wrap around, and the `free`, `top` and `ps -eLf` check that proves the failure is PID exhaustion.
+2. [The Three Independent Ceilings](./course-02-the-three-independent-ceilings.md): each ceiling side by side, with what enforces it, how far it reaches (machine, real user, unit cgroup), where its permanent setting lives, and why a `fork()` must pass all three.
+3. [Raising The Kernel And User Ceilings](./course-03-raising-the-kernel-and-user-ceilings.md): live and permanent changes for `kernel.pid_max` and `ulimit -u`, and why an open session keeps its old limit.
+   - Mission: [Process Limits: Diagnose the Single Clamp (ulimit -u) Lab](./labs/lab-02/README.md)
+4. [Raising TasksMax And The Triage Order](./course-04-raising-tasksmax-and-the-triage-order.md): a `TasksMax=` override with `daemon-reload` and a restart, and the fixed order to check all three ceilings.
+   - Mission: [Process & Thread Ceilings Lab](./labs/lab-01/README.md)
+   - Mission: [Process Limits: Diagnose the Single Clamp (TasksMax) Lab](./labs/lab-03/README.md)
+5. [Wrap-Up: Mission Debrief](./course-05-wrap-up.md)
+
+## Why this matters
+
+"Fixed one layer, and the problem moved to the next" is a pattern you will meet again and again in Linux troubleshooting. Process limits show it more clearly than almost anything else. On the exam you may get a workload that hits exactly this failure, and the task expects a check of every layer, not a single `pid_max` bump.

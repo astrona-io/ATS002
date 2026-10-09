@@ -46,14 +46,14 @@ modules:
         title: "Reading and Reshaping the Live Kernel with sysctl"
         path: sections/section-010/module-01/course.md
       - type: reading
-        title: "Identifying the running kernel"
+        title: "Identifying The Running Kernel"
         path: sections/section-010/module-01/course-01-identifying-the-running-kernel.md
       - type: reading
-        title: "/proc/sys and the live value"
-        path: sections/section-010/module-01/course-02-proc-sys-and-the-live-value.md
+        title: "Every Sysctl Name Is A File"
+        path: sections/section-010/module-01/course-02-every-sysctl-name-is-a-file.md
       - type: reading
-        title: "Runtime vs. persistent changes"
-        path: sections/section-010/module-01/course-03-runtime-vs-persistent-changes.md
+        title: "Reading The Live Value"
+        path: sections/section-010/module-01/course-03-reading-the-live-value.md
       - type: reading
         title: Question
         path: sections/section-010/module-01/labs/lab-01/question.md
@@ -77,17 +77,48 @@ modules:
           - name: "timedatectl manual page"
             url: https://www.freedesktop.org/software/systemd/man/latest/timedatectl.html
       - type: reading
+        title: "Runtime Changes Live In Memory"
+        path: sections/section-010/module-01/course-04-runtime-changes-live-in-memory.md
+      - type: reading
+        title: "Persistent Changes And Which File Wins"
+        path: sections/section-010/module-01/course-05-persistent-changes-and-which-file-wins.md
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-010/module-01/course-06-wrap-up.md
+      - type: reading
         title: "Process Limits — pid_max, ulimit, and the Three Ceilings"
         path: sections/section-010/module-02/course.md
       - type: reading
-        title: "The shared PID pool and confirming exhaustion"
+        title: "The Shared PID Pool"
         path: sections/section-010/module-02/course-01-the-shared-pid-pool.md
       - type: reading
-        title: "The three independent ceilings"
+        title: "The Three Independent Ceilings"
         path: sections/section-010/module-02/course-02-the-three-independent-ceilings.md
       - type: reading
-        title: "Raising each ceiling, in order"
-        path: sections/section-010/module-02/course-03-raising-each-ceiling-in-order.md
+        title: "Raising The Kernel And User Ceilings"
+        path: sections/section-010/module-02/course-03-raising-the-kernel-and-user-ceilings.md
+      - type: reading
+        title: Question
+        path: sections/section-010/module-02/labs/lab-02/question.md
+      - type: lab
+        title: "Process Limits: Diagnose the Single Clamp (ulimit -u) Lab"
+        path: sections/section-010/module-02/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: process-limits
+        task_kind: troubleshooting
+        tags: [pid-max, ulimit, limits-conf, tasksmax, cgroups]
+        learning_goals:
+          - Read all three process ceilings and find the one that is actually too low
+          - Raise only a user's ulimit -u in the right file, leaving the other ceilings alone
+        resources:
+          - name: "limits.conf(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/limits.conf.5.html
+          - name: "getrlimit(2): RLIMIT_NPROC"
+            url: https://man7.org/linux/man-pages/man2/getrlimit.2.html
+      - type: reading
+        title: "Raising TasksMax And The Triage Order"
+        path: sections/section-010/module-02/course-04-raising-tasksmax-and-the-triage-order.md
       - type: reading
         title: Question
         path: sections/section-010/module-02/labs/lab-01/question.md
@@ -112,25 +143,6 @@ modules:
             url: https://man7.org/linux/man-pages/man5/proc_sys_kernel.5.html
       - type: reading
         title: Question
-        path: sections/section-010/module-02/labs/lab-02/question.md
-      - type: lab
-        title: "Process Limits: Diagnose the Single Clamp (ulimit -u) Lab"
-        path: sections/section-010/module-02/labs/lab-02
-        difficulty: intermediate
-        estimated_duration: 20m
-        topic: process-limits
-        task_kind: troubleshooting
-        tags: [pid-max, ulimit, limits-conf, tasksmax, cgroups]
-        learning_goals:
-          - Read all three process ceilings and find the one that is actually too low
-          - Raise only a user's ulimit -u in the right file, leaving the other ceilings alone
-        resources:
-          - name: "limits.conf(5) manual page"
-            url: https://man7.org/linux/man-pages/man5/limits.conf.5.html
-          - name: "getrlimit(2): RLIMIT_NPROC"
-            url: https://man7.org/linux/man-pages/man2/getrlimit.2.html
-      - type: reading
-        title: Question
         path: sections/section-010/module-02/labs/lab-03/question.md
       - type: lab
         title: "Process Limits: Diagnose the Single Clamp (TasksMax) Lab"
@@ -149,17 +161,23 @@ modules:
           - name: "systemctl manual page"
             url: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
       - type: reading
-        title: "Kernel Modules — Loading, Parameters, and Blacklisting"
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-010/module-02/course-05-wrap-up.md
+      - type: reading
+        title: "Kernel Modules: Loading, Parameters, and Blacklisting"
         path: sections/section-010/module-03/course.md
       - type: reading
-        title: "Inspecting modules and their parameters"
+        title: "Inspecting Modules And Their Parameters"
         path: sections/section-010/module-03/course-01-inspecting-modules-and-parameters.md
       - type: reading
-        title: "Loading: modprobe, depmod, and the dependency graph"
+        title: "Loading Modules With Modprobe"
         path: sections/section-010/module-03/course-02-loading-modprobe-and-dependencies.md
       - type: reading
-        title: "Persistence and blacklisting"
-        path: sections/section-010/module-03/course-03-persistence-and-blacklisting.md
+        title: "Loading Modules At Boot With Options"
+        path: sections/section-010/module-03/course-03-loading-at-boot-with-options.md
+      - type: reading
+        title: "Blacklisting Modules"
+        path: sections/section-010/module-03/course-04-blacklisting-modules.md
       - type: reading
         title: Question
         path: sections/section-010/module-03/labs/lab-01/question.md
@@ -182,16 +200,19 @@ modules:
           - name: "modules-load.d(5) manual page"
             url: https://www.freedesktop.org/software/systemd/man/latest/modules-load.d.html
       - type: reading
-        title: "udev — Giving a Device a Name It Can Keep"
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-010/module-03/course-05-wrap-up.md
+      - type: reading
+        title: "udev: Giving a Device a Name It Can Keep"
         path: sections/section-010/module-04/course.md
       - type: reading
-        title: "Device events, sysfs, and finding a stable identity"
+        title: "Device Events And A Stable Identity"
         path: sections/section-010/module-04/course-01-device-events-and-identity.md
       - type: reading
-        title: "Writing the rule: match keys vs. assignment keys"
+        title: "Writing The udev Rule"
         path: sections/section-010/module-04/course-02-writing-the-rule.md
       - type: reading
-        title: "Applying, verifying, and using the rule"
+        title: "Applying And Using The Rule"
         path: sections/section-010/module-04/course-03-applying-verifying-and-using.md
       - type: reading
         title: Question
@@ -214,16 +235,19 @@ modules:
           - name: "udevadm manual page"
             url: https://www.freedesktop.org/software/systemd/man/latest/udevadm.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-010/module-04/course-04-wrap-up.md
+      - type: reading
         title: "Catching a Process in the Act with strace"
         path: sections/section-010/module-05/course.md
       - type: reading
-        title: "From a name to the right PIDs"
+        title: "From A Name To The Right PIDs"
         path: sections/section-010/module-05/course-01-from-a-name-to-the-right-pids.md
       - type: reading
-        title: "Attaching and filtering the syscall stream"
+        title: "Attaching And Filtering The Syscall Stream"
         path: sections/section-010/module-05/course-02-attaching-and-filtering.md
       - type: reading
-        title: "From confirmed process to safe cleanup"
+        title: "From Confirmed Process To Safe Cleanup"
         path: sections/section-010/module-05/course-03-from-confirmed-process-to-safe-cleanup.md
       - type: reading
         title: Question
@@ -246,20 +270,45 @@ modules:
           - name: "proc(5): /proc/pid/exe"
             url: https://man7.org/linux/man-pages/man5/proc_pid_exe.5.html
       - type: reading
-        title: "Debugging a Service That Won't Start with systemctl and journalctl"
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-010/module-05/course-04-wrap-up.md
+      - type: reading
+        title: "Debugging A Service That Will Not Start"
         path: sections/section-010/module-06/course.md
       - type: reading
-        title: "The service manager and unit state"
+        title: "The Service Manager And Unit State"
         path: sections/section-010/module-06/course-01-service-manager-and-unit-state.md
       - type: reading
-        title: "The effective unit definition"
+        title: "The Effective Unit Definition"
         path: sections/section-010/module-06/course-02-the-effective-unit-definition.md
       - type: reading
-        title: "Reading the journal"
+        title: "Reading The Journal"
         path: sections/section-010/module-06/course-03-reading-the-journal.md
       - type: reading
-        title: "Failure shapes, and proving the fix"
-        path: sections/section-010/module-06/course-04-failure-shapes-and-proving-the-fix.md
+        title: "Keeping The Journal"
+        path: sections/section-010/module-06/course-04-keeping-the-journal.md
+      - type: reading
+        title: Question
+        path: sections/section-010/module-06/labs/lab-05/question.md
+      - type: lab
+        title: "Configure journald: Persistent & Bounded Lab"
+        path: sections/section-010/module-06/labs/lab-05
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: services
+        task_kind: build
+        tags: [journald, journalctl, systemd, unit-files]
+        learning_goals:
+          - Make the journal persistent so logs survive a reboot
+          - Cap the journal's disk use and apply the change now
+        resources:
+          - name: "journald.conf manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/journald.conf.html
+          - name: "systemd-journald.service manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd-journald.service.html
+      - type: reading
+        title: "Bad Commands And Taken Ports"
+        path: sections/section-010/module-06/course-05-bad-commands-and-taken-ports.md
       - type: reading
         title: Question
         path: sections/section-010/module-06/labs/lab-01/question.md
@@ -281,25 +330,6 @@ modules:
             url: https://www.freedesktop.org/software/systemd/man/latest/journalctl.html
       - type: reading
         title: Question
-        path: sections/section-010/module-06/labs/lab-02/question.md
-      - type: lab
-        title: "Service Won't Start: Permission Denied Lab"
-        path: sections/section-010/module-06/labs/lab-02
-        difficulty: intermediate
-        estimated_duration: 20m
-        topic: services
-        task_kind: troubleshooting
-        tags: [systemd, systemctl, journalctl, file-permissions, exit-status]
-        learning_goals:
-          - Trace a Permission denied start failure to the directory the service writes to
-          - Fix the ownership so the service runs as its non-root user
-        resources:
-          - name: "systemd.exec: User and StateDirectory"
-            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html
-          - name: "journalctl manual page"
-            url: https://www.freedesktop.org/software/systemd/man/latest/journalctl.html
-      - type: reading
-        title: Question
         path: sections/section-010/module-06/labs/lab-03/question.md
       - type: lab
         title: "Service Won't Start: Port Already In Use Lab"
@@ -317,6 +347,28 @@ modules:
             url: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
           - name: "ss(8) manual page"
             url: https://man7.org/linux/man-pages/man8/ss.8.html
+      - type: reading
+        title: "Dependencies, Permissions And Restart Loops"
+        path: sections/section-010/module-06/course-06-dependencies-permissions-and-restart-loops.md
+      - type: reading
+        title: Question
+        path: sections/section-010/module-06/labs/lab-02/question.md
+      - type: lab
+        title: "Service Won't Start: Permission Denied Lab"
+        path: sections/section-010/module-06/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: services
+        task_kind: troubleshooting
+        tags: [systemd, systemctl, journalctl, file-permissions, exit-status]
+        learning_goals:
+          - Trace a Permission denied start failure to the directory the service writes to
+          - Fix the ownership so the service runs as its non-root user
+        resources:
+          - name: "systemd.exec: User and StateDirectory"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html
+          - name: "journalctl manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/journalctl.html
       - type: reading
         title: Question
         path: sections/section-010/module-06/labs/lab-04/question.md
@@ -340,24 +392,8 @@ modules:
           - name: "systemctl manual page"
             url: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
       - type: reading
-        title: Question
-        path: sections/section-010/module-06/labs/lab-05/question.md
-      - type: lab
-        title: "Configure journald: Persistent & Bounded Lab"
-        path: sections/section-010/module-06/labs/lab-05
-        difficulty: intermediate
-        estimated_duration: 15m
-        topic: services
-        task_kind: build
-        tags: [journald, journalctl, systemd, unit-files]
-        learning_goals:
-          - Make the journal persistent so logs survive a reboot
-          - Cap the journal's disk use and apply the change now
-        resources:
-          - name: "journald.conf manual page"
-            url: https://www.freedesktop.org/software/systemd/man/latest/journald.conf.html
-          - name: "systemd-journald.service manual page"
-            url: https://www.freedesktop.org/software/systemd/man/latest/systemd-journald.service.html
+        title: "Proving The Fix And Boot Targets"
+        path: sections/section-010/module-06/course-07-proving-the-fix-and-boot-targets.md
       - type: reading
         title: Question
         path: sections/section-010/module-06/labs/lab-06/question.md
@@ -377,6 +413,9 @@ modules:
             url: https://www.freedesktop.org/software/systemd/man/latest/systemd.special.html
           - name: "systemctl: set-default"
             url: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-010/module-06/course-08-wrap-up.md
       - type: reading
         title: "Section 010 Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics"
         path: sections/section-010/quiz.md

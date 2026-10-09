@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Follow these steps to find the guilty process, resolve its executable, and clean it up.
+This walkthrough finds the guilty process with `strace`, records its real program file, ends it, and removes that file. The two innocent processes stay untouched. You can run `astrona submit` after any step: each failing check names the one thing still missing.
 
 ---
 
@@ -16,6 +16,8 @@ pgrep -a -f collector
 1236 /usr/local/bin/collector3
 ```
 
+Your PIDs will differ, so use the ones `pgrep` prints in every command below. On this lab machine, each service also passes a Python script as an argument (for example `/opt/lab-scripts/collector2.py`), so your command lines will probably be longer than the sample above, which shows only the program path.
+
 ---
 
 ## Step 2: Attach strace to each PID, filtered to the `kill` syscall
@@ -27,17 +29,17 @@ sudo strace -p 1236 -e trace=kill &
 wait
 ```
 
-Watch for at least 15-20 seconds — the forbidden syscall fires periodically, not necessarily instantly. You should see a line like:
+The processes run as another user, and `kernel.yama.ptrace_scope` only lets root attach to a process you did not start, so `sudo` is needed. Watch for at least 15 to 20 seconds: the forbidden call happens at regular intervals, not necessarily at once. You should see a line like this:
 
 ```text
 kill(1235, 0)                          = 0
 ```
 
-attributed to `collector2`'s session — that process is confirmed guilty. `collector1` and `collector3` should show nothing over the same window.
+The line comes from `collector2`'s session, so that process is confirmed guilty. `collector1` and `collector3` should show nothing over the same time.
 
 ---
 
-## Step 3: Resolve the actual executable backing the guilty PID
+## Step 3: Resolve the real program file behind the guilty PID
 
 ```bash
 sudo readlink -f /proc/1235/exe
@@ -47,7 +49,7 @@ sudo readlink -f /proc/1235/exe
 /usr/local/bin/collector2
 ```
 
-Do this **before** terminating the process — once it's killed, `/proc/1235/` no longer exists.
+Do this **before** you end the process. Once it is gone, the kernel removes `/proc/1235/`, and the path can no longer be read there.
 
 ---
 
@@ -59,7 +61,7 @@ sleep 2
 ps -p 1235
 ```
 
-Escalate if it's still alive:
+`kill` sends `SIGTERM`, which asks the process to finish and leave. If `ps` still lists it, escalate to `SIGKILL`, which the kernel carries out at once:
 
 ```bash
 sudo kill -9 1235
@@ -67,19 +69,19 @@ sudo kill -9 1235
 
 ---
 
-## Step 5: Remove the confirmed executable
+## Step 5: Remove the confirmed program file
 
 ```bash
 sudo rm /usr/local/bin/collector2
 ```
 
-Use the exact path captured in Step 3 — not a path guessed from the process name.
+Use the exact path you captured in Step 3, not a path guessed from the process name.
 
 ---
 
 ## Step 6: Leave the innocent processes alone
 
-`collector1` and `collector3` showed no `kill()` calls — leave them running with their executables intact.
+`collector1` and `collector3` showed no `kill()` calls. Leave them running, with their program files in place.
 
 ---
 
@@ -94,6 +96,12 @@ pgrep -a -f collector2
 
 ls -l /usr/local/bin/collector2
 # ls: cannot access '/usr/local/bin/collector2': No such file or directory
+```
+
+Then send the mission for grading:
+
+```bash
+astrona submit -c sections/section-010/module-05/labs/lab-01
 ```
 
 ---
@@ -113,5 +121,3 @@ ps -p 1235          # escalate to `sudo kill -9 1235` if still alive
 sudo rm /usr/local/bin/collector2
 pgrep -a -f collector2   # verify gone
 ```
-
-Once verified, run the local validation suite to pass the lab!

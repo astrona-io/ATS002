@@ -1,12 +1,12 @@
-# Part 2 — The effective unit definition
+# The Effective Unit Definition
 
-> Prerequisite: [Part 1 — The service manager and unit state](./course-01-service-manager-and-unit-state.md). Next: [Part 3 — Reading the journal](./course-03-reading-the-journal.md).
+`systemctl status` tells you which unit file the manager *loaded*. That is rarely the whole story. The definition `systemd` really acts on is a **merge** of one base unit file and any number of small extra files, layered in a fixed order. This part shows where those pieces come from, which one wins, how to see the merged result, and why `daemon-reload` is not optional after you change any of them.
 
-Part 1's `systemctl status` told you which file the manager *loaded*. That is rarely the whole story: the definition the manager actually acts on is a **merge** of a base unit and any number of drop-in fragments, layered in a fixed precedence. This part is that merge — where fragments come from, which wins, how to see the resolved result, and why `daemon-reload` is not optional after you change any of it.
+A **unit file** is the duty card for one station: it tells the duty officer (`systemd`) what to run and how. The extra files are sticky notes on that card.
 
 ## The unit load path
 
-When the manager needs `apache2.service`, it searches a list of directories **in priority order** and takes the first match as the base unit, then collects drop-ins from *all* of them. The system instance's path, highest priority first:
+When the manager needs `apache2.service`, it searches a list of folders **in priority order**. It takes the first match as the base unit file, then collects the extra files from *all* of the folders. Here is the path for the system manager, highest priority first:
 
 ```
   /etc/systemd/system/        ← admin. You put overrides here. WINS.
@@ -14,36 +14,48 @@ When the manager needs `apache2.service`, it searches a list of directories **in
   /usr/lib/systemd/system/    ← vendor. The package ships the unit here. Lowest.
 ```
 
-See it on the host:
+The administrator's folder `/etc/systemd/system/` wins. The vendor folder `/usr/lib/systemd/system/` is where the package puts its unit file, and it has the lowest priority.
+
+<!-- astrona:playground:renew -->
+
+See the full search path on the machine:
 
 ```bash
 # shell: any host, unprivileged
 systemctl show -p UnitPath | tr ' ' '\n' | head
 ```
 
-So a `apache2.service` placed in `/etc/systemd/system/` **completely replaces** the packaged one in `/usr/lib/systemd/system/`. That is a blunt instrument — a package update to the vendor unit will not reach a service you have fully shadowed. Drop-ins are the surgical alternative.
+So an `apache2.service` file placed in `/etc/systemd/system/` **fully replaces** the one the package put in `/usr/lib/systemd/system/`. That is a blunt tool. When the package is updated later, its new unit file never reaches a service you have fully replaced. Drop-ins are the careful alternative.
 
-## Drop-ins: partial overrides that survive updates
+## Drop-ins: small overrides that survive updates
 
-A **drop-in** is a `.conf` file in a directory named after the unit:
+A **drop-in** is a sticky note on the duty card: a small `.conf` file that changes a few lines and leaves the rest alone. This section shows where drop-ins live, how they merge, and the one trap in that merge.
+
+### Where drop-ins live and how they merge
+
+A drop-in lives in a folder named after the unit, with `.d` on the end:
 
 ```
   /etc/systemd/system/apache2.service.d/override.conf
   /etc/systemd/system/apache2.service.d/10-hardening.conf
 ```
 
-The manager loads the base unit, then applies every `*.conf` in every `<unit>.d/` directory it found, **sorted lexically by filename** across all sources. Later files win on any setting they touch; settings they do not mention keep the base value.
+The manager loads the base unit. Then it applies every `*.conf` file from every `<unit>.d/` folder it found, **sorted by file name** across all those folders. A later file wins on any setting it touches. Settings it does not mention keep the base value.
 
 ```mermaid
-flowchart TD
-    B["base unit (/usr/lib/.../apache2.service)<br/>Type=forking · ExecStart=/usr/sbin/apachectl start"] --> D1["+ 10-hardening.conf<br/>PrivateTmp=true"]
-    D1 --> D2["+ override.conf<br/>Environment=APACHE_PORT=8080"]
-    D2 --> EFF["= effective unit<br/>Type=forking · ExecStart=…apachectl start · PrivateTmp=true · Environment=APACHE_PORT=8080"]
+flowchart TB
+    B["apache2.service"] -->|"plus"| D1["10-hardening.conf"]
+    D1 -->|"plus"| D2["override.conf"]
+    D2 -->|"merge"| E["effective unit"]
 ```
 
-As an analogy (flagged): drop-ins are the CSS cascade for units — a later, more specific rule overrides an earlier one property-by-property, and anything it does not set is inherited. Where it breaks down: CSS has specificity weighting; systemd drop-ins are purely last-wins by sorted filename, so people prefix them `10-`, `20-` to control order.
+The diagram shows the merge order. The base unit in `/usr/lib/systemd/system/apache2.service` has `Type=forking` and `ExecStart=/usr/sbin/apachectl start`; `10-hardening.conf` adds `PrivateTmp=true`; `override.conf` adds `Environment=APACHE_PORT=8080`. The effective unit has all four settings.
 
-**One sharp edge — list-valued directives.** Settings like `ExecStart=`, `Environment=`, `After=` are *additive lists*, not scalars. A drop-in line `ExecStart=/new/thing` **appends** a second start command (usually an error). To replace, you must reset the list first:
+Order is decided only by the sorted file name: the last file wins. That is why people start drop-in names with numbers such as `10-` and `20-`, to control which one comes last.
+
+### The trap: settings that hold a list
+
+Some settings hold a **list**, not a single value. `ExecStart=`, `Environment=` and `After=` are lists. A drop-in line `ExecStart=/new/thing` **adds** a second start command to the list, which is usually an error. To replace the command, empty the list first and then set the new entry. A drop-in that replaces the start command looks like this (do not apply this one; it only shows the shape):
 
 ```ini
 [Service]
@@ -51,11 +63,15 @@ ExecStart=
 ExecStart=/usr/sbin/apachectl -DFOREGROUND
 ```
 
-The empty assignment clears the list; the next line sets the only entry. A scalar like `Type=` or `User=` just overrides directly, no reset needed.
+The empty `ExecStart=` line clears the list. The next line sets the only entry. A single-value setting such as `Type=` or `User=` just overrides the old value; it needs no empty line first. The manual page `man systemd.directives` points to the description of every setting, and `man systemd.unit` has the exact load path and merge rules.
 
 ## See the effective definition, not a guess
 
-**`systemctl cat`** prints the base unit and every drop-in, each under a comment header naming its source file:
+Two commands show you what the manager really holds. Use them before you edit anything.
+
+### `systemctl cat`: every file, in order
+
+**`systemctl cat`** prints the base unit and every drop-in, each under a comment line that names its file:
 
 ```bash
 systemctl cat apache2
@@ -76,9 +92,11 @@ ExecStart=/usr/sbin/apachectl start
 Environment=APACHE_PORT=80
 ```
 
-Opening `/usr/lib/systemd/system/apache2.service` in a pager instead would miss `override.conf` entirely — and an override is exactly where a half-finished change from a colleague hides. `systemctl cat` is the first thing to run before editing anything.
+If you opened `/usr/lib/systemd/system/apache2.service` in a pager instead, you would miss `override.conf` completely. An override is exactly where a colleague's half-finished change hides. `systemctl cat` is the first thing to run before you edit a unit.
 
-**`systemctl show`** prints the *computed* properties — every value after the full merge, which is what the manager will actually act on:
+### `systemctl show`: the computed values
+
+**`systemctl show`** prints the *computed* properties: every value after the full merge, which is what the manager will act on:
 
 ```bash
 systemctl show apache2 -p FragmentPath -p DropInPaths -p ExecStart -p User -p Type
@@ -92,31 +110,34 @@ User=
 Type=forking
 ```
 
-`FragmentPath` = the base unit; `DropInPaths` = every fragment layered on it. If `DropInPaths` lists a file you did not expect, read it.
+`FragmentPath` is the base unit file. `DropInPaths` lists every drop-in layered on top of it. If `DropInPaths` lists a file you did not expect, read it.
 
-> [!TIP]
-> **Try it — see the effective definition.** On the host:
->
-> ```bash
-> systemctl cat apache2 | head -20
-> systemctl show apache2 -p FragmentPath -p DropInPaths -p ExecStart
-> ```
->
-> Expect something like:
->
-> ```text
-> # /usr/lib/systemd/system/apache2.service
-> [Unit]
-> Description=The Apache HTTP Server
-> ...
-> FragmentPath=/usr/lib/systemd/system/apache2.service
-> DropInPaths=/usr/lib/systemd/system/apache2.service.d/apache2-systemd.conf
-> ExecStart={ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl start ; ... }
-> ```
->
-> `systemctl cat` shows the base plus every drop-in with its source path; `show -p` gives the computed values. Reading the vendor file alone would miss any `/etc/...d/` override.
+### See it in your playground
+
+In your playground, show the effective definition of `apache2`:
+
+```bash
+systemctl cat apache2 | head -20
+systemctl show apache2 -p FragmentPath -p DropInPaths -p ExecStart
+```
+
+You should see something like this:
+
+```text
+# /usr/lib/systemd/system/apache2.service
+[Unit]
+Description=The Apache HTTP Server
+...
+FragmentPath=/usr/lib/systemd/system/apache2.service
+DropInPaths=/usr/lib/systemd/system/apache2.service.d/apache2-systemd.conf
+ExecStart={ path=/usr/sbin/apachectl ; argv[]=/usr/sbin/apachectl start ; ... }
+```
+
+`systemctl cat` shows the base unit plus every drop-in with its file path. `show -p` gives the computed values. Here the package itself ships a drop-in next to its unit file, so reading the vendor unit file alone would already miss part of the definition.
 
 ## Editing, the safe way
+
+`systemctl edit` is the safe way to write a drop-in, because `systemd` puts the file in the right folder for you:
 
 ```bash
 # shell: host, root
@@ -124,41 +145,38 @@ sudo systemctl edit apache2          # create/modify /etc/.../apache2.service.d/
 sudo systemctl edit --full apache2   # copy the whole unit to /etc/ and edit that
 ```
 
-`systemctl edit` opens an empty drop-in in `$EDITOR`, writes it under `/etc/systemd/system/<unit>.d/`, and runs `daemon-reload` for you on save. `edit --full` instead copies the entire vendor unit into `/etc/systemd/system/` for wholesale changes (and shadows the vendor copy — same update caveat as above). Prefer plain `edit` unless you are rewriting most of the unit.
+`systemctl edit` opens an empty drop-in in your editor (`$EDITOR`). When you save, it writes the file as `/etc/systemd/system/<unit>.d/override.conf` and runs `daemon-reload` for you. `edit --full` instead copies the whole vendor unit into `/etc/systemd/system/` for big changes. That copy fully replaces the vendor file, with the same update problem as above. Use plain `edit` unless you are rewriting most of the unit. `systemctl revert <unit>` deletes your drop-ins and returns a unit to the vendor version.
 
-## `daemon-reload`: re-parse disk into the manager's memory
+## `daemon-reload`: read the duty cards again
 
-The manager parses every unit file **once, at boot**, into an in-memory dependency graph, and acts on that graph. Editing a file on disk changes nothing the manager sees until:
+The manager reads every unit file **once, at boot**, into a map of units in its memory, and it acts on that map. Changing a file on disk changes nothing the manager sees until you tell the duty officer to read the duty cards again:
 
 ```bash
 sudo systemctl daemon-reload
 ```
 
-`daemon-reload` re-reads every unit file and drop-in from the load path and rebuilds the in-memory graph, **without stopping or restarting any running unit**. It is the systemd analogue of `nginx -s reload` re-reading `nginx.conf`, or `sysctl -p` re-reading `sysctl.conf`.
+`daemon-reload` reads every unit file and drop-in from the load path again and rebuilds the map in memory. It does this **without stopping or restarting any running unit**. It works like `sysctl -p` reading `sysctl.conf` again, or `nginx -s reload` reading `nginx.conf` again.
 
-Two things it is *not*:
+There are two things it is *not*:
 
-- It is **not** `systemctl reload apache2` — that runs the unit's `ExecReload=` command (tell the *service* to re-read *its own* config). Different layer entirely.
-- It does **not** apply a changed `ExecStart=`/`Environment=` to the process that is already running. `daemon-reload` updates the plan; you still need `systemctl restart apache2` to relaunch the process under the new plan.
+- It is **not** `systemctl reload apache2`. That runs the unit's `ExecReload=` command, which tells the *service* to read *its own* configuration again. That is a different layer.
+- It does **not** apply a changed `ExecStart=` or `Environment=` to the process that is already running. `daemon-reload` updates the plan. You still need `systemctl restart apache2` to start the process again under the new plan.
 
-The manager tracks whether you owe it a reload:
+The manager keeps track of whether you owe it a reload:
 
 ```bash
 systemctl show apache2 -p NeedDaemonReload
 # NeedDaemonReload=yes
 ```
 
-and `systemctl status` prints a `warning: The unit file … changed on disk. Run 'systemctl daemon-reload'` banner.
+`systemctl status` also prints a warning line, `warning: The unit file … changed on disk. Run 'systemctl daemon-reload'`, when a reload is due.
+
+## Common pitfalls
 
 > [!WARNING]
-> Two failure modes around this:
-> - **Hand-edit a `.service` or drop-in, then `systemctl restart`, and see no change.** You skipped `daemon-reload`; the manager restarted the process under the *old* plan. Reload, then restart.
-> - **Run `daemon-reload` and expect the running service to pick up a new `ExecStart=`.** It will not — `daemon-reload` only updates the plan. A config change to a running unit needs `restart` (or `reload` if only the service's own config changed and it supports it).
+> - **Editing a `.service` file or drop-in by hand, then running `systemctl restart`, and seeing no change.** You skipped `daemon-reload`, so the manager restarted the process under the *old* plan. Reload, then restart.
+> - **Running `daemon-reload` and expecting the running service to pick up a new `ExecStart=`.** It will not. `daemon-reload` only updates the plan. A changed running unit needs `restart` (or `reload`, if only the service's own configuration changed and the service supports it).
+> - **Setting `ExecStart=` in a drop-in without the empty line first.** `ExecStart=` is a list, so a single new line adds a second command instead of replacing the first.
+> - **Reading only the vendor unit file.** Drop-ins in any `<unit>.d/` folder change the definition. Use `systemctl cat` and `systemctl show -p`.
 
-> *The effective unit is the base file plus every `<unit>.d/*.conf` drop-in merged last-wins by sorted filename; read it with `systemctl cat` / `systemctl show -p`, and after any edit run `daemon-reload` (updates the plan) then `restart` (relaunches under it).*
-
-## Reference
-
-- `man systemd.unit` — the "Unit File Load Path" and "drop-in" sections: every directory searched and the exact merge rules.
-- `man systemd.directives` — which directives are list-valued (need the empty-reset idiom) versus scalar.
-- `man systemctl` — `cat`, `show`, `edit`, `revert`, `daemon-reload`; `revert` deletes your drop-ins and returns a unit to its vendor state.
+> *The effective unit is the base file plus every `<unit>.d/*.conf` drop-in, merged so the last sorted file name wins. Read it with `systemctl cat` and `systemctl show -p`. After any edit, run `daemon-reload` (updates the plan), then `restart` (starts the process under it).*

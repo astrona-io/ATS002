@@ -1,10 +1,10 @@
 # Solution Walkthrough
 
-Follow these steps to diagnose and raise all three independent ceilings.
+Follow these steps to check and raise all three independent ceilings. Each ceiling has a live part and a permanent part, and the grader checks both.
 
 ---
 
-## Step 1: Confirm this is a fork/thread-creation ceiling, not memory or CPU pressure
+## Step 1: Confirm this is a fork ceiling, not memory or CPU pressure
 
 ```bash
 free -m
@@ -12,7 +12,7 @@ top -bn1 | head -5
 dmesg | tail -30 | grep -iE 'fork|cannot allocate|out of memory'
 ```
 
-An idle-looking CPU/RAM combined with `fork`/`pthread_create` failures is the signature of a process/thread ceiling, not real resource exhaustion.
+Idle-looking CPU and memory together with `fork` or `pthread_create` failures is the signature of a process or thread ceiling, not of a real shortage of resources.
 
 ---
 
@@ -23,64 +23,79 @@ sysctl -n kernel.pid_max
 cat /proc/sys/kernel/pid_max
 ```
 
-You should see the legacy default, `32768`. Modern 64-bit kernels can support values up to `4194304` (2²²).
+You should see the old kernel default, `32768`. The lab setup forces it with the file `/etc/sysctl.d/01-pid-max-baseline.conf`. A 64-bit kernel supports values up to `4194304` (2²²).
+
+Note: Ubuntu 24.04 also ships its own sysctl file that sets `kernel.pid_max` to `4194304`, and it can win over the low baseline when the files are applied. If you already see `4194304` here, the live part is done. You still need your own persistent file in the next step, because the grader looks for one.
 
 ---
 
-## Step 3: Raise `kernel.pid_max` live, then persist it
+## Step 3: Raise `kernel.pid_max` live, then make it permanent
+
+Change the live value:
 
 ```bash
 sudo sysctl -w kernel.pid_max=4194304
 ```
 
-```bash
-echo "kernel.pid_max = 4194304" | sudo tee /etc/sysctl.d/98-pid-max.conf
+Save this as `/etc/sysctl.d/98-pid-max.conf`:
+
+```ini
+kernel.pid_max = 4194304
+```
+
+Apply it:
+
+```sh
 sudo sysctl --system
 ```
 
-The live `sysctl -w` change alone would evaporate on reboot; the drop-in file under `/etc/sysctl.d/` combined with `sysctl --system` makes it both immediate and permanent.
+The live `sysctl -w` change alone would be lost at the next reboot. The drop-in file under `/etc/sysctl.d/` together with `sysctl --system` makes the value both immediate and permanent. Do not edit the baseline file `01-pid-max-baseline.conf`: the grader ignores it and looks for your own file.
+
+**Check your progress:** run `astrona submit -c sections/section-010/module-02/labs/lab-01` from your own computer. The `pid_max` check should now pass. The other two still fail, which is expected.
 
 ---
 
-## Step 4: Check the second ceiling — `ulimit -u` for the `dataproc` user
+## Step 4: Check the second ceiling, `ulimit -u` for the `dataproc` user
 
 ```bash
 sudo -iu dataproc bash -c 'ulimit -u'
 ```
 
-This should currently show a low value (well below what a thread-heavy workload needs). Raise it persistently by dropping a file under `/etc/security/limits.d/` — this is read by `pam_limits` at login/session-start time, so a *new* file overriding an existing low baseline needs to sort after it alphabetically to win:
+This shows a low value, far below what a thread-heavy workload needs. The setup put it in `/etc/security/limits.d/00-dataproc-baseline.conf`.
 
-```bash
-sudo tee /etc/security/limits.d/50-dataproc.conf > /dev/null <<'EOF'
+Raise it permanently with a file under `/etc/security/limits.d/`. `pam_limits` reads these files when a session starts. When two files set the same limit, the file read later wins, so your new file must sort after the baseline file in alphabetical order.
+
+Save this as `/etc/security/limits.d/50-dataproc.conf`:
+
+```text
 dataproc soft nproc 32768
 dataproc hard nproc 65536
-EOF
 ```
 
-Confirm it applied to a fresh session for that user:
+There is no apply command: `pam_limits` reads the file at the next login. Confirm that a fresh session for that user picks it up:
 
 ```bash
 sudo -iu dataproc bash -c 'ulimit -u'
 # 32768
 ```
 
-`-iu dataproc` starts a full login session as `dataproc`, which is what actually triggers `pam_limits` to re-read the limits files — an already-open shell would not pick this up without a fresh login.
+`-iu dataproc` starts a full login session as `dataproc`, and that is what makes `pam_limits` read the limit files again. A shell that was already open would not pick up the change without a fresh login.
 
 ---
 
-## Step 5: Check the third ceiling — `TasksMax=` on the systemd unit
+## Step 5: Check the third ceiling, `TasksMax=` on the systemd unit
 
 ```bash
 systemctl show data-ingest.service --property=TasksMax,TasksCurrent
 ```
 
-This unit was started with a low, explicit `TasksMax=`. Raise it with a systemd override:
+The setup started this unit with a low `TasksMax=` written straight into its unit file. Raise it with a systemd override. `systemctl edit` opens an editor on a new drop-in file:
 
 ```bash
 sudo systemctl edit data-ingest.service
 ```
 
-Add:
+Add these lines, then save and close the editor:
 
 ```ini
 [Service]
@@ -94,7 +109,7 @@ sudo systemctl daemon-reload
 sudo systemctl restart data-ingest.service
 ```
 
-An override file alone does not retroactively apply to an already-running cgroup — `daemon-reload` plus a restart is required.
+`daemon-reload` makes systemd read the override. The restart makes sure the running cgroup gets the new limit too. The grader reads the value with `systemctl show`, which reports `infinity` once systemd has loaded the override.
 
 ---
 
@@ -118,6 +133,14 @@ systemctl show data-ingest.service --property=TasksMax
 # TasksMax=infinity
 ```
 
+Then send it for grading from your own computer:
+
+```sh
+astrona submit -c sections/section-010/module-02/labs/lab-01
+```
+
+All three checks should pass. If one fails, its message names the ceiling and the value it found.
+
 ---
 
 ## Command Summary
@@ -127,14 +150,11 @@ free -m
 sysctl -n kernel.pid_max
 
 sudo sysctl -w kernel.pid_max=4194304
-echo "kernel.pid_max = 4194304" | sudo tee /etc/sysctl.d/98-pid-max.conf
+# save /etc/sysctl.d/98-pid-max.conf  (kernel.pid_max = 4194304)
 sudo sysctl --system
 
 sudo -iu dataproc bash -c 'ulimit -u'
-sudo tee /etc/security/limits.d/50-dataproc.conf > /dev/null <<'EOF'
-dataproc soft nproc 32768
-dataproc hard nproc 65536
-EOF
+# save /etc/security/limits.d/50-dataproc.conf  (dataproc soft nproc 32768 / dataproc hard nproc 65536)
 
 systemctl show data-ingest.service --property=TasksMax,TasksCurrent
 sudo systemctl edit data-ingest.service
@@ -143,5 +163,3 @@ sudo systemctl edit data-ingest.service
 sudo systemctl daemon-reload
 sudo systemctl restart data-ingest.service
 ```
-
-Once verified, run the local validation suite to pass the lab!

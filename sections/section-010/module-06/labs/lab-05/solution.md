@@ -1,6 +1,10 @@
 # Solution Walkthrough
 
+Look at where the journal lives now, write the two settings in a drop-in file, restart the log keeper, and check that it writes to disk.
+
 ## 1. See the current state
+
+Check where the journal files are and how much space they use:
 
 ```bash
 journalctl --header | grep -iE 'storage|/run/log|/var/log'
@@ -10,37 +14,40 @@ journalctl --disk-usage
 # Archived and active journals take up 24.0M in the file system.  (in /run)
 ```
 
+The journal files are under `/run/log/journal`, which lives in memory. That is why the log is lost at every reboot.
+
 ## 2. Configure journald
 
-Use a drop-in (clean, does not fight the shipped `journald.conf`):
+Use a drop-in file. It keeps your settings apart from the shipped `journald.conf`. First create the folder for it:
 
 ```bash
 sudo mkdir -p /etc/systemd/journald.conf.d
-sudo tee /etc/systemd/journald.conf.d/persistent.conf >/dev/null <<'EOF'
+```
+
+Save this as `/etc/systemd/journald.conf.d/persistent.conf`:
+
+```ini
 [Journal]
 Storage=persistent
 SystemMaxUse=200M
-EOF
 ```
 
-- `Storage=persistent` — always keep the journal under `/var/log/journal/`,
-  creating it if needed (`auto` only persists if the directory already
-  exists).
-- `SystemMaxUse=200M` — hard ceiling on total on-disk journal size;
-  journald rotates and deletes the oldest data to stay under it.
+- `Storage=persistent` always keeps the journal under `/var/log/journal/`, and creates that folder if it is missing. (`auto` only keeps it on disk if the folder already exists.)
+- `SystemMaxUse=200M` is the upper limit for the journal's total size on disk. `journald` deletes the oldest archived files to stay under it.
 
 ## 3. Apply it
 
-```bash
+`journald` reads its settings when it starts, so restart it:
+
+```sh
 sudo systemctl restart systemd-journald
 ```
 
-On restart journald creates `/var/log/journal/<machine-id>/` and starts
-writing there. (`sudo systemd-tmpfiles --create --prefix /var/log/journal`
-also creates the directory with correct ownership if you prefer to do it
-explicitly first.)
+When it starts again, `journald` creates `/var/log/journal/<machine-id>/` and writes there. If you want to create the folder yourself first, with the right owner and permissions, `sudo systemd-tmpfiles --create --prefix /var/log/journal` does that too.
 
 ## 4. Verify
+
+Then check the result:
 
 ```bash
 ls /var/log/journal/*/                       # system.journal etc. now here
@@ -49,5 +56,10 @@ journalctl --disk-usage                      # within 200M
 journalctl --verify                          # optional integrity check
 ```
 
-To reclaim space immediately rather than waiting for rotation:
-`sudo journalctl --vacuum-size=150M` or `--vacuum-time=7d`.
+To free space at once instead of waiting for `journald` to clean up, run `sudo journalctl --vacuum-size=150M` or `sudo journalctl --vacuum-time=7d`.
+
+The grader checks that `/var/log/journal` holds journal files, that `journald.conf` or a drop-in sets `Storage=persistent` and a `SystemMaxUse=` of 200 MB or less, and that `journalctl --disk-usage` answers. When all of that holds, send it for grading:
+
+```sh
+astrona submit -c sections/section-010/module-06/labs/lab-05
+```

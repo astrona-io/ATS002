@@ -2,19 +2,12 @@
 
 Solve this question on: `terminal`
 
-Logs on this host do not survive a reboot — `journalctl -b -1` shows
-nothing, because the journal is stored only in `/run` (volatile). It is also
-uncapped, which on a busy host risks filling `/var` over time.
+Astronaut, the logs on this machine do not survive a reboot: the journal is kept only in memory, under `/run`, so `journalctl -b -1` shows nothing. The journal also has no size limit of its own, and on a busy machine it could slowly fill `/var`.
 
 Configure `systemd-journald` so that:
 
-1. The journal is **persistent** — it is kept under `/var/log/journal/` and
-   survives reboots (`Storage=persistent`, and the directory actually
-   populated).
-2. On-disk journal usage is **bounded to 200 MB or less** (`SystemMaxUse`).
-3. The changes are **applied now**, not just written to the config file —
-   after your change, `journalctl` reports a persistent store and
-   `journalctl --disk-usage` shows a size within the cap.
+1. The journal is **persistent**: `Storage=persistent` is set, and the journal is really kept under `/var/log/journal/`, with journal files in that folder.
+2. The journal's disk use is **capped at 200 MB or less** with `SystemMaxUse=`.
+3. The changes are **applied now**, not only written to a file: `journald` is writing journal files under `/var/log/journal/`, and `journalctl --disk-usage` reports the journal's size.
 
-Put the settings in `/etc/systemd/journald.conf` or a drop-in under
-`/etc/systemd/journald.conf.d/`.
+Put the settings in `/etc/systemd/journald.conf` or in a drop-in file under `/etc/systemd/journald.conf.d/` (a file ending in `.conf`).

@@ -2,7 +2,15 @@
 
 Solve this question on: `terminal`
 
-Two independent requests came in from the platform team for this system:
+Astronaut, the platform team sent two separate requests for this ship.
 
-1.  The `dummy` network interface module needs to be loaded with two dummy interfaces available (`numdummies=2`), and this must keep working identically after every future reboot (both the load itself and the parameter need to persist).
-2.  The `pcspkr` module (PC speaker beep driver) has been triggering an annoying hardware beep on every kernel warning, and it must never load automatically again — even though the underlying hardware would normally cause it to be auto-detected and loaded. Unload it now, and confirm the blacklist holds against a simulated hardware re-detection pass (`udevadm trigger`), without rebooting.
+1.  Load the `dummy` kernel module with two dummy interfaces (`numdummies=2`). It must be loaded now, and both the load and the parameter must survive every future reboot:
+    - `/sys/module/dummy/parameters/numdummies` shows `2` right now.
+    - A `.conf` file under `/etc/modules-load.d/` loads `dummy` at boot.
+    - A `.conf` file under `/etc/modprobe.d/` contains the line `options dummy numdummies=2`.
+2.  The `pcspkr` module (the PC speaker beep driver) beeps on every kernel warning. It must never load automatically again, even when hardware detection would normally load it:
+    - A `.conf` file under `/etc/modprobe.d/` contains the line `blacklist pcspkr`.
+    - `pcspkr` is unloaded now.
+    - `pcspkr` stays unloaded after a replayed hardware detection pass (`udevadm trigger`). Do not reboot.
+
+The grader runs `udevadm trigger` itself and checks that `pcspkr` does not come back.

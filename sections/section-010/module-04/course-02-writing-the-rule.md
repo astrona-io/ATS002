@@ -1,20 +1,12 @@
-# Part 2 — Writing the rule: match keys vs. assignment keys
+# Writing The udev Rule
 
-> Prerequisite: [Part 1 — Device events, sysfs, and finding a stable identity](./course-01-device-events-and-identity.md). Next: [Part 3 — Applying, verifying, and using the rule](./course-03-applying-verifying-and-using.md).
+Astronaut, a udev rule is a line on the dock master's rule card. It is one line of **keys** separated by commas, and every key is either a *test* ("is this the bay I mean?") or an *action* ("then give it this name"). One wrong operator turns a test into an action, and udev does not warn you.
 
-A udev rule is a single line of comma-separated **keys**, and every key is either a *test* or an *action*. Mixing up the two operators silently changes what the rule does. This part is the rule file's location and precedence, the operator vocabulary, and a worked two-line rule.
+This part covers where the rule file goes, the operators, and a worked two-line rule.
 
-## Where the rule file goes, and why it wins
+## A worked rule first
 
-```
-  /etc/udev/rules.d/         ← your rules. Package managers never touch this.
-  /run/udev/rules.d/         ← runtime-generated
-  /usr/lib/udev/rules.d/     ← distro/package rules. A package update can rewrite these.
-```
-
-udev merges all three directories and processes the files **in lexical order by filename** across the merged set (a file in `/etc` with a given name replaces a same-named file in `/usr/lib`). Custom rules go in `/etc/udev/rules.d/` — never in `/usr/lib/udev/rules.d/`, where the next package update can revert them. The conventional `99-` prefix sorts your rule *after* the distro's built-in rules, so it layers on top of the `ID_FS_TYPE`, `ID_SERIAL` and similar properties they have already set.
-
-## The rule
+Here is a complete rule file for a backup disk on a physical server, matched by the serial that the attribute walk found:
 
 ```
 # /etc/udev/rules.d/99-backup-drive.rules
@@ -22,11 +14,29 @@ SUBSYSTEM=="block", ATTRS{serial}=="WD-WXA1E23456789", SYMLINK+="backup-drive"
 SUBSYSTEM=="block", ATTRS{serial}=="WD-WXA1E23456789", ENV{ID_FS_TYPE}=="ext4", SYMLINK+="backup-drive1"
 ```
 
-Line 1 matches the whole-disk device and adds `/dev/backup-drive`. Line 2 narrows to the `ext4` partition on that same disk and adds `/dev/backup-drive1` — the node a backup script would actually mount.
+Line 1 matches the whole disk and adds `/dev/backup-drive`. Line 2 narrows the match to the `ext4` partition on that same disk and adds `/dev/backup-drive1`. That partition is the node a backup script would actually mount. The rest of this part explains every piece of these two lines.
 
-## Match keys vs. assignment keys — the operators
+## Where the rule file goes, and why it wins
 
-`man 7 udev` draws the line by operator:
+udev reads rule files from three folders. Which folder you choose decides whether your rule survives the next package update.
+
+### The three folders
+
+| Folder | Who writes it |
+| --- | --- |
+| `/etc/udev/rules.d/` | You, the administrator. Package managers never touch this folder. |
+| `/run/udev/rules.d/` | Generated at runtime. |
+| `/usr/lib/udev/rules.d/` | Ubuntu and its packages. A package update can rewrite these files. |
+
+### The order udev reads them in
+
+udev merges all three folders and processes the files **in alphabetical order by file name**. A file in `/etc` replaces a file with the same name in `/usr/lib`. Put your own rules in `/etc/udev/rules.d/`, never in `/usr/lib/udev/rules.d/`, where the next package update can undo them.
+
+The usual `99-` prefix sorts your rule *after* the built-in rules. So your rule runs on top of the properties those rules already set, such as `ID_FS_TYPE` and `ID_SERIAL`.
+
+## Match keys versus assignment keys
+
+The operator decides whether a key tests something or sets something. The manual page `man 7 udev` draws the line like this:
 
 | Operator | Kind | Meaning |
 |---|---|---|
@@ -37,41 +47,63 @@ Line 1 matches the whole-disk device and adds `/dev/backup-drive`. Line 2 narrow
 | `-=` | **assign** | remove from a list-valued key |
 | `:=` | **assign** | set, and forbid later rules from changing it |
 
-So in `SUBSYSTEM=="block"`, the `==` makes it a *test*. Write `SUBSYSTEM="block"` (one `=`) by accident and you have told udev to *set* the subsystem — a silent change of meaning, no error.
+In `SUBSYSTEM=="block"`, the `==` makes the key a *test*. If you type `SUBSYSTEM="block"` (one `=`) by mistake, you tell udev to *set* the subsystem. The meaning changes, and no error appears.
 
-Key types used above:
+## The keys in the worked rule
 
-- **`SUBSYSTEM=="block"`** — match the device's subsystem. `SUBSYSTEMS==` (with S) would match any subsystem in the parent chain.
-- **`ATTRS{serial}=="…"`** — match a sysfs attribute anywhere **up the parent chain** (Part 1). `ATTR{}` without the S matches only the device's own attributes — a serial on a parent needs `ATTRS{}`.
-- **`ENV{ID_FS_TYPE}=="ext4"`** — match a udev *property*. `ID_FS_TYPE` is set earlier in the rule chain by the built-in `blkid` rules; your `99-` rule runs after them, so the value is available. This is why file order matters.
-- **`SYMLINK+="backup-drive"`** — `+=`, not `=`, because `SYMLINK` is a list. `+=` **appends** your name to whatever symlinks the built-in rules already assigned (`/dev/disk/by-id/...`, etc.). `SYMLINK="backup-drive"` would *replace* the whole list and drop the built-in links. The kernel node `/dev/sdc` is untouched either way — `/dev/backup-drive` is an additional path to it.
+Each key in the worked rule does one job. Here they are in the order they appear.
 
-## Other common match keys
+### Keys that test
 
-`KERNEL=="sd*"` (the kernel name — avoid depending on it), `ACTION=="add"`, `ATTRS{idVendor}=="0781"` + `ATTRS{idProduct}=="5567"` (USB VID/PID when there is no serial), `ENV{ID_FS_UUID}=="…"`.
+- **`SUBSYSTEM=="block"`** matches the device's own subsystem. `SUBSYSTEMS==` (with S) would match any subsystem in the parent chain.
+- **`ATTRS{serial}=="…"`** matches a sysfs attribute on the device **or any of its parents**. `ATTR{}` without the S matches only the device's own attributes, so a serial on a parent needs `ATTRS{}`.
+- **`ENV{ID_FS_TYPE}=="ext4"`** matches a udev *property*. The built-in `blkid` rules set `ID_FS_TYPE` earlier in the chain. Your `99-` rule runs after them, so the value is ready. This is why file order matters.
 
-> [!TIP]
-> **Try it — write the rule.** On the host, keyed on the serial the previous checkpoint found (this virtio disk exposes it as `ATTR{serial}`; the `ENV{ID_SERIAL}` form works too and is more portable):
->
-> ```bash
-> sudo tee /etc/udev/rules.d/99-backup.rules > /dev/null <<'EOF'
-> SUBSYSTEM=="block", ENV{ID_SERIAL}=="BACKUPWD42", SYMLINK+="backup-drive"
-> EOF
-> cat /etc/udev/rules.d/99-backup.rules
-> ```
->
-> Nothing happens yet — the file is on disk but udev has not re-read it and has not re-evaluated `/dev/vdc`. That is Part 3. Note the `==` on every condition and `+=` (not `=`) on `SYMLINK`, so the built-in `/dev/disk/by-id/` link is kept alongside your new name.
+### The key that acts
+
+**`SYMLINK+="backup-drive"`** uses `+=`, not `=`, because `SYMLINK` is a list. `+=` **adds** your name to the links the built-in rules already made, such as `/dev/disk/by-id/...`. `SYMLINK="backup-drive"` would *replace* the whole list and drop the built-in links.
+
+The kernel node `/dev/sdc` stays the same either way. `/dev/backup-drive` is an extra path to the same device.
+
+### Other common match keys
+
+You will also meet these:
+
+- `KERNEL=="sd*"`: the kernel name. Avoid depending on it.
+- `ACTION=="add"`: only when a device arrives.
+- `ATTRS{idVendor}=="0781"` with `ATTRS{idProduct}=="5567"`: the USB vendor and product numbers, useful when a device has no serial.
+- `ENV{ID_FS_UUID}=="…"`: the filesystem's unique ID.
+
+## Try it: write the rule
+
+Write a rule for your playground's spare disk, matched by the serial you found with `udevadm info`. This virtio disk shows the serial as `ATTR{serial}`, but the `ENV{ID_SERIAL}` form works too, and it works on more kinds of disk.
+
+<!-- astrona:playground:renew -->
+
+Save this as `/etc/udev/rules.d/99-backup.rules`:
+
+```
+SUBSYSTEM=="block", ENV{ID_SERIAL}=="BACKUPWD42", SYMLINK+="backup-drive"
+```
+
+Then check the result:
+
+```bash
+cat /etc/udev/rules.d/99-backup.rules
+```
+
+Nothing happens to the disk yet. The file is on disk, but udev has not read it again and has not checked `/dev/vdc` again. Applying it takes two separate commands: `udevadm control --reload-rules` to read the file, then `udevadm trigger` to run the rules against the disk.
+
+Note the `==` on every condition and the `+=` (not `=`) on `SYMLINK`. That keeps the built-in `/dev/disk/by-id/` link next to your new name.
+
+For more detail, `man 7 udev` lists every key and operator, and the built-in file `/usr/lib/udev/rules.d/60-persistent-storage.rules` shows how properties such as `ID_FS_TYPE` get set.
+
+> *A udev rule is a line of comma-separated keys. `==` and `!=` test, while `=`, `+=` and `:=` assign. `SYMLINK+=` adds a name without dropping the built-in links, `ATTRS{}` matches up the parent chain, and the file belongs in `/etc/udev/rules.d/` with a `99-` prefix.*
+
+## Common pitfalls
 
 > [!WARNING]
-> - **`=` where you meant `==`.** `SUBSYSTEM="block"` is an assignment, not a test; the rule silently stops filtering. Always `==` for conditions.
-> - **`ATTR{}` when the attribute is on a parent.** Use `ATTRS{}` (with S) for a serial/model that `--attribute-walk` showed under a *parent device*.
-> - **`SYMLINK=` instead of `SYMLINK+=`.** `=` replaces the symlink list and removes the distro's `by-id`/`by-uuid` links. Use `+=`.
-> - **Editing a file under `/usr/lib/udev/rules.d/`.** A package update reverts it. Put the rule in `/etc/udev/rules.d/` with a `99-` prefix.
-
-> *A udev rule is comma-separated keys; `==`/`!=` test and `=`/`+=`/`:=` assign — `SYMLINK+=` appends a name without dropping the built-in links, `ATTRS{}` matches up the parent chain, and the file belongs in `/etc/udev/rules.d/` with a `99-` prefix.*
-
-## Reference
-
-- `man 7 udev` — the full key list, every operator, and string-matching (`*`, `?`, `[]`) in match values.
-- `udevadm info --attribute-walk` output — the exact `SUBSYSTEM` / `ATTRS{}` / `KERNELS` strings to paste into a rule.
-- `/usr/lib/udev/rules.d/60-persistent-storage.rules` — the built-in rules your `99-` file layers on; shows how `ID_FS_TYPE` etc. get set.
+> - **`=` where you meant `==`.** `SUBSYSTEM="block"` is an assignment, not a test, so the rule stops filtering without any warning. Always use `==` for conditions.
+> - **`ATTR{}` when the attribute is on a parent.** Use `ATTRS{}` (with S) for a serial or model that `--attribute-walk` showed under a *parent device*.
+> - **`SYMLINK=` instead of `SYMLINK+=`.** `=` replaces the list of links and removes Ubuntu's `by-id` and `by-uuid` links. Use `+=`.
+> - **Editing a file under `/usr/lib/udev/rules.d/`.** A package update undoes it. Put the rule in `/etc/udev/rules.d/` with a `99-` prefix.

@@ -1,45 +1,57 @@
-# Chapter 6: Debugging a Service That Won't Start with systemctl and journalctl
+# Debugging A Service That Will Not Start
 
-<!-- astrona:playground -->
-> [!NOTE]
-> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS002/tree/main/sections/section-010/module-06/playground)
->
-> ```sh
-> astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/module-06/playground
-> astrona destroy systemd-service-debugging
-> ```
+Astronaut, someone on the bridge tells you "the web server is down". You run `systemctl start apache2`, the console pauses, and it answers `Job for apache2.service failed`. No clear reason, no obvious cause. But nothing here is a mystery. `systemd`, the ship's duty officer, ran the service, watched it fail, recorded the exit code and kept every line the process wrote on its way down. All of it is already on the machine. This module teaches you to read that record in the right order instead of guessing at configuration files.
 
-Someone tells you "the web server is down." You run `systemctl start apache2`, the shell pauses, and hands back `Job for apache2.service failed`. No stack trace, no obvious cause. But nothing here is mysterious: `systemd` ran the service, watched it fail, recorded the exit code, and captured every line the process wrote on its way down. All of it is already on the machine. This module is about reading that record in the right order instead of guessing at config files.
-
-Two tools do the work, and they sit at different layers. `systemctl` — *system control* — is a client of `systemd` running as PID 1; it reports what **state** a unit is in and why. `journalctl` — *journal control* — queries the **journal**, the structured store of everything every unit printed plus PID 1's own messages about starting and stopping them. The contrast to keep in mind: `systemctl status` is the verdict (ten lines, already summarised); `journalctl -u` is the full evidence. Read the verdict, then the evidence, then change a file — in that order.
-
-The module is split into four parts; work them in order — each uses terms the earlier ones define.
-
-## How this module is organised
-
-1. **[Part 1 — The service manager and unit state](./course-01-service-manager-and-unit-state.md)** — `systemctl` as a client of PID 1, the unit lifecycle state machine (`inactive → activating → active`, the `failed` sink), the `Result:` failure categories, reading `systemctl status` field by field, and `is-active` / `is-enabled` / `is-failed` / `--failed`.
-2. **[Part 2 — The effective unit definition](./course-02-the-effective-unit-definition.md)** — the unit load path and its precedence, drop-in `.d/*.conf` merging (and the list-directive reset idiom), `systemctl cat` vs `show -p`, `systemctl edit`, and what `daemon-reload` actually re-parses.
-3. **[Part 3 — Reading the journal](./course-03-reading-the-journal.md)** — the journal as a store of fields not lines, what `-u` really matches, slicing by boot / time / priority / grep, `Storage=` and why the previous boot can be missing, and reading a failure cascade first-error-first.
-4. **[Part 4 — Failure shapes, and proving the fix](./course-04-failure-shapes-and-proving-the-fix.md)** — the four shapes a start-failure takes as consequences of the start job (bad config, port in use, dependency/readiness timeout, permission/MAC), the `Restart=` flap, the verify loop, and why `active` and `enabled` are separate checks.
+Two tools do the work, and they sit at different layers. `systemctl` (system control) asks `systemd` what **state** a unit is in and why. `journalctl` (journal control) reads the **journal**, the ship's log of everything every service printed, plus the duty officer's own notes about starting and stopping them. Keep this contrast in mind: `systemctl status` is the verdict, a short summary; `journalctl -u` is the full evidence. Read the verdict, then the evidence, and only then change a file.
 
 ## Learning objectives
 
 After this module you can:
 
-- **Name** the state a unit is stuck in from `systemctl status`, and read `Loaded:`, `Active:`, `Result:`, and `Process:` / `Main PID:` correctly.
-- **Choose** between `systemctl status` (human triage), the `is-*` one-word checks (scripting), and `systemctl --failed` (whole-system).
-- **Show** a unit's effective definition with `systemctl cat` and `systemctl show -p`, and explain why reading the vendor file alone is not enough.
-- **Explain** what `systemctl daemon-reload` does, and distinguish it from `systemctl reload` and from `restart`.
-- **Query** the journal for one unit and one incident — `journalctl -u`, `-b`, `--since`, `-p`, `-g`, `-xeu` — and read a failure cascade to its first concrete error.
-- **Diagnose** which of the four start-failure shapes applies from the `status` / journal signature, and name the tool for each (`apache2ctl -t`, `ss -ltnp`, `list-dependencies`, `journalctl -k`).
-- **Verify** a fix with `is-active` + `status` + `journalctl`, and set `enable --now` so the service also survives a reboot.
+- Name the state a unit is stuck in from `systemctl status`, and read `Loaded:`, `Active:`, `Result:`, `Process:` and `Main PID:` correctly.
+- Choose between `systemctl status` (for people), the one-word `is-*` checks (for scripts) and `systemctl --failed` (for the whole machine).
+- Show a unit's effective definition with `systemctl cat` and `systemctl show -p`, and explain why reading the vendor file alone is not enough.
+- Explain what `systemctl daemon-reload` does, and how it differs from `systemctl reload` and from `restart`.
+- Search the journal for one unit and one incident with `journalctl -u`, `-b`, `--since`, `-p`, `-g` and `-xeu`, and read a chain of errors to its first real error.
+- Make the journal survive a reboot and cap its size.
+- Tell the kinds of start failure apart from their fingerprints (bad configuration or start command, port in use, dependency or readiness, permission or mandatory access control), and name the tool for each (`apache2ctl -t`, `ss -ltnp`, `list-dependencies`, `journalctl -k`).
+- Prove a fix with `is-active`, `status` and `journalctl`, use `enable --now` so the service also survives a reboot, and set the default boot target.
 
 ## Before you start
 
-Assumed: comfort with a Linux shell and `sudo`, editing a text config file, and the idea that `systemd` manages long-running services. Chapter 5 (`strace`) is useful adjacent context — it diagnoses a *running* process; this module diagnoses one that will not start or stay started — but it is not a prerequisite.
+Check that you have the knowledge this module expects, and know what is waiting in your playground.
 
-The playground (callout above) is a throwaway Ubuntu 24.04 VM where **`apache2` is already `failed`** — a helper unit holds TCP 80, so it cannot bind — giving you a real failed unit with a genuine journal trail. Get a shell with `astrona ssh astro-systemd-service-debugging`. The **Try it** checkpoints in Parts 1–4 run there; every command block also states the shell and privilege it assumes. A graded lab is planned at `sections/section-010/module-06/labs/lab-01`.
+### What you should already know
 
-## Where this fits
+- **A Linux shell and `sudo`.** You can type commands, read their output and run a command as root.
+- **Editing a text file.** You can open and change a configuration file with an editor such as `nano` or `vim`.
+- **What a service is.** A service is a program that runs in the background, such as a web server. On this machine, `systemd` starts and manages every service.
 
-Chapters 1–5 built the live-diagnosis toolkit for a machine mid-incident: read kernel state precisely, reason about the ceilings on process creation, manage which modules the kernel runs, give devices stable names, and trace a running process. This module adds the service-manager view — when the thing misbehaving is a `systemd` unit that will not come up, `systemctl status` and `journalctl -u` tell you exactly why before you touch a config file. It is one of the most frequently tested shapes on the LFCS "Operation of Running Systems" domain, and it feeds the section capstone, which stages a multi-fault incident that includes a service that will not start.
+### What is in your playground
+
+Your playground is a training ship: one Ubuntu 24.04 virtual machine where **`apache2` has already failed**. A small helper unit, `port80-hog.service`, holds port 80 with a `socat` listener, so Apache cannot listen there. That gives you a real failed unit with a real trail in the journal, plus `ss` to see who holds the port.
+
+Start the playground with `astrona run`, then open a terminal on it with `astrona ssh astro-systemd-service-debugging`. Every "See it in your playground" step in the parts runs there. When you are done, remove it with `astrona destroy systemd-service-debugging`. Launch it now and keep it running next to you while you read:
+
+<!-- astrona:playground -->
+
+## How this module is laid out
+
+1. [The Service Manager And Unit State](./course-01-service-manager-and-unit-state.md): `systemctl` as a client of PID 1, the unit states, the `Result:` categories, reading `systemctl status` line by line, and the `is-*` checks.
+2. [The Effective Unit Definition](./course-02-the-effective-unit-definition.md): the unit load path, drop-in files and how they merge, `systemctl cat` and `show -p`, `systemctl edit`, and what `daemon-reload` really does.
+3. [Reading The Journal](./course-03-reading-the-journal.md): the journal as fields, what `-u` matches, cutting the log down to one incident, and reading a chain of errors first error first.
+4. [Keeping The Journal](./course-04-keeping-the-journal.md): `Storage=`, why the previous boot can be missing, making the journal persistent and capping its size.
+   - Mission: Configure journald: Persistent & Bounded Lab
+5. [Bad Commands And Taken Ports](./course-05-bad-commands-and-taken-ports.md): how a start job runs, a bad configuration or `ExecStart=` path, and a port that is already in use.
+   - Mission: Service Won't Start: Bad ExecStart Path Lab
+   - Mission: Service Won't Start: Port Already In Use Lab
+6. [Dependencies, Permissions And Restart Loops](./course-06-dependencies-permissions-and-restart-loops.md): `Requires=` failures, readiness timeouts, permission and mandatory access control denials, and `start-limit-hit`.
+   - Mission: Service Won't Start: Permission Denied Lab
+   - Mission: Service Won't Start: Failed Dependency & Restart Flap Lab
+7. [Proving The Fix And Boot Targets](./course-07-proving-the-fix-and-boot-targets.md): applying and proving a fix, `active` versus `enabled`, and the default boot target.
+   - Mission: Set the Default Boot Target Lab
+8. [Wrap-Up: Mission Debrief](./course-08-wrap-up.md)
+
+## Why this matters
+
+A service that will not start is one of the most common problems on a real server, and one of the most common tasks on the exam. The exam does not check what you typed; it checks the machine's real state, often after a reboot. Reading `systemctl status` and `journalctl -u` in the right order tells you the exact cause before you touch a file, and `is-active` plus `is-enabled` prove that your fix holds.

@@ -2,18 +2,13 @@
 
 Solve this question on: `terminal`
 
-`metricsd.service` fails every time it starts. It is enabled for boot but
-inactive/failed right now.
+Astronaut, `metricsd.service` fails every time it starts. It is enabled for boot, but right now it is not running: it is in the `failed` state.
 
-The unit runs as a dedicated non-root user and writes its data under
-`/var/lib/metricsd`. Diagnose the failure with `systemctl status metricsd`
-and `journalctl -xeu metricsd`, then repair it so that:
+The unit runs as its own non-root user and writes its data under `/var/lib/metricsd`. Find out why it fails with `systemctl status metricsd` and `journalctl -xeu metricsd`. Then repair it so that:
 
 - `systemctl is-active metricsd` reports `active`
 - `systemctl is-enabled metricsd` reports `enabled`
-- the daemon is genuinely running (it appends to
-  `/var/lib/metricsd/metrics.log` every few seconds)
+- the unit still runs as a **non-root** user (its `User=` is set, and it is not `root`)
+- the daemon really runs: it adds a line to `/var/lib/metricsd/metrics.log` every few seconds, so the file keeps growing
 
-The service must still run as a **non-root** user. Fixing this by changing
-`ExecStart` to run as `root`, or by disabling/masking the unit, does not
-count — fix the underlying access problem.
+Running the service as `root`, or disabling or masking the unit, does not count. Fix the access problem itself.

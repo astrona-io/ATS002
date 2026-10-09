@@ -1,12 +1,12 @@
 # Solution Walkthrough
 
-Five independent incident items, five independent fixes. Work through them in order — none of them depend on each other, but this is the order they were reported in.
+Five separate incident items, five separate fixes. None of them depends on another, but work through them in the order they were reported.
 
 ---
 
-## Task 1: Audit the live kernel state
+## Task 1: Record the live kernel state
 
-**Reasoning:** Before touching any configuration, record what the machine actually looks like right now. `uname -r` gives the running kernel's release string (not `uname -v`, which is a build timestamp, not the release). `sysctl -n` gives a bare parameter value with no key name or `=` sign attached — exactly what a script-friendly audit file needs.
+**Why:** Before you touch any configuration, record what the machine looks like right now. `uname -r` gives the running kernel's release string. (`uname -v` gives the build date, not the release.) `sysctl -n` gives the bare value of a kernel parameter, with no name and no `=` sign. That is exactly what an audit file for scripts needs.
 
 **Commands:**
 
@@ -17,9 +17,9 @@ uname -r > /tmp/kernel-release && sudo mv /tmp/kernel-release /opt/course/audit/
 sysctl -n vm.swappiness > /tmp/vm-swappiness && sudo mv /tmp/vm-swappiness /opt/course/audit/vm-swappiness
 ```
 
-(Or, if `/opt/course/audit` is writable by your user, redirect directly — `uname -r | sudo tee /opt/course/audit/kernel-release > /dev/null` works too.)
+If your user can write to `/opt/course/audit`, you can redirect straight into the files. `uname -r | sudo tee /opt/course/audit/kernel-release > /dev/null` works too.
 
-**Verify:**
+**Check:**
 
 ```bash
 cat /opt/course/audit/kernel-release
@@ -29,22 +29,33 @@ sysctl -n vm.swappiness   # cross-check: should match the file exactly
 
 ---
 
-## Task 2: Raise the pid_max fork ceiling
+## Task 2: Raise the `pid_max` limit
 
-**Reasoning:** `kernel.pid_max` governs the whole system's shared pool of PID/TID numbers. A `sysctl -w` change alone only pokes the live, in-memory value — nothing on disk changes, so it reverts on the next reboot. Persisting it means writing a drop-in file under `/etc/sysctl.d/` and re-applying with `sysctl --system`.
+**Why:** `kernel.pid_max` sets the size of the whole system's shared pool of process and thread ID numbers: the number of crew badges the ship can print. A `sysctl -w` change alone only turns the live dial in memory. Nothing on disk changes, so the value goes back at the next reboot. To keep it, write a drop-in file under `/etc/sysctl.d/` and apply it with `sysctl --system`.
 
 **Commands:**
 
+Turn the live value up now:
+
 ```bash
 sudo sysctl -w kernel.pid_max=1048576
+```
 
-echo "kernel.pid_max = 1048576" | sudo tee /etc/sysctl.d/99-pid-max.conf
+Save this as `/etc/sysctl.d/99-pid-max.conf`:
+
+```ini
+kernel.pid_max = 1048576
+```
+
+Apply it:
+
+```sh
 sudo sysctl --system
 ```
 
-A numeric prefix like `99-` places this file late in udev's — sorry, `sysctl.d`'s — lexical read order, so it wins even if the box already ships a lower baseline value in an earlier-sorting file.
+The number at the front of the file name, `99-`, puts this file late in the order in which `sysctl --system` reads `/etc/sysctl.d/`. So it wins even if the machine already has a lower value in a file that sorts earlier.
 
-**Verify:**
+**Check:**
 
 ```bash
 sysctl -n kernel.pid_max
@@ -55,17 +66,17 @@ cat /etc/sysctl.d/99-pid-max.conf
 
 ---
 
-## Task 3: Kernel modules — load-and-persist `dummy`, blacklist `pcspkr`
+## Task 3: Kernel modules: load and persist `dummy`, blacklist `pcspkr`
 
-**Reasoning:** These are two entirely separate module operations, and the persistence half of each uses two entirely separate config file families: `/etc/modules-load.d/` answers "should this load at boot," `/etc/modprobe.d/` answers "with what parameters" (and, separately, "should it ever auto-load at all").
+**Why:** These are two separate module jobs, and the persistent half of each uses a different family of configuration files. `/etc/modules-load.d/` answers "should this module load at boot?". `/etc/modprobe.d/` answers "with which parameters?" and, separately, "may it ever load automatically?".
 
-**Check parameters before loading:**
+**Check the parameters before loading:**
 
 ```bash
 modinfo -p dummy
 ```
 
-**Load `dummy` live with the parameter:**
+**Load `dummy` now with the parameter:**
 
 ```bash
 sudo modprobe dummy numdummies=4
@@ -76,12 +87,19 @@ cat /sys/module/dummy/parameters/numdummies
 
 **Persist the load and the parameter:**
 
-```bash
-echo "dummy" | sudo tee /etc/modules-load.d/dummy.conf
-echo "options dummy numdummies=4" | sudo tee /etc/modprobe.d/dummy.conf
+Save this as `/etc/modules-load.d/dummy.conf`:
+
+```ini
+dummy
 ```
 
-Prove the config file — not the earlier interactive command — is actually driving the value:
+Save this as `/etc/modprobe.d/dummy.conf`:
+
+```ini
+options dummy numdummies=4
+```
+
+Apply it, and prove that the configuration file, not the earlier command, now sets the value. Unload the module and load it again with no parameter:
 
 ```bash
 sudo modprobe -r dummy
@@ -90,14 +108,23 @@ cat /sys/module/dummy/parameters/numdummies
 # 4
 ```
 
+`systemd-modules-load` reads `/etc/modules-load.d/` at every boot and loads `dummy`, and `modprobe` adds the `options` line from `/etc/modprobe.d/` each time it loads the module.
+
 **Blacklist and unload `pcspkr`:**
 
+Save this as `/etc/modprobe.d/blacklist-pcspkr.conf`:
+
+```ini
+blacklist pcspkr
+```
+
+Apply it by unloading the module that is loaded now:
+
 ```bash
-echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/blacklist-pcspkr.conf
 sudo modprobe -r pcspkr
 ```
 
-**Confirm the blacklist holds against a simulated re-detection pass:**
+**Then check that the blacklist holds during a simulated hardware detection pass:**
 
 ```bash
 sudo udevadm trigger
@@ -105,13 +132,13 @@ lsmod | grep pcspkr
 # (no output)
 ```
 
-A blacklist entry only blocks the *automatic*, hardware-detection-driven load path — it does not stop an explicit `sudo modprobe pcspkr`, and it does not retroactively unload an already-loaded module, which is why the manual `modprobe -r` above was still required.
+A blacklist entry only blocks the *automatic* load that hardware detection starts. It does not stop an explicit `sudo modprobe pcspkr`, and it does not unload a module that is already loaded. That is why the `modprobe -r` above was still needed.
 
 ---
 
 ## Task 4: A stable udev name for the new telemetry disk
 
-**Reasoning:** Kernel-assigned device letters (`/dev/vdb`, `/dev/vdc`) are assigned purely in discovery order and can shift on the next boot. The fix is a udev rule that matches on something the device itself carries — a serial number — rather than the slot the kernel happened to give it this time.
+**Why:** The kernel hands out device letters (`/dev/vdb`, `/dev/vdc`) in the order it finds the disks, so a letter can change at the next boot. The fix is a udev rule that matches something the disk itself carries, its serial number, instead of the letter it happened to get this time. udev is the dock master who names each arriving cargo bay, and the rule is its rule card.
 
 **Find the disk and its stable attribute:**
 
@@ -120,29 +147,26 @@ lsblk
 udevadm info --attribute-walk --name=/dev/vdX
 ```
 
-Look for `ATTRS{serial}=="..."` in the output — that's the attribute the rule below will match against. (If you're working from `/dev/disk/by-id/`, the serial is usually right there in the symlink name too.)
+Replace `vdX` with the new disk's name from `lsblk`. Look for `ATTRS{serial}=="..."` in the output: that is the attribute the rule matches. If you look in `/dev/disk/by-id/` instead, the serial is usually part of the link name there too.
 
 **Write the rule:**
 
+Save this as `/etc/udev/rules.d/99-telemetry-disk.rules`, with the serial you found in place of `<the-serial-you-found>`:
+
 ```bash
-# /etc/udev/rules.d/99-telemetry-disk.rules
 SUBSYSTEM=="block", ATTRS{serial}=="<the-serial-you-found>", SYMLINK+="telemetry-disk"
 ```
 
-```bash
-echo 'SUBSYSTEM=="block", ATTRS{serial}=="<the-serial-you-found>", SYMLINK+="telemetry-disk"' | sudo tee /etc/udev/rules.d/99-telemetry-disk.rules
-```
-
-**Apply it live, without rebooting — both steps are required:**
+**Apply it now, without rebooting. Both steps are needed:**
 
 ```bash
 sudo udevadm control --reload-rules
 sudo udevadm trigger --subsystem-match=block
 ```
 
-`--reload-rules` only tells the running `udevd` to re-read rule files from disk; it does not, by itself, re-evaluate hardware that's already attached. Skipping `udevadm trigger` is the single most common way this task silently fails to apply.
+`--reload-rules` only tells the running `udevd` to read the rule files from disk again. It does not, on its own, check disks that are already attached. Skipping `udevadm trigger` is the most common way this task quietly fails.
 
-**Verify:**
+**Then check the result:**
 
 ```bash
 ls -l /dev/telemetry-disk
@@ -151,25 +175,25 @@ ls -l /dev/telemetry-disk
 
 ---
 
-## Task 5: Diagnose and terminate the hung telemetry-agent
+## Task 5: Diagnose and stop the hung `telemetry-agent`
 
-**Reasoning:** A process showing zero CPU usage and no output isn't necessarily "doing nothing" — it may be legitimately blocked inside a syscall, waiting on something that will never arrive. `strace -p` lets you attach and see exactly which syscall it's sitting in, turning a guess into hard evidence before you act.
+**Why:** A process with zero CPU use and no output is not always "doing nothing". It may be blocked inside a system call, waiting for something that will never arrive. `strace -p` is a flight recorder you clip onto one crew member: it attaches to the process and shows exactly which system call it is sitting in. That turns a guess into hard evidence before you act.
 
-**Find the PID:**
+**Find the process ID:**
 
 ```bash
 pgrep -a -f telemetry-agent
 ```
 
-**Attach and observe:**
+**Attach and watch:**
 
 ```bash
 sudo strace -p <PID>
 ```
 
-Watch the output: rather than a fast-scrolling torrent of unrelated syscalls, you'll see the process sitting inside repeated `pause()` calls — the syscall that blocks a process indefinitely until a signal arrives. A process parked in `pause()` with no timer, no external event, and no signal ever coming is the textbook definition of genuinely hung, not just slow or quiet between bursts of real work.
+Watch the output. Instead of a fast stream of different system calls, you see the process sitting in repeated `pause()` calls. `pause()` blocks a process until a signal arrives. A process parked in `pause()`, with no timer, no outside event and no signal on the way, is really hung, not just slow or quiet between bursts of work. Press `Ctrl+C` to detach `strace`.
 
-**Terminate it:**
+**Stop it:**
 
 ```bash
 sudo kill <PID>
@@ -177,54 +201,37 @@ sleep 2
 ps -p <PID>
 ```
 
-If it's still present after a `SIGTERM`, escalate:
+`kill` sends `SIGTERM` ("finish up and leave"). If the process is still there after that, send `SIGKILL` ("out of the airlock now"):
 
 ```bash
 sudo kill -9 <PID>
 ```
 
-**Verify:**
+**Check:**
 
 ```bash
 pgrep -f telemetry-agent
 # (no output)
 ```
 
+The unit has no `Restart=` setting, so `systemd` does not start the agent again.
+
 ---
 
-## Command Summary
+## Checklist
 
-```bash
-# 1. Audit
-sudo mkdir -p /opt/course/audit
-uname -r | sudo tee /opt/course/audit/kernel-release > /dev/null
-sysctl -n vm.swappiness | sudo tee /opt/course/audit/vm-swappiness > /dev/null
+Before you submit, check every item:
 
-# 2. pid_max
-sudo sysctl -w kernel.pid_max=1048576
-echo "kernel.pid_max = 1048576" | sudo tee /etc/sysctl.d/99-pid-max.conf
-sudo sysctl --system
+| Task | What must be true | Check |
+| --- | --- | --- |
+| 1 | `/opt/course/audit/kernel-release` and `/opt/course/audit/vm-swappiness` match the live values | `cat` both files, compare with `uname -r` and `sysctl -n vm.swappiness` |
+| 2 | `kernel.pid_max` is at least `1048576` live and in `/etc/sysctl.d/99-pid-max.conf` | `sysctl -n kernel.pid_max` |
+| 3 | `dummy` loaded with `numdummies=4`; `/etc/modules-load.d/dummy.conf` and `/etc/modprobe.d/dummy.conf` exist; `pcspkr` blacklisted in `/etc/modprobe.d/blacklist-pcspkr.conf` and not loaded | `cat /sys/module/dummy/parameters/numdummies`, `lsmod \| grep pcspkr` after `sudo udevadm trigger` |
+| 4 | `/etc/udev/rules.d/99-telemetry-disk.rules` exists and `/dev/telemetry-disk` points at the disk with that serial | `ls -l /dev/telemetry-disk` |
+| 5 | No `telemetry-agent` process is running | `pgrep -f telemetry-agent` |
 
-# 3. Kernel modules
-sudo modprobe dummy numdummies=4
-echo "dummy" | sudo tee /etc/modules-load.d/dummy.conf
-echo "options dummy numdummies=4" | sudo tee /etc/modprobe.d/dummy.conf
+When everything is in place, send it for grading:
 
-echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/blacklist-pcspkr.conf
-sudo modprobe -r pcspkr
-sudo udevadm trigger
-
-# 4. udev
-lsblk
-udevadm info --attribute-walk --name=/dev/vdX
-echo 'SUBSYSTEM=="block", ATTRS{serial}=="<serial>", SYMLINK+="telemetry-disk"' | sudo tee /etc/udev/rules.d/99-telemetry-disk.rules
-sudo udevadm control --reload-rules
-sudo udevadm trigger --subsystem-match=block
-
-# 5. strace + kill
-pgrep -a -f telemetry-agent
-sudo strace -p <PID>
-sudo kill <PID>
+```sh
+astrona submit -c sections/section-010/capstone/labs/lab-01
 ```
-
-Once verified, run the local validation suite to pass the lab!

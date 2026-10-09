@@ -1,16 +1,16 @@
 # Solution Walkthrough
 
-Follow these steps to load, parameterize, and persist the `dummy` module, then blacklist and unload `pcspkr`.
+This walkthrough first loads the `dummy` module with its parameter and makes both survive a reboot. Then it blacklists `pcspkr`, unloads it, and proves the blacklist holds. You can run `astrona submit` after any step: each failing check names the one thing still missing.
 
 ---
 
-## Step 1: Inspect what's currently loaded
+## Step 1: Inspect what is loaded now
 
 ```bash
 lsmod | grep -E 'dummy|pcspkr'
 ```
 
-`dummy` shouldn't appear yet. `pcspkr` should already be loaded (it's currently loaded and beeping, per the scenario).
+`dummy` should not appear yet. `pcspkr` should already be loaded: the lab's start-up script loaded it, to stand in for the beeping driver in the story.
 
 ---
 
@@ -20,40 +20,48 @@ lsmod | grep -E 'dummy|pcspkr'
 modinfo -p dummy
 ```
 
-Confirm `numdummies` is a real, correctly-spelled parameter before attempting to load with it.
+Confirm that `numdummies` is a real parameter, spelled exactly like this, before you load the module with it. `modprobe` may ignore a misspelled parameter without any error.
 
 ---
 
-## Step 3: Load `dummy` live with the parameter
+## Step 3: Load `dummy` now with the parameter
 
 ```bash
 sudo modprobe dummy numdummies=2
 ```
 
-Verify it took:
+Check that it worked:
 
 ```bash
 lsmod | grep dummy
 cat /sys/module/dummy/parameters/numdummies
 ```
 
----
-
-## Step 4: Persist the `dummy` module's load across reboots
-
-```bash
-echo "dummy" | sudo tee /etc/modules-load.d/dummy.conf
-```
+The kernel publishes the live value in `/sys/module/dummy/parameters/numdummies`. It should show `2`. This load is not kept: after a reboot, the module and its parameter would be gone.
 
 ---
 
-## Step 5: Persist the `dummy` module's parameter across reboots
+## Step 4: Load `dummy` at every boot
 
-```bash
-echo "options dummy numdummies=2" | sudo tee /etc/modprobe.d/dummy.conf
+Save this as `/etc/modules-load.d/dummy.conf`:
+
+```ini
+dummy
 ```
 
-Prove the file — not the earlier interactive command — actually drives the value:
+`systemd-modules-load.service` reads this file at every boot and loads each module name in it. Nothing needs to run now. This file holds bare names only, never parameters.
+
+---
+
+## Step 5: Keep the parameter for every load
+
+Save this as `/etc/modprobe.d/dummy.conf`:
+
+```ini
+options dummy numdummies=2
+```
+
+Apply it by unloading the module and loading it again with a bare `modprobe`. This proves that the file, and not the command you typed in Step 3, sets the value:
 
 ```bash
 sudo modprobe -r dummy
@@ -62,17 +70,25 @@ cat /sys/module/dummy/parameters/numdummies
 # 2
 ```
 
+`modprobe` read the `options` line from `/etc/modprobe.d/dummy.conf` and passed `numdummies=2` to the kernel, even though you did not type it.
+
 ---
 
-## Step 6: Blacklist `pcspkr` so it never auto-loads again
+## Step 6: Blacklist `pcspkr` so it never loads automatically again
 
-```bash
-echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/blacklist-pcspkr.conf
+Save this as `/etc/modprobe.d/blacklist-pcspkr.conf`:
+
+```ini
+blacklist pcspkr
 ```
 
+`modprobe` reads this line on every load. It tells `modprobe` to skip `pcspkr` when udev asks for it during hardware detection. An explicit `sudo modprobe pcspkr` would still load it, which is expected behaviour.
+
 ---
 
-## Step 7: Unload the already-loaded `pcspkr` and confirm the blacklist holds
+## Step 7: Unload `pcspkr` and confirm the blacklist holds
+
+The blacklist only affects future loads, so unload the running module once by hand. Then replay hardware detection and check that it stays away:
 
 ```bash
 sudo modprobe -r pcspkr
@@ -80,7 +96,7 @@ sudo udevadm trigger
 lsmod | grep pcspkr
 ```
 
-If `pcspkr` stays absent after `udevadm trigger` (which simulates a hardware re-detection pass without a reboot), the blacklist is working against the automatic path. An explicit `sudo modprobe pcspkr` would still load it — that's expected, documented behavior, not a bug.
+`udevadm trigger` makes the kernel send its device events again for hardware that is already present, which is the same thing that happens at boot. If `pcspkr` stays absent afterwards, the blacklist holds against the automatic path.
 
 ---
 
@@ -106,25 +122,36 @@ cat /etc/modprobe.d/blacklist-pcspkr.conf
 # blacklist pcspkr
 ```
 
+Then send the mission for grading:
+
+```bash
+astrona submit -c sections/section-010/module-03/labs/lab-01
+```
+
 ---
 
 ## Command Summary
+
+The three configuration files:
+
+| File | Content |
+| --- | --- |
+| `/etc/modules-load.d/dummy.conf` | `dummy` |
+| `/etc/modprobe.d/dummy.conf` | `options dummy numdummies=2` |
+| `/etc/modprobe.d/blacklist-pcspkr.conf` | `blacklist pcspkr` |
+
+The commands:
 
 ```bash
 lsmod | grep -E 'dummy|pcspkr'
 modinfo -p dummy
 
 sudo modprobe dummy numdummies=2
-echo "dummy" | sudo tee /etc/modules-load.d/dummy.conf
-echo "options dummy numdummies=2" | sudo tee /etc/modprobe.d/dummy.conf
 sudo modprobe -r dummy
 sudo modprobe dummy
 cat /sys/module/dummy/parameters/numdummies
 
-echo "blacklist pcspkr" | sudo tee /etc/modprobe.d/blacklist-pcspkr.conf
 sudo modprobe -r pcspkr
 sudo udevadm trigger
 lsmod | grep pcspkr
 ```
-
-Once verified, run the local validation suite to pass the lab!

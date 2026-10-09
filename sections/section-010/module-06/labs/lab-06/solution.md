@@ -1,6 +1,10 @@
 # Solution Walkthrough
 
+The default boot target is one symlink. Read where it points, move it with one command, and check it again.
+
 ## 1. Check the current default
+
+Read the default target and the link behind it:
 
 ```bash
 systemctl get-default
@@ -10,9 +14,11 @@ readlink -f /etc/systemd/system/default.target
 # /usr/lib/systemd/system/graphical.target
 ```
 
-`default.target` is a symlink; `get-default` just reads what it points at.
+`/etc/systemd/system/default.target` is a symlink. `get-default` only reads where it points.
 
 ## 2. Set the new default
+
+Point the link at `multi-user.target`:
 
 ```bash
 sudo systemctl set-default multi-user.target
@@ -23,10 +29,11 @@ Removed /etc/systemd/system/default.target.
 Created symlink /etc/systemd/system/default.target -> /usr/lib/systemd/system/multi-user.target.
 ```
 
-`set-default` repoints that symlink. Nothing about the running system
-changes — this only affects the next boot.
+`set-default` replaces the symlink. Nothing changes on the running system; only the next boot is affected.
 
 ## 3. Verify
+
+Read the default and the link again:
 
 ```bash
 systemctl get-default
@@ -35,7 +42,15 @@ readlink -f /etc/systemd/system/default.target
 # /usr/lib/systemd/system/multi-user.target
 ```
 
+The grader checks exactly these two things: `systemctl get-default` reports `multi-user.target`, and `/etc/systemd/system/default.target` resolves to `multi-user.target`. When both hold, send it for grading:
+
+```sh
+astrona submit -c sections/section-010/module-06/labs/lab-06
+```
+
 ## Related commands (not needed for this task)
+
+These change the target in other ways:
 
 ```bash
 sudo systemctl isolate multi-user.target      # switch the RUNNING system now
@@ -44,5 +59,4 @@ systemctl list-units --type=target            # which targets are active
 #   systemd.unit=rescue.target
 ```
 
-The target hierarchy, roughly: `poweroff` → `rescue` → `multi-user` →
-`graphical`, each pulling in the one before it.
+`graphical.target` builds on `multi-user.target`: it pulls in everything a server needs, plus a graphical login. `rescue.target` is a much smaller maintenance mode, and `poweroff.target` shuts the machine down.

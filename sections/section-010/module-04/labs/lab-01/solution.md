@@ -1,16 +1,16 @@
 # Solution Walkthrough
 
-Follow these steps to identify the disk, write a stable udev rule for it, and apply it live.
+This walkthrough finds the backup disk, writes a udev rule that matches it by serial number, and applies the rule without a reboot. You can run `astrona submit` after any step: each failing check names the one thing still missing.
 
 ---
 
-## Step 1: Identify the disk's current (unstable) device node
+## Step 1: Find the disk's current (unstable) device node
 
 ```bash
 lsblk
 ```
 
-Look for the disk that already has a single partition on it holding the backup data — note its current letter (e.g. `/dev/vdb`, `/dev/vdb1`).
+Look for the extra 1 GB disk that already has one partition holding the backup data, and note its current letter. The commands below use `/dev/vdb` and `/dev/vdb1` as the example. On this image `vdb` is often the small cloud-init disk, so the backup disk may well be `/dev/vdc` on your machine. Use the letter that `lsblk` shows you.
 
 ---
 
@@ -20,47 +20,47 @@ Look for the disk that already has a single partition on it holding the backup d
 udevadm info --query=all --name=/dev/vdb
 ```
 
-If the serial isn't visible there, walk the device's full ancestry:
+If the serial does not show there, walk the device's whole parent chain:
 
 ```bash
 udevadm info --attribute-walk --name=/dev/vdb
 ```
 
-Look for `ATTRS{serial}=="lab014-backup-drive"` — this is the identifier that stays with the physical disk no matter which `/dev/vdX` letter the kernel assigns it.
+Look for the serial `lab014-backup-drive`. On this virtio disk it shows as `ATTR{serial}=="lab014-backup-drive"` on the disk itself. The serial stays with the physical disk, whatever `/dev/vdX` letter the kernel gives it. `ATTRS{serial}` in a rule matches it on the disk and also on the disk's partitions, because `ATTRS{}` searches the parent levels too.
 
 ---
 
-## Step 3: Draft the custom rule
+## Step 3: Write the custom rule
 
-```bash
-sudo tee /etc/udev/rules.d/99-backup-drive.rules > /dev/null <<'EOF'
+Save this as `/etc/udev/rules.d/99-backup-drive.rules`:
+
+```
 SUBSYSTEM=="block", ATTRS{serial}=="lab014-backup-drive", KERNEL=="vd[a-z]", SYMLINK+="backup-drive"
 SUBSYSTEM=="block", ATTRS{serial}=="lab014-backup-drive", KERNEL=="vd[a-z]1", SYMLINK+="backup-drive1"
-EOF
 ```
 
-The first line matches the whole-disk device and creates `/dev/backup-drive`. The second line matches only its first partition and creates `/dev/backup-drive1` — the node the backup script actually needs to mount. Both match on `ATTRS{serial}`, the stable attribute from Step 2, rather than any kernel-assigned letter.
+The first line matches the whole disk and creates `/dev/backup-drive`. The second line matches only its first partition and creates `/dev/backup-drive1`, the node the backup script needs to mount. Both lines match on `ATTRS{serial}`, the stable attribute from Step 2. The `KERNEL==` patterns only tell the disk (`vdc`) apart from its partition (`vdc1`); they work for any letter.
 
 ---
 
-## Step 4: Load the new rule without rebooting
+## Step 4: Apply the new rule without rebooting
 
 ```bash
 sudo udevadm control --reload-rules
 sudo udevadm trigger --subsystem-match=block
 ```
 
-`--reload-rules` tells the running `udevd` to re-read rule files from disk; `trigger` is still needed afterward to re-evaluate already-connected hardware against the newly-loaded rule.
+`--reload-rules` tells the running `systemd-udevd` to read the rule files from disk again. `trigger` is still needed afterwards: it replays the device events, so `systemd-udevd` runs the new rule against the disk that is already connected.
 
 ---
 
-## Step 5: Verify the symlinks appeared
+## Step 5: Check that the links appeared
 
 ```bash
 ls -l /dev/backup-drive /dev/backup-drive1
 ```
 
-Both should resolve as symlinks pointing at the disk's current letter and its first partition.
+Both should be symbolic links: one to the disk's current letter, one to its first partition.
 
 ---
 
@@ -76,24 +76,25 @@ sudo udevadm trigger --subsystem-match=block
 ls -l /dev/backup-drive
 ```
 
+Then send the mission for grading:
+
+```bash
+astrona submit -c sections/section-010/module-04/labs/lab-01
+```
+
 ---
 
 ## Command Summary
+
+The rule file `/etc/udev/rules.d/99-backup-drive.rules` holds the two lines from Step 3. The commands:
 
 ```bash
 lsblk
 udevadm info --query=all --name=/dev/vdb
 udevadm info --attribute-walk --name=/dev/vdb
 
-sudo tee /etc/udev/rules.d/99-backup-drive.rules > /dev/null <<'EOF'
-SUBSYSTEM=="block", ATTRS{serial}=="lab014-backup-drive", KERNEL=="vd[a-z]", SYMLINK+="backup-drive"
-SUBSYSTEM=="block", ATTRS{serial}=="lab014-backup-drive", KERNEL=="vd[a-z]1", SYMLINK+="backup-drive1"
-EOF
-
 sudo udevadm control --reload-rules
 sudo udevadm trigger --subsystem-match=block
 
 ls -l /dev/backup-drive /dev/backup-drive1
 ```
-
-Once verified, run the local validation suite to pass the lab!

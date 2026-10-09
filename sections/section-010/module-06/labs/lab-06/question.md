@@ -2,17 +2,10 @@
 
 Solve this question on: `terminal`
 
-This host is currently configured to boot into `graphical.target`, but it is
-a headless server with no display manager — it should come up in
-`multi-user.target` instead.
+Astronaut, this machine is set to boot into `graphical.target`. It is a server with no screen and no graphical login, so it should come up in `multi-user.target` instead.
 
-1. Confirm the current default with `systemctl get-default`.
-2. Change the default boot target to `multi-user.target` so the next boot
-   uses it.
-3. Verify: `systemctl get-default` reports `multi-user.target`, and
-   `/etc/systemd/system/default.target` resolves to it.
+1. Check the current default with `systemctl get-default`.
+2. Change the default boot target to `multi-user.target`, so the next boot uses it.
+3. Make sure that `systemctl get-default` reports `multi-user.target`, and that `/etc/systemd/system/default.target` points at `multi-user.target`.
 
-You do **not** need to switch the running system's target right now — only
-change what it boots into. (For reference: `systemctl isolate
-<target>` switches the *running* system, and appending
-`systemd.unit=<target>` at the boot loader overrides it for one boot.)
+You do **not** need to switch the running system to the new target now. Only change what it boots into. (`systemctl isolate <target>` would switch the *running* system, and adding `systemd.unit=<target>` to the kernel line in the boot loader would change the target for one boot only. Neither is needed here.)

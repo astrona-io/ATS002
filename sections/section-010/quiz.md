@@ -1,10 +1,12 @@
 # Section 010 Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics
 
-Test your understanding of live kernel parameters, process/thread ceilings, kernel module management, stable device naming, and syscall-level process forensics.
+Astronaut, test what you know about live kernel parameters, process and thread limits, kernel modules, stable device names, and tracing a process at the level of its system calls.
 
 ---
 
 ## Scenario-Based Questions
+
+Each question describes a real situation on a training ship. Pick one answer, then open the answer box to check your reasoning.
 
 ### Question 1
 You need to record the current value of `net.ipv4.ip_forward` into a script-friendly file containing nothing but the bare value — no parameter name, no `=` sign. Which command accomplishes this correctly?
@@ -39,7 +41,7 @@ A batch job running as the `dataproc` user fails partway through a nightly run w
 
 **Correct Answer: B**
 
-*   **Why B is correct:** `kernel.pid_max` governs the whole system's shared pool of PID/TID numbers, but a per-user process/thread ceiling (`RLIMIT_NPROC`, surfaced as `ulimit -u`) is a completely separate, independently enforced accounting path scoped to the real UID running the workload. Raising the global pool does nothing to widen a per-user cap that's still capped below what the job needs. If the job runs as a systemd unit, a third ceiling — `TasksMax=` — could also independently be the culprit.
+*   **Why B is correct:** `kernel.pid_max` governs the whole system's shared pool of process and thread ID numbers (PIDs and TIDs), but a per-user process/thread ceiling (`RLIMIT_NPROC`, surfaced as `ulimit -u`) is a completely separate, independently enforced accounting path scoped to the real UID running the workload. Raising the global pool does nothing to widen a per-user cap that is still set below what the job needs. If the job runs as a systemd unit, a third ceiling — `TasksMax=` — could also independently be the culprit.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because the scenario states the change was persisted and confirmed — a value that reverts on its own without any recorded cause is not the expected behavior of a correctly persisted sysctl setting.
     *   *Option C* is incorrect because the scenario explicitly rules out memory pressure via `free -m`, and `pthread_create` failures are commonly caused by hitting a process/thread ceiling, not only memory exhaustion.
@@ -84,14 +86,14 @@ You write a udev rule matching `ATTRS{serial}=="WD-XA123456"` to create a persis
 *   **Why C is correct:** `udevadm control --reload-rules` and applying those rules to already-present hardware are two genuinely separate steps. Reloading rules tells the running `udevd` daemon to re-read rule files — it does not synthesize new `add`/`change` events for devices that are already sitting there. `sudo udevadm trigger --subsystem-match=block` is required afterward to force udev to re-run its complete rule chain, including the new rule, against already-connected devices. This is a common trap because `--reload-rules` runs cleanly with no error, making it look like it worked.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because `/etc/udev/rules.d/` is precisely the correct, package-manager-untouched location for custom administrator rules — `/lib/udev/rules.d/` and `/usr/lib/udev/rules.d/` are the ones to avoid, since package updates can overwrite them.
-    *   *Option B* is incorrect because `SYMLINK+=` is intentionally additive syntax, appending a new symlink name without erasing symlinks the distro's built-in rules already created; a plain `=` would be the wrong, destructive choice here, not the fix.
+    *   *Option B* is incorrect because `SYMLINK+=` is intentionally additive syntax, appending a new symlink name without erasing symlinks the distribution's built-in rules already created; a plain `=` would be the wrong, destructive choice here, not the fix.
     *   *Option D* is incorrect because `udevadm trigger` exists specifically to make a custom rule apply to already-attached hardware without requiring a reboot.
 </details>
 
 ---
 
 ### Question 5
-You're investigating a process suspected of periodically calling the `kill()` syscall. You run `sudo strace -p 4821 -e trace=kill` and, after a short wait, see the process call `kill()`. Before terminating it, what must you do, and why does the order matter?
+You are investigating a process suspected of periodically calling the `kill()` syscall. You run `sudo strace -p 4821 -e trace=kill` and, after a short wait, see the process call `kill()`. Before terminating it, what must you do, and why does the order matter?
 *   **A)** Immediately run `sudo kill -9 4821`, since a confirmed offender should be stopped as fast as possible regardless of order.
 *   **B)** Run `sudo readlink -f /proc/4821/exe` first to capture the real on-disk executable path, because `/proc/PID/` — and the information it holds — ceases to exist the instant the process is terminated.
 *   **C)** Run `ps aux | grep 4821` first to double-check the process's displayed name, since the name is always authoritative for identifying the correct binary.
@@ -102,7 +104,7 @@ You're investigating a process suspected of periodically calling the `kill()` sy
 
 **Correct Answer: B**
 
-*   **Why B is correct:** `/proc/PID/exe` is a magic symlink the kernel maintains only while the process is alive, pointing at the exact inode currently mapped as its executable image. The moment the process is killed, `/proc/PID/` disappears entirely — there is nothing left to resolve. Capturing the real, canonicalized path with `readlink -f` *before* terminating the process is the one ordering detail a grader (or a real incident postmortem) is most likely to specifically check for.
+*   **Why B is correct:** `/proc/PID/exe` is a magic symlink the kernel maintains only while the process is alive, pointing at the exact inode currently mapped as its executable image. The moment the process is killed, `/proc/PID/` disappears entirely — there is nothing left to resolve. Capturing the real, canonicalized path with `readlink -f` *before* terminating the process is the one ordering detail a grader (or a real review after an incident) is most likely to specifically check for.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because killing first destroys the only reliable evidence of the process's real backing file, potentially leaving a disguised or renamed offending binary untouched on disk while creating a false sense the incident is closed.
     *   *Option C* is incorrect because a process's displayed name (`argv[0]`/`comm`) is not guaranteed to match its actual backing file — it could be a renamed copy, a symlink, or a script whose displayed name is really its interpreter's.
