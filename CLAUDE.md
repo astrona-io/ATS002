@@ -444,7 +444,7 @@ lab's own names, they must match the tables above.
 - **Other distributions run in containers.** Sections 060 and 070 install
   Docker on the Ubuntu machine and run `rockylinux:9`-based `rpmbox` and
   `opensuse/leap:15.6`-based `zypperbox` as long-lived privileged
-  containers. Commands run inside them (`sudo docker exec -it rpmbox bash`).
+  containers. Commands run inside them (`docker exec -it rpmbox bash`).
   The package tools inside are real; only the host is different.
 - **Ubuntu-only gaps.** Real SELinux enforcement, `rd.break` and the
   RHEL-family boot flow cannot run on the Ubuntu image. Pages teach them as
@@ -545,7 +545,8 @@ this order:
   `daemon-reload`, `journalctl`, `journald`, `exit-status`,
   `file-permissions`, `port-conflict`, `unit-dependencies`,
   `restart-policy`, `boot-target`, `timedatectl`, `redirection`
-- Scheduling: `cron`, `crontab`, `cron-d`, `systemd-timers`, `oncalendar`
+- Scheduling: `cron`, `crontab`, `cron-d`, `cron-syntax`, `systemd-timers`,
+  `oncalendar`
 - Containers: `docker`, `container-lifecycle`, `docker-inspect`,
   `port-mapping`, `bind-mounts`, `resource-limits`
 - Building and virtual machines: `source-build`, `tarball`, `configure`,
@@ -631,7 +632,8 @@ Check facts here before writing them down. Prefer these over memory.
 - **Packages:** the Debian `apt` and `dpkg` manual pages
   (<https://manpages.debian.org/>), `apt_preferences(5)` for pinning,
   <https://dnf.readthedocs.io/>, <https://rpm.org/documentation.html>, and
-  the openSUSE Zypper documentation <https://en.opensuse.org/SDB:Zypper_manual>.
+  the openSUSE `zypper` documentation
+  <https://doc.opensuse.org/documentation/leap/reference/html/book-reference/cha-sw-cl.html>.
 - **Recovery:** the GNU GRUB manual <https://www.gnu.org/software/grub/manual/grub/>,
   `sgdisk(8)` and `fstab(5)`.
 - **The exam itself:** the LFCS page on the Linux Foundation training site

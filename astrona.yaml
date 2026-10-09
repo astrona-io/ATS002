@@ -1,10 +1,23 @@
+# Course manifest for ATS002 - Operations Deployment (Linux Foundation
+# Certified System Administrator, LFCS).
+#
+# One entry per section under `modules:`. Each section lists, in order: its
+# README, then for each module the landing page (course.md), its parts
+# (course-0N-*.md), and right after the part a lab tests, the lab's
+# question.md reading and the `type: lab` entry. The module's wrap-up page
+# comes last. The section quiz and the section capstone close the section.
+# Playgrounds are not listed: the landing page's playground marker shows
+# them. solution.md files are never listed.
+#
+# Every `path:` is relative to this file.
+
 training:
   id: ATS002
   title: "LFCS: Operations Deployment"
   description: >
     Training material covering the Linux Foundation Certified System
-    Administrator (LFCS) Operations Deployment domain, with hands-on labs
-    for each competency.
+    Administrator (LFCS) Operations Deployment domain, with hands-on labs for
+    each competency.
 
   certification:
     name: Linux Foundation Certified System Administrator
@@ -14,1229 +27,1440 @@ training:
     weight: 25
 
 modules:
+
   - id: module-010
     title: "Section 010: Kernel Tuning, Process Limits, and Device Forensics"
     description: >
       Learn to read and persist live kernel state with sysctl, diagnose and
-      raise the three independent process/thread ceilings a workload can
-      hit, manage kernel modules (parameterized loads and permanent
-      blacklisting), give disks stable udev-based names immune to
-      device-letter reassignment, and use strace to catch a misbehaving or
-      hung process in the act before safely terminating it.
+      raise the three independent process/thread ceilings a workload can hit,
+      manage kernel modules (parameterized loads and permanent blacklisting),
+      give disks stable udev-based names immune to device-letter reassignment,
+      and use strace to catch a misbehaving or hung process in the act before
+      safely terminating it.
 
     content:
       - type: reading
-        title: Section Overview
+        title: "Section Overview"
         path: sections/section-010/README.md
-
       - type: reading
-        title: "Module 1: Reading and Reshaping the Live Kernel with sysctl"
+        title: "Reading and Reshaping the Live Kernel with sysctl"
         path: sections/section-010/module-01/course.md
-
       - type: reading
-        title: "Module 1.1: Identifying the running kernel"
+        title: "Identifying the running kernel"
         path: sections/section-010/module-01/course-01-identifying-the-running-kernel.md
-
       - type: reading
-        title: "Module 1.2: /proc/sys and the live value"
+        title: "/proc/sys and the live value"
         path: sections/section-010/module-01/course-02-proc-sys-and-the-live-value.md
-
       - type: reading
-        title: "Module 1.3: Runtime vs. persistent changes"
+        title: "Runtime vs. persistent changes"
         path: sections/section-010/module-01/course-03-runtime-vs-persistent-changes.md
-
       - type: reading
         title: Question
         path: sections/section-010/module-01/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-01/labs/lab-01/solution.md
-
       - type: lab
         title: "sysctl Live Kernel State Lab"
         path: sections/section-010/module-01/labs/lab-01
-        difficulty: intermediate
-
+        difficulty: beginner
+        estimated_duration: 15m
+        topic: kernel-parameters
+        task_kind: build
+        tags: [uname, sysctl, proc-sys, timedatectl, redirection]
+        learning_goals:
+          - Write the running kernel release into a file with the right uname option
+          - Read a live kernel parameter value with no extra text around it
+          - Record the system timezone from timedatectl
+        resources:
+          - name: "sysctl(8) manual page"
+            url: https://man7.org/linux/man-pages/man8/sysctl.8.html
+          - name: "uname(1) manual page"
+            url: https://man7.org/linux/man-pages/man1/uname.1.html
+          - name: "timedatectl manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/timedatectl.html
       - type: reading
-        title: "Module 2: Process Limits — pid_max, ulimit, and the Three Ceilings"
+        title: "Process Limits — pid_max, ulimit, and the Three Ceilings"
         path: sections/section-010/module-02/course.md
-
       - type: reading
-        title: "Module 2.1: The shared PID pool and confirming exhaustion"
+        title: "The shared PID pool and confirming exhaustion"
         path: sections/section-010/module-02/course-01-the-shared-pid-pool.md
-
       - type: reading
-        title: "Module 2.2: The three independent ceilings"
+        title: "The three independent ceilings"
         path: sections/section-010/module-02/course-02-the-three-independent-ceilings.md
-
       - type: reading
-        title: "Module 2.3: Raising each ceiling, in order"
+        title: "Raising each ceiling, in order"
         path: sections/section-010/module-02/course-03-raising-each-ceiling-in-order.md
-
       - type: reading
         title: Question
         path: sections/section-010/module-02/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-02/labs/lab-01/solution.md
-
       - type: lab
         title: "Process & Thread Ceilings Lab"
         path: sections/section-010/module-02/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: process-limits
+        task_kind: troubleshooting
+        tags: [pid-max, ulimit, limits-conf, tasksmax, sysctl-d, drop-in-override, daemon-reload]
+        learning_goals:
+          - Raise kernel.pid_max both live and in a sysctl drop-in file
+          - Raise one user's process limit with a file under /etc/security/limits.d/
+          - Raise a service's TasksMax with a systemd override and apply it to the running unit
+        resources:
+          - name: "limits.conf(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/limits.conf.5.html
+          - name: "systemd.resource-control: TasksMax"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html
+          - name: "proc(5): /proc/sys/kernel/pid_max"
+            url: https://man7.org/linux/man-pages/man5/proc_sys_kernel.5.html
       - type: reading
         title: Question
         path: sections/section-010/module-02/labs/lab-02/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-02/labs/lab-02/solution.md
-
       - type: lab
         title: "Process Limits: Diagnose the Single Clamp (ulimit -u) Lab"
         path: sections/section-010/module-02/labs/lab-02
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: process-limits
+        task_kind: troubleshooting
+        tags: [pid-max, ulimit, limits-conf, tasksmax, cgroups]
+        learning_goals:
+          - Read all three process ceilings and find the one that is actually too low
+          - Raise only a user's ulimit -u in the right file, leaving the other ceilings alone
+        resources:
+          - name: "limits.conf(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/limits.conf.5.html
+          - name: "getrlimit(2): RLIMIT_NPROC"
+            url: https://man7.org/linux/man-pages/man2/getrlimit.2.html
       - type: reading
         title: Question
         path: sections/section-010/module-02/labs/lab-03/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-02/labs/lab-03/solution.md
-
       - type: lab
         title: "Process Limits: Diagnose the Single Clamp (TasksMax) Lab"
         path: sections/section-010/module-02/labs/lab-03
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: process-limits
+        task_kind: troubleshooting
+        tags: [tasksmax, cgroups, drop-in-override, daemon-reload, pid-max, ulimit]
+        learning_goals:
+          - Read all three process ceilings and find the one that is actually too low
+          - Raise only a service's TasksMax with a systemd override and apply it to the running unit
+        resources:
+          - name: "systemd.resource-control: TasksMax"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.resource-control.html
+          - name: "systemctl manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
       - type: reading
-        title: "Module 3: Kernel Modules — Loading, Parameters, and Blacklisting"
+        title: "Kernel Modules — Loading, Parameters, and Blacklisting"
         path: sections/section-010/module-03/course.md
-
       - type: reading
-        title: "Module 3.1: Inspecting modules and their parameters"
+        title: "Inspecting modules and their parameters"
         path: sections/section-010/module-03/course-01-inspecting-modules-and-parameters.md
-
       - type: reading
-        title: "Module 3.2: Loading — modprobe, depmod, and the dependency graph"
+        title: "Loading: modprobe, depmod, and the dependency graph"
         path: sections/section-010/module-03/course-02-loading-modprobe-and-dependencies.md
-
       - type: reading
-        title: "Module 3.3: Persistence and blacklisting"
+        title: "Persistence and blacklisting"
         path: sections/section-010/module-03/course-03-persistence-and-blacklisting.md
-
       - type: reading
         title: Question
         path: sections/section-010/module-03/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-03/labs/lab-01/solution.md
-
       - type: lab
         title: "Kernel Module Loading & Blacklisting Lab"
         path: sections/section-010/module-03/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: kernel-modules
+        task_kind: build
+        tags: [kernel-modules, modprobe, modprobe-d, module-parameters, blacklist, lsmod, udevadm]
+        learning_goals:
+          - Load a kernel module with a parameter and make both the load and the parameter survive a reboot
+          - Unload a module and blacklist it so hardware detection cannot load it again
+        resources:
+          - name: "modprobe(8) manual page"
+            url: https://man7.org/linux/man-pages/man8/modprobe.8.html
+          - name: "modprobe.d(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/modprobe.d.5.html
+          - name: "modules-load.d(5) manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/modules-load.d.html
       - type: reading
-        title: "Module 4: udev — Giving a Device a Name It Can Keep"
+        title: "udev — Giving a Device a Name It Can Keep"
         path: sections/section-010/module-04/course.md
-
       - type: reading
-        title: "Module 4.1: Device events, sysfs, and finding a stable identity"
+        title: "Device events, sysfs, and finding a stable identity"
         path: sections/section-010/module-04/course-01-device-events-and-identity.md
-
       - type: reading
-        title: "Module 4.2: Writing the rule — match keys vs. assignment keys"
+        title: "Writing the rule: match keys vs. assignment keys"
         path: sections/section-010/module-04/course-02-writing-the-rule.md
-
       - type: reading
-        title: "Module 4.3: Applying, verifying, and using the rule"
+        title: "Applying, verifying, and using the rule"
         path: sections/section-010/module-04/course-03-applying-verifying-and-using.md
-
       - type: reading
         title: Question
         path: sections/section-010/module-04/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-04/labs/lab-01/solution.md
-
       - type: lab
         title: "Stable Device Naming with udev Lab"
         path: sections/section-010/module-04/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: devices
+        task_kind: build
+        tags: [udev, udev-rules, udevadm, disk-serial, block-devices]
+        learning_goals:
+          - Find a disk's stable serial with udevadm instead of trusting its device letter
+          - Write a udev rule that creates symlinks for a disk and its partition, matched by serial
+          - Apply the rule live and prove both symlinks point at the right devices
+        resources:
+          - name: "udev(7) manual page"
+            url: https://man7.org/linux/man-pages/man7/udev.7.html
+          - name: "udevadm manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/udevadm.html
       - type: reading
-        title: "Module 5: Catching a Process in the Act with strace"
+        title: "Catching a Process in the Act with strace"
         path: sections/section-010/module-05/course.md
-
       - type: reading
-        title: "Module 5.1: From a name to the right PIDs"
+        title: "From a name to the right PIDs"
         path: sections/section-010/module-05/course-01-from-a-name-to-the-right-pids.md
-
       - type: reading
-        title: "Module 5.2: Attaching and filtering the syscall stream"
+        title: "Attaching and filtering the syscall stream"
         path: sections/section-010/module-05/course-02-attaching-and-filtering.md
-
       - type: reading
-        title: "Module 5.3: From confirmed process to safe cleanup"
+        title: "From confirmed process to safe cleanup"
         path: sections/section-010/module-05/course-03-from-confirmed-process-to-safe-cleanup.md
-
       - type: reading
         title: Question
         path: sections/section-010/module-05/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-05/labs/lab-01/solution.md
-
       - type: lab
         title: "Process Forensics with strace Lab"
         path: sections/section-010/module-05/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: process-forensics
+        task_kind: troubleshooting
+        tags: [strace, syscalls, pgrep, kill, signals]
+        learning_goals:
+          - Attach strace to running processes and filter for one system call
+          - Find a process's real executable through /proc/PID/exe
+          - Stop and remove only the confirmed offender, leaving innocent processes running
+        resources:
+          - name: "strace(1) manual page"
+            url: https://man7.org/linux/man-pages/man1/strace.1.html
+          - name: "proc(5): /proc/pid/exe"
+            url: https://man7.org/linux/man-pages/man5/proc_pid_exe.5.html
       - type: reading
-        title: "Module 6: Debugging a Service That Won't Start with systemctl and journalctl"
+        title: "Debugging a Service That Won't Start with systemctl and journalctl"
         path: sections/section-010/module-06/course.md
-
       - type: reading
-        title: "Module 6.1: The service manager and unit state"
+        title: "The service manager and unit state"
         path: sections/section-010/module-06/course-01-service-manager-and-unit-state.md
-
       - type: reading
-        title: "Module 6.2: The effective unit definition"
+        title: "The effective unit definition"
         path: sections/section-010/module-06/course-02-the-effective-unit-definition.md
-
       - type: reading
-        title: "Module 6.3: Reading the journal"
+        title: "Reading the journal"
         path: sections/section-010/module-06/course-03-reading-the-journal.md
-
       - type: reading
-        title: "Module 6.4: Failure shapes, and proving the fix"
+        title: "Failure shapes, and proving the fix"
         path: sections/section-010/module-06/course-04-failure-shapes-and-proving-the-fix.md
-
       - type: reading
         title: Question
         path: sections/section-010/module-06/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-06/labs/lab-01/solution.md
-
       - type: lab
         title: "Service Won't Start: Bad ExecStart Path Lab"
         path: sections/section-010/module-06/labs/lab-01
-        difficulty: intermediate
-
+        difficulty: beginner
+        estimated_duration: 15m
+        topic: services
+        task_kind: troubleshooting
+        tags: [systemd, systemctl, journalctl, unit-files, exit-status, daemon-reload]
+        learning_goals:
+          - Read a 203/EXEC failure from systemctl status and the unit's journal
+          - Point the unit's ExecStart at the real binary and prove the service runs and is enabled
+        resources:
+          - name: "systemd.service: ExecStart"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html
+          - name: "journalctl manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/journalctl.html
       - type: reading
         title: Question
         path: sections/section-010/module-06/labs/lab-02/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-06/labs/lab-02/solution.md
-
       - type: lab
         title: "Service Won't Start: Permission Denied Lab"
         path: sections/section-010/module-06/labs/lab-02
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: services
+        task_kind: troubleshooting
+        tags: [systemd, systemctl, journalctl, file-permissions, exit-status]
+        learning_goals:
+          - Trace a Permission denied start failure to the directory the service writes to
+          - Fix the ownership so the service runs as its non-root user
+        resources:
+          - name: "systemd.exec: User and StateDirectory"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html
+          - name: "journalctl manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/journalctl.html
       - type: reading
         title: Question
         path: sections/section-010/module-06/labs/lab-03/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-06/labs/lab-03/solution.md
-
       - type: lab
         title: "Service Won't Start: Port Already In Use Lab"
         path: sections/section-010/module-06/labs/lab-03
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: services
+        task_kind: troubleshooting
+        tags: [systemd, systemctl, journalctl, port-conflict, exit-status]
+        learning_goals:
+          - Find which service already holds the port another service needs
+          - Stop and disable the leftover service and prove the right service now answers on the port
+        resources:
+          - name: "systemctl manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
+          - name: "ss(8) manual page"
+            url: https://man7.org/linux/man-pages/man8/ss.8.html
       - type: reading
         title: Question
         path: sections/section-010/module-06/labs/lab-04/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-06/labs/lab-04/solution.md
-
       - type: lab
         title: "Service Won't Start: Failed Dependency & Restart Flap Lab"
         path: sections/section-010/module-06/labs/lab-04
-        difficulty: intermediate
-
+        difficulty: advanced
+        estimated_duration: 25m
+        topic: services
+        task_kind: troubleshooting
+        tags: [systemd, systemctl, unit-dependencies, restart-policy, journalctl, unit-files]
+        learning_goals:
+          - Follow a failure through Requires= to the broken dependency
+          - Clear the start-limit-hit state with reset-failed and start the whole chain
+          - Enable both units so the pipeline comes back after a reboot
+        resources:
+          - name: "systemd.unit: Requires and After"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html
+          - name: "systemd.unit: StartLimitBurst"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html#StartLimitIntervalSec=interval
+          - name: "systemctl manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
       - type: reading
         title: Question
         path: sections/section-010/module-06/labs/lab-05/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-06/labs/lab-05/solution.md
-
       - type: lab
         title: "Configure journald: Persistent & Bounded Lab"
         path: sections/section-010/module-06/labs/lab-05
         difficulty: intermediate
-
+        estimated_duration: 15m
+        topic: services
+        task_kind: build
+        tags: [journald, journalctl, systemd, unit-files]
+        learning_goals:
+          - Make the journal persistent so logs survive a reboot
+          - Cap the journal's disk use and apply the change now
+        resources:
+          - name: "journald.conf manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/journald.conf.html
+          - name: "systemd-journald.service manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd-journald.service.html
       - type: reading
         title: Question
         path: sections/section-010/module-06/labs/lab-06/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/module-06/labs/lab-06/solution.md
-
       - type: lab
         title: "Set the Default Boot Target Lab"
         path: sections/section-010/module-06/labs/lab-06
-        difficulty: intermediate
-
+        difficulty: beginner
+        estimated_duration: 10m
+        topic: services
+        task_kind: build
+        tags: [boot-target, systemd, systemctl, unit-files]
+        learning_goals:
+          - Read and change the default boot target
+          - Prove the default.target link points at multi-user.target
+        resources:
+          - name: "systemd.special: default.target"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.special.html
+          - name: "systemctl: set-default"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
       - type: reading
         title: "Section 010 Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics"
         path: sections/section-010/quiz.md
-
       - type: reading
         title: Question
         path: sections/section-010/capstone/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-010/capstone/labs/lab-01/solution.md
-
       - type: lab
         title: "Kernel, Process, Module & Device Runtime Management Capstone Lab"
         path: sections/section-010/capstone/labs/lab-01
         difficulty: advanced
+        estimated_duration: 45m
+        topic: kernel-parameters
+        task_kind: troubleshooting
+        tags: [sysctl, sysctl-d, pid-max, modprobe-d, blacklist, udev-rules, strace, signals]
+        learning_goals:
+          - Record live kernel state and raise kernel.pid_max live and persistently
+          - Load, parameterise, persist and blacklist kernel modules, and name a disk with a udev rule
+          - Confirm a hung service with strace before you stop it
+        resources:
+          - name: "sysctl.d(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/sysctl.d.5.html
+          - name: "modprobe.d(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/modprobe.d.5.html
+          - name: "udev(7) manual page"
+            url: https://man7.org/linux/man-pages/man7/udev.7.html
+          - name: "strace(1) manual page"
+            url: https://man7.org/linux/man-pages/man1/strace.1.html
 
   - id: module-020
     title: "Section 020: Scheduled & Containerized Workloads"
     description: >
       Covers the two mechanisms admins lean on to keep systems running
       unattended: per-user vs. system-wide cron scheduling (and safely
-      migrating jobs between them without duplicate execution), and the
-      Docker container lifecycle — stopping containers gracefully,
-      extracting precise facts from docker inspect via Go templates, and
-      launching new containers with exact memory and port constraints.
+      migrating jobs between them without duplicate execution), and the Docker
+      container lifecycle — stopping containers gracefully, extracting precise
+      facts from docker inspect via Go templates, and launching new containers
+      with exact memory and port constraints.
 
     content:
       - type: reading
-        title: Section Overview
+        title: "Section Overview"
         path: sections/section-020/README.md
-
       - type: reading
-        title: "Module 1: Per-User Cron Job Scheduling"
+        title: "Per-User Cron Job Scheduling"
         path: sections/section-020/module-01/course.md
-
       - type: reading
-        title: "Module 1.1: Where a cron job lives, and the format that follows"
+        title: "Where a cron job lives, and the format that follows"
         path: sections/section-020/module-01/course-01-where-a-cron-job-lives.md
-
       - type: reading
-        title: "Module 1.2: Migrating a job safely"
+        title: "Migrating a job safely"
         path: sections/section-020/module-01/course-02-migrating-a-job-safely.md
-
       - type: reading
         title: Question
         path: sections/section-020/module-01/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-020/module-01/labs/lab-01/solution.md
-
       - type: lab
         title: "Per-User Cron Job Scheduling Lab"
         path: sections/section-020/module-01/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: scheduling
+        task_kind: migration
+        tags: [cron, crontab, cron-d, cron-syntax]
+        learning_goals:
+          - Move a system-wide cron job into a user's own crontab
+          - Write a cron schedule for two weekdays at a set time
+          - Remove the old job so it does not run twice
+        resources:
+          - name: "crontab(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/crontab.5.html
+          - name: "crontab(1) manual page"
+            url: https://man7.org/linux/man-pages/man1/crontab.1.html
       - type: reading
-        title: "Module 2: Docker Container Lifecycle"
+        title: "Docker Container Lifecycle: Inspect, Stop, and Launch"
         path: sections/section-020/module-02/course.md
-
       - type: reading
-        title: "Module 2.1: The container lifecycle, and stopping one cleanly"
+        title: "The container lifecycle, and stopping one cleanly"
         path: sections/section-020/module-02/course-01-the-container-lifecycle-and-stopping.md
-
       - type: reading
-        title: "Module 2.2: Inspecting with --format, and launching with constraints"
+        title: "Inspecting with `--format`, and launching with constraints"
         path: sections/section-020/module-02/course-02-inspecting-with-format.md
-
       - type: reading
         title: Question
         path: sections/section-020/module-02/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-020/module-02/labs/lab-01/solution.md
-
       - type: lab
         title: "Docker Container Lifecycle Lab"
         path: sections/section-020/module-02/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: containers
+        task_kind: build
+        tags: [docker, container-lifecycle, docker-inspect, port-mapping, resource-limits, bind-mounts]
+        learning_goals:
+          - Stop a running container cleanly
+          - Read a container's IP address and mount destination with docker inspect --format
+          - Start a detached container with a memory limit and a port mapping
+        resources:
+          - name: "docker container run"
+            url: https://docs.docker.com/reference/cli/docker/container/run/
+          - name: "docker container inspect"
+            url: https://docs.docker.com/reference/cli/docker/container/inspect/
       - type: reading
-        title: "Module 3: systemd Timers"
+        title: "systemd Timers"
         path: sections/section-020/module-03/course.md
-
       - type: reading
-        title: "Module 3.1: The timer and service pair"
+        title: "The timer and service pair"
         path: sections/section-020/module-03/course-01-the-timer-and-service-pair.md
-
       - type: reading
-        title: "Module 3.2: Schedule expressions"
+        title: "Schedule expressions"
         path: sections/section-020/module-03/course-02-schedule-expressions.md
-
       - type: reading
-        title: "Module 3.3: Timers vs. cron, and operating them"
+        title: "Timers vs. cron, and operating them"
         path: sections/section-020/module-03/course-03-timers-vs-cron-and-operating.md
-
       - type: reading
         title: Question
         path: sections/section-020/module-03/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-020/module-03/labs/lab-01/solution.md
-
       - type: lab
         title: "systemd Timers Lab"
         path: sections/section-020/module-03/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: scheduling
+        task_kind: migration
+        tags: [systemd-timers, oncalendar, unit-files, cron-d, systemctl]
+        learning_goals:
+          - Write a service and timer pair with an OnCalendar schedule and Persistent=true
+          - Replace a cron job with an equivalent timer and remove the cron job
+          - Prove both timers with systemctl list-timers
+        resources:
+          - name: "systemd.timer manual page"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html
+          - name: "systemd.time: calendar events"
+            url: https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html
       - type: reading
         title: "Section 020 Knowledge Check: Scheduled & Containerized Workloads"
         path: sections/section-020/quiz.md
-
       - type: reading
         title: Question
         path: sections/section-020/capstone/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-020/capstone/labs/lab-01/solution.md
-
       - type: lab
         title: "Scheduled Container Recovery Capstone Lab"
         path: sections/section-020/capstone/labs/lab-01
         difficulty: advanced
+        estimated_duration: 30m
+        topic: containers
+        task_kind: build
+        tags: [docker, container-lifecycle, port-mapping, resource-limits, crontab, cron]
+        learning_goals:
+          - Remove a container that holds a host port and start its replacement with limits
+          - Schedule a per-user watchdog script that restarts the container when it stops
+        resources:
+          - name: "docker container run"
+            url: https://docs.docker.com/reference/cli/docker/container/run/
+          - name: "crontab(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/crontab.5.html
 
   - id: module-030
     title: "Section 030: Building & Virtualizing Systems"
     description: >
-      Compiling and installing software directly from source when a
-      package manager can't help you, and standing up and managing full
-      virtual machines with libvirt when a container isn't isolated
-      enough — precise control over exactly where a build lands and
-      exactly what capabilities a VM ends up with.
+      Compiling and installing software directly from source when a package
+      manager can't help you, and standing up and managing full virtual
+      machines with libvirt when a container isn't isolated enough — precise
+      control over exactly where a build lands and exactly what capabilities a
+      VM ends up with.
 
     content:
       - type: reading
-        title: Section Overview
+        title: "Section Overview"
         path: sections/section-030/README.md
-
       - type: reading
-        title: "Module 1: Compile & Install From Source"
+        title: "Compile & Install From Source"
         path: sections/section-030/module-01/course.md
-
       - type: reading
-        title: "Module 1.1: Unpacking the tarball, and the build pipeline"
+        title: "Unpacking the tarball, and the build pipeline"
         path: sections/section-030/module-01/course-01-unpacking-and-the-build-pipeline.md
-
       - type: reading
-        title: "Module 1.2: Discovering and choosing configure flags"
+        title: "Discovering and choosing configure flags"
         path: sections/section-030/module-01/course-02-discovering-and-choosing-flags.md
-
       - type: reading
-        title: "Module 1.3: Building, installing, and verifying"
+        title: "Building, installing, and verifying"
         path: sections/section-030/module-01/course-03-building-installing-verifying.md
-
       - type: reading
         title: Question
         path: sections/section-030/module-01/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-030/module-01/labs/lab-01/solution.md
-
       - type: lab
         title: "Compile & Install From Source Lab"
         path: sections/section-030/module-01/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: building-software
+        task_kind: build
+        tags: [source-build, tarball, configure, make]
+        learning_goals:
+          - Unpack a source tarball and find the configure options it supports
+          - Build and install with a chosen install path and a feature turned off
+        resources:
+          - name: "GNU Autoconf: running configure"
+            url: https://www.gnu.org/software/autoconf/manual/autoconf.html#Running-configure-Scripts
+          - name: "GNU make manual"
+            url: https://www.gnu.org/software/make/manual/make.html
       - type: reading
-        title: "Module 2: libvirt Virtual Machine Lifecycle"
+        title: "libvirt Virtual Machine Lifecycle"
         path: sections/section-030/module-02/course.md
-
       - type: reading
-        title: "Module 2.1: The domain and the libvirt stack"
+        title: "The domain and the libvirt stack"
         path: sections/section-030/module-02/course-01-domain-and-the-libvirt-stack.md
-
       - type: reading
-        title: "Module 2.2: Defining a domain around an existing disk"
+        title: "Defining a domain around an existing disk"
         path: sections/section-030/module-02/course-02-defining-around-an-existing-disk.md
-
       - type: reading
-        title: "Module 2.3: Persistent vs. transient — the domain lifecycle"
+        title: "Persistent vs. transient: the domain lifecycle"
         path: sections/section-030/module-02/course-03-persistent-vs-transient-lifecycle.md
-
       - type: reading
-        title: "Module 2.4: Autostart and reading a domain's true state"
+        title: "Autostart and reading a domain's true state"
         path: sections/section-030/module-02/course-04-autostart-and-reading-true-state.md
-
       - type: reading
-        title: "Module 2.5: Graceful shutdown vs. hard power-off"
+        title: "Graceful shutdown vs. hard power-off"
         path: sections/section-030/module-02/course-05-graceful-shutdown-vs-hard-destroy.md
-
       - type: reading
         title: Question
         path: sections/section-030/module-02/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-030/module-02/labs/lab-01/solution.md
-
       - type: lab
         title: "libvirt Virtual Machine Lifecycle Lab"
         path: sections/section-030/module-02/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: virtual-machines
+        task_kind: build
+        tags: [libvirt, virsh, virt-install, qcow2, autostart, domain-xml]
+        learning_goals:
+          - Define a persistent domain around an existing qcow2 disk with set memory and vCPUs
+          - Mark the domain to autostart and start it
+          - Tell a graceful shutdown from a hard destroy by the state each leaves
+        resources:
+          - name: "virsh manual page"
+            url: https://libvirt.org/manpages/virsh.html
+          - name: "virt-install manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man1/virt-install.1.html
       - type: reading
         title: Question
         path: sections/section-030/module-02/labs/lab-02/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-030/module-02/labs/lab-02/solution.md
-
       - type: lab
         title: "Transient to Persistent Domain Lab"
         path: sections/section-030/module-02/labs/lab-02
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: virtual-machines
+        task_kind: migration
+        tags: [libvirt, virsh, transient-domain, domain-xml, autostart]
+        learning_goals:
+          - Make a running transient domain persistent without stopping it
+          - Mark it to autostart and prove its definition is on disk
+        resources:
+          - name: "virsh manual page"
+            url: https://libvirt.org/manpages/virsh.html
+          - name: "libvirt domain XML format"
+            url: https://libvirt.org/formatdomain.html
       - type: reading
         title: Question
         path: sections/section-030/module-02/labs/lab-03/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-030/module-02/labs/lab-03/solution.md
-
       - type: lab
         title: "Reconfigure a Persistent Domain Lab"
         path: sections/section-030/module-02/labs/lab-03
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: virtual-machines
+        task_kind: troubleshooting
+        tags: [libvirt, virsh, vm-resources, domain-xml]
+        learning_goals:
+          - Change a domain's memory and vCPUs in its persistent configuration
+          - Start the domain and prove the new size with virsh dominfo
+        resources:
+          - name: "virsh manual page"
+            url: https://libvirt.org/manpages/virsh.html
+          - name: "libvirt domain XML: memory and CPU"
+            url: https://libvirt.org/formatdomain.html#memory-allocation
       - type: reading
         title: "Section 030 Knowledge Check: Building & Virtualizing Systems"
         path: sections/section-030/quiz.md
-
       - type: reading
         title: Question
         path: sections/section-030/capstone/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-030/capstone/labs/lab-01/solution.md
-
       - type: lab
         title: "New Toolchain, New Host Capstone Lab"
         path: sections/section-030/capstone/labs/lab-01
         difficulty: advanced
+        estimated_duration: 45m
+        topic: virtual-machines
+        task_kind: build
+        tags: [source-build, configure, make, libvirt, virsh, virt-install, autostart]
+        learning_goals:
+          - Build and install a tool from source to an exact path with a feature turned off
+          - Define, autostart and start a persistent domain around an existing disk
+          - Use the new tool to prove the domain is running
+        resources:
+          - name: "GNU Autoconf: running configure"
+            url: https://www.gnu.org/software/autoconf/manual/autoconf.html#Running-configure-Scripts
+          - name: "virsh manual page"
+            url: https://libvirt.org/manpages/virsh.html
 
   - id: module-040
     title: "Section 040: Mandatory Access Control — SELinux & AppArmor"
     description: >
-      Diagnose Mandatory Access Control denials that occur even when
-      standard DAC permissions are correct. Hands-on AppArmor profile
-      diagnosis and repair on the platform's native Ubuntu image, plus a
-      fully worked, honestly-labeled conceptual walkthrough of the
-      equivalent SELinux workflow used on RHEL-family exam hosts.
+      Diagnose Mandatory Access Control denials that occur even when standard
+      DAC permissions are correct. Hands-on AppArmor profile diagnosis and
+      repair on the platform's native Ubuntu image, plus a fully worked,
+      honestly-labeled conceptual walkthrough of the equivalent SELinux
+      workflow used on RHEL-family exam hosts.
 
     content:
       - type: reading
-        title: Section Overview
+        title: "Section Overview"
         path: sections/section-040/README.md
-
       - type: reading
-        title: "Module 1: AppArmor Profile Enforcement & the Other MAC System: SELinux"
+        title: "AppArmor Profile Enforcement & the Other MAC System: SELinux"
         path: sections/section-040/module-01/course.md
-
       - type: reading
-        title: "Module 1.1: Two gates — DAC, MAC, and which system you're on"
+        title: "Two gates: DAC, MAC, and which system you're on"
         path: sections/section-040/module-01/course-01-two-gates-dac-mac-and-which-system.md
-
       - type: reading
-        title: "Module 1.2: AppArmor — profiles, modes, and what's loaded"
+        title: "AppArmor: profiles, modes, and what's loaded"
         path: sections/section-040/module-01/course-02-apparmor-profiles-and-modes.md
-
       - type: reading
-        title: "Module 1.3: AppArmor — diagnosing and fixing a path denial"
+        title: "AppArmor: diagnosing and fixing a path denial"
         path: sections/section-040/module-01/course-03-apparmor-diagnosing-and-fixing.md
-
       - type: reading
-        title: "Module 1.4: SELinux — labels, contexts, and the AVC denial"
+        title: "SELinux: labels, contexts, and the AVC denial"
         path: sections/section-040/module-01/course-04-selinux-labels-and-avc-denials.md
-
       - type: reading
-        title: "Module 1.5: SELinux — persistent fixes and the AppArmor contrast"
+        title: "SELinux: persistent fixes and the AppArmor contrast"
         path: sections/section-040/module-01/course-05-selinux-persistent-fixes-and-contrast.md
-
       - type: reading
         title: Question
         path: sections/section-040/module-01/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-040/module-01/labs/lab-01/solution.md
-
       - type: lab
         title: "AppArmor Profile Enforcement Lab"
         path: sections/section-040/module-01/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: mandatory-access-control
+        task_kind: troubleshooting
+        tags: [apparmor, aa-status, apparmor-profiles, enforce-mode, audit-log]
+        learning_goals:
+          - Find an AppArmor write denial in the kernel audit log
+          - Add a profile rule for the new path and reload the profile
+          - Prove the profile still enforces and the service writes again
+        resources:
+          - name: "Ubuntu Server: AppArmor"
+            url: https://ubuntu.com/server/docs/how-to/security/apparmor/
+          - name: "apparmor_parser manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/apparmor_parser.8.html
       - type: reading
         title: Question
         path: sections/section-040/module-01/labs/lab-02/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-040/module-01/labs/lab-02/solution.md
-
       - type: lab
         title: "AppArmor: Repair a Read Denial Lab"
         path: sections/section-040/module-01/labs/lab-02
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: mandatory-access-control
+        task_kind: troubleshooting
+        tags: [apparmor, aa-status, apparmor-profiles, enforce-mode, audit-log]
+        learning_goals:
+          - Read a read denial's operation, requested mask and path from the audit line
+          - Allow only read access to the new key file and reload the profile in enforce mode
+        resources:
+          - name: "Ubuntu Server: AppArmor"
+            url: https://ubuntu.com/server/docs/how-to/security/apparmor/
+          - name: "apparmor.d(5) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man5/apparmor.d.5.html
       - type: reading
         title: "Section 040 Knowledge Check: Mandatory Access Control — SELinux & AppArmor"
         path: sections/section-040/quiz.md
-
       - type: reading
         title: Question
         path: sections/section-040/capstone/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-040/capstone/labs/lab-01/solution.md
-
       - type: lab
         title: "Two Services, Two Denials Capstone Lab"
         path: sections/section-040/capstone/labs/lab-01
         difficulty: advanced
+        estimated_duration: 35m
+        topic: mandatory-access-control
+        task_kind: troubleshooting
+        tags: [apparmor, aa-status, apparmor-profiles, enforce-mode, audit-log, complain-mode]
+        learning_goals:
+          - Find and close a write denial and a read denial in two different profiles
+          - Leave both profiles in enforce mode with no new denials
+        resources:
+          - name: "Ubuntu Server: AppArmor"
+            url: https://ubuntu.com/server/docs/how-to/security/apparmor/
+          - name: "apparmor.d(5) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man5/apparmor.d.5.html
 
   - id: module-050
     title: "Section 050: Debian Package Management: Repositories, dpkg & APT"
     description: >
-      The full Debian/Ubuntu package-management stack from the bottom up
-      — dpkg low-level package surgery, the daily apt maintenance loop,
-      read-only package research before any change, bulk/group
-      operations with holds, and trusting third-party vendor repositories
-      the modern signed-by way.
+      The full Debian/Ubuntu package-management stack from the bottom up —
+      dpkg low-level package surgery, the daily apt maintenance loop,
+      read-only package research before any change, bulk/group operations with
+      holds, and trusting third-party vendor repositories the modern signed-by
+      way.
 
     content:
       - type: reading
-        title: Section Overview
+        title: "Section Overview"
         path: sections/section-050/README.md
-
       - type: reading
-        title: "Module 1: Third-Party Repositories & Package Pinning"
+        title: "Third-Party Repositories & Package Pinning"
         path: sections/section-050/module-01/course.md
-
       - type: reading
-        title: "Module 1.1: Scoped trust — keyrings and signed-by"
+        title: "Scoped trust: keyrings and `signed-by`"
         path: sections/section-050/module-01/course-01-scoped-trust.md
-
       - type: reading
-        title: "Module 1.2: Adding the repository and confirming it registered"
+        title: "Adding the repository and confirming it registered"
         path: sections/section-050/module-01/course-02-adding-the-repository.md
-
       - type: reading
-        title: "Module 1.3: Installing an exact version, and locking it"
+        title: "Installing an exact version, and locking it"
         path: sections/section-050/module-01/course-03-exact-version-and-hold.md
-
       - type: reading
         title: Question
         path: sections/section-050/module-01/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-050/module-01/labs/lab-01/solution.md
-
       - type: lab
         title: "Third-Party Repositories & Package Pinning Lab"
         path: sections/section-050/module-01/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: debian-packages
+        task_kind: build
+        tags: [apt, apt-repositories, gpg-keyring, signed-by, package-versions, apt-mark-hold]
+        learning_goals:
+          - Add a third-party repository with its own keyring and a signed-by reference
+          - Install the exact version the repository publishes and hold it
+        resources:
+          - name: "Debian wiki: DebianRepository/UseThirdParty"
+            url: https://wiki.debian.org/DebianRepository/UseThirdParty
+          - name: "sources.list(5) manual page"
+            url: https://manpages.debian.org/bookworm/apt/sources.list.5.en.html
+          - name: "apt-mark(8) manual page"
+            url: https://manpages.debian.org/bookworm/apt/apt-mark.8.en.html
       - type: reading
         title: Question
         path: sections/section-050/module-01/labs/lab-02/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-050/module-01/labs/lab-02/solution.md
-
       - type: lab
         title: "APT Pinning (not a hold) Lab"
         path: sections/section-050/module-01/labs/lab-02
         difficulty: intermediate
-
+        estimated_duration: 15m
+        topic: debian-packages
+        task_kind: build
+        tags: [apt, apt-pinning, apt-cache, package-versions]
+        learning_goals:
+          - Write a preferences file that pins a package to the release pocket
+          - Prove the new candidate version with apt-cache policy
+        resources:
+          - name: "apt_preferences(5) manual page"
+            url: https://manpages.debian.org/bookworm/apt/apt_preferences.5.en.html
       - type: reading
-        title: "Module 2: dpkg Low-Level Package Management"
+        title: "dpkg Low-Level Package Management"
         path: sections/section-050/module-02/course.md
-
       - type: reading
-        title: "Module 2.1: What dpkg knows, and inspecting a .deb"
+        title: "What `dpkg` knows, and inspecting a `.deb` before you trust it"
         path: sections/section-050/module-02/course-01-dpkg-scope-and-inspecting-a-deb.md
-
       - type: reading
-        title: "Module 2.2: Installing directly, and ownership queries"
+        title: "Installing directly, and ownership queries in both directions"
         path: sections/section-050/module-02/course-02-installing-and-ownership-queries.md
-
       - type: reading
-        title: "Module 2.3: Status codes and recovering an interrupted package"
+        title: "Status codes and recovering an interrupted package"
         path: sections/section-050/module-02/course-03-status-codes-and-recovery.md
-
       - type: reading
         title: Question
         path: sections/section-050/module-02/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-050/module-02/labs/lab-01/solution.md
-
       - type: lab
         title: "dpkg Low-Level Package Management Lab"
         path: sections/section-050/module-02/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: debian-packages
+        task_kind: troubleshooting
+        tags: [dpkg, package-ownership, interrupted-install, apt]
+        learning_goals:
+          - Inspect a .deb file's metadata and file list before installing it
+          - Install it with dpkg and query file ownership both ways
+          - Recover a half-configured package to a clean state
+        resources:
+          - name: "dpkg(1) manual page"
+            url: https://manpages.debian.org/bookworm/dpkg/dpkg.1.en.html
+          - name: "dpkg-deb(1) manual page"
+            url: https://manpages.debian.org/bookworm/dpkg/dpkg-deb.1.en.html
       - type: reading
-        title: "Module 3: APT Basic Package Operations"
+        title: "APT Basic Package Operations"
         path: sections/section-050/module-03/course.md
-
       - type: reading
-        title: "Module 3.1: apt update is not apt upgrade"
+        title: "`apt update` is not `apt upgrade`"
         path: sections/section-050/module-03/course-01-update-is-not-upgrade.md
-
       - type: reading
-        title: "Module 3.2: Applying upgrades, and installing"
+        title: "Applying upgrades, and installing"
         path: sections/section-050/module-03/course-02-applying-upgrades-and-installing.md
-
       - type: reading
-        title: "Module 3.3: Removing cleanly"
+        title: "Removing cleanly"
         path: sections/section-050/module-03/course-03-removing-cleanly.md
-
       - type: reading
         title: Question
         path: sections/section-050/module-03/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-050/module-03/labs/lab-01/solution.md
-
       - type: lab
         title: "APT Basic Package Operations Lab"
         path: sections/section-050/module-03/labs/lab-01
-        difficulty: intermediate
-
+        difficulty: beginner
+        estimated_duration: 20m
+        topic: debian-packages
+        task_kind: build
+        tags: [apt, purge, autoremove, package-versions]
+        learning_goals:
+          - Refresh the index, list upgrades and apply them
+          - Install a package and purge another with its configuration files
+          - Remove orphaned dependencies
+        resources:
+          - name: "apt(8) manual page"
+            url: https://manpages.debian.org/bookworm/apt/apt.8.en.html
+          - name: "apt-get(8) manual page"
+            url: https://manpages.debian.org/bookworm/apt/apt-get.8.en.html
       - type: reading
-        title: "Module 4: APT Package Information Lookup"
+        title: "APT Package Information Lookup"
         path: sections/section-050/module-04/course.md
-
       - type: reading
-        title: "Module 4.1: Finding a package, and describing it"
+        title: "Finding a package, and describing it"
         path: sections/section-050/module-04/course-01-finding-and-describing.md
-
       - type: reading
-        title: "Module 4.2: Installed vs. candidate, and which source wins"
+        title: "Installed vs. candidate, and which source wins"
         path: sections/section-050/module-04/course-02-installed-vs-candidate.md
-
       - type: reading
         title: Question
         path: sections/section-050/module-04/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-050/module-04/labs/lab-01/solution.md
-
       - type: lab
         title: "APT Package Information Lookup Lab"
         path: sections/section-050/module-04/labs/lab-01
-        difficulty: intermediate
-
+        difficulty: beginner
+        estimated_duration: 20m
+        topic: debian-packages
+        task_kind: build
+        tags: [apt, apt-cache, package-search, package-versions, redirection]
+        learning_goals:
+          - Search for packages by keyword and show one package's metadata without installing it
+          - Compare installed and candidate versions and their source with apt-cache policy
+          - List installed packages by name pattern and list upgradable packages
+        resources:
+          - name: "apt-cache(8) manual page"
+            url: https://manpages.debian.org/bookworm/apt/apt-cache.8.en.html
+          - name: "apt(8) manual page"
+            url: https://manpages.debian.org/bookworm/apt/apt.8.en.html
       - type: reading
-        title: "Module 5: APT Package Groups & Bulk Operations"
+        title: "APT Package Groups & Bulk Operations"
         path: sections/section-050/module-05/course.md
-
       - type: reading
-        title: "Module 5.1: One transaction, and finding a family by pattern"
+        title: "One transaction, and finding a family by pattern"
         path: sections/section-050/module-05/course-01-one-transaction-and-finding-a-family.md
-
       - type: reading
-        title: "Module 5.2: Bulk actions across a matched set"
+        title: "Bulk actions across a matched set"
         path: sections/section-050/module-05/course-02-bulk-actions-across-a-set.md
-
       - type: reading
         title: Question
         path: sections/section-050/module-05/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-050/module-05/labs/lab-01/solution.md
-
       - type: lab
         title: "APT Package Groups & Bulk Operations Lab"
         path: sections/section-050/module-05/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: debian-packages
+        task_kind: build
+        tags: [apt, apt-mark-hold, package-search, dpkg]
+        learning_goals:
+          - Install several packages in one APT transaction
+          - Find a package family by name pattern and hold every member at once
+        resources:
+          - name: "apt-mark(8) manual page"
+            url: https://manpages.debian.org/bookworm/apt/apt-mark.8.en.html
+          - name: "dpkg-query(1) manual page"
+            url: https://manpages.debian.org/bookworm/dpkg/dpkg-query.1.en.html
       - type: reading
-        title: "Section 050 Knowledge Check: Debian Package Management"
+        title: "Section 050 Knowledge Check: Debian Package Management: Repositories, dpkg & APT"
         path: sections/section-050/quiz.md
-
       - type: reading
         title: Question
         path: sections/section-050/capstone/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-050/capstone/labs/lab-01/solution.md
-
       - type: lab
         title: "New App Server Onboarding Capstone Lab"
         path: sections/section-050/capstone/labs/lab-01
         difficulty: advanced
+        estimated_duration: 45m
+        topic: debian-packages
+        task_kind: build
+        tags: [apt, signed-by, gpg-keyring, apt-mark-hold, interrupted-install, apt-cache, package-versions]
+        learning_goals:
+          - Add a vendor repository with a dedicated keyring and install and hold its exact version
+          - Recover a half-configured package and hold a whole package family by pattern
+          - Record which version and repository APT would install, without installing
+        resources:
+          - name: "Debian wiki: DebianRepository/UseThirdParty"
+            url: https://wiki.debian.org/DebianRepository/UseThirdParty
+          - name: "apt-mark(8) manual page"
+            url: https://manpages.debian.org/bookworm/apt/apt-mark.8.en.html
+          - name: "apt-cache(8) manual page"
+            url: https://manpages.debian.org/bookworm/apt/apt-cache.8.en.html
 
   - id: module-060
     title: "Section 060: RPM/DNF Package Management: rpm, dnf & Package Groups"
     description: >
       The full RPM-family package-management stack from the bottom up —
-      low-level rpm package surgery and RPM database recovery, the daily
-      dnf maintenance loop, read-only package research, and dnf's
-      first-class package groups. All labs run real rpm/dnf tooling
-      inside a privileged Rocky Linux 9 Docker container on the
-      platform's Ubuntu VM image.
+      low-level rpm package surgery and RPM database recovery, the daily dnf
+      maintenance loop, read-only package research, and dnf's first-class
+      package groups. All labs run real rpm/dnf tooling inside a privileged
+      Rocky Linux 9 Docker container on the platform's Ubuntu VM image.
 
     content:
       - type: reading
-        title: Section Overview
+        title: "Section Overview"
         path: sections/section-060/README.md
-
       - type: reading
-        title: "Module 1: RPM Low-Level Package Management"
+        title: "RPM Low-Level Package Management"
         path: sections/section-060/module-01/course.md
-
       - type: reading
-        title: "Module 1.1: What rpm knows, and inspecting a .rpm"
+        title: "What `rpm` knows, and inspecting a `.rpm` before you trust it"
         path: sections/section-060/module-01/course-01-rpm-scope-and-inspecting.md
-
       - type: reading
-        title: "Module 1.2: Installing directly, and ownership queries"
+        title: "Installing directly, and ownership queries in both directions"
         path: sections/section-060/module-01/course-02-installing-and-ownership.md
-
       - type: reading
-        title: "Module 1.3: Verifying integrity"
+        title: "Verifying integrity"
         path: sections/section-060/module-01/course-03-verifying-integrity.md
-
       - type: reading
         title: Question
         path: sections/section-060/module-01/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-060/module-01/labs/lab-01/solution.md
-
       - type: lab
         title: "RPM Low-Level Package Management Lab"
         path: sections/section-060/module-01/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: rpm-packages
+        task_kind: build
+        tags: [rpm, package-ownership, rpm-verify, dependency-check]
+        learning_goals:
+          - Inspect an .rpm file's metadata and file list before installing it
+          - Install it with rpm and query ownership, file lists, requires and provides
+          - Verify the installed files against the RPM database
+        resources:
+          - name: "RPM documentation"
+            url: https://rpm.org/documentation.html
+          - name: "rpm(8) manual page"
+            url: https://rpm-software-management.github.io/rpm/man/rpm.8.html
       - type: reading
-        title: "Module 2: Rebuilding a Corrupted RPM Database"
+        title: "Rebuilding a Corrupted RPM Database"
         path: sections/section-060/module-02/course.md
-
       - type: reading
-        title: "Module 2.1: Recognising the symptom, and not assuming the backend"
+        title: "Recognising the symptom, and not assuming the backend"
         path: sections/section-060/module-02/course-01-recognising-the-symptom.md
-
       - type: reading
-        title: "Module 2.2: Back up, rebuild, verify"
+        title: "Back up, rebuild, verify"
         path: sections/section-060/module-02/course-02-backup-rebuild-verify.md
-
       - type: reading
         title: Question
         path: sections/section-060/module-02/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-060/module-02/labs/lab-01/solution.md
-
       - type: lab
         title: "Rebuilding a Corrupted RPM Database Lab"
         path: sections/section-060/module-02/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: rpm-packages
+        task_kind: troubleshooting
+        tags: [rpm-database, rpmdb-rebuild, rpm, dnf]
+        learning_goals:
+          - Confirm that a failure is real database corruption and find the database backend
+          - Back up and rebuild the RPM database, then prove rpm and dnf both work
+        resources:
+          - name: "rpm(8) manual page: --rebuilddb"
+            url: https://rpm-software-management.github.io/rpm/man/rpm.8.html
+          - name: "DNF command reference"
+            url: https://dnf.readthedocs.io/en/latest/command_ref.html
       - type: reading
         title: Question
         path: sections/section-060/module-02/labs/lab-02/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-060/module-02/labs/lab-02/solution.md
-
       - type: lab
         title: "RPM Database: Corruption Look-Alike Lab"
         path: sections/section-060/module-02/labs/lab-02
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: rpm-packages
+        task_kind: troubleshooting
+        tags: [rpm-database, dependency-check, dnf, rpm]
+        learning_goals:
+          - Read dnf check errors and tell a broken dependency from a corrupt database
+          - Fix the missing dependency without rebuilding the database
+        resources:
+          - name: "DNF command reference: check"
+            url: https://dnf.readthedocs.io/en/latest/command_ref.html#check-command
+          - name: "rpm(8) manual page"
+            url: https://rpm-software-management.github.io/rpm/man/rpm.8.html
       - type: reading
-        title: "Module 3: DNF Basic Package Operations"
+        title: "DNF Basic Package Operations"
         path: sections/section-060/module-03/course.md
-
       - type: reading
-        title: "Module 3.1: The everyday dnf loop"
+        title: "The everyday `dnf` loop"
         path: sections/section-060/module-03/course-01-the-dnf-loop.md
-
       - type: reading
-        title: "Module 3.2: Removing, and transactional history"
+        title: "Removing, and transactional history"
         path: sections/section-060/module-03/course-02-removing-and-history.md
-
       - type: reading
         title: Question
         path: sections/section-060/module-03/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-060/module-03/labs/lab-01/solution.md
-
       - type: lab
         title: "DNF Basic Package Operations Lab"
         path: sections/section-060/module-03/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: rpm-packages
+        task_kind: build
+        tags: [dnf, dnf-history, epel, autoremove]
+        learning_goals:
+          - List and apply upgrades, install and remove packages with dnf
+          - Find a transaction in dnf history and undo it as one unit
+        resources:
+          - name: "DNF command reference"
+            url: https://dnf.readthedocs.io/en/latest/command_ref.html
+          - name: "DNF command reference: history"
+            url: https://dnf.readthedocs.io/en/latest/command_ref.html#history-command
       - type: reading
-        title: "Module 4: DNF Package Information Lookup"
+        title: "DNF Package Information Lookup"
         path: sections/section-060/module-04/course.md
-
       - type: reading
-        title: "Module 4.1: Finding a package, and describing it"
+        title: "Finding a package, and describing it"
         path: sections/section-060/module-04/course-01-search-and-describe.md
-
       - type: reading
-        title: "Module 4.2: What would provide this, and cross-referencing rpm"
+        title: "What would provide this, and cross-referencing `rpm`"
         path: sections/section-060/module-04/course-02-provides-and-cross-referencing.md
-
       - type: reading
         title: Question
         path: sections/section-060/module-04/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-060/module-04/labs/lab-01/solution.md
-
       - type: lab
         title: "DNF Package Information Lookup Lab"
         path: sections/section-060/module-04/labs/lab-01
-        difficulty: intermediate
-
+        difficulty: beginner
+        estimated_duration: 20m
+        topic: rpm-packages
+        task_kind: build
+        tags: [dnf, dnf-provides, package-search, redirection]
+        learning_goals:
+          - Search for packages by keyword and show a package's metadata without installing it
+          - Find which package provides a missing command
+          - List installed packages by name pattern
+        resources:
+          - name: "DNF command reference"
+            url: https://dnf.readthedocs.io/en/latest/command_ref.html
+          - name: "DNF command reference: provides"
+            url: https://dnf.readthedocs.io/en/latest/command_ref.html#provides-command
       - type: reading
-        title: "Module 5: DNF Package Groups"
+        title: "DNF Package Groups"
         path: sections/section-060/module-05/course.md
-
       - type: reading
-        title: "Module 5.1: What a group is, and discovering what exists"
+        title: "What a group is, and discovering what exists"
         path: sections/section-060/module-05/course-01-what-a-group-is-and-discovering.md
-
       - type: reading
-        title: "Module 5.2: Inspecting membership, and installing"
+        title: "Inspecting membership, and installing"
         path: sections/section-060/module-05/course-02-inspecting-and-installing.md
-
       - type: reading
-        title: "Module 5.3: Confirming what landed, and removing cleanly"
+        title: "Confirming what landed, and removing cleanly"
         path: sections/section-060/module-05/course-03-confirming-and-removing.md
-
       - type: reading
         title: Question
         path: sections/section-060/module-05/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-060/module-05/labs/lab-01/solution.md
-
       - type: lab
         title: "DNF Package Groups Lab"
         path: sections/section-060/module-05/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: rpm-packages
+        task_kind: build
+        tags: [dnf, dnf-groups, dnf-history, autoremove]
+        learning_goals:
+          - List the package groups and inspect a group's members before installing it
+          - Install and remove a group as one unit
+          - Explain which packages a group removal leaves behind
+        resources:
+          - name: "DNF command reference: group"
+            url: https://dnf.readthedocs.io/en/latest/command_ref.html#group-command
       - type: reading
         title: "Section 060 Knowledge Check: RPM/DNF Package Management"
         path: sections/section-060/quiz.md
-
       - type: reading
         title: Question
         path: sections/section-060/capstone/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-060/capstone/labs/lab-01/solution.md
-
       - type: lab
         title: "RPM/DNF Package Management Capstone Lab"
         path: sections/section-060/capstone/labs/lab-01
         difficulty: advanced
+        estimated_duration: 45m
+        topic: rpm-packages
+        task_kind: troubleshooting
+        tags: [rpm-database, rpmdb-rebuild, rpm, rpm-verify, dnf-groups, dependency-check]
+        learning_goals:
+          - Diagnose and repair a corrupted RPM database with a backup first
+          - Inspect, install and verify a standalone .rpm file
+          - Install a package group and prove the system is consistent with dnf check
+        resources:
+          - name: "rpm(8) manual page"
+            url: https://rpm-software-management.github.io/rpm/man/rpm.8.html
+          - name: "DNF command reference"
+            url: https://dnf.readthedocs.io/en/latest/command_ref.html
 
   - id: module-070
     title: "Section 070: SUSE Package Management: Zypper"
     description: >
-      The zypper package tool used across openSUSE and SUSE Linux
-      Enterprise, including the patch-vs-update distinction unique to
-      SUSE, install/remove/history operations, and the search/info/
-      what-provides research workflow — exercised inside a real
-      opensuse/leap:15.6 Docker sandbox on the platform's Ubuntu VM.
+      The zypper package tool used across openSUSE and SUSE Linux Enterprise,
+      including the patch-vs-update distinction unique to SUSE,
+      install/remove/history operations, and the search/info/ what-provides
+      research workflow — exercised inside a real opensuse/leap:15.6 Docker
+      sandbox on the platform's Ubuntu VM.
 
     content:
       - type: reading
-        title: Section Overview
+        title: "Section Overview"
         path: sections/section-070/README.md
-
       - type: reading
-        title: "Module 1: Zypper Basic Package Operations"
+        title: "Zypper Basic Package Operations"
         path: sections/section-070/module-01/course.md
-
       - type: reading
-        title: "Module 1.1: Refresh, and the two questions — updates vs. patches"
+        title: "Refresh, and the two questions: updates vs. patches"
         path: sections/section-070/module-01/course-01-refresh-updates-vs-patches.md
-
       - type: reading
-        title: "Module 1.2: Applying the right one — zypper patch vs zypper update"
+        title: "Applying the right one: `zypper patch` vs `zypper update`"
         path: sections/section-070/module-01/course-02-applying-the-right-one.md
-
       - type: reading
-        title: "Module 1.3: Installing, removing, and reading history"
+        title: "Installing, removing, and reading history"
         path: sections/section-070/module-01/course-03-install-remove-history.md
-
       - type: reading
         title: Question
         path: sections/section-070/module-01/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-070/module-01/labs/lab-01/solution.md
-
       - type: lab
         title: "Zypper Basic Package Operations Lab"
         path: sections/section-070/module-01/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: suse-packages
+        task_kind: build
+        tags: [zypper, zypper-patch, zypper-update, zypper-repositories]
+        learning_goals:
+          - Refresh metadata and list available updates and patches as two separate questions
+          - Apply only patches, install one package and remove another
+          - Read zypper's history to confirm what changed
+        resources:
+          - name: "zypper(8) manual page"
+            url: https://manpages.opensuse.org/Tumbleweed/zypper/zypper.8.en.html
+          - name: "openSUSE Leap reference: managing software with zypper"
+            url: https://doc.opensuse.org/documentation/leap/reference/html/book-reference/cha-sw-cl.html
       - type: reading
-        title: "Module 2: Zypper Package Information Lookup"
+        title: "Zypper Package Information Lookup"
         path: sections/section-070/module-02/course.md
-
       - type: reading
-        title: "Module 2.1: The three research questions — search, info, what-provides"
+        title: "The three research questions: search, info, what-provides"
         path: sections/section-070/module-02/course-01-the-three-questions.md
-
       - type: reading
-        title: "Module 2.2: Installed-only filtering, and the rpm fallback"
+        title: "Installed-only filtering, and the `rpm` fallback"
         path: sections/section-070/module-02/course-02-installed-only-and-rpm-fallback.md
-
       - type: reading
         title: Question
         path: sections/section-070/module-02/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-070/module-02/labs/lab-01/solution.md
-
       - type: lab
         title: "Zypper Package Information Lookup Lab"
         path: sections/section-070/module-02/labs/lab-01
-        difficulty: intermediate
-
+        difficulty: beginner
+        estimated_duration: 20m
+        topic: suse-packages
+        task_kind: build
+        tags: [zypper, zypper-search, zypper-what-provides, redirection]
+        learning_goals:
+          - Search by keyword and show a package's metadata without installing it
+          - Find which package provides a file, and list installed packages with zypper's own filters
+        resources:
+          - name: "zypper(8) manual page"
+            url: https://manpages.opensuse.org/Tumbleweed/zypper/zypper.8.en.html
+          - name: "openSUSE Leap reference: managing software with zypper"
+            url: https://doc.opensuse.org/documentation/leap/reference/html/book-reference/cha-sw-cl.html
       - type: reading
         title: "Section 070 Knowledge Check: SUSE Package Management: Zypper"
         path: sections/section-070/quiz.md
-
       - type: reading
         title: Question
         path: sections/section-070/capstone/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-070/capstone/labs/lab-01/solution.md
-
       - type: lab
         title: "Zypper Research-Then-Act Capstone Lab"
         path: sections/section-070/capstone/labs/lab-01
         difficulty: advanced
+        estimated_duration: 35m
+        topic: suse-packages
+        task_kind: build
+        tags: [zypper, zypper-search, zypper-patch, zypper-repositories, redirection]
+        learning_goals:
+          - Research a package by keyword and metadata before installing it
+          - Apply only curated patches, install and remove packages, and read the history
+        resources:
+          - name: "zypper(8) manual page"
+            url: https://manpages.opensuse.org/Tumbleweed/zypper/zypper.8.en.html
+          - name: "openSUSE Leap reference: managing software with zypper"
+            url: https://doc.opensuse.org/documentation/leap/reference/html/book-reference/cha-sw-cl.html
 
   - id: module-080
     title: "Section 080: System Disaster Recovery"
     description: >
-      A calm, repeatable procedure for getting back into a broken
-      machine: chroot-based root filesystem and password repair, GPT
-      partition table backup and restoration, and GRUB bootloader
-      reinstallation — every boot-breaking scenario safely re-staged onto
-      a disposable secondary disk so the grading VM always stays
-      SSH-reachable.
+      A calm, repeatable procedure for getting back into a broken machine:
+      chroot-based root filesystem and password repair, GPT partition table
+      backup and restoration, and GRUB bootloader reinstallation — every
+      boot-breaking scenario safely re-staged onto a disposable secondary disk
+      so the grading VM always stays SSH-reachable.
 
     content:
       - type: reading
-        title: Section Overview
+        title: "Section Overview"
         path: sections/section-080/README.md
-
       - type: reading
-        title: "Module 1: Root-Filesystem Repair via chroot"
+        title: "Root-Filesystem Repair via chroot"
         path: sections/section-080/module-01/course.md
-
       - type: reading
-        title: "Module 1.1: Why a bad fstab stops the boot, and how to reach a shell"
+        title: "Why a bad fstab stops the boot, and how to reach a shell"
         path: sections/section-080/module-01/course-01-why-it-wont-boot-and-reaching-a-shell.md
-
       - type: reading
-        title: "Module 1.2: Mount the broken root, and get the tools in"
+        title: "Mount the broken root, and get the tools in"
         path: sections/section-080/module-01/course-02-mount-and-get-tools-in.md
-
       - type: reading
-        title: "Module 1.3: chroot in, fix, prove, unmount"
+        title: "chroot in, fix, prove, unmount"
         path: sections/section-080/module-01/course-03-chroot-fix-prove-unmount.md
-
       - type: reading
         title: Question
         path: sections/section-080/module-01/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-080/module-01/labs/lab-01/solution.md
-
       - type: lab
         title: "Root-Filesystem Repair via chroot Lab"
         path: sections/section-080/module-01/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 30m
+        topic: system-recovery
+        task_kind: troubleshooting
+        tags: [chroot, fstab, blkid, mount, rescue-shell]
+        learning_goals:
+          - Mount a broken root filesystem and prepare it for chroot with bind mounts
+          - Fix a mistyped UUID in /etc/fstab and prove it with mount -a
+          - Unmount everything cleanly in reverse order
+        resources:
+          - name: "fstab(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/fstab.5.html
+          - name: "chroot(1) manual page"
+            url: https://man7.org/linux/man-pages/man1/chroot.1.html
+          - name: "mount(8): bind mounts"
+            url: https://man7.org/linux/man-pages/man8/mount.8.html
       - type: reading
         title: Question
         path: sections/section-080/module-01/labs/lab-02/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-080/module-01/labs/lab-02/solution.md
-
       - type: lab
         title: "chroot Repair: Wrong fstab Filesystem Type Lab"
         path: sections/section-080/module-01/labs/lab-02
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: system-recovery
+        task_kind: troubleshooting
+        tags: [chroot, fstab, blkid, mount]
+        learning_goals:
+          - Read a wrong fs type error from mount -a inside a chroot
+          - Correct the filesystem type in /etc/fstab and prove it with mount -a
+        resources:
+          - name: "fstab(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/fstab.5.html
+          - name: "chroot(1) manual page"
+            url: https://man7.org/linux/man-pages/man1/chroot.1.html
       - type: reading
-        title: "Module 2: Password Reset & Single-User Recovery"
+        title: "Password Reset & Single-User Recovery"
         path: sections/section-080/module-02/course.md
-
       - type: reading
-        title: "Module 2.1: Two doors — rd.break and init=/bin/bash"
+        title: "Two doors: `rd.break` and `init=/bin/bash`"
         path: sections/section-080/module-02/course-01-two-doors-rd-break-and-init.md
-
       - type: reading
-        title: "Module 2.2: The chroot equivalent, and editing /etc/shadow directly"
+        title: "The chroot equivalent, and editing `/etc/shadow` directly"
         path: sections/section-080/module-02/course-02-chroot-equivalent-and-shadow-edit.md
-
       - type: reading
         title: Question
         path: sections/section-080/module-02/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-080/module-02/labs/lab-01/solution.md
-
       - type: lab
         title: "Password Reset & Single-User Recovery Lab"
         path: sections/section-080/module-02/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: system-recovery
+        task_kind: troubleshooting
+        tags: [chroot, password-reset, etc-shadow, mount]
+        learning_goals:
+          - Enter a stand-in root filesystem with chroot
+          - Write a new password hash into root's /etc/shadow line by hand
+        resources:
+          - name: "shadow(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/shadow.5.html
+          - name: "openssl-passwd manual page"
+            url: https://docs.openssl.org/3.0/man1/openssl-passwd/
       - type: reading
-        title: "Module 3: Partition Table Backup & Recovery"
+        title: "Partition Table Backup & Recovery"
         path: sections/section-080/module-03/course.md
-
       - type: reading
-        title: "Module 3.1: Two layers, not one, and identifying the target disk"
+        title: "Two layers, not one, and identifying the target disk"
         path: sections/section-080/module-03/course-01-two-layers-and-identifying-the-disk.md
-
       - type: reading
-        title: "Module 3.2: Back up the partition table, and verify the backup"
+        title: "Back up the partition table, and verify the backup"
         path: sections/section-080/module-03/course-02-backup-and-verify.md
-
       - type: reading
-        title: "Module 3.3: Simulate, restore, and verify both layers"
+        title: "Simulate, restore, and verify both layers"
         path: sections/section-080/module-03/course-03-simulate-restore-verify.md
-
       - type: reading
         title: Question
         path: sections/section-080/module-03/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-080/module-03/labs/lab-01/solution.md
-
       - type: lab
         title: "Partition Table Backup & Recovery Lab"
         path: sections/section-080/module-03/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 25m
+        topic: system-recovery
+        task_kind: build
+        tags: [partition-table, gpt, sgdisk, block-devices]
+        learning_goals:
+          - Back up a disk's GPT table with sgdisk and check the backup file
+          - Restore the table after a wipe and prove the filesystems are intact
+        resources:
+          - name: "sgdisk(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/sgdisk.8.html
       - type: reading
-        title: "Module 4: GRUB Corruption Recovery"
+        title: "GRUB Corruption Recovery"
         path: sections/section-080/module-04/course.md
-
       - type: reading
-        title: "Module 4.1: Two repairs, easy to confuse, and reading the symptom"
+        title: "Two repairs, easy to confuse, and reading the symptom"
         path: sections/section-080/module-04/course-01-two-repairs-and-the-symptom.md
-
       - type: reading
-        title: "Module 4.2: The one-boot manual rescue from grub>"
+        title: "The one-boot manual rescue from `grub>`"
         path: sections/section-080/module-04/course-02-manual-rescue-from-grub.md
-
       - type: reading
-        title: "Module 4.3: The durable repair — reinstall and regenerate"
+        title: "The durable repair: reinstall and regenerate"
         path: sections/section-080/module-04/course-03-durable-repair.md
-
       - type: reading
         title: Question
         path: sections/section-080/module-04/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-080/module-04/labs/lab-01/solution.md
-
       - type: lab
         title: "GRUB Corruption Recovery Lab"
         path: sections/section-080/module-04/labs/lab-01
         difficulty: intermediate
-
+        estimated_duration: 20m
+        topic: system-recovery
+        task_kind: troubleshooting
+        tags: [grub, grub-install, update-grub, boot-recovery]
+        learning_goals:
+          - Find the boot mode and the disk that holds the root filesystem
+          - Reinstall GRUB and regenerate grub.cfg, then prove the repair without a reboot
+        resources:
+          - name: "GNU GRUB manual"
+            url: https://www.gnu.org/software/grub/manual/grub/grub.html
+          - name: "grub-install manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/grub-install.8.html
       - type: reading
         title: "Section 080 Knowledge Check: System Disaster Recovery"
         path: sections/section-080/quiz.md
-
       - type: reading
         title: Question
         path: sections/section-080/capstone/labs/lab-01/question.md
-
-      - type: reading
-        title: Solution Walkthrough
-        path: sections/section-080/capstone/labs/lab-01/solution.md
-
       - type: lab
         title: "System Disaster Recovery Integration Capstone Lab"
         path: sections/section-080/capstone/labs/lab-01
         difficulty: advanced
+        estimated_duration: 40m
+        topic: system-recovery
+        task_kind: troubleshooting
+        tags: [sgdisk, partition-table, gpt, grub, grub-install, update-grub, boot-recovery]
+        learning_goals:
+          - Restore a wiped GPT table from a backup and prove the filesystems are intact
+          - Reinstall GRUB and regenerate grub.cfg on the running machine
+        resources:
+          - name: "sgdisk(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/sgdisk.8.html
+          - name: "GNU GRUB manual"
+            url: https://www.gnu.org/software/grub/manual/grub/grub.html
 
   - id: module-090
     title: "LFCS Operations Deployment Domain Certification Quiz"
     description: >
-      A comprehensive, scenario-based final assessment covering all 26
-      modules across the 8 sections of this domain, simulating actual
-      Linux Foundation exam pressure.
+      A comprehensive, scenario-based final assessment covering all 26 modules
+      across the 8 sections of this domain, simulating actual Linux Foundation
+      exam pressure.
 
     content:
       - type: reading
