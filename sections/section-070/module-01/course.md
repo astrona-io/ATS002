@@ -1,29 +1,48 @@
 # Zypper Basic Package Operations
 
-`zypper`, the package tool on openSUSE and SUSE Linux Enterprise, tells the same refresh-then-act story as `apt` and `dnf` — with one extra chapter nobody else writes. Alongside "is there a newer version of this package", SUSE distributions ask a second, separate question: "has the vendor published a **patch** that covers this system?" Those are not the same question, and confusing `zypper patch` with `zypper update` is the most common way a SUSE admin drifts out of policy or ships more change than a maintenance window intended.
+Astronaut, this module brings you to a new kind of supply depot. `zypper` is the quartermaster on openSUSE and SUSE Linux Enterprise, two Linux systems from the company SUSE. Like `apt` on Ubuntu and `dnf` on Red Hat systems, it refreshes the depot's catalogue first and then acts: it orders crates (packages) and every crate they depend on.
 
-Three short parts; work them in order.
-
-## How this module is organised
-
-1. **[Part 1 — Refresh, and the two questions: updates vs. patches](./course-01-refresh-updates-vs-patches.md)** — `zypper refresh`, `list-updates` (raw version arithmetic) vs `list-patches` (curated, categorised patch objects), and why the two lists legitimately differ.
-2. **[Part 2 — Applying the right one: `zypper patch` vs `zypper update`](./course-02-applying-the-right-one.md)** — `zypper patch` (only patch-covered, with `--category security`) vs `zypper update` (everything), and reading a task's wording to choose.
-3. **[Part 3 — Installing, removing, and reading history](./course-03-install-remove-history.md)** — `zypper in` / `rm` with automatic RPM `.rpmsave` handling (no `purge`), and `zypper history` as an audit log with no `undo`.
+SUSE adds one thing the other two do not have in the same form. Besides "is there a newer version of this package?", SUSE systems ask a second question: "has the depot sent a **patch**, a reviewed safety notice that names exactly which crates to replace?" Mixing up `zypper patch` and `zypper update` is the most common way a SUSE administrator ships more change than a maintenance window allowed.
 
 ## Learning objectives
 
 After this module you can:
 
-- **Refresh** repository metadata and explain what `zypper refresh` does and does not change.
-- **Distinguish** `zypper list-updates` from `zypper list-patches` and explain why they differ.
-- **Choose** between `zypper patch` and `zypper update` from a policy description, and filter patches by category.
-- **Install** and **remove** packages, and predict RPM's per-file config handling on removal.
-- **Read** `zypper history` as an audit trail, and reverse a change manually because there is no `zypper history undo`.
+- Refresh repository metadata with `zypper refresh`, and say what it changes and what it leaves alone.
+- Tell `zypper list-updates` apart from `zypper list-patches`, and explain why the two lists can differ.
+- Choose between `zypper patch` and `zypper update` from a written policy, and filter patches by category.
+- Install and remove packages, and predict what happens to changed configuration files on removal.
+- Read `zypper history` as a record of what happened, and undo a change by hand, because there is no `zypper history undo`.
 
 ## Before you start
 
-Assumed: the `apt` and `dnf` basic-operations modules as context, a Linux shell, `sudo`. This repo's only VM is Ubuntu 24.04, so the lab runs a real openSUSE Leap 15.6 container **`zypperbox`** — `docker exec -it zypperbox bash`, and run every `zypper` command there (the Ubuntu host has no `zypper`).
+Check that you have the knowledge and the tools this module expects before you begin.
 
-## Where this fits
+### What you should already know
 
-This is the SUSE-family everyday loop, the third of the three package-manager families in the domain. The patch-vs-update distinction is the one thing genuinely unique to SUSE and the point the section leans on.
+- **How to type a command at a prompt** and how to use `sudo`.
+- **What a package and a repository are.** A package is a supply crate with a parts list, a version and the crates it needs. A repository is a supply depot that ships those crates.
+
+### What you need
+
+This module has no playground. The training ship (the lab virtual machine) runs Ubuntu 24.04, which has no `zypper`. Each lab in this module starts Docker on that ship and runs a real openSUSE Leap 15.6 container called `zypperbox` next to it. A container is a sealed pod docked to the ship: it has its own crew and its own files, but shares the ship's reactor.
+
+To try the examples, start the mission at the end of the last part, then step into the pod:
+
+```sh
+docker exec -it zypperbox bash
+```
+
+Run every `zypper` command inside that shell. If Docker refuses with a permission error, run the same command with `sudo` in front.
+
+## How this module is laid out
+
+1. [Refresh, Updates and Patches](./course-01-refresh-updates-vs-patches.md): `zypper refresh`, the raw update list and the reviewed patch list, and why they can differ.
+2. [Applying Patches or Updates](./course-02-applying-the-right-one.md): `zypper patch` (only what a patch covers) against `zypper update` (everything), and how to read a task's wording to choose.
+3. [Installing, Removing and Reading History](./course-03-install-remove-history.md): `zypper install` and `zypper remove`, how the RPM layer keeps changed configuration files, and `zypper history` as a log with no undo.
+   - Mission: [Zypper Basic Package Operations Lab](./labs/lab-01/README.md)
+4. [Wrap-Up: Mission Debrief](./course-04-wrap-up.md)
+
+## Why this matters
+
+On the exam, a task that says "conservative" or "security patches only" wants `zypper patch`, not `zypper update`. Both commands finish without errors, so nothing warns you if you pick the wrong one. Knowing which question each command answers is what keeps the system inside its policy.

@@ -1,12 +1,14 @@
-# Part 1 — The three research questions: search, info, what-provides
+# Search, Info and What-Provides
 
-> Prerequisite: [module landing page](./course.md). Next: [Part 2 — Installed-only filtering, and the rpm fallback](./course-02-installed-only-and-rpm-fallback.md).
+Every `zypper` research task is one of three questions, each more exact than the one before. Picking the right question is most of the skill. All three commands only read, so none needs `sudo`.
 
-Every zypper research task is one of three questions, in increasing order of specificity — and picking the right one is most of the skill. All three are read-only; none needs `sudo`.
+Picture the depot's catalogue on your ship. You can browse it by topic when you do not know a crate's name (**search**). You can open one crate's full label when you know its exact name (**info**). Or you can ask which crate holds one particular part (**what-provides**). Unlike a helpful clerk, `zypper` matches names literally, so `info` needs the exact package name.
 
-As an analogy (flagged): three questions you would ask a librarian. "Do you have anything about intrusion prevention?" — a **search** (you know the topic, not the title). "Tell me everything about this exact book" — an **info** lookup (you know precisely what you are asking about). "Which book contains this sentence?" — a **what-provides** query (working backward from a fragment to the source). Where it breaks down: a librarian can improvise; zypper matches literally, so `info` needs the exact package name.
+Run every command inside the `zypperbox` container (`docker exec -it zypperbox bash`).
 
-## `zypper search` — "I do not know the exact name"
+## `zypper search`: "I do not know the exact name"
+
+Look for a package by a word you know:
 
 ```bash
 # shell: inside the zypperbox container
@@ -19,9 +21,13 @@ S | Name       | Summary                                   | Type
   | fail2ban   | Ban IPs after too many failed auth tries  | package
 ```
 
-`zypper search` scans both package **names** and their **summary text**, case-insensitively — which is why a rough keyword like "intrusion" or "brute-force" surfaces `fail2ban` even though that word is not in the name. The `S` column shows whether each result is already installed (`i`).
+`zypper search` looks through package **names**, and it ignores upper and lower case. The `S` (status) column shows whether a result is already installed (`i`); here it is empty, so `fail2ban` is not installed.
 
-## `zypper info` — "tell me everything about this one"
+To also look through the one-line summary and the longer description, add `-d` (`zypper se -d intrusion`). That is how a rough keyword such as "intrusion" or "brute" can find `fail2ban` even when the word is not in its name. Add `-t` to limit results to one type, for example `-t package` or `-t patch`.
+
+## `zypper info`: "tell me everything about this one"
+
+When you know the exact name, read the full label:
 
 ```bash
 zypper info nginx
@@ -37,9 +43,13 @@ Installed      : No
 Summary        : A HTTP and reverse proxy server
 ```
 
-`zypper info` matches the **exact literal package name** — no partial matching, no description scanning. Same purpose as `dnf info` / `apt show`: version, arch, vendor, size, source repository, full description, from zypper's cached repository metadata. Changes nothing; run it on a package you have no intention of installing.
+`zypper info` matches the **exact package name** only. It does no partial matching and does not search descriptions. It does the same job as `dnf info` or `apt show`: it prints the version, architecture, vendor, size, source repository and full description, all from the cached repository metadata. The sample above is shortened; the real output has more fields.
 
-## `zypper what-provides` — "what would give me this file?"
+It changes nothing, so you can run it on a package you never plan to install. Add `--requires` (`zypper info --requires nginx`) to also see what the package depends on.
+
+## `zypper what-provides`: "what would give me this file?"
+
+When you know a file or command but not the package, ask which package supplies it:
 
 ```bash
 zypper what-provides /usr/sbin/ip      # shorthand: zypper wp
@@ -51,17 +61,15 @@ S | Name       | Type    | Version   | Arch   | Repository
   | iproute2   | package | 6.1.0-1.2 | x86_64 | Main Repository
 ```
 
-zypper's analogue of `dnf provides`. It searches **repository metadata**, not the local filesystem — which is exactly why it answers the question even for a package not installed anywhere on this system. If unsure of the exact path, a `zypper search` on the bare command name first often surfaces a candidate to confirm.
+This is the `zypper` version of `dnf provides`. It searches the **repository metadata**, not the files on your disk. That is exactly why it can answer even for a package that is not installed anywhere on this system.
+
+If you are not sure of the exact path, run `zypper search` on the bare command name first; it often turns up a candidate you can then confirm. For deeper questions, `zypper search --provides <capability>` and `zypper search --requires <capability>` search what packages offer and what they need.
+
+In short: `zypper search` matches names (and with `-d`, descriptions) when you know the topic but not the name; `zypper info` needs the exact name and prints the full details; `zypper what-provides <path>` searches repository metadata to find the package that would supply a file, even one that is not installed.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **`zypper info <keyword>` to discover a package** → `info` needs the exact name. Use `zypper search`.
-> - **Expecting `what-provides` to check the local filesystem** → it reads repo metadata, which is why it works for uninstalled packages.
-> - **Running any of these with `sudo`** → all three are read-only; needing root is a sign you reached for the wrong command.
-
-> *`zypper search` matches names + summaries (topic known, name not); `zypper info` needs the exact name and prints full metadata; `zypper what-provides <path>` searches repository metadata to find the package that would supply a file — even an uninstalled one.*
-
-## Reference
-
-- `man zypper` — `search` / `se` (and `-d` for description search, `-t` by type), `info`, `what-provides` / `wp`.
-- `man zypper` — `search --provides` and `search --requires` for capability-level queries.
-- `zypper info --requires <pkg>` — see a package's dependencies during the `info` lookup.
+> - **Using `zypper info <keyword>` to discover a package.** `info` needs the exact name. Use `zypper search`.
+> - **Expecting `what-provides` to look at the local disk.** It reads repository metadata, which is why it works for packages that are not installed.
+> - **Running any of these with `sudo`.** All three only read. If you think you need root, you picked the wrong command.

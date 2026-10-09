@@ -1,19 +1,37 @@
-# section-070 / module-02: Zypper Package Information Lookup
+# Zypper Package Information Lookup Lab
 
-QEMU VM for the LFCS course — real openSUSE zypper research commands (`search`, `info`, `what-provides`, and filtered installed-only search) running inside a Dockerized `opensuse/leap:15.6` sandbox on the Ubuntu host. Entirely read-only: nothing is installed, removed, or updated anywhere in this lab.
+Welcome to a research mission, astronaut. Before anyone orders a crate, the quartermaster needs answers: which package does a job, what exactly is in one package, which package supplies a missing command, and what is already on board. You will find each answer with `zypper` and save it to a file. Nothing gets installed, removed or updated.
 
-## Working Inside zypperbox
-
-This lab's VM boots Ubuntu 24.04 — that's simply the only base image this platform provides. There is no zypper on the Ubuntu host itself. Instead, bootstrap installs Docker and starts a long-lived container named `zypperbox` from the real `opensuse/leap:15.6` image. All zypper work happens inside that container, which you reach with:
+The training ship runs Ubuntu 24.04, which has no `zypper`. The setup starts Docker and runs a real openSUSE Leap 15.6 container called `zypperbox` on it, with `python3-base` and `python3-pip` installed and an empty `/root/answers` directory. Do all your work inside it:
 
 ```bash
 docker exec -it zypperbox bash
 ```
 
-Everything inside that shell is a genuine openSUSE Leap 15.6 environment — real `zypper`, real RPM database, real openSUSE repositories. Run every command in this lab's question from inside that `docker exec` shell, not on the Ubuntu host directly.
+If Docker refuses with a permission error, run the same command with `sudo` in front.
 
-## Run
+## Launching the Lab
+
+Run this command to start the virtual machine:
 
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-070/module-02/labs/lab-01
+```
+
+Open a terminal on it:
+
+```bash
+astrona ssh ats-002-lab-072
+```
+
+When you think you have finished, send it for grading:
+
+```bash
+astrona submit -c sections/section-070/module-02/labs/lab-01
+```
+
+When you are done, remove the lab:
+
+```bash
+astrona destroy ats-002-lab-072
 ```

@@ -1,57 +1,46 @@
 # Section 070: SUSE Package Management: Zypper
 
-Welcome to the SUSE side of package management. Everything you've learned so far in this domain — refresh, search, install, remove, dependency resolution — carries over conceptually. What's new here is `zypper`, the package tool used across openSUSE and SUSE Linux Enterprise, and one genuinely distinctive concept neither `apt` nor `dnf` models the same way: a curated, tracked **patch** system layered on top of ordinary package version bumps.
+Astronaut, welcome to the SUSE supply depots. Refreshing the catalogue, searching, installing, removing and resolving dependencies work much as they do with `apt` and `dnf`. What is new is `zypper`, the quartermaster on openSUSE and SUSE Linux Enterprise, and one idea the other tools do not have in the same form: the **patch**. A patch is a reviewed safety notice from the depot that names exactly which crates (packages) to replace, kept separate from the plain stream of newer versions.
 
-**A note on how this section runs.** The only virtual machine image available on this training platform is Ubuntu 24.04 — there is no openSUSE image to boot directly. Rather than fake a zypper experience with a wrapper script, every lab in this section takes a more honest approach: bootstrap installs Docker on the Ubuntu VM, then starts a long-lived container from the real `opensuse/leap:15.6` image, named `zypperbox`. You do all of your zypper work by shelling into that container with `docker exec -it zypperbox bash`. Inside it, `zypper` is the genuine openSUSE tool, backed by the genuine RPM database, talking to genuine openSUSE repositories — nothing about the package management itself is simulated. Only the disk it runs on is virtualized. Every module and lab in this section repeats this instruction prominently, so you'll never be left wondering where to type a command.
+## How this section runs
 
----
+Every lab here starts one training ship: an Ubuntu 24.04 virtual machine, because that is the only system image the platform offers. There is no openSUSE image to boot. Instead, each lab installs Docker on the ship and runs a long-lived container from the real `opensuse/leap:15.6` image, called `zypperbox`. A container is a sealed pod docked to the ship: its own crew and files, sharing the ship's reactor.
 
-## What You Will Master
+You do all your `zypper` work inside that pod:
 
-By completing this section, you will acquire three core zypper capabilities:
-*   **Refresh, Patch, and Update Discipline:** How to refresh repository metadata, and — critically — how to tell the difference between a raw package update (`zypper list-updates` / `zypper update`) and a curated, often security-focused patch (`zypper list-patches` / `zypper patch`), and why an administrator would deliberately choose one over the other.
-*   **Install, Remove, and Audit:** How to install and remove packages with `zypper install`/`zypper remove`, and how to read zypper's own operation log with `zypper history` — while understanding, precisely, that it is an audit trail, not a `dnf history undo`-style rollback mechanism.
-*   **Package Research Before Action:** How to find a package by rough keyword (`zypper search`), pull full metadata for one exact package without installing it (`zypper info`), discover which package would provide a missing file or command (`zypper what-provides`), and filter search results down to only what's already installed (`zypper search --installed-only`).
+```bash
+docker exec -it zypperbox bash
+```
 
----
+Inside it, `zypper`, the RPM database and the openSUSE repositories are all real. Only the host underneath is different. The Ubuntu host itself has no `zypper`, so a `zypper` command typed there fails with "command not found". The modules in this section have no playground; you try the examples inside a running lab.
 
-## The Learning & Lab Path
+## What you will learn
 
-This section is divided into two modules, each paired with hands-on practice inside the `zypperbox` openSUSE sandbox, followed by a capstone lab that ties both skill sets together.
+By the end of this section you can:
 
-### 1. Zypper Basic Package Operations
-*   **Module Reader:** **[Module 1: Zypper Basic Package Operations](./module-01/course.md)**
-    1. [Refresh, and the two questions — updates vs. patches](./module-01/course-01-refresh-updates-vs-patches.md)
-    2. [Applying the right one — zypper patch vs zypper update](./module-01/course-02-applying-the-right-one.md)
-    3. [Installing, removing, and reading history](./module-01/course-03-install-remove-history.md)
-*   **Associated Lab:** **`sections/section-070/module-01/labs/lab-01`**
-*   **Lab Run Command:**
-    ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-070/module-01/labs/lab-01
-    ```
-*   **Hands-on Objective:** Inside `zypperbox`, refresh repository metadata, report available raw updates versus curated patches separately, apply only the patches per a conservative security policy, install `fail2ban`, remove `telnet-server` (the package providing the `telnetd` daemon), and review the resulting operation history.
+- **Refresh, then choose patches or updates.** Refresh repository metadata, tell a raw update (`zypper list-updates`, `zypper update`) from a reviewed patch (`zypper list-patches`, `zypper patch`), and pick the one a policy asks for.
+- **Install, remove and audit.** Install and remove packages with `zypper install` and `zypper remove`, and read `zypper history` as a record of what happened, not as an undo tool.
+- **Research before you act.** Find a package by keyword (`zypper search`), read one package's full details without installing it (`zypper info`), find which package would supply a missing file (`zypper what-provides`), and list only installed matches (`zypper search --installed-only`).
 
-### 2. Zypper Package Information Lookup
-*   **Module Reader:** **[Module 2: Zypper Package Information Lookup](./module-02/course.md)**
-    1. [The three research questions — search, info, what-provides](./module-02/course-01-the-three-questions.md)
-    2. [Installed-only filtering, and the rpm fallback](./module-02/course-02-installed-only-and-rpm-fallback.md)
-*   **Associated Lab:** **`sections/section-070/module-02/labs/lab-01`**
-*   **Lab Run Command:**
-    ```bash
-    astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-070/module-02/labs/lab-01
-    ```
-*   **Hands-on Objective:** Inside `zypperbox`, research candidate intrusion-prevention packages by keyword, pull full metadata for `nginx` without installing it, identify which package provides `/usr/sbin/ip`, and list every installed `python3-*` package using zypper's own filtered search.
+## The modules
 
----
+1. [Zypper Basic Package Operations](./module-01/course.md): refresh, updates against patches, install, remove and the history log. Mission: a conservative maintenance pass inside `zypperbox`.
+2. [Zypper Package Information Lookup](./module-02/course.md): `search`, `info`, `what-provides` and installed-only search, plus the `rpm` fallback. Mission: four read-only research questions inside `zypperbox`.
 
-## Ready for Assessment?
+## Check yourself, then the capstone
 
-Test your theoretical knowledge and diagnostic reasoning before tackling the capstone mission:
+Test your understanding with the [section knowledge check](./quiz.md).
 
-*   **[Take the Section 070 Knowledge Check Quiz](./quiz.md)**
-
-Once you're confident, put both skill sets to work together in one coherent maintenance-window scenario:
+Then put both skill sets together in one maintenance window: research two requested changes, save your findings, apply only patches, install one package and remove another. Start the capstone and open a terminal on it:
 
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-070/capstone/labs/lab-01
+astrona ssh ats-002-lab-070
+```
+
+When you think you are done, send it for grading, and remove it afterwards:
+
+```bash
+astrona submit -c sections/section-070/capstone/labs/lab-01
+astrona destroy ats-002-lab-070
 ```

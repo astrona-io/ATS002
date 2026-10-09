@@ -1199,13 +1199,13 @@ modules:
         title: "Zypper Basic Package Operations"
         path: sections/section-070/module-01/course.md
       - type: reading
-        title: "Refresh, and the two questions: updates vs. patches"
+        title: "Refresh, Updates and Patches"
         path: sections/section-070/module-01/course-01-refresh-updates-vs-patches.md
       - type: reading
-        title: "Applying the right one: `zypper patch` vs `zypper update`"
+        title: "Applying Patches or Updates"
         path: sections/section-070/module-01/course-02-applying-the-right-one.md
       - type: reading
-        title: "Installing, removing, and reading history"
+        title: "Installing, Removing and Reading History"
         path: sections/section-070/module-01/course-03-install-remove-history.md
       - type: reading
         title: Question
@@ -1228,13 +1228,16 @@ modules:
           - name: "openSUSE Leap reference: managing software with zypper"
             url: https://doc.opensuse.org/documentation/leap/reference/html/book-reference/cha-sw-cl.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-070/module-01/course-04-wrap-up.md
+      - type: reading
         title: "Zypper Package Information Lookup"
         path: sections/section-070/module-02/course.md
       - type: reading
-        title: "The three research questions: search, info, what-provides"
+        title: "Search, Info and What-Provides"
         path: sections/section-070/module-02/course-01-the-three-questions.md
       - type: reading
-        title: "Installed-only filtering, and the `rpm` fallback"
+        title: "Installed-Only Search and the rpm Fallback"
         path: sections/section-070/module-02/course-02-installed-only-and-rpm-fallback.md
       - type: reading
         title: Question
@@ -1255,6 +1258,9 @@ modules:
             url: https://manpages.opensuse.org/Tumbleweed/zypper/zypper.8.en.html
           - name: "openSUSE Leap reference: managing software with zypper"
             url: https://doc.opensuse.org/documentation/leap/reference/html/book-reference/cha-sw-cl.html
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-070/module-02/course-03-wrap-up.md
       - type: reading
         title: "Section 070 Knowledge Check: SUSE Package Management: Zypper"
         path: sections/section-070/quiz.md

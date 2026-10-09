@@ -6,11 +6,13 @@ Test your understanding of zypper's patch-versus-update distinction, its researc
 
 ## Scenario-Based Questions
 
+Each question describes a real situation on an openSUSE host. Pick an answer before you open the explanation.
+
 ### Question 1
-You SSH into the lab VM and type `zypper refresh` directly at the shell prompt, expecting to see the openSUSE repositories sync. Instead you get `zypper: command not found`. What is the cause, and what should you do instead?
-*   **A)** The VM's `zypper` binary is corrupted and needs to be reinstalled with `apt`.
-*   **B)** The VM itself is Ubuntu 24.04, not openSUSE — `zypper` only exists inside the `zypperbox` container. You need to run `docker exec -it zypperbox bash` first, then run zypper commands inside that shell.
-*   **C)** `zypper` requires a reboot of the VM before it becomes available on the PATH.
+You open a terminal on the lab virtual machine with SSH (secure shell) and type `zypper refresh` directly at the shell prompt, expecting to see the openSUSE repositories sync. Instead you get `zypper: command not found`. What is the cause, and what should you do instead?
+*   **A)** The virtual machine's `zypper` program is corrupted and needs to be reinstalled with `apt`.
+*   **B)** The virtual machine itself is Ubuntu 24.04, not openSUSE — `zypper` only exists inside the `zypperbox` container. You need to run `docker exec -it zypperbox bash` first, then run zypper commands inside that shell.
+*   **C)** `zypper` requires a reboot of the virtual machine before it becomes available on the PATH (the list of folders the shell searches for commands).
 *   **D)** `zypper` must be prefixed with `sudo` for the shell to recognize it as a valid command.
 
 <details>
@@ -18,7 +20,7 @@ You SSH into the lab VM and type `zypper refresh` directly at the shell prompt, 
 
 **Correct Answer: B**
 
-*   **Why B is correct:** This lab's VM boots from the platform's only available base image, Ubuntu 24.04, which has no zypper or openSUSE package database at all. To provide a genuine openSUSE experience anyway, bootstrap installs Docker and starts a long-lived `opensuse/leap:15.6` container named `zypperbox`. All zypper work happens inside that container, reached via `docker exec -it zypperbox bash` — not on the Ubuntu host directly.
+*   **Why B is correct:** This lab's virtual machine boots from the platform's only available base image, Ubuntu 24.04, which has no zypper or openSUSE package database at all. To provide a genuine openSUSE experience anyway, bootstrap installs Docker and starts a long-lived `opensuse/leap:15.6` container named `zypperbox`. All zypper work happens inside that container, reached via `docker exec -it zypperbox bash` — not on the Ubuntu host directly.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because there is no zypper binary to corrupt on an Ubuntu host — it was never installed there in the first place, by design.
     *   *Option C* is incorrect because no reboot would install a package manager that doesn't exist for this distribution on this host.
@@ -42,7 +44,7 @@ Your team's policy for this openSUSE host is strictly conservative: apply securi
 *   **Why C is correct:** `zypper patch` applies only the updates covered by currently published, curated patch definitions — the layer where SUSE tracks security and bug-fix bundles deliberately. It leaves any raw package version bump not covered by a published patch untouched, which is precisely the "security patches promptly, don't chase every bump" posture.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because `zypper update` applies every available update regardless of patch coverage — a more aggressive outcome than the stated conservative policy calls for.
-    *   *Option B* is incorrect because `zypper dup` performs a full distribution version upgrade/sync, an even larger and riskier operation than a routine update, nowhere near what a conservative policy would call for.
+    *   *Option B* is incorrect because `zypper dup` (distribution upgrade) performs a full upgrade or sync to a new distribution version, an even larger and riskier operation than a routine update, nowhere near what a conservative policy would call for.
     *   *Option D* is incorrect because `install --force` reinstalls or forces a specific package installation; it has nothing to do with applying updates or patches across the system.
 </details>
 
@@ -70,7 +72,7 @@ While auditing an openSUSE host, you run both `zypper list-updates` and `zypper 
 ---
 
 ### Question 4
-You mistakenly ran `zypper remove` on a package that turned out to still be needed. You want to reverse the mistake and ask a colleague whether `zypper history` can undo it for you the way `dnf history undo <id>` would on a Red Hat–family system. What is the accurate answer?
+You mistakenly ran `zypper remove` on a package that turned out to still be needed. You want to reverse the mistake and ask a colleague whether `zypper history` can undo it for you the way `dnf history undo <id>` would on a Red Hat family system. What is the accurate answer?
 *   **A)** Yes — `zypper history undo <id>` mechanically reverses any past zypper transaction, identically to dnf.
 *   **B)** No — `zypper history` is an ordered, timestamped audit log of what zypper has done; it has no undo/rollback subcommand, so reversing the removal means manually reinstalling the package, informed by what the log shows happened.
 *   **C)** Yes, but only for `patch` operations, not for `install` or `remove` operations.
