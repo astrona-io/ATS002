@@ -693,20 +693,17 @@ modules:
         title: "AppArmor Profile Enforcement & the Other MAC System: SELinux"
         path: sections/section-040/module-01/course.md
       - type: reading
-        title: "Two gates: DAC, MAC, and which system you're on"
+        title: "Two Gates: DAC, MAC And Which System You Are On"
         path: sections/section-040/module-01/course-01-two-gates-dac-mac-and-which-system.md
       - type: reading
-        title: "AppArmor: profiles, modes, and what's loaded"
+        title: "AppArmor Profiles And Modes"
         path: sections/section-040/module-01/course-02-apparmor-profiles-and-modes.md
       - type: reading
-        title: "AppArmor: diagnosing and fixing a path denial"
-        path: sections/section-040/module-01/course-03-apparmor-diagnosing-and-fixing.md
+        title: "Read An AppArmor Denial"
+        path: sections/section-040/module-01/course-03-apparmor-reading-a-denial.md
       - type: reading
-        title: "SELinux: labels, contexts, and the AVC denial"
-        path: sections/section-040/module-01/course-04-selinux-labels-and-avc-denials.md
-      - type: reading
-        title: "SELinux: persistent fixes and the AppArmor contrast"
-        path: sections/section-040/module-01/course-05-selinux-persistent-fixes-and-contrast.md
+        title: "Fix An AppArmor Denial And Prove It"
+        path: sections/section-040/module-01/course-04-apparmor-fixing-a-denial.md
       - type: reading
         title: Question
         path: sections/section-040/module-01/labs/lab-01/question.md
@@ -746,6 +743,15 @@ modules:
             url: https://ubuntu.com/server/docs/how-to/security/apparmor/
           - name: "apparmor.d(5) manual page"
             url: https://manpages.ubuntu.com/manpages/noble/man5/apparmor.d.5.html
+      - type: reading
+        title: "SELinux Labels And AVC Denials"
+        path: sections/section-040/module-01/course-05-selinux-labels-and-avc-denials.md
+      - type: reading
+        title: "Persistent SELinux Fixes And The AppArmor Contrast"
+        path: sections/section-040/module-01/course-06-selinux-persistent-fixes-and-contrast.md
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-040/module-01/course-07-wrap-up.md
       - type: reading
         title: "Section 040 Knowledge Check: Mandatory Access Control — SELinux & AppArmor"
         path: sections/section-040/quiz.md
