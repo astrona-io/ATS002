@@ -1,10 +1,10 @@
 # Solution Walkthrough
 
-This lab's "broken bootloader" is staged directly on your primary VM's own disk — safely, because only `/boot/grub/grub.cfg` was removed. GRUB's own installed boot-sector/EFI code, and the kernel your **current** session already booted from, were never touched. Every command below is the genuine repair; nothing here is a simulation aimed at a stand-in disk.
+The broken bootloader is set up directly on your training ship's own disk. That is safe because only `/boot/grub/grub.cfg` was removed. GRUB's installed boot code and the kernel your current session booted from were not touched. Every command below is the real repair; nothing is aimed at a stand-in disk.
 
 ---
 
-## Step 1: Confirm the Symptom
+## Step 1: Confirm the symptom
 
 ```bash
 ls -l /boot/grub/grub.cfg
@@ -14,21 +14,21 @@ ls -l /boot/grub/grub.cfg
 ls: cannot access '/boot/grub/grub.cfg': No such file or directory
 ```
 
-This is the on-disk equivalent of a machine that would drop to a bare `grub>` rescue prompt on its next boot: GRUB's own menu configuration is simply gone. Your SSH session staying alive right now is not evidence this is fine — it only proves the **current** boot, which already happened before this file went missing, is unaffected.
+This is the on-disk version of a machine that would stop at a bare `grub>` prompt on its next boot: GRUB's launch checklist is gone. Your SSH session working right now does not mean all is well. It only proves that the current boot, which finished before the file went missing, is unaffected.
 
 ---
 
-## Step 2: Determine the Firmware/Boot Mode
+## Step 2: Find the firmware type
 
 ```bash
 [ -d /sys/firmware/efi ] && echo "UEFI" || echo "BIOS/legacy"
 ```
 
-`grub-install`'s correct invocation genuinely differs between the two — a BIOS-style invocation on a UEFI system (or vice versa) is a classic, easy-to-make mistake worth ruling out before touching anything.
+The kernel creates `/sys/firmware/efi` only on machines started by UEFI firmware. The right `grub-install` command differs between the two. Using the BIOS form on a UEFI machine, or the other way round, is a classic mistake, so rule it out before you write anything.
 
 ---
 
-## Step 3: Identify the Primary Disk
+## Step 3: Identify the primary disk
 
 ```bash
 lsblk -f
@@ -41,11 +41,13 @@ vda
 └─vda1  ext4     1a2b3c4d-...                          /
 ```
 
-`findmnt -no SOURCE /` gives the exact partition backing your root filesystem (e.g. `/dev/vda1`); strip the partition number to get the whole-disk device `grub-install` needs (`/dev/vda`). Your actual device letter may differ — substitute your own from here on, and confirm it with `lsblk` before running anything that writes to a disk.
+This output is shortened and its UUID is made up. On Ubuntu 24.04 the main disk usually has more partitions, for example a separate `/boot` and an EFI partition, and `lsblk -f` shows a few more columns.
+
+`findmnt -no SOURCE /` prints the partition behind your root filesystem, for example `/dev/vda1`. Remove the partition number to get the whole disk that `grub-install` needs on BIOS: `/dev/vda`. Your device name may differ. Use your own, and confirm it with `lsblk` before running anything that writes to a disk.
 
 ---
 
-## Step 4: Reinstall GRUB's Boot-Sector/EFI Code
+## Step 4: Reinstall GRUB's boot code
 
 BIOS/legacy:
 
@@ -59,34 +61,36 @@ UEFI:
 sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi
 ```
 
-This writes GRUB's actual boot-sector or EFI executable code — the very first, tiny program the firmware hands control to before anything else exists. A config regenerated on top of a machine that skipped this step still would not boot; this is the step that matters most, and the one most guides skip past too quickly.
+The UEFI form above is for 64-bit Intel and AMD machines. If your training ship runs on an ARM computer, the target is `arm64-efi` instead.
+
+This writes GRUB's boot code, the first tiny program the firmware runs. It also rewrites GRUB's core image under `/boot/grub` (`core.img` on BIOS, `core.efi` on UEFI), which is how the grader knows you ran it. A new `grub.cfg` on a machine that skipped this step would not help if the boot code were damaged.
 
 ---
 
-## Step 5: Regenerate a Fresh grub.cfg
+## Step 5: Write a fresh grub.cfg
 
 ```bash
 sudo update-grub
 ```
 
-`update-grub` is Ubuntu's thin wrapper around `grub-mkconfig -o /boot/grub/grub.cfg` — same underlying machinery, distro-specific output path already baked in. It scans installed kernels and `/etc/default/grub` settings and writes a fresh menu configuration to exactly the path GRUB's reinstalled code (Step 4) will read on the next real, unassisted reboot.
+`update-grub` is Ubuntu's short wrapper around `grub-mkconfig -o /boot/grub/grub.cfg`. It scans the installed kernels and the settings in `/etc/default/grub`, and writes a new menu file to the exact path the reinstalled boot code reads on the next real boot.
 
 ```bash
 ls -l /boot/grub/grub.cfg
 grep -c menuentry /boot/grub/grub.cfg
 ```
 
-Confirm the file exists, carries a fresh timestamp, and its `menuentry` count is non-zero — not just an empty shell of a file.
+Confirm that the file exists, has a fresh timestamp, and that its `menuentry` count is above zero, so it is not just an empty shell.
 
 ---
 
-## Step 6: Confirm the Repair Is Durable
+## Step 6: Check the repair
 
 ```bash
 sudo grub-install --recheck /dev/vda        # or the --target=x86_64-efi form on UEFI
 ```
 
-`--recheck` reports success (or an error naming exactly what's still wrong) without needing an actual reboot to find out — the closest thing to "prove it before you bet on it" this repair offers over SSH.
+`--recheck` makes `grub-install` throw away its old map of the disks, look at them again and install once more. A run that ends with `No error reported` shows GRUB can find the disk and write its code, without a reboot. An error message names what is still wrong.
 
 ---
 
@@ -98,10 +102,16 @@ grep -c menuentry /boot/grub/grub.cfg
 sudo grub-install --recheck /dev/vda
 ```
 
-Once verified, run the local validation suite to pass the lab.
+When all three look right, send the lab for grading from your own computer:
+
+```bash
+astrona submit -c sections/section-080/module-04/labs/lab-01
+```
 
 ---
 
-## A Note on the Real, Physical Technique
+## The real console technique
 
-On a real machine actually stuck at a bare `grub>` rescue prompt, Steps 1–3 above would instead start with GRUB's own built-in shell: `ls` to list devices in GRUB's own naming scheme, `ls (hd0,gptN)/` to find the partition holding `/boot`, then `set root=`, `linux`, `initrd`, and `boot` to manually assemble and boot the installed system for one session. That manual sequence lives only in GRUB's in-memory session state — nothing about it is written to disk, so the moment the machine reboots it starts fresh from the same broken state. Steps 4–6 above are exactly what you'd run once back in that way (or via `chroot` from external rescue media, using the same bind-mount mechanics as Module 1's fstab-repair lab) — this lab's grading picks up at that identical point, since this VM's current boot simply already succeeded on its own.
+On a real machine stuck at a bare `grub>` prompt, the work before Step 4 starts in GRUB's own shell instead. `ls` lists the devices in GRUB's naming, and `ls (hd0,gptN)/` finds the partition that holds the kernel and initrd. Then `set root=`, `linux`, `initrd` and `boot` start the installed system by hand for one session.
+
+That hand-built boot lives only in GRUB's memory. Nothing is written to disk, so the next reboot starts from the same broken state. Steps 4 to 6 are exactly what you run once you are back in that way, or through a chroot from rescue media with `/dev`, `/proc` and `/sys` bind-mounted. This lab picks up at that same point, because your ship's current boot already succeeded on its own.

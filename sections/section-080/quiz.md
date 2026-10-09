@@ -1,10 +1,12 @@
 # Section 080 Knowledge Check: System Disaster Recovery
 
-Test your understanding of chroot-based repair, password recovery without rescue media, partition table backup/restore, and GRUB reinstallation.
+Astronaut, test your understanding of chroot repair, password recovery without rescue media, partition table backup and restore, and GRUB reinstallation. Try to answer each question before you open the explanation.
 
 ---
 
 ## Scenario-Based Questions
+
+Each question describes a real recovery situation. Pick the best answer, then open the explanation to see why the other options are wrong.
 
 ### Question 1
 You mount a broken system's root partition at `/mnt/sysroot` and immediately run `sudo chroot /mnt/sysroot /bin/bash`, skipping straight past any further setup. Inside the chroot, `blkid` prints nothing at all, even though you know the disk has partitions with real UUIDs. What's the cause, and what should you have done first?
@@ -18,7 +20,7 @@ You mount a broken system's root partition at `/mnt/sysroot` and immediately run
 
 **Correct Answer: B**
 
-*   **Why B is correct:** A bare chroot has no populated `/dev`, `/proc`, or `/sys` — those need to be explicitly bind-mounted in (`mount --bind /dev /mnt/sysroot/dev`, and likewise for `/proc` and `/sys`) before chrooting. Without that step, tools that depend on device nodes, kernel state, or process information fail in ways that look unrelated to the missing binds — `blkid` returning nothing despite real partitions existing is a textbook symptom.
+*   **Why B is correct:** A bare chroot has no populated `/dev`, `/proc`, or `/sys` — those need to be explicitly bind-mounted in (`mount --bind /dev /mnt/sysroot/dev`, and likewise for `/proc` and `/sys`) before chrooting. Without that step, tools that depend on device nodes, kernel state, or process information fail in ways that look unrelated to the missing binds — `blkid` returning nothing despite real partitions existing is the classic symptom.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because `blkid` works fine inside a properly-prepared chroot; it is not disabled by design.
     *   *Option C* is incorrect because a read-only mount doesn't stop `blkid` from reading device metadata — `blkid` doesn't need write access to report what it finds.

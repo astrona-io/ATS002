@@ -1,28 +1,41 @@
 # Password Reset & Single-User Recovery
 
-Losing the root password is a different problem from an unbootable system: the machine boots perfectly, every service starts, the login prompt appears on schedule — only proof of identity is missing, and there is no other privileged account to `sudo` from. Full rescue media works but is overkill. The fast technique interrupts the bootloader for a single boot, edits the kernel command line for that boot only, and lands you in a root shell before any login prompt — nothing saved, one borrowed boot cycle.
+Astronaut, a lost root password is a different problem from a ship that will not launch. The machine boots perfectly, every service starts and the login prompt appears on time. Only proof of identity is missing, and there is no other account that can borrow the captain's authority with `sudo`. Full rescue media would work, but it is more than you need.
 
-Two short parts; work them in order.
-
-## How this module is organised
-
-1. **[Part 1 — Two doors: `rd.break` and `init=/bin/bash`](./course-01-two-doors-rd-break-and-init.md)** — the one-boot GRUB edit, and where each parameter drops you (`rd.break` in the initramfs with the real root read-only at `/sysroot`; `init=/bin/bash` on the real root as PID 1), plus the SELinux `/.autorelabel` gotcha.
-2. **[Part 2 — The chroot equivalent, and editing `/etc/shadow` directly](./course-02-chroot-equivalent-and-shadow-edit.md)** — why the chroot mechanic reaches the same end state, and generating a `$6$` hash with `openssl passwd -6` to splice into `/etc/shadow` when the target has no working `passwd`.
+The fast technique interrupts the boot menu for one launch, changes the kernel's start-up instructions for that launch only, and lands you in a root shell before any login prompt. Nothing is saved. You borrow one boot, reset the password, and the next boot is normal again.
 
 ## Learning objectives
 
 After this module you can:
 
-- **Choose** a one-boot kernel-parameter edit over rescue media for a healthy but locked-out system.
-- **Describe** where `rd.break` and `init=/bin/bash` each land you and the extra steps each needs.
-- **Remount** the target root read-write and reset the password, exiting each path correctly.
-- **Flag** an SELinux relabel with `/.autorelabel` when the target is enforcing.
-- **Generate** a SHA-512-crypt hash and edit only the correct `/etc/shadow` field when `passwd` is unavailable.
+- Choose a one-boot kernel parameter edit over rescue media for a healthy but locked-out system.
+- Describe where `rd.break` and `init=/bin/bash` each drop you, and the extra steps each one needs.
+- Make the target root read-write and reset the password, then leave each path correctly.
+- Request an SELinux relabel with `/.autorelabel` when the target enforces SELinux.
+- Make a SHA-512 password hash and change only the right field of `/etc/shadow` when `passwd` cannot run.
 
 ## Before you start
 
-Assumed: Module 1's chroot mechanic, a Linux shell, `sudo`, and the `/etc/shadow` field layout. **How the lab runs:** the SSH-only grading harness cannot type into a GRUB menu or recover an unbootable VM, so the lab reuses Module 1's disposable-disk stand-in — you aim the chroot-then-reset sequence at that disk. Know the `rd.break` / `init=/bin/bash` keystrokes for the exam; the lab drills everything else about the technique.
+Check that you have the knowledge and the tools this module expects before you begin.
 
-## Where this fits
+### What you should already know
 
-This is the second of the section's chroot-repair modules — same mechanic as Module 1, aimed at a credential store instead of an fstab line. The direct `/etc/shadow` hash edit is the fallback the section capstone expects when an interactive `passwd` will not run.
+- **How to use a Linux shell and `sudo`.**
+- **The chroot repair steps:** mount the target root, bind-mount a set of tools plus `/dev`, `/proc` and `/sys` into it, then run `chroot`.
+- **That `/etc/shadow` holds the password hashes**, one line per user, with fields separated by colons.
+
+### What you need
+
+- This module has no playground. The `rd.break` and `init=/bin/bash` steps are worked walkthroughs only: they need a real console at the boot menu, and you cannot type into one on the training ships. Learn the keystrokes for the exam by reading them carefully.
+- The mission gives you a ready-made training ship with a second, disposable disk. That disk holds a stand-in system whose root account is locked. You run the chroot and password reset steps against it, while your own ship stays healthy and reachable.
+
+## How this module is laid out
+
+1. [Two Doors: rd.break And init=/bin/bash](./course-01-two-doors-rd-break-and-init.md): the one-boot GRUB edit, where each parameter drops you, how to leave each path, and the SELinux relabel step.
+2. [The chroot Equivalent And Editing /etc/shadow](./course-02-chroot-equivalent-and-shadow-edit.md): why a chroot reaches the same end state, and how to make a hash with `openssl passwd -6` and put it into `/etc/shadow` when `passwd` will not run.
+   - Mission: Password Reset & Single-User Recovery Lab
+3. [Wrap-Up: Mission Debrief](./course-03-wrap-up.md)
+
+## Why this matters
+
+Every administrator meets a locked-out machine sooner or later: an old server whose password nobody wrote down, or a test system where the only account was disabled. Knowing the one-boot edit turns a reinstall into a five-minute job. Knowing how `/etc/shadow` works means you can still finish the job when the usual `passwd` command is not available.

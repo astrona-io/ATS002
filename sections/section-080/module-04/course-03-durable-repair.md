@@ -1,10 +1,14 @@
-# Part 3 — The durable repair: reinstall and regenerate
+# The Durable Repair: Reinstall And Regenerate
 
-> Prerequisite: [Part 2 — The one-boot manual rescue from `grub>`](./course-02-manual-rescue-from-grub.md). Next: [Section 080 quiz](../quiz.md).
+Astronaut, you have a working shell on the ship: from a hand-built boot, from a chroot, or because the system still booted on its own. Now you make the fix last. Refit the launch computer with `grub-install`, write a fresh launch checklist with `update-grub`, and check both before you trust a reboot to them.
 
-You have a working shell — from the Part 2 manual boot, a chroot, or a system that booted on its own. The durable repair is both halves of Part 1's pair, in order, then a verification that does not need a reboot to be useful.
+Run these commands on the target system itself. If the target cannot boot, run them inside a chroot of it, with `/dev`, `/proc` and `/sys` bind-mounted in, so they act on the target's disk and kernels and not on the rescue system's.
 
-## Step 1 — reinstall GRUB's boot code
+## Step 1: reinstall GRUB's boot code
+
+`grub-install` needs to know two things: which disk to write to, and whether the machine starts with BIOS or UEFI firmware. Check both first.
+
+### Check the disk and the firmware type
 
 ```bash
 # shell: the working shell on the target (chroot or real), root
@@ -12,65 +16,92 @@ lsblk                                   # confirm the disk before writing to it
 [ -d /sys/firmware/efi ] && echo UEFI || echo BIOS
 ```
 
-**BIOS / legacy:**
+The kernel creates the `/sys/firmware/efi` folder only when the machine was started by UEFI firmware. If it exists, use the UEFI form below; if not, use the BIOS form. `findmnt -no SOURCE /` shows the partition behind `/`, for example `/dev/vda1`. Remove the partition number to get the whole disk, `/dev/vda`.
+
+### BIOS (legacy) machines
 
 ```bash
 sudo grub-install /dev/vda              # RHEL/openSUSE: grub2-install /dev/vda
 ```
 
-Writes GRUB's boot code to the disk's boot sector / MBR gap. `grub-install` writes directly to a disk device — it deserves the same fresh identity check as any disk-level write.
+This writes GRUB's boot code to the start of the disk: the boot sector, plus a small hidden area (on GPT disks, a tiny BIOS boot partition) for the rest of the code. It writes straight to a whole disk, so it deserves the same fresh check of the disk name as any other disk-level write.
 
-**UEFI:**
+### UEFI machines
 
 ```bash
 sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi
 ```
 
-Targets the EFI system partition, not a raw disk device. This step is what fixes "GRUB's own code is missing or corrupted on disk" at the root; without it the next reboot returns to the broken state, because the Part 2 manual boot never touched the disk.
+This writes GRUB's EFI program into the EFI system partition, mounted at `/boot/efi`, instead of a raw disk. `x86_64-efi` is for 64-bit Intel and AMD machines; on an ARM machine the target is `arm64-efi`, and running `grub-install` with no `--target` usually picks the right one.
 
-## Step 2 — regenerate the config
+Either form fixes "GRUB's own code is missing or damaged on disk" at the root. Without it, the next reboot can return to the broken state.
+
+## Step 2: write a fresh `grub.cfg`
 
 ```bash
 sudo update-grub                                       # Debian/Ubuntu
 sudo grub2-mkconfig -o /boot/grub2/grub.cfg            # RHEL/openSUSE
 ```
 
-Scans installed kernels and `/etc/default/grub`, rebuilds `grub.cfg` — the file Step 1's reinstalled code reads on the next real boot.
+Run the line for the target's family. Both scan the installed kernels in `/boot` and the settings in `/etc/default/grub` (such as `GRUB_TIMEOUT` and `GRUB_CMDLINE_LINUX`), and write a new `grub.cfg`. That is the file the reinstalled boot code reads on the next real boot.
 
 ```bash
 ls -l /boot/grub/grub.cfg      # exists, non-empty, fresh timestamp
 ```
 
-## Step 3 — verify without rebooting
+## Step 3: check the repair without rebooting
 
 ```bash
 sudo grub-install --recheck /dev/vda     # reports success, or names exactly what is still wrong
 grep -c menuentry /boot/grub/grub.cfg    # non-zero → the config has real bootable entries
 ```
 
+`--recheck` tells `grub-install` to throw away its old map of the disks and look at them again, then install once more. It is not a read-only test. A run that ends with `No error reported` means GRUB could find the disk and write its code; an error names what is still wrong. On a UEFI machine, use the same `--target` and `--efi-directory` options as in Step 1 instead of the disk name.
+
+`grep -c menuentry` counts the boot entries in the new file. A number above zero means `update-grub` found at least one kernel.
+
 ```mermaid
 flowchart TD
-    W["working shell on the target"] --> FW{"/sys/firmware/efi exists?"}
-    FW -->|no — BIOS| GI1["grub-install /dev/vda"]
-    FW -->|yes — UEFI| GI2["grub-install --target=x86_64-efi --efi-directory=/boot/efi"]
-    GI1 --> UG["update-grub / grub2-mkconfig -o …"]
+    W["Shell on target"] --> FW{"/sys/firmware/efi?"}
+    FW -->|"no, BIOS"| GI1["grub-install /dev/vda"]
+    FW -->|"yes, UEFI"| GI2["grub-install --target"]
+    GI1 --> UG["update-grub"]
     GI2 --> UG
-    UG --> V["grub-install --recheck  +  grep -c menuentry grub.cfg"]
-    V --> RB["real reboot = final proof (outside an SSH-only harness)"]
+    UG -->|"check"| V["--recheck and grep"]
+    V -->|"real system"| RB["Reboot"]
 ```
 
-On a real machine the final confirmation is still a real reboot — a normal menu (or unassisted boot) with no manual step. The lab stops short of that reboot, but every command up to it is the identical real repair.
+The diagram shows the order: check the firmware, run the matching `grub-install`, run `update-grub`, check both, and only then reboot. The UEFI box stands for `grub-install --target=x86_64-efi --efi-directory=/boot/efi`.
+
+On a real machine the final proof is still a real reboot: a normal menu, or a boot with no manual steps. The mission stops before that reboot, but every command up to it is the real repair.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **`update-grub` only, on genuinely broken boot code** → still will not boot. Do `grub-install` first, every time.
-> - **BIOS invocation on a UEFI system (or vice versa)** → check `/sys/firmware/efi` first; the two `grub-install` forms are not interchangeable.
-> - **Running the repair outside the chroot** on a broken system → it targets the rescue environment's GRUB and kernels, not the target's.
-> - **Skipping the `grep -c menuentry` check** → a regenerated `grub.cfg` can be a near-empty shell if `/boot` had no kernels visible; confirm it has entries.
+> - **Running only `update-grub` when the boot code is broken.** It still will not boot. Run `grub-install` first, every time.
+> - **Using the BIOS form on a UEFI machine, or the other way round.** Check `/sys/firmware/efi` first; the two forms of `grub-install` are not interchangeable.
+> - **Running the repair outside the chroot on a system that cannot boot.** It then repairs the rescue system's GRUB and kernels, not the target's.
+> - **Skipping the `grep -c menuentry` check.** A new `grub.cfg` can be almost empty if no kernels were visible in `/boot`. Confirm it has entries.
 
-> *Run `grub-install` (BIOS: `/dev/vda`; UEFI: `--target=x86_64-efi --efi-directory=/boot/efi`) then `update-grub` / `grub2-mkconfig`, and verify with `grub-install --recheck` and a non-zero `grep -c menuentry` before betting a reboot on it.*
+## Your mission: GRUB Corruption Recovery Lab
 
-## Reference
+You can now reinstall GRUB's boot code, write a fresh `grub.cfg` and check both without a reboot. The mission asks you to repair a training ship whose `/boot/grub/grub.cfg` is gone, before its next reboot.
 
-- `man grub-install` — `--target`, `--efi-directory`, `--recheck`, `--boot-directory`.
-- `man grub-mkconfig` / `man update-grub` — the scan of `/boot` and `/etc/default/grub`.
-- `man 5 grub` (`/etc/default/grub`) — `GRUB_CMDLINE_LINUX`, `GRUB_TIMEOUT`, and what a regenerated config picks up.
+Start the mission and open a terminal on it:
+
+```sh
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-04/labs/lab-01
+astrona ssh ats-002-lab-084
+```
+
+Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-080/module-04/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-002-lab-084
+```

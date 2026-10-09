@@ -1,10 +1,12 @@
-# Part 2 — The one-boot manual rescue from `grub>`
+# The One-Boot Rescue From grub>
 
-> Prerequisite: [Part 1 — Two repairs, easy to confuse, and reading the symptom](./course-01-two-repairs-and-the-symptom.md). Next: [Part 3 — The durable repair: reinstall and regenerate](./course-03-durable-repair.md).
+Astronaut, the launch computer has lost its checklist and sits at a bare `grub>` prompt. It still understands typed orders. With a handful of commands you can tell it where the kernel is and launch the ship once, by hand. This part shows that sequence, and why it is only a way back in, not a fix.
 
-Stuck at a bare `grub>` prompt, GRUB's own built-in shell has just enough to hand-assemble one boot and get back into the system. This part is that sequence — and why it is a way *in*, not a fix.
+This whole part is a worked walkthrough. It needs a real console during boot, which you cannot reach on the training ships. The exam expects you to know it, so read each step closely.
 
-## Find the boot partition by hand
+## Find the boot files by hand
+
+GRUB names disks and partitions its own way: `(hd0)` is the first disk and `(hd0,gpt2)` is the second GPT partition on it. Start by listing what GRUB can see, then look inside one partition:
 
 ```text
 grub> ls
@@ -14,9 +16,13 @@ grub> ls (hd0,gpt2)/
 lost+found/ grub/ vmlinuz-6.8.0-... initrd.img-6.8.0-...img ...
 ```
 
-`ls` alone lists devices in GRUB's naming (`(hdN,gptM)`). `ls (hd0,gptM)/` lists that partition's contents. Iterate through candidates until one holds recognisable boot artefacts — `vmlinuz-*`, `initrd.img-*`, a `grub/` directory. This is how you locate the right partition with **zero prior assumptions** about disk layout, which matters precisely because the config that would have told you is what is missing.
+This output is shortened. A real disk often shows more partitions, and on Ubuntu 24.04 cloud images `/boot` is often a partition of its own.
 
-## Hand-assemble one boot
+`ls` on its own lists the devices. `ls (hd0,gptN)/` lists the files in one partition. Try each candidate until one holds the files you recognise from `/boot`: a `vmlinuz-*` kernel, a matching `initrd.img-*`, and a `grub/` folder. This finds the right partition with **no guessing** about the disk layout. That matters, because the file that would normally tell GRUB is exactly what is missing.
+
+## Start the system once by hand
+
+With the right partition found, type the four orders that a menu entry would normally give:
 
 ```text
 grub> set root=(hd0,gpt2)
@@ -25,36 +31,36 @@ grub> initrd (hd0,gpt2)/initrd.img-6.8.0-...img
 grub> boot
 ```
 
-- **`set root=(hd0,gptN)`** — the partition subsequent bare paths are relative to.
-- **`linux <path> root=<dev>`** — the kernel and its command line; the `root=` here is the **real root device** (`/dev/vda1`, `/dev/mapper/...`), a different thing from GRUB's `root`.
-- **`initrd <path>`** — the matching initramfs. **Mismatch the kernel and initrd versions and the boot commonly fails** or drops to its own emergency shell.
-- **`boot`** — start this hand-built config.
+- **`set root=(hd0,gptN)`** tells GRUB which partition to read files from.
+- **`linux <path> root=<dev>`** loads the kernel and gives it its command line. The `root=` here is the **real root filesystem** the kernel should mount as `/` (`/dev/vda1`, `/dev/mapper/...`). It is a different thing from GRUB's own `root`.
+- **`initrd <path>`** loads the matching initramfs, the starter system that helps the kernel mount the real root. **If the kernel and initrd versions do not match, the boot usually fails** or stops at an emergency shell.
+- **`boot`** starts the kernel with these settings.
 
-## This is a door, not a fix
+## A way in, not a fix
+
+Every order you typed lives only in GRUB's memory for this one launch.
 
 ```mermaid
 flowchart TD
-    P["bare grub> prompt"] --> LS["ls / ls (hd0,gptN)/  → find the partition with vmlinuz + initrd"]
-    LS --> ASM["set root= ; linux ...root=<realdev> ; initrd ... ; boot"]
-    ASM --> UP["system boots THIS ONCE — nothing written to disk"]
-    UP --> FIX["now run grub-install + update-grub (Part 3)"]
-    UP -.skip Part 3.-> BACK["next reboot → same broken grub> prompt"]
+    P["grub> prompt"] -->|"ls"| LS["Boot partition found"]
+    LS -->|"set root, linux, initrd"| ASM["Boot built by hand"]
+    ASM -->|"boot"| UP["System runs once"]
+    UP -->|"grub-install, update-grub"| FIX["Lasting repair"]
+    UP -.->|"reboot without repair"| BACK["grub> again"]
 ```
 
-Nothing in this sequence is written to disk. The moment the machine reboots, GRUB starts again from the broken state. It gets you a working shell for one session so you can run the durable repair in Part 3 — that is all.
+The diagram shows that the hand-built boot gives you one running session. Only the lasting repair, `grub-install` plus `update-grub`, stops the machine from returning to `grub>`.
 
-This console sequence is exactly what an SSH-only grading harness cannot exercise (there is no console to type into). Know it for the exam; the hands-on lab picks up at Part 3, which is identical whether you reached a shell this way or the system booted on its own.
+Nothing in this sequence is written to disk. The moment the machine reboots, GRUB starts again from the same broken state. The hand-built boot gives you a working system for one session, so you can run the lasting repair. That is all it does.
+
+The lasting repair is the same whether you got in this way, through a chroot from rescue media, or because the system still booted on its own. The mission starts from that point.
+
+GRUB has two more useful orders at this prompt. If `grub.cfg` exists but was not loaded, `configfile (hd0,gpt2)/grub/grub.cfg` loads it. If you see the more limited `grub rescue>` prompt instead, `insmod normal` and then `normal` try to load the normal GRUB menu.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Treating a successful manual boot as the repair** → nothing persisted; the next reboot is back to `grub>`. Run Part 3.
-> - **Kernel and initrd from different versions** → `linux vmlinuz-6.8.0-31` with `initrd initrd.img-6.8.0-29` typically fails. Match them.
-> - **Confusing GRUB's `root=` with the kernel's `root=`** → `set root=(hd0,gpt2)` is where GRUB reads files; `linux ... root=/dev/vda1` is where the kernel mounts `/`. Both are needed and they differ.
-> - **Guessing the partition instead of using `ls`** → `ls (hd0,gptN)/` on each candidate; do not assume `gpt1` is `/boot`.
-
-> *At a bare `grub>` prompt, `ls` then `ls (hd0,gptN)/` locate the partition with `vmlinuz`/`initrd`, and `set root=` / `linux …root=<realdev>` / `initrd` / `boot` hand-assemble one boot — none of it persists, so it is only a way in to run the Part 3 repair.*
-
-## Reference
-
-- `info grub` "GRUB only offers a rescue shell" — the `ls` / `set root` / `linux` / `initrd` / `boot` recovery sequence.
-- `man grub` / GRUB command reference — `insmod normal`, `configfile` as an alternative when `grub.cfg` exists but was not auto-loaded.
-- `man 7 bootup` — kernel `root=` vs bootloader device selection.
+> - **Treating a successful hand-built boot as the repair.** Nothing was saved. The next reboot goes back to `grub>`. Run `grub-install` and `update-grub`.
+> - **Using a kernel and an initrd from different versions.** `linux vmlinuz-6.8.0-31` with `initrd initrd.img-6.8.0-29` usually fails. Match the version numbers.
+> - **Mixing up GRUB's `root` and the kernel's `root=`.** `set root=(hd0,gpt2)` is where GRUB reads files. `linux ... root=/dev/vda1` is where the kernel mounts `/`. You need both, and they differ.
+> - **Guessing the partition instead of using `ls`.** Run `ls (hd0,gptN)/` on each candidate. Do not assume `gpt1` holds `/boot`.

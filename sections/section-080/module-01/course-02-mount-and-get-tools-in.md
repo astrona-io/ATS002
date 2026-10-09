@@ -1,10 +1,12 @@
-# Part 2 — Mount the broken root, and get the tools in
+# Mount The Broken Root And Get The Tools In
 
-> Prerequisite: [Part 1 — Why a bad fstab stops the boot, and how to reach a shell](./course-01-why-it-wont-boot-and-reaching-a-shell.md). Next: [Part 3 — chroot in, fix, prove, unmount](./course-03-chroot-fix-prove-unmount.md).
+Astronaut, your rescue ship is docked and you have a shell that can see the broken ship's disks. Before you can step inside, you need three things: the broken root filesystem mounted, a set of working tools inside it, and power cables from your ship for the kernel's own folders. This part builds all three.
 
-You have a shell that sees the disks. Before you can run the target system's own tools against its own config, you need its root mounted and a working userland plus the kernel interfaces bind-mounted into it. This part is identifying the right partition and assembling a usable chroot.
+In these examples the healthy machine you work from is called the **repair host**. It can be a live USB system, or your own lab ship with the broken system on a spare disk.
 
-## Identify the partition — never assume a device name
+## Find the right partition, never guess
+
+The first job is to know exactly which partition holds the broken root filesystem. Run this on the repair host:
 
 ```bash
 # shell: the rescue shell / repair host
@@ -20,18 +22,22 @@ vdb
 └─vdb2  ext4    DATA001VOL    aabbccdd-5555-6666-7777-888899990000
 ```
 
-`lsblk -f` shows device, filesystem type, label, and UUID in one view. Cross-check with `sudo blkid`. In a real incident you may have only UUIDs and disk sizes — which is exactly why the combined view beats guessing `/dev/sdb1`.
+This output is a shortened example with made-up UUIDs. On Ubuntu 24.04, `lsblk -f` also shows the `FSVER`, `FSAVAIL` and `FSUSE%` columns and calls the last one `MOUNTPOINTS`, and the main disk usually has more than one partition.
 
-Mount the target root:
+`lsblk -f` shows each device with its filesystem type, label and UUID in one view. `sudo blkid` gives the same facts from another angle, so use it to double-check. The device letters (`vdb`, `sdb`) are handed out in arrival order, like bay numbers at a busy dock, so they can change between boots. Labels, sizes and UUIDs do not. That is why you read this view instead of guessing `/dev/sdb1`.
+
+Here the labels make it clear: `DATA001ROOT` is the broken system's root filesystem and `DATA001VOL` is the data volume its fstab line should mount. Mount the root on an empty folder:
 
 ```bash
 sudo mkdir -p /mnt/repair
 sudo mount /dev/vdb1 /mnt/repair
 ```
 
-## Get a working userland in — bind mounts
+Use your own device name if it is different.
 
-An empty mount is not a usable chroot. A bare chroot has no `bash`, `mount`, `sed`, or `blkid`. Bind-mount the repair host's own userland into it (read-only is fine):
+## Bring in a working set of tools
+
+An empty mount is not yet a usable chroot. If the target has no `bash`, `mount`, `sed` or `blkid` of its own, there is nothing to run once you step inside. You can lend it the repair host's tools with bind mounts:
 
 ```bash
 sudo mount --bind /usr  /mnt/repair/usr
@@ -41,11 +47,13 @@ sudo mount --bind /lib  /mnt/repair/lib
 [ -e /lib64 ] && sudo mount --bind /lib64 /mnt/repair/lib64
 ```
 
-`man mount` `--bind`: a bind mount does **not** create a new filesystem — it re-attaches an already-mounted tree at a second location. Nothing is copied; `/mnt/repair/usr` becomes a second doorway to the same files. This gives the chroot working tools while `/mnt/repair/etc` stays the target disk's own `/etc` — broken fstab and all, which is what you are there to fix.
+A **bind mount** does not create a new filesystem and copies nothing. The kernel simply shows a folder that is already mounted at a second place, like a second hatch into the same cargo hold. `/mnt/repair/usr` becomes another door to the repair host's `/usr`. The important part stays untouched: `/mnt/repair/etc` is still the target disk's own `/etc`, broken fstab and all, which is what you came to fix.
 
-(On a normal full-OS root partition this bind-userland step is unnecessary — the target already has its own `/usr`, `/bin`, etc. It matters when the target carries only config, as this lab's stand-in disk does.)
+On a real, fully installed root partition you can skip this step, because the target already has its own `/usr`, `/bin` and libraries. It matters when the target carries only configuration, as the missions' stand-in disks do.
 
-## Get the kernel interfaces in — the step guides skip
+## Run the power cables: `/dev`, `/proc` and `/sys`
+
+This is the step many guides leave out. Three folders are not ordinary files at all; the kernel fills them while the system runs. Bind-mounting them is like running power cables from the rescue ship into the damaged one:
 
 ```bash
 sudo mount --bind /dev  /mnt/repair/dev
@@ -53,32 +61,36 @@ sudo mount --bind /proc /mnt/repair/proc
 sudo mount --bind /sys  /mnt/repair/sys
 ```
 
-Without a populated `/dev` (device nodes), `/proc` (process and mount info), and `/sys` (kernel/device state), tools inside the chroot fail in ways that look unrelated to the missing binds:
+- `/dev` holds the device files, one for each disk and partition.
+- `/proc` shows the running processes and what is mounted.
+- `/sys` shows the kernel's view of devices and their state.
 
-- `blkid` finds nothing — there are no device nodes to read.
-- `mount` cannot resolve a `UUID=` at all.
-- `grub-install`, `update-initramfs` misbehave silently.
+Without them, tools inside the chroot fail in ways that seem to have nothing to do with the missing folders:
 
-**If something inside a chroot fails mysteriously, check these three binds first.**
+- `blkid` finds nothing, because there are no device files to read.
+- `mount` cannot work out which device a `UUID=` line means.
+- `grub-install` and `update-initramfs` misbehave without a clear error.
 
 ```mermaid
 flowchart TD
-    T["target root mounted at /mnt/repair"] --> U["bind /usr /bin /sbin /lib → working bash, mount, sed, blkid"]
-    U --> K["bind /dev /proc /sys → device nodes, mount info, kernel state"]
-    K --> C["chroot /mnt/repair /bin/bash  (Part 3)"]
-    K -.skip these.-> FAIL["blkid finds nothing · mount can't resolve UUID= · grub tools fail oddly"]
+    T["Target root"] -->|"mount"| R["/mnt/repair"]
+    R -->|"bind /usr /bin /sbin /lib"| U["Tools inside"]
+    U -->|"bind /dev /proc /sys"| K["Kernel folders inside"]
+    K -->|"chroot"| C["Working chroot"]
+    U -.->|"skip kernel folders"| F["Odd failures"]
 ```
 
+The diagram shows the order: mount the target root at `/mnt/repair`, bind in the tools, bind in the kernel folders, then `chroot`. Skipping the kernel folders leads to failures like `blkid` returning nothing.
+
+> [!TIP]
+> If anything fails in a strange way inside a chroot, check the `/dev`, `/proc` and `/sys` bind mounts first. They are the most common missing piece.
+
+There are tools that do the bind-then-chroot steps for you, such as `arch-chroot` on Arch Linux and `systemd-nspawn`. Learn the manual steps first, because the exam expects you to know them.
+
+## Common pitfalls
+
 > [!WARNING]
-> - **Guessing `/dev/sdb1` instead of reading `lsblk -f` / `blkid`** → you may mount and edit the wrong disk.
-> - **chrooting before bind-mounting `/dev`, `/proc`, `/sys`** → `blkid` returns nothing, `mount -a` cannot resolve UUIDs; the errors do not point at the real cause.
-> - **Forgetting `/lib64` on a 64-bit system** → dynamic linker failures for tools inside the chroot. The `[ -e /lib64 ]` guard covers it.
-> - **Bind-mounting the target's `/etc` over the real one** → you want the *target's* `/etc` visible in the chroot, i.e. left as whatever the mounted disk provides. Do not bind the host's `/etc` in.
-
-> *Identify the target partition with `lsblk -f` (never a bare device name), mount it, bind-mount `/usr /bin /sbin /lib` for a working userland, then bind-mount `/dev /proc /sys` — skipping the last three makes chroot tools fail in ways that hide the real cause.*
-
-## Reference
-
-- `man mount` — `--bind`, `--rbind`, `-o remount`; what a bind mount is and is not.
-- `man lsblk` — `-f` (filesystem view), `-o` custom columns; `man blkid` for the cross-check.
-- `arch-chroot(8)` (Arch) / `systemd-nspawn` — tools that automate the bind-mount-then-chroot sequence.
+> - **Guessing `/dev/sdb1` instead of reading `lsblk -f` or `blkid`.** You may mount and edit the wrong disk.
+> - **Running `chroot` before bind-mounting `/dev`, `/proc` and `/sys`.** `blkid` returns nothing and `mount -a` cannot resolve UUIDs, and the errors do not point at the real cause.
+> - **Forgetting `/lib64` on a 64-bit system.** Programs inside the chroot fail to start because their loader is missing. The `[ -e /lib64 ]` check covers it.
+> - **Bind-mounting the repair host's `/etc` over the target's.** You want the target's own `/etc` visible inside the chroot, so leave it as the mounted disk provides it.

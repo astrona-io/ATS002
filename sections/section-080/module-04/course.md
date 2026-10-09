@@ -1,29 +1,42 @@
 # GRUB Corruption Recovery
 
-A bad `/etc/fstab` line (Module 1) leaves the bootloader working. This module covers GRUB itself being broken: the machine drops straight to a bare `grub>` rescue prompt, or a menu appears but its config file is missing or unreadable. Regenerating a config — all Module 1 needed — is not the whole fix here. GRUB's own installed boot code, and its ability to find a config at all, may both be broken, which means genuinely reinstalling GRUB to the disk, not just rebuilding a config on top of it.
+Astronaut, sometimes the trouble starts before the kernel even wakes up. GRUB is the ship's launch computer, and `grub.cfg` is its launch checklist. When GRUB itself is broken, the machine drops straight to a bare `grub>` prompt: the launch computer with no checklist, waiting for typed orders. Or a menu appears, but the file behind it is missing or cannot be read.
 
-Three short parts; work them in order.
-
-## How this module is organised
-
-1. **[Part 1 — Two repairs, easy to confuse, and reading the symptom](./course-01-two-repairs-and-the-symptom.md)** — `grub-install` (boot-sector/EFI code) vs `update-grub` / `grub2-mkconfig` (menu config), and telling a broken-GRUB symptom from a failing menu entry.
-2. **[Part 2 — The one-boot manual rescue from `grub>`](./course-02-manual-rescue-from-grub.md)** — `ls` / `set root=` / `linux` / `initrd` / `boot` to hand-assemble a single boot, and why nothing about it persists.
-3. **[Part 3 — The durable repair: reinstall and regenerate](./course-03-durable-repair.md)** — `grub-install` (BIOS vs UEFI forms), `update-grub` / `grub2-mkconfig`, and verifying with `grub-install --recheck` and `grep -c menuentry`.
+Rebuilding the checklist alone is not always enough. GRUB's own installed boot code, and its ability to find a checklist at all, may both be broken. The full repair reinstalls GRUB on the disk and then writes a fresh checklist.
 
 ## Learning objectives
 
 After this module you can:
 
-- **Distinguish** `grub-install` from `update-grub` / `grub2-mkconfig` by what each writes and assumes.
-- **Read** a boot symptom to tell broken GRUB from a problem further along.
-- **Hand-assemble** a one-time boot from a bare `grub>` prompt, and explain why it is not a fix.
-- **Reinstall** GRUB with the correct BIOS or UEFI invocation after confirming the firmware type.
-- **Regenerate** the GRUB config and verify the repair without a reboot.
+- Tell `grub-install` apart from `update-grub` and `grub2-mkconfig` by what each one writes and what each one needs.
+- Read a boot symptom to tell a broken GRUB from a problem further along.
+- Build a one-time boot by hand from a bare `grub>` prompt, and explain why it is not a fix.
+- Reinstall GRUB with the right BIOS or UEFI command after checking the firmware type.
+- Regenerate the GRUB configuration and check the repair without a reboot.
 
 ## Before you start
 
-Assumed: Module 1's chroot mechanic, a Linux shell, `sudo`, and BIOS vs UEFI. **How the lab runs:** the SSH-only harness cannot type at a `grub>` prompt or recover an unbootable VM, so bootstrap removes this VM's `grub.cfg` but leaves the running kernel and GRUB's boot code intact — the current boot already succeeded, SSH stays up, and the next reboot would fail. Framing is "fix it before that reboot". Know the Part 2 console sequence for the exam; the lab drills Parts 1 and 3 in full, running both `grub-install` and `update-grub` as a real full repair would.
+Check that you have the knowledge and the tools this module expects before you begin.
 
-## Where this fits
+### What you should already know
 
-This is the section's deepest boot-layer repair — Module 1 fixed a mount instruction handed to systemd, this fixes the bootloader that runs before systemd exists. Running both repair tools every time, even when only one was strictly needed, is the habit the section capstone rewards.
+- **How to use a Linux shell and `sudo`.**
+- **The chroot repair steps:** mount the target root, bind-mount `/dev`, `/proc` and `/sys` into it, then run `chroot`. You need them when the broken system cannot boot at all.
+- **The two firmware types:** older BIOS machines and modern UEFI machines start a bootloader in different ways.
+
+### What you need
+
+- This module has no playground. The `grub>` prompt steps are a worked walkthrough only: they need a real console during boot, which you cannot reach on the training ships.
+- The mission gives you a ready-made training ship whose `/boot/grub/grub.cfg` has been removed. Its current boot already finished, so SSH keeps working; only the next reboot would fail. You run the real repair before that reboot happens.
+
+## How this module is laid out
+
+1. [Two Repairs And Reading The Symptom](./course-01-two-repairs-and-the-symptom.md): `grub-install` (the boot code) versus `update-grub` and `grub2-mkconfig` (the menu file), and telling a broken GRUB from a failing menu entry.
+2. [The One-Boot Rescue From grub>](./course-02-manual-rescue-from-grub.md): `ls`, `set root=`, `linux`, `initrd` and `boot` to start the system once by hand, and why nothing about it lasts.
+3. [The Durable Repair: Reinstall And Regenerate](./course-03-durable-repair.md): `grub-install` for BIOS and UEFI, `update-grub` and `grub2-mkconfig`, and checking the result with `grub-install --recheck` and `grep -c menuentry`.
+   - Mission: GRUB Corruption Recovery Lab
+4. [Wrap-Up: Mission Debrief](./course-04-wrap-up.md)
+
+## Why this matters
+
+A machine that stops at `grub>` looks dead to most people. It is not: the kernel, the files and the data are all still there. Knowing which of the two repairs you need, and running both when in doubt, turns a scary screen into a ten-minute fix.

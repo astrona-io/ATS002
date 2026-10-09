@@ -1,62 +1,66 @@
-# Part 2 — Back up the partition table, and verify the backup
+# Back Up And Verify The Partition Table
 
-> Prerequisite: [Part 1 — Two layers, not one, and identifying the target disk](./course-01-two-layers-and-identifying-the-disk.md). Next: [Part 3 — Simulate, restore, and verify both layers](./course-03-simulate-restore-verify.md).
+Astronaut, the best moment to save a deck plan is before anything goes wrong. A copy kept in another ship's safe turns a wiped partition table into a two-minute restore instead of a data recovery emergency. This part shows the backup command for GPT disks, the tools for older MBR disks, and the step people skip: checking that the backup is actually good.
 
-The professional fix for partition-table loss is preventive: capture the table *before* running anything risky, so a mistake is a two-minute restore instead of a data-recovery emergency. This part is the backup command for GPT (and the MBR contrast), and — the step people skip — verifying the backup is actually sane.
+## Back up a GPT table with `sgdisk`
 
-## Back up the GPT table
+`sgdisk` is the script-friendly member of the GPT fdisk tools (`gdisk`, `sgdisk`). It works on GPT disks. Run it as root against the whole disk, not a partition:
 
 ```bash
 # shell: repair host, root
 sudo sgdisk --backup=/root/vdc-ptable-backup.bin /dev/vdc
 ```
 
-`man sgdisk` `--backup`: writes a binary snapshot of the **GPT header and the full partition entry array** — every partition's exact start/end sector, type GUID, and unique GUID — to the file. Structural only: **no file data from inside the partitions**, by design. Its only job is letting the exact layout be reconstructed later.
+Use your own disk's name; the extra disk is often `/dev/vdb`.
 
-## The MBR contrast
+`--backup` writes a small binary file holding the protective MBR, both GPT headers and one copy of the partition entries. That is every partition's exact start and end sector, its type ID and its unique ID. It holds **no file data from inside the partitions**, on purpose. Its only job is to let you rebuild the exact layout later.
 
-For a legacy MBR disk the equivalents are different tools:
+Keep the backup off the disk you are about to risk. `/root` on the main system disk works for practice; on a real system, copy it to another machine too.
+
+## Tools for older MBR disks
+
+An MBR disk (Master Boot Record, the older format) needs different tools:
 
 ```bash
 sudo sfdisk -d /dev/vdX > /root/vdX-ptable-backup.txt        # plain-text, editable; works for MBR and GPT
 sudo dd if=/dev/vdX of=/root/vdX-mbr-backup.img bs=512 count=1  # raw first sector only
 ```
 
-`sfdisk -d` produces a human-readable, editable description and handles both table types, though `sgdisk` is more GPT-native. The raw `dd` form captures only the literal first 512 bytes — enough for a pure MBR table, but it does **not** capture GPT's structures, which live beyond that first sector (and a backup GPT header at the very end of the disk).
+`sfdisk -d` writes a plain-text description you can read and edit. It works for both MBR and GPT, and you restore it later by feeding the file back into `sfdisk`. `sgdisk` is still the more natural tool for GPT.
 
-## Verify the backup — before you need it
+The raw `dd` form copies only the first 512 bytes of the disk. That is enough for a pure MBR table, but it does **not** capture a GPT table. GPT keeps its structures after that first sector, and its second copy at the very end of the disk.
+
+## Check the backup before you need it
+
+A backup you have never looked at is only a hope. `sgdisk` can read the backup file the same way it reads a disk:
 
 ```bash
 sudo sgdisk --print /root/vdc-ptable-backup.bin
 ```
 
-`sgdisk` treats a backup file like a device for reads — `--print` parses and displays it exactly as it would the live disk. Confirm the expected number of partitions with plausible sizes matching Part 1's `lsblk -f`.
+`--print` shows the partition list. Check that it has the expected number of partitions and that their sizes match what `lsblk -f` showed for the disk.
 
 ```bash
 ls -lh /root/vdc-ptable-backup.bin      # a plausible non-zero size
 ```
 
-An empty, truncated, or garbled backup shows up **here** — far better than discovering it mid-emergency when it is too late to take a fresh one.
+An empty, cut-short or garbled backup shows up **here**, while you can still take a fresh one. Finding it in the middle of an emergency is too late.
 
 ```mermaid
 flowchart TD
-    ID["target disk positively identified (Part 1)"] --> BK["sgdisk --backup=FILE /dev/vdc"]
-    BK --> PR["sgdisk --print FILE  → expected partition count + plausible sizes?"]
-    PR -->|looks right| SZ["ls -lh FILE  → non-zero, plausible size"]
-    PR -->|empty / garbled| RETAKE["retake the backup now, while you still can"]
-    SZ --> READY["backup trusted — safe to proceed to risky work"]
+    ID["Target disk confirmed"] -->|"sgdisk --backup"| BK["Backup file"]
+    BK -->|"sgdisk --print"| PR{"Partitions look right?"}
+    PR -->|"yes"| SZ["Size check with ls -lh"]
+    PR -->|"no"| RE["Take the backup again"]
+    SZ -->|"non-zero"| OK["Backup trusted"]
 ```
 
+The diagram shows the order: confirm the disk, take the backup, read it back with `sgdisk --print`, check its size, and only then trust it. If the printout looks wrong, take the backup again straight away.
+
+## Common pitfalls
+
 > [!WARNING]
-> - **Assuming `sgdisk --backup` includes file data** → it does not; it is the table structure only. Filesystem backups are a separate concern.
-> - **Using raw `dd` of sector 0 for a GPT disk** → misses the GPT entry array and the backup header. Use `sgdisk --backup` (or `sfdisk -d`) for GPT.
-> - **Skipping `sgdisk --print` on the backup file** → a corrupt backup is discovered only when you try to restore from it under pressure.
-> - **Writing the backup onto the same disk you are about to risk** → put it elsewhere (`/root` on the OS disk, or off-box).
-
-> *`sgdisk --backup=FILE /dev/DISK` captures the GPT header and partition entry array (no file data); verify it immediately with `sgdisk --print FILE` and a size check — a corrupt backup found now is fixable, found mid-restore is not.*
-
-## Reference
-
-- `man sgdisk` — `--backup`, `--load-backup`, `--print`; GPT header + entry array.
-- `man sfdisk` — `-d` dump / restore-by-redirect; works for MBR and GPT.
-- `man dd` — `bs=512 count=1` first-sector capture and its limits for GPT.
+> - **Thinking `sgdisk --backup` saves your files.** It saves only the table. Backing up the data inside is a separate job.
+> - **Using a raw `dd` of the first sector for a GPT disk.** It misses the GPT entries and the second copy at the end of the disk. Use `sgdisk --backup` or `sfdisk -d`.
+> - **Skipping `sgdisk --print` on the backup file.** A bad backup is then found only when you try to restore from it under pressure.
+> - **Writing the backup onto the disk you are about to risk.** Keep it somewhere else: `/root` on the system disk, or another machine.

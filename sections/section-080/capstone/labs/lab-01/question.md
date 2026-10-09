@@ -2,27 +2,32 @@
 
 Solve this question on: `terminal`
 
-**Scenario.** You've just been paged. Two things are wrong on this host at once:
+You have just been paged. Two things are wrong on this host at once:
 
-1.  Its secondary disk's GPT partition table is gone. A backup taken before this incident already exists on disk at `/root/vdc-ptable-backup.bin` — restore from it rather than reconstructing partitions from memory.
-2.  Its own bootloader is stale: `/boot/grub/grub.cfg` is missing, so the next reboot would come up needing a configuration that isn't there. Your **current** SSH session is unaffected — this VM's boot already completed before anything went wrong, and GRUB's own installed boot-sector/EFI code was never corrupted — but fix this before the next reboot happens, not after.
+- **The secondary disk's GPT partition table is gone.** A backup taken before the incident is on file at `/root/vdc-ptable-backup.bin`. Restore from it instead of rebuilding partitions from memory.
+- **The bootloader is in trouble.** `/boot/grub/grub.cfg` is missing, so the next reboot would find no menu. Your current SSH session is not affected: the machine finished booting before the file went missing, and GRUB's installed boot code was not damaged. Fix it before the next reboot.
 
-Your job:
+## Task 1: Restore the secondary disk
 
-**Part 1 — Secondary disk (partition table restore):**
+1. Identify the secondary disk (serial `lab080-vdc`). It is **not** the disk mounted as `/`, and it currently shows no partitions at all. Do not assume a device letter such as `/dev/vdb`.
+2. Check that the existing backup is good with `sgdisk --print` on the backup file.
+3. Restore the partition table from it with `sgdisk --load-backup`.
+4. Confirm the partitions are back, then check the filesystems separately: run `fsck -n` on each partition, and mount each one to confirm its `marker.txt` is still there with its original content. Unmount them again when you are done.
 
-1.  Identify the secondary disk with `lsblk -f` (it is **not** the disk mounted as `/`, and it currently shows no partitions at all — do not assume a specific `/dev/vdX` letter).
-2.  Confirm the existing backup is sane: `sudo sgdisk --print /root/vdc-ptable-backup.bin`.
-3.  Restore the partition table from it: `sudo sgdisk --load-backup=/root/vdc-ptable-backup.bin <disk>`.
-4.  Confirm partitions reappear with `lsblk -f`, then — as a **separate** check — confirm the filesystems inside are actually intact: run `fsck -n` on each partition, and mount each one to confirm its original `marker.txt` file is still there with its original content.
+## Task 2: Repair GRUB on the main disk
 
-**Part 2 — Primary disk (GRUB reinstall):**
+5. Confirm the symptom: `/boot/grub/grub.cfg` is missing.
+6. Find out whether this machine started with BIOS or UEFI firmware.
+7. Identify the disk that holds your root filesystem. Do not assume a device letter.
+8. Reinstall GRUB's boot code with `grub-install`: on BIOS, target the whole disk; on UEFI, target the EFI system partition with `--target=x86_64-efi --efi-directory=/boot/efi`.
+9. Write a fresh `/boot/grub/grub.cfg` with `update-grub`.
+10. Without rebooting, check the repair: `grub-install --recheck` against the same disk or target must succeed, and `/boot/grub/grub.cfg` must contain `menuentry` lines.
 
-5.  Confirm the symptom: `ls -l /boot/grub/grub.cfg` should show it missing.
-6.  Determine this VM's firmware/boot mode: `[ -d /sys/firmware/efi ] && echo UEFI || echo "BIOS/legacy"`.
-7.  Identify the primary disk backing your root filesystem with `lsblk` and `findmnt -no SOURCE /` (do not assume a specific `/dev/vdX` letter).
-8.  Reinstall GRUB's own boot-sector or EFI code with `grub-install` — targeting the whole disk on BIOS/legacy, or the EFI system partition on UEFI.
-9.  Regenerate a fresh `/boot/grub/grub.cfg` with `sudo update-grub`.
-10. Confirm the repair is durable without rebooting: `sudo grub-install --recheck` against the same disk/target should report success, and `/boot/grub/grub.cfg` should contain real `menuentry` lines.
+Do not reboot before the GRUB repair is finished: the machine would not come back.
 
-The fix is graded on four checks: the secondary disk's partition table is back with both original partitions present; both partitions' filesystems pass `fsck -n` and their original marker files are intact; `/boot/grub/grub.cfg` exists, is non-empty, contains menu entries, and was genuinely regenerated during this session; and GRUB's installed boot-sector/EFI image was also genuinely rewritten during this session.
+## What the grader checks
+
+- The secondary disk has both of its original partitions again.
+- Each partition passes `fsck -n` without errors, mounts, and still holds its original `marker.txt` with its original content.
+- `/boot/grub/grub.cfg` exists, is not empty, has at least one line starting with `menuentry`, and was written after the lab was set up.
+- GRUB's installed core image (`core.img` or `core.efi` under `/boot/grub`) was rewritten after the lab was set up, and `grub-install --recheck` on the disk behind `/` (or in its UEFI form) finishes without an error.

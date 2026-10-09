@@ -1400,14 +1400,17 @@ modules:
         title: "Root-Filesystem Repair via chroot"
         path: sections/section-080/module-01/course.md
       - type: reading
-        title: "Why a bad fstab stops the boot, and how to reach a shell"
+        title: "Why A Bad fstab Stops The Boot"
         path: sections/section-080/module-01/course-01-why-it-wont-boot-and-reaching-a-shell.md
       - type: reading
-        title: "Mount the broken root, and get the tools in"
+        title: "Mount The Broken Root And Get The Tools In"
         path: sections/section-080/module-01/course-02-mount-and-get-tools-in.md
       - type: reading
-        title: "chroot in, fix, prove, unmount"
-        path: sections/section-080/module-01/course-03-chroot-fix-prove-unmount.md
+        title: "Chroot In And Fix The Line"
+        path: sections/section-080/module-01/course-03-chroot-in-and-fix-the-line.md
+      - type: reading
+        title: "Prove The Fix And Unmount"
+        path: sections/section-080/module-01/course-04-prove-the-fix-and-unmount.md
       - type: reading
         title: Question
         path: sections/section-080/module-01/labs/lab-01/question.md
@@ -1450,13 +1453,16 @@ modules:
           - name: "chroot(1) manual page"
             url: https://man7.org/linux/man-pages/man1/chroot.1.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-080/module-01/course-05-wrap-up.md
+      - type: reading
         title: "Password Reset & Single-User Recovery"
         path: sections/section-080/module-02/course.md
       - type: reading
-        title: "Two doors: `rd.break` and `init=/bin/bash`"
+        title: "Two Doors: rd.break And init=/bin/bash"
         path: sections/section-080/module-02/course-01-two-doors-rd-break-and-init.md
       - type: reading
-        title: "The chroot equivalent, and editing `/etc/shadow` directly"
+        title: "The chroot Equivalent And Editing /etc/shadow"
         path: sections/section-080/module-02/course-02-chroot-equivalent-and-shadow-edit.md
       - type: reading
         title: Question
@@ -1478,16 +1484,19 @@ modules:
           - name: "openssl-passwd manual page"
             url: https://docs.openssl.org/3.0/man1/openssl-passwd/
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-080/module-02/course-03-wrap-up.md
+      - type: reading
         title: "Partition Table Backup & Recovery"
         path: sections/section-080/module-03/course.md
       - type: reading
-        title: "Two layers, not one, and identifying the target disk"
+        title: "Two Layers And The Target Disk"
         path: sections/section-080/module-03/course-01-two-layers-and-identifying-the-disk.md
       - type: reading
-        title: "Back up the partition table, and verify the backup"
+        title: "Back Up And Verify The Partition Table"
         path: sections/section-080/module-03/course-02-backup-and-verify.md
       - type: reading
-        title: "Simulate, restore, and verify both layers"
+        title: "Wipe, Restore And Verify Both Layers"
         path: sections/section-080/module-03/course-03-simulate-restore-verify.md
       - type: reading
         title: Question
@@ -1507,16 +1516,19 @@ modules:
           - name: "sgdisk(8) manual page"
             url: https://manpages.ubuntu.com/manpages/noble/man8/sgdisk.8.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-080/module-03/course-04-wrap-up.md
+      - type: reading
         title: "GRUB Corruption Recovery"
         path: sections/section-080/module-04/course.md
       - type: reading
-        title: "Two repairs, easy to confuse, and reading the symptom"
+        title: "Two Repairs And Reading The Symptom"
         path: sections/section-080/module-04/course-01-two-repairs-and-the-symptom.md
       - type: reading
-        title: "The one-boot manual rescue from `grub>`"
+        title: "The One-Boot Rescue From grub>"
         path: sections/section-080/module-04/course-02-manual-rescue-from-grub.md
       - type: reading
-        title: "The durable repair: reinstall and regenerate"
+        title: "The Durable Repair: Reinstall And Regenerate"
         path: sections/section-080/module-04/course-03-durable-repair.md
       - type: reading
         title: Question
@@ -1537,6 +1549,9 @@ modules:
             url: https://www.gnu.org/software/grub/manual/grub/grub.html
           - name: "grub-install manual page"
             url: https://manpages.ubuntu.com/manpages/noble/man8/grub-install.8.html
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-080/module-04/course-04-wrap-up.md
       - type: reading
         title: "Section 080 Knowledge Check: System Disaster Recovery"
         path: sections/section-080/quiz.md

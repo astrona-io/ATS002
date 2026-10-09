@@ -1,18 +1,31 @@
-# section-080 / capstone: System Disaster Recovery Capstone
+# System Disaster Recovery Integration Capstone Lab
 
-QEMU VM for the LFCS course — the Section 080 capstone. A bad night on call: a secondary disk's partition table needs restoring from an existing backup, and this VM's own bootloader needs reinstalling and its configuration regenerated before the next scheduled reboot.
+Welcome to a bad night on call, astronaut. You have just been paged, and two things are wrong on this host at once. A secondary disk's partition table is gone, and the ship's own launch checklist, `/boot/grub/grub.cfg`, is missing before the next scheduled reboot.
 
-## How This Lab Stays Safely Gradable
+Both problems are set up safely. The secondary disk (serial `lab080-vdc`) is a real 2 GB GPT disk with two ext4 partitions; the setup script backed up its table to `/root/vdc-ptable-backup.bin` and then wiped it. On the main disk, only `grub.cfg` was removed: the running kernel and GRUB's installed boot code were not touched, so SSH keeps working and only the next reboot would fail.
 
-This capstone combines two mechanics already used separately elsewhere in this section, each safely re-staged for the same reason: the lab harness grades by SSHing into this VM and running a script, which cannot survive an actually-unbootable machine or script an interactive console.
+## Launching the Lab
 
-*   **The secondary disk** (`extraDisks`, serial `lab080-vdc`) is a real, GPT-partitioned disk carrying real filesystems — the Module 3 / lab-083 mechanism. It needs no adaptation of its own: it's a non-root disk, so the VM stays reachable throughout even while its partition table is genuinely gone.
-*   **The primary disk's bootloader** uses the Module 4 / lab-084 mechanism: bootstrap removes `/boot/grub/grub.cfg` but never touches the kernel this VM's **current** boot already loaded into memory, and never touches GRUB's own installed boot-sector/EFI code. SSH stays fully reachable throughout — only the **next** reboot would be affected.
-
-Unlike lab-083, this capstone doesn't ask you to create the partition-table backup yourself — bootstrap already took one and the "disaster" already happened before you logged in, exactly like being paged after the incident is already underway rather than while everything is still fine.
-
-## Run
+Run this command to start the virtual machine:
 
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/capstone/labs/lab-01
+```
+
+Open a terminal on it:
+
+```bash
+astrona ssh ats-002-lab-080
+```
+
+When you think you have finished, send it for grading:
+
+```bash
+astrona submit -c sections/section-080/capstone/labs/lab-01
+```
+
+When you are done, remove the lab:
+
+```bash
+astrona destroy ats-002-lab-080
 ```
