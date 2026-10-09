@@ -1,10 +1,10 @@
-# Part 3 — Status codes and recovering an interrupted package
+# Status Codes And Recovering An Interrupted Package
 
-> Prerequisite: [Part 2 — Installing directly, and ownership queries in both directions](./course-02-installing-and-ownership-queries.md). Next: [Section 050 quiz](../quiz.md).
-
-A package that is neither cleanly installed nor absent shows up not as an error but as a two-letter code in `dpkg -l`. This part is reading that column, what an interruption actually leaves behind, and the fixed two-command recovery.
+A package that is neither cleanly installed nor gone does not show up as an error. It shows up as a two-letter code in `dpkg -l`. This part covers reading that column, what an interruption really leaves behind, and the fixed two-command recovery.
 
 ## The `dpkg -l` status column
+
+Here is what `dpkg -l` prints for four packages in four different states:
 
 ```text
 Desired=Unknown/Install/Remove/Purge/Hold
@@ -18,55 +18,78 @@ iF  banner         1.3.4        amd64        prints large text
 rc  ftp            0.17-36      amd64        classic FTP client
 ```
 
-Three positions:
+The first column has up to three letters:
 
-1. **Desired** — what you want: `i` install (almost always), `h` hold, `r` remove, `p` purge.
-2. **Status** — where it actually is: `n` not-installed, `i` installed, `c` config-files-only, `U` unpacked, `F` half-configured, `H` half-installed.
-3. **Err** — usually blank; `R` means reinstall required.
+1. **Desired**: what you asked for. `i` is install (almost always), `h` hold, `r` remove, `p` purge.
+2. **Status**: where the package really is. `n` not installed, `i` installed, `c` only configuration files left, `U` unpacked, `F` half-configured, `H` half-installed.
+3. **Err**: usually blank. `R` means a reinstall is required.
 
-The codes that matter:
+These are the codes that matter:
 
 | Code | Meaning | What it tells you |
 |---|---|---|
-| `ii` | installed, fully configured | the clean, target state |
-| `iU` | unpacked, **not yet configured** | interrupted after unpack, before the config step |
-| `iF` | half-configured | the post-install `configure` step started and was cut short |
-| `iH` | half-installed | the unpack itself was cut short |
-| `rc` | removed, **config files remain** | `apt remove` (not `purge`) ran; conffiles under `/etc` are still there |
-| `rn` / `pn` | removed/purged, nothing left | fully gone |
+| `ii` | installed, fully configured | the clean target state |
+| `iU` | unpacked, **not yet configured** | interrupted after unpacking, before the configure step |
+| `iF` | half-configured | the post-install configure step started and was cut short |
+| `iH` | half-installed | the unpacking itself was cut short |
+| `rc` | removed, **configuration files remain** | `apt remove` (not `purge`) ran; the configuration files under `/etc` are still there |
+| `rn` / `pn` | removed or purged, nothing left | fully gone |
 
-`iU` / `iF` / `iH` are the fingerprint of an **interruption** — a killed process, a dropped SSH session mid-install, a power event. None means "broken beyond repair"; they mean "left mid-step".
+`iU`, `iF` and `iH` are the fingerprint of an **interruption**: a killed process, an SSH session that dropped in the middle of an install, or a power cut. None of them means "broken beyond repair". They mean "left in the middle of a step", like a crate the loading crew put down halfway through unpacking.
 
 ## Recovering: `--configure -a`, then the safety net
 
+The recovery is always the same two commands, in the same order.
+
 ```mermaid
-flowchart TD
-    S["dpkg -l shows iU / iF / iH"] --> C["sudo dpkg --configure -a"]
-    C -->|files were on disk, only config was cut short| OK["back to ii — done"]
-    C -->|a dependency is genuinely missing| FB["sudo apt --fix-broken install<br/>fetches the missing package, finishes config"]
-    FB --> OK
+flowchart TB
+    S["iU, iF or iH"] -->|"run"| C["dpkg --configure -a"]
+    C -->|"only configure was cut short"| OK["ii"]
+    C -->|"dependency missing"| FB["apt --fix-broken install"]
+    FB -->|"fetches and configures"| OK
 ```
+
+The diagram shows that `dpkg --configure -a` alone brings most interrupted packages back to `ii`, and `apt --fix-broken install` covers the case where a dependency is really missing.
 
 ```bash
 sudo dpkg --configure -a
 sudo apt --fix-broken install
 ```
 
-- **`dpkg --configure -a`** — the `-a` / `--pending` finishes configuring **every** package currently in a pending state, not just one you name. Right approach when you do not know the full scope of what an interruption touched. For the common case (files already on disk, only the config step cut short) this alone fixes it.
-- **`apt --fix-broken install`** — run it immediately after even on apparent success. It catches the other failure mode: a genuinely missing dependency, which `dpkg --configure -a` cannot resolve (no repository — same reason as Part 2).
+Here is what each command does:
 
-This pair, in this order, is the standard answer to "this system's package state looks inconsistent" — not a disaster-only tool.
+- **`dpkg --configure -a`** finishes configuring **every** package that is waiting, not just one you name. The `-a` is short for `--pending`. That is the right approach when you do not know everything an interruption touched. In the common case, where the files are already on disk and only the configure step was cut short, this alone fixes it.
+- **`apt --fix-broken install`** runs right after, even when the first command seemed to succeed. It catches the other failure: a dependency that is really missing. `dpkg --configure -a` cannot fix that, because `dpkg` has no repository to fetch from.
+
+This pair, in this order, is the standard answer to "this system's package state looks inconsistent". It is not only a disaster tool. Afterwards, `sudo dpkg --audit` checks the whole database and prints nothing when no package is left half-done.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Reading `iF` / `iU` as "installed"** → it is mid-step; software may not run. `sudo dpkg --configure -a` first.
-> - **`dpkg --configure -a` alone when a dependency is missing** → it cannot fetch anything. Always follow with `apt --fix-broken install`.
-> - **`rc` mistaken for "still installed"** → the binaries are gone; only `/etc` conffiles remain. `apt purge <pkg>` clears them (relevant to the next module).
-> - **Naming one package to `dpkg --configure`** → use `-a`; an interruption often leaves several packages pending and you may not see all of them.
+> - **Reading `iF` or `iU` as "installed".** The package is in the middle of a step, and the software may not run. Run `sudo dpkg --configure -a` first.
+> - **Running only `dpkg --configure -a` when a dependency is missing.** It cannot fetch anything. Always follow it with `apt --fix-broken install`.
+> - **Taking `rc` for "still installed".** The programs are gone; only the configuration files under `/etc` remain. `apt purge <package>` clears them.
+> - **Naming one package to `dpkg --configure`.** Use `-a`. An interruption often leaves several packages waiting, and you may not see all of them.
 
-> *`iU`/`iF`/`iH` in `dpkg -l` mean a package was left mid-install by an interruption; `sudo dpkg --configure -a` finishes every pending package, and `sudo apt --fix-broken install` right after covers the missing-dependency case `dpkg` cannot.*
+## Your mission: dpkg Low-Level Package Management Lab
 
-## Reference
+You can now inspect a `.deb`, install it with `dpkg`, ask who owns what, and recover a package left half-configured. The mission asks you to do all of that on one ship: install an internal tool from a `.deb` file and bring an unrelated stuck package back to a clean state.
 
-- `man dpkg` — the status-code legend (the header block of `dpkg -l`), `--configure`, `--pending` / `-a`.
-- `man 1 dpkg-query` — `-l` output format and `-W` for machine-readable status.
-- `man apt-get` — `-f` / `--fix-broken install` as the dependency-completing half of the recovery.
+The mission runs on its own training ship. Start it and open a terminal on it:
+
+```sh
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-02/labs/lab-01
+astrona ssh ats-002-lab-052
+```
+
+Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-050/module-02/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-002-lab-052
+```

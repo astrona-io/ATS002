@@ -1,10 +1,10 @@
-# Part 2 — Installed vs. candidate, and which source wins
+# Installed Versus Candidate
 
-> Prerequisite: [Part 1 — Finding a package, and describing it](./course-01-finding-and-describing.md). Next: [Section 050 quiz](../quiz.md).
+`apt show` describes a package in general. This part covers the commands that describe a package's link to *this* system right now: which version is installed, which one would be applied next, which repository it would come from, and how to list what is already on board by pattern.
 
-`apt show` describes a package in the abstract. This part is the commands that describe a package's relationship to *this* system right now: which version is installed, which one would be applied next, which repository it would come from, and how to enumerate what is already here by pattern.
+## `apt-cache policy`: the view of this system
 
-## `apt-cache policy` — the system-specific view
+Ask about one package:
 
 ```bash
 # shell: any host, unprivileged
@@ -22,48 +22,73 @@ nginx:
         500 https://vendor.example.com/nginx/ubuntu jammy/main amd64 Packages
 ```
 
-- **`Installed:`** — the version on the system now, or `(none)`.
-- **`Candidate:`** — the version a plain `apt install` / `apt upgrade` would apply right now, given current repository priorities. Unless the package is held, this is what the next upgrade moves to.
-- **Version table** — every available version, its **priority** (the `500`; higher wins, ties go to the higher version), and the **exact repository and version string** of each. This is the only command that tells you *which repository* a candidate would be pulled from — `apt show` never does.
+This example comes from an Ubuntu 22.04 (`jammy`) machine with a made-up vendor repository added. On Ubuntu 24.04 the archive line says `noble` and the versions differ.
 
-Two repositories legitimately offering the same name (Ubuntu's archive and a vendor's line) both appear here; the priority column resolves the tie.
+Here is how to read it:
 
-## Enumerate what is installed, by pattern
+- **`Installed:`** is the version on the system now, or `(none)`.
+- **`Candidate:`** is the version a plain `apt install` or `apt upgrade` would apply right now, given the current repository priorities. Unless the package is held, this is where the next upgrade goes.
+- **The version table** lists every available version, its **priority** and the **exact repository and version string** of each. The priority is the `500`; a higher number wins, and when numbers tie the higher version wins. This is the only command that tells you *which repository* a candidate would come from. `apt show` never does.
+
+Two repositories can both offer the same package name, for example Ubuntu's archive and a vendor's depot. Both appear here, and the priority column settles which one wins.
+
+## List what is installed, by pattern
+
+To see which packages of one family are on board, filter the installed list:
 
 ```bash
 apt list --installed | grep '^python3-'
 ```
 
-`apt list --installed` restricts output to currently-installed packages, one per line: `name/repo,now version arch [installed]`.
+`apt list --installed` shows only installed packages, one per line, in the form `name/repo,now version arch [installed]`.
 
-Anchoring the grep with **`^`** matters: it matches only names that *begin with* the prefix, not any package whose name or version string merely contains that substring. `^python3-` is a precise answer; `python3-` (unanchored) is a noisy, half-wrong one.
+The **`^`** anchor in the `grep` matters. It matches only names that *begin with* the prefix, not any package whose name or version merely contains that text somewhere. `^python3-` gives a precise answer; plain `python3-` gives a noisy, half-wrong one.
 
-The same subcommand answers "what is upgradable" (the Module 3 preview, usable here as a report):
+The same subcommand answers "what is upgradable" as a report:
 
 ```bash
 apt list --upgradable
 ```
 
+Run it after `sudo apt update`, so the list reflects the current catalogue.
+
 ## When to trust `dpkg -s` instead
 
-`apt show` and `apt-cache policy` describe APT's **cache** of repository metadata — accurate only as of the last `apt update`, and describing the *candidate*. For "what is genuinely installed on this system right now", the authoritative source is the local `dpkg` database:
+`apt show` and `apt-cache policy` describe APT's **cache** of repository metadata. That cache is only as accurate as the last `apt update`, and it describes the *candidate*. For "what is really installed on this system right now", the final word is the local `dpkg` database, the quartermaster's ledger:
 
 ```bash
 dpkg -s nginx 2>/dev/null || echo 'nginx not installed'
 ```
 
-`dpkg -s` reads that database directly, independent of cache freshness. The tools are complementary: `apt show` / `apt-cache policy` answer "what is available"; `dpkg -s` answers "what is actually here". When the question is specifically about installed state and cache staleness could matter, `dpkg -s` is the more trustworthy of the two.
+`dpkg -s` reads that database directly, whatever the state of the cache. The tools work together: `apt show` and `apt-cache policy` answer "what is available"; `dpkg -s` answers "what is actually here". When the question is about installed state and an old cache could matter, trust `dpkg -s`.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Expecting `apt show` to name the source repository** → it does not; `apt-cache policy` does, in the version table.
-> - **`grep 'python3-'` without `^`** → matches `libpython3-...`, `...python3-doc` mid-string, and version strings. Anchor it.
-> - **Trusting `apt-cache policy` on a system with a stale index** → `Candidate` reflects the last `apt update`. Run `apt update` first, or use `dpkg -s` for installed state.
-> - **`apt list --installed` output fed straight to another command** → the `name/repo,...` format needs `cut -d/ -f1` first (Module 5).
+> - **Expecting `apt show` to name the source repository.** It does not. `apt-cache policy` does, in the version table.
+> - **Using `grep 'python3-'` without `^`.** It matches `libpython3-...`, names with `python3-` in the middle, and version strings. Anchor it.
+> - **Trusting `apt-cache policy` on a system with an old index.** `Candidate:` reflects the last `apt update`. Run `apt update` first, or use `dpkg -s` for installed state.
+> - **Feeding `apt list --installed` output straight to another command.** The `name/repo,...` format needs `cut -d/ -f1` first to leave only the names.
 
-> *`apt-cache policy <pkg>` is the system-specific view — Installed, Candidate, and a priority-ranked version table naming each source repository — while `apt list --installed | grep '^prefix'` enumerates what is here and `dpkg -s` is the cache-independent truth for installed state.*
+## Your mission: APT Package Information Lookup Lab
 
-## Reference
+You can now search for a package, read its metadata, compare installed and candidate versions, and list packages by pattern, all without changing anything. The mission asks you to research five questions on one ship and save each answer to a file.
 
-- `man apt-cache` — `policy`: Installed / Candidate, priorities, the version table.
-- `man apt_preferences` — how priorities are assigned and changed by pinning.
-- `man dpkg-query` — `-s` / `--status`, `-W --showformat` for exact installed-state queries in scripts.
+The mission runs on its own training ship. Start it and open a terminal on it:
+
+```sh
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-04/labs/lab-01
+astrona ssh ats-002-lab-054
+```
+
+Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-050/module-04/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-002-lab-054
+```

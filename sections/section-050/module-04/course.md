@@ -1,28 +1,41 @@
-# Chapter 4: APT Package Information Lookup
+# APT Package Information Lookup
 
-"It installed without an error" and "it is the version and source I expected" are different claims, and conflating them is how systems accumulate quiet surprises — the wrong build, an unexpectedly old version, a package from a repository nobody meant to trust. Before you install, remove, or upgrade anything, a whole layer of `apt` tooling exists only to answer questions, entirely read-only. This module is that research layer — what you reach for *before* committing to a change.
+Astronaut, "it installed without an error" and "it is the version and source I expected" are two different claims. Mixing them up is how a ship collects quiet surprises: the wrong build, an older version than you thought, or a crate from a depot nobody meant to trust.
 
-Two short parts; work them in order.
-
-## How this module is organised
-
-1. **[Part 1 — Finding a package, and describing it](./course-01-finding-and-describing.md)** — `apt search` (keyword across name and description) vs `apt list '<glob>'` (name only), and `apt show` for the full declared metadata of one package in the abstract.
-2. **[Part 2 — Installed vs. candidate, and which source wins](./course-02-installed-vs-candidate.md)** — `apt-cache policy` (Installed, Candidate, priority-ranked version table naming each repository), enumerating installed packages by anchored pattern, and when `dpkg -s` is the more trustworthy answer.
+Before you install, remove or upgrade anything, a whole layer of `apt` tools exists only to answer questions. None of them changes the ship. This module is that research layer: what you reach for *before* you commit to a change.
 
 ## Learning objectives
 
 After this module you can:
 
-- **Find** a package by function with `apt search`, and by rough name with `apt list '<glob>'`.
-- **Read** a package's declared dependencies and footprint with `apt show` without changing the system.
-- **Interpret** `apt-cache policy` — Installed, Candidate, priorities, and which repository a version comes from.
-- **Enumerate** installed packages matching a prefix with an anchored `grep`.
-- **Choose** `dpkg -s` over `apt show` / `apt-cache policy` when the question is about installed state and the cache may be stale.
+- Find a package by what it does with `apt search`, and by a rough name with `apt list '<glob>'`.
+- Read a package's declared dependencies and size with `apt show`, without changing the system.
+- Read `apt-cache policy`: the Installed line, the Candidate line, the priorities, and which repository each version comes from.
+- List installed packages whose names start with a prefix, using an anchored `grep`.
+- Choose `dpkg -s` over `apt show` or `apt-cache policy` when the question is about what is installed and the catalogue may be old.
 
 ## Before you start
 
-Assumed: a Linux shell and Modules 1–3 (repositories, `dpkg` basics, the `apt` loop). Every command in this module is read-only; none changes installed software.
+Check that you have the knowledge and the tools this module expects before you begin.
 
-## Where this fits
+### What you should already know
 
-This module is the "look before you leap" companion to Module 3's action loop and Module 5's bulk operations. `apt-cache policy` in particular is the command that ties the section together — it is how you confirm which repository and version any later action will actually touch.
+- **That `apt` reads repositories and keeps a local catalogue.** `sudo apt update` refreshes that catalogue.
+- **How to save command output to a file with `>`.** The mission asks you to record your answers in files.
+- **What `grep` does.** It prints only the lines that match a pattern.
+
+### What you need
+
+- A terminal on an Ubuntu 24.04 machine. Every command in this module is read-only, so you can try them on any machine without changing it.
+- Or a running lab machine: start the mission with `astrona run` and open a terminal on it with `astrona ssh <lab name>`. The mission gives you the exact commands.
+
+## How this module is laid out
+
+1. [Finding And Describing A Package](./course-01-finding-and-describing.md): `apt search` (keyword in name and description) versus `apt list '<glob>'` (name only), and `apt show` for the full declared metadata of one package.
+2. [Installed Versus Candidate](./course-02-installed-vs-candidate.md): `apt-cache policy` (Installed, Candidate and a priority-ranked version table naming each repository), listing installed packages by an anchored pattern, and when `dpkg -s` is the more trustworthy answer.
+   - Mission: APT Package Information Lookup Lab
+3. [Wrap-Up: Mission Debrief](./course-03-wrap-up.md)
+
+## Why this matters
+
+`apt-cache policy` is the command that ties all package work together. It tells you which repository and which version any later action will really touch. A minute of read-only research before a change saves hours of finding out afterwards why a server runs a version nobody chose.

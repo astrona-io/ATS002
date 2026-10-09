@@ -1,38 +1,38 @@
-# Part 1 — One transaction, and finding a family by pattern
+# One Transaction And Finding A Family
 
-> Prerequisite: [module landing page](./course.md). Next: [Part 2 — Bulk actions across a matched set](./course-02-bulk-actions-across-a-set.md).
-
-Package management rarely happens one package at a time. This part is installing several related packages as one consistent transaction, and finding an entire family by naming pattern without listing packages by hand — including the two regex details that quietly make or break the match.
+Package work rarely happens one package at a time. This part covers installing several related packages as one consistent transaction, and finding a whole family by its naming pattern without listing the packages by hand. Two small pattern details quietly make or break that match.
 
 ## Install several as one transaction
+
+Give every related package to one `apt install` call:
 
 ```bash
 # shell: host, root
 sudo apt install build-essential git cmake pkg-config
 ```
 
-`build-essential` is a **meta-package** — no payload of its own, existing only to pull in `gcc`, `g++`, `make`, `libc6-dev`, and the rest of a standard toolchain as dependencies. It installs like any other name; "meta" changes nothing about the command.
+`build-essential` is a **metapackage**: an empty crate whose only job is to pull in other crates. It has no content of its own and exists to bring in `gcc`, `g++`, `make`, `libc6-dev` and the rest of a standard build toolchain as dependencies. It installs like any other name; "meta" changes nothing about the command.
 
-Why one call and not four: APT resolves **all** named packages' dependencies **together**, computing one version set that satisfies every one of them simultaneously. Four separate `apt install` calls each resolve independently, at whatever moment they run — more fragile if system state shifts between calls, and slower. "Install X together with Y and Z" is a direct instruction: one command.
+Why one call and not four? `apt` works out the dependencies of **all** named packages **together**, as one **transaction**: one planned change that finds a single set of versions that suits every package at once. Four separate `apt install` calls each plan on their own, at whatever moment they run. That is more fragile if the system changes between calls, and slower. "Install X together with Y and Z" is a direct instruction: one command.
 
 ## Find a family by pattern
 
-A host has a full PHP 8.1 module set — `php8.1-cli`, `php8.1-fpm`, `php8.1-mysql`, `php8.1-curl`, more — and you need every one:
+Imagine a host with a full PHP 8.1 module set: `php8.1-cli`, `php8.1-fpm`, `php8.1-mysql`, `php8.1-curl` and more. You need every one of them:
 
 ```bash
 apt list --installed | grep -E '^php8\.1-'
 ```
 
-Two details are load-bearing, not stylistic:
+Two details carry the weight here; they are not style:
 
-- **`-E` (extended regex)** so `\.` cleanly escapes the literal dot in `8.1`. Without `-E`, in basic regex an unescaped `.` matches *any* character — `php8x1-`, `php801-` would match too. Wrong for a version number.
-- **`^` anchor** so the match is restricted to the **start** of the package-name field. Without it, a package that merely mentions `php8.1-` later in a longer name or in a version string gets swept in.
+- **`-E` (extended regular expression)** lets `\.` cleanly stand for the literal dot in `8.1`. A regular expression is a text pattern, and in it an unescaped `.` matches *any* character. Without the escape, `php8x1-` or `php801-` would match too, which is wrong for a version number.
+- **The `^` anchor** limits the match to the **start** of the line, that is the start of the package name. Without it, a package that merely mentions `php8.1-` later in a longer name, or in a version string, gets swept in.
 
-Drop either and the match set is silently wrong.
+Drop either one and the matched set is silently wrong.
 
 ## Strip to clean names
 
-`apt list` output is `name/repo,now version arch [installed]` — for reading, not for use as arguments. The package name is always followed immediately by `/`:
+`apt list` output looks like `name/repo,now version arch [installed]`. It is made for reading, not for passing to another command. The package name is always followed directly by a `/`, so cut there:
 
 ```bash
 apt list --installed 2>/dev/null | grep -E '^php8\.1-' | cut -d/ -f1
@@ -45,17 +45,11 @@ php8.1-fpm
 php8.1-mysql
 ```
 
-`cut -d/ -f1` isolates exactly the field the next command needs (Part 2).
+`cut -d/ -f1` splits each line at `/` and keeps the first field, the bare name. The `2>/dev/null` hides `apt`'s warning that its output format may change between versions. These clean names are exactly what `apt-mark` and other package commands take as arguments.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Four `apt install` calls instead of one** → dependencies resolved independently; fragile if state shifts between calls. Pass all names to one call.
-> - **`grep 'php8.1-'` (no `-E`, no `^`)** → the unescaped `.` matches any character and the missing anchor matches mid-string. Use `grep -E '^php8\.1-'`.
-> - **Feeding `apt list` output straight to `apt-mark`** → the `name/repo,...` suffix breaks it. `cut -d/ -f1` first.
-
-> *Pass every related package to a single `apt install` so their dependencies resolve as one set; find a family with `grep -E '^prefix'` (the `-E` escapes the literal dot, the `^` anchors to the name start) and `cut -d/ -f1` to get clean names.*
-
-## Reference
-
-- `man apt` — `install` with multiple names; meta-packages behave like any package.
-- `man 1 grep` — `-E` extended regex, anchoring; why an unescaped `.` is a wildcard.
-- `man 1 cut` — `-d` / `-f` for field extraction from `apt list` output.
+> - **Four `apt install` calls instead of one.** Each call plans its dependencies on its own, which is fragile if the system changes in between. Give all names to one call.
+> - **`grep 'php8.1-'` without `-E` and `^`.** The unescaped `.` matches any character, and the missing anchor matches in the middle of a line. Use `grep -E '^php8\.1-'`.
+> - **Feeding `apt list` output straight to `apt-mark`.** The `name/repo,...` suffix breaks it. Run `cut -d/ -f1` first.

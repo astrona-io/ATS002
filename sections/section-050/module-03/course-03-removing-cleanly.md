@@ -1,67 +1,87 @@
-# Part 3 — Removing cleanly
+# Removing Cleanly
 
-> Prerequisite: [Part 2 — Applying upgrades, and installing](./course-02-applying-upgrades-and-installing.md). Next: [Section 050 quiz](../quiz.md).
+"Remove the package" hides two decisions: keep its configuration or not, and clean up the dependencies it brought along or not. This part covers `remove` versus `purge`, `autoremove`, and the one place where `apt` and `apt-get` or `apt-cache` really differ.
 
-"Remove the package" hides two decisions: keep its config or not, and clean up the dependencies it dragged in or not. This part is `remove` vs `purge`, `autoremove`, and the one place `apt` and `apt-get`/`apt-cache` genuinely differ.
+## `remove` keeps configuration, `purge` deletes it
 
-## `remove` keeps config; `purge` deletes it
+The two commands differ only in what they leave under `/etc`. Start with `remove`:
 
 ```bash
 # shell: host, root
 sudo apt remove ftp
 ```
 
-Removes the package's binaries. Files under `/etc` the package marked as **configuration** ("conffiles") are **left behind** — the idea being a later reinstall should pick the same config back up.
+This removes the package's programs. Files under `/etc` that the package marked as configuration are **left behind**. `dpkg` calls these **conffiles**: configuration files it tracks for a package and protects from being overwritten. The idea is that a later reinstall picks the same settings up again.
 
 ```bash
 sudo apt purge ftp
 ```
 
-Everything `remove` does, **plus** deleting those conffiles. The difference only shows later: after `remove`, a future reinstall silently inherits old config nobody remembers; after `purge`, a reinstall starts from the package's shipped defaults.
+`purge` does everything `remove` does, **plus** it deletes those conffiles. The difference only shows later. After `remove`, a future reinstall silently inherits old settings nobody remembers. After `purge`, a reinstall starts from the package's shipped defaults.
 
-A removed-but-not-purged package shows in `dpkg -l` as **`rc`** — **r**emoved, **c**onfig-files remain. Recognise it on sight; `apt purge <pkg>` clears it to `pn`.
+A removed-but-not-purged package shows in `dpkg -l` as **`rc`**: **r**emoved, **c**onfiguration files remain. Learn to recognise it on sight. `apt purge <package>` clears it to `pn`.
 
-**Task wording is the cue:** "completely remove", "including configuration", "so a reinstall starts clean" → `purge`, not `remove`.
+**The task's wording is the cue.** "Completely remove", "including configuration" and "so a reinstall starts clean" all mean `purge`, not `remove`.
 
 ## Orphans do not clean themselves up
 
-Removing `ftp` does not touch any dependency package that `ftp` alone pulled in. If nothing else needs it, it sits there installed and unused:
+Removing a package does not touch the dependencies it pulled in. If nothing else needs one of them any more, it stays installed and unused. Such a package is called an **orphan**. Clean orphans up with:
 
 ```bash
 sudo apt autoremove
 ```
 
-`apt autoremove` removes every package that (a) was installed automatically as a dependency and (b) nothing currently installed still depends on. It is a **separate, deliberate step** — `remove`/`purge` never cascades to orphans on its own. A cleanup task that does not end with `autoremove` is incomplete. (`apt autoremove --purge` also drops the orphans' conffiles.)
+`apt autoremove` removes every package that (a) was installed automatically as a dependency and (b) is no longer needed by anything installed. It is a **separate, deliberate step**: `remove` and `purge` never cascade to orphans on their own. A cleanup task that does not end with `autoremove` is not finished. `apt autoremove --purge` also deletes the orphans' conffiles.
 
 ```mermaid
-flowchart TD
-    T["retire a package"] --> C{"config must go too?<br/>('completely', 'clean reinstall')"}
-    C -->|no| RM["sudo apt remove &lt;pkg&gt; → dpkg -l shows 'rc'"]
-    C -->|yes| PG["sudo apt purge &lt;pkg&gt; → 'pn', /etc conffiles gone"]
-    RM --> AR["sudo apt autoremove — drop now-unused dependencies"]
-    PG --> AR
+flowchart TB
+    T["retire a package"] -->|"keep configuration"| RM["apt remove"]
+    T -->|"configuration must go"| PG["apt purge"]
+    RM -->|"then"| AR["apt autoremove"]
+    PG -->|"then"| AR
 ```
 
-## `apt` vs `apt-get` / `apt-cache`
+The diagram shows the choice between `remove` (the package ends in the `rc` state) and `purge` (it ends in `pn` with its `/etc` conffiles gone), and that both are followed by `apt autoremove` to drop dependencies nobody needs any more.
+
+## `apt` versus `apt-get` and `apt-cache`
+
+`apt` is not the only front door to the quartermaster. Its own manual page warns about one thing:
 
 ```bash
 man apt      # note: CLI and output are NOT guaranteed stable across releases
 ```
 
-`apt` is the friendly combined front-end — progress bar, colour, built for a human at a keyboard, and explicitly free to change its output between versions. `apt-get` and `apt-cache` (the older split tools) carry **no such warning**: stable, long-standing behaviour and output, which is why scripts, Ansible, and CI still use them. Neither is deprecated.
+`apt` is the friendly combined tool: progress bar, colour, made for a person at a keyboard. It is openly allowed to change its output between versions. `apt-get` and `apt-cache` are the older, separate tools, and they carry **no such warning**. Their behaviour and output stay stable for a long time, which is why scripts, Ansible and CI (continuous integration) pipelines still use them. Neither is deprecated.
 
-**Use `apt` interactively; use `apt-get` / `apt-cache` in anything you are not there to watch.**
+**Use `apt` at the keyboard; use `apt-get` and `apt-cache` in anything you are not there to watch.**
+
+## Common pitfalls
 
 > [!WARNING]
-> - **`remove` when the task says "completely" / "including config"** → conffiles stay under `/etc` (`rc` state) and a reinstall inherits them. Use `purge`.
-> - **Assuming `remove`/`purge` cleans orphaned dependencies** → it does not. Run `apt autoremove` as a distinct step.
-> - **Parsing `apt` output in a script** → its format can change between releases. Use `apt-get` / `apt-cache`.
-> - **`rc` read as "still installed"** → binaries are gone; only config remains.
+> - **Using `remove` when the task says "completely" or "including configuration".** The conffiles stay under `/etc` (`rc` state), and a reinstall inherits them. Use `purge`.
+> - **Assuming `remove` or `purge` cleans up orphaned dependencies.** It does not. Run `apt autoremove` as its own step.
+> - **Parsing `apt` output in a script.** Its format can change between releases. Use `apt-get` or `apt-cache`.
+> - **Reading `rc` as "still installed".** The programs are gone; only the configuration remains.
 
-> *`apt remove` keeps a package's `/etc` conffiles (`rc` state), `apt purge` deletes them; neither removes orphaned dependencies — that is a separate `apt autoremove` — and scripts should use the stable `apt-get`/`apt-cache`, not `apt`.*
+## Your mission: APT Basic Package Operations Lab
 
-## Reference
+You can now refresh the catalogue, preview and apply upgrades, install a package, and retire one completely. The mission asks you to run that whole maintenance loop on one ship, ending with a package purged and its orphans cleaned up.
 
-- `man apt` / `man apt-get` — `remove`, `purge`, `autoremove`, `--purge`; the stability caveat in `man apt`.
-- `man dpkg` — the `rc` / `pn` status codes for removed vs purged.
-- `man apt.conf` — `APT::Get::AutomaticRemove` and how "automatically installed" is tracked (`apt-mark showauto`).
+The mission runs on its own training ship. Start it and open a terminal on it:
+
+```sh
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-03/labs/lab-01
+astrona ssh ats-002-lab-053
+```
+
+Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-050/module-03/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-002-lab-053
+```

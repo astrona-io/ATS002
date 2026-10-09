@@ -1,51 +1,73 @@
-# Part 2 — Bulk actions across a matched set
+# Bulk Actions Across A Matched Set
 
-> Prerequisite: [Part 1 — One transaction, and finding a family by pattern](./course-01-one-transaction-and-finding-a-family.md). Next: [Section 050 quiz](../quiz.md).
-
-With clean names from Part 1, one more command applies an action to all of them. This part is `xargs` into `apt-mark hold`, why a partial hold on an interdependent set is worse than no hold, and auditing the result instead of trusting the pipeline.
+Once you have a clean list of package names, one more command applies an action to all of them. This part covers piping the names through `xargs` into `apt-mark hold`, why a partial hold on a family that depends on itself is worse than no hold, and checking the result instead of trusting the pipeline.
 
 ## `xargs` into one `apt-mark hold`
+
+Add one more stage to the pipeline that produced the clean names:
 
 ```bash
 # shell: host, root
 apt list --installed 2>/dev/null | grep -E '^php8\.1-' | cut -d/ -f1 | xargs sudo apt-mark hold
 ```
 
-`apt-mark hold` accepts any number of names in a single call. `xargs` collects every matched name from the pipeline into **one** `apt-mark hold pkg1 pkg2 pkg3 …` invocation — not a loop calling `apt-mark hold` once per package. One consolidated, auditable operation.
+`apt-mark hold` accepts any number of names in one call. `xargs` collects every name from the pipeline and builds **one** `apt-mark hold pkg1 pkg2 pkg3 ...` command from them. It is not a loop that calls `apt-mark hold` once per package. The result is one combined action you can check afterwards.
 
 ## Why the *whole* family, not just the named members
 
+Packages in a family like `php8.1-*` are built to work together. They share one **ABI** (application binary interface): the exact way compiled pieces of software connect to each other, which changes between PHP releases. Think of crates whose parts only fit together if they all come from the same production run.
+
 ```mermaid
-flowchart TD
-    F["php8.1-* : cli, fpm, mysql, curl, … (share one PHP ABI)"] --> P{"hold which?"}
-    P -->|only the 1-2 a task names| PART["partial hold"]
-    P -->|every matched member| ALL["whole-set hold"]
-    PART --> BAD["next apt upgrade moves the UNHELD members to php8.2<br/>→ mixed ABI: some modules 8.1, some 8.2<br/>→ looks protected, is not"]
-    ALL --> GOOD["every member frozen at 8.1 together — actually consistent"]
+flowchart TB
+    F["php8.1 family"] -->|"hold only named members"| PART["partial hold"]
+    F -->|"hold every match"| ALL["whole-set hold"]
+    PART -->|"next upgrade"| BAD["mixed 8.1 and 8.2"]
+    ALL -->|"next upgrade"| GOOD["all stay at 8.1"]
 ```
 
-If the family shares real interdependencies — built against the same PHP ABI, the same minor release — holding only some members means a future `apt upgrade` / `full-upgrade` is free to move the **unheld** ones to a newer PHP release while the held ones stay behind. The result is a mixed installation: some modules compiled against one minor version, others against another. **A partial hold on a genuinely interdependent set is often worse than no hold** — it looks protected without being protected.
+The diagram shows what the next upgrade does in each case: with a partial hold, the unheld members move to a newer PHP release while the held ones stay behind; with a whole-set hold, every member stays at 8.1 together.
 
-## Audit the result
+If the members really depend on each other, holding only some of them lets a future `apt upgrade` or `full-upgrade` move the **unheld** ones to a newer release. The result is a mixed installation: some modules built against one minor version, others against another. **A partial hold on a family that depends on itself is often worse than no hold**, because it looks protected without being protected.
+
+## Check the result
+
+Never trust that the pipeline did what you meant. List every hold on the system:
 
 ```bash
 apt-mark showhold
 ```
 
-A pipeline can silently hold **fewer** packages than intended — a pattern typo, an empty result `xargs` quietly did nothing with, an unexpected extra match. "The command did not error" is not proof.
+A pipeline can quietly hold **fewer** packages than intended: a typo in the pattern, an empty result that `xargs` did nothing with, or an unexpected extra match. "The command did not error" is not proof.
 
-`apt-mark showhold` prints every held package system-wide, unfiltered. Compare it **line for line** against the list your pattern match produced (`grep -E '^php8\.1-' | cut -d/ -f1`). This is the difference between an entire interdependent set genuinely held and a partial hold that only looks complete.
+`apt-mark showhold` prints every held package on the system, unfiltered. Compare it **line for line** with the list your pattern produced (`grep -E '^php8\.1-' | cut -d/ -f1`). That comparison is the difference between a whole family that is really held and a partial hold that only looks complete.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Looping `apt-mark hold` per package** → slower and easy to abort half-done. `xargs` builds one call.
-> - **`xargs` on an empty pipeline** → with GNU `xargs` it may still run `apt-mark hold` with no args (a no-op that "succeeds"). Add `xargs -r` to skip on empty, and check the count.
-> - **Holding only the members a task names** → the rest drift to an incompatible version. Hold the whole matched set.
-> - **Trusting the pipeline exit code** → run `apt-mark showhold` and diff it against your intended list.
+> - **Looping `apt-mark hold` once per package.** It is slower and easy to stop half-way. `xargs` builds one call.
+> - **`xargs` on an empty pipeline.** GNU `xargs` may still run `apt-mark hold` with no names, which does nothing and "succeeds". Add `xargs -r` to skip the command when the input is empty, and check the count.
+> - **Holding only the members a task names.** The rest drift to a version that no longer fits. Hold the whole matched set.
+> - **Trusting the pipeline's exit code.** Run `apt-mark showhold` and compare it with your intended list.
 
-> *Pipe clean names into one `xargs sudo apt-mark hold`, hold the entire interdependent family (a partial hold lets the unheld members drift to an incompatible version), and verify with `apt-mark showhold` compared line-for-line against your match.*
+## Your mission: APT Package Groups & Bulk Operations Lab
 
-## Reference
+You can now install related packages in one transaction, find a family by pattern and hold the whole family in one checked step. The mission asks you to install a build toolchain in one call and hold an entire installed package family ahead of a risky upgrade.
 
-- `man apt-mark` — `hold` / `unhold` / `showhold` accepting multiple names.
-- `man 1 xargs` — `-r` / `--no-run-if-empty`, `-n`, `-t` (echo the built command before running).
-- `man apt_preferences` — the pinning alternative when you need a whole family targeted at a specific version rather than frozen.
+The mission runs on its own training ship. Start it and open a terminal on it:
+
+```sh
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-05/labs/lab-01
+astrona ssh ats-002-lab-055
+```
+
+Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+
+```sh
+astrona submit -c sections/section-050/module-05/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-002-lab-055
+```

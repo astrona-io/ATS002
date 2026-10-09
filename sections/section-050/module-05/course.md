@@ -1,29 +1,42 @@
-# Chapter 5: APT Package Groups & Bulk Operations
+# APT Package Groups & Bulk Operations
 
-Real package management rarely happens strictly one package at a time. A toolchain arrives as a meta-package plus companions, installed together. A family of modules — every `php8.x-*`, every `linux-image-*` — needs to be found and acted on as a set. And when a group is genuinely interdependent, protecting only *some* of it from an upgrade can be worse than protecting none. This module is operating on packages in groups: one transaction, pattern discovery, and a bulk hold across a whole matched set in one auditable step.
+Astronaut, real package work rarely happens one crate at a time. A build toolchain arrives as a metapackage plus a few companions, installed together. A whole family of modules, such as every `php8.x-*` package or every `linux-image-*` package, has to be found and handled as one set. And when the members of a family really depend on each other, protecting only *some* of them from an upgrade can be worse than protecting none.
 
-Two short parts; work them in order.
-
-## How this module is organised
-
-1. **[Part 1 — One transaction, and finding a family by pattern](./course-01-one-transaction-and-finding-a-family.md)** — passing several packages to a single `apt install` so dependencies resolve as one set, and matching a family with `grep -E '^prefix'` (the `-E` and `^` details) then `cut -d/ -f1`.
-2. **[Part 2 — Bulk actions across a matched set](./course-02-bulk-actions-across-a-set.md)** — `xargs` into one `apt-mark hold`, why a partial hold on an interdependent family is worse than no hold, and auditing with `apt-mark showhold`.
+This module is about working on packages in groups. You install several in one transaction, find a family by its naming pattern, and hold the whole matched set in one step you can check.
 
 ## Learning objectives
 
 After this module you can:
 
-- **Install** several related packages as one transaction and explain why that beats separate calls.
-- **Match** a package family by naming pattern, escaping the literal dot and anchoring to the name start.
-- **Convert** `apt list` output to bare package names with `cut -d/ -f1`.
-- **Apply** a bulk `apt-mark hold` across a matched set with `xargs`.
-- **Explain** why a partial hold on a genuinely interdependent family can be worse than no hold.
-- **Audit** the result with `apt-mark showhold` rather than trusting the pipeline's exit code.
+- Install several related packages as one transaction, and explain why that beats separate calls.
+- Match a package family by its naming pattern, escaping the literal dot and anchoring the match to the start of the name.
+- Turn `apt list` output into bare package names with `cut -d/ -f1`.
+- Hold a whole matched set at once by piping the names through `xargs` into `apt-mark hold`.
+- Explain why a partial hold on a family that depends on itself can be worse than no hold.
+- Check the result with `apt-mark showhold` instead of trusting the pipeline's exit code.
 
 ## Before you start
 
-Assumed: a Linux shell, `sudo`, basic regex, and Modules 1–4 (`apt-mark hold`, `apt list --installed`). Every command block states the shell and privilege it assumes.
+Check that you have the knowledge and the tools this module expects before you begin.
 
-## Where this fits
+### What you should already know
 
-This module combines the earlier ones — the hold from Module 1, the `apt list --installed` research from Module 4 — into a repeatable set operation. The section capstone protects an interdependent package family ahead of a risky upgrade, and expects the whole set held and verified, not just the members named in the brief.
+- **How to run a command with `sudo`.** Installing and holding packages needs the captain's authority.
+- **What a hold is.** `apt-mark hold <name>` puts a "do not replace" tag on one installed package, and `apt-mark showhold` lists the tagged ones.
+- **`apt list --installed` and basic `grep` patterns.** The parts explain the two pattern details that matter here.
+
+### What you need
+
+- A terminal on an Ubuntu 24.04 machine where you may install packages.
+- Or a running lab machine: start the mission with `astrona run` and open a terminal on it with `astrona ssh <lab name>`. The mission gives you the exact commands.
+
+## How this module is laid out
+
+1. [One Transaction And Finding A Family](./course-01-one-transaction-and-finding-a-family.md): giving several packages to one `apt install` so their dependencies resolve as one set, and matching a family with `grep -E '^prefix'` (the `-E` and `^` details) and `cut -d/ -f1`.
+2. [Bulk Actions Across A Matched Set](./course-02-bulk-actions-across-a-set.md): `xargs` into one `apt-mark hold`, why a partial hold on a family that depends on itself is worse than no hold, and checking with `apt-mark showhold`.
+   - Mission: APT Package Groups & Bulk Operations Lab
+3. [Wrap-Up: Mission Debrief](./course-03-wrap-up.md)
+
+## Why this matters
+
+A hold that covers four of six related packages looks safe and is not. The next upgrade moves the other two, and the family no longer matches. Finding the whole set by pattern, acting on it in one step and checking the result is how you protect a group for real.

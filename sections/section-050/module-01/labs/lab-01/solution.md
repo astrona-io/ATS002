@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Follow these steps to trust, pin, and hold the vendor's `nginx` build.
+Follow these steps to trust the vendor's repository, install its exact `nginx` build and hold it. Run `astrona submit` after each step to see which checks already pass.
 
 ---
 
@@ -10,40 +10,50 @@ Follow these steps to trust, pin, and hold the vendor's `nginx` build.
 sudo install -d -m 0755 /etc/apt/keyrings
 ```
 
-`install -d` creates the directory with the exact permissions given, in one step.
+`install -d` creates the directory with exactly the permissions you give it, in one step.
 
 ---
 
-## Step 2: Fetch and dearmor the vendor's key
+## Step 2: Download and convert the vendor's key
 
 ```bash
 curl -fsSL http://127.0.0.1:8100/vendor-nginx-archive-keyring.asc | \
   sudo gpg --dearmor -o /etc/apt/keyrings/vendor-nginx.gpg
 ```
 
-`curl -fsSL` fails loudly on an HTTP error, suppresses the progress meter, and follows redirects. `gpg --dearmor` converts the ASCII-armored key into the binary format APT's `signed-by=` option expects. This never touches the deprecated global `apt-key` keyring — the key lives only in this one dedicated file.
+`curl -fsSL` fails loudly on an HTTP error, hides the progress meter and follows redirects. `gpg --dearmor` turns the ASCII-armored text key into the binary format that APT's `signed-by=` option expects. This never touches the deprecated global `apt-key` keyring: the key lives only in this one dedicated file.
 
 ---
 
-## Step 3: Add the repository, scoped to this key
+## Step 3: Add the repository, tied to this key
 
-```bash
-echo "deb [signed-by=/etc/apt/keyrings/vendor-nginx.gpg] http://127.0.0.1:8100 vendor-nginx main" | \
-  sudo tee /etc/apt/sources.list.d/vendor-nginx.list
+Save this as `/etc/apt/sources.list.d/vendor-nginx.list`:
+
+```text
+deb [signed-by=/etc/apt/keyrings/vendor-nginx.gpg] http://127.0.0.1:8100 vendor-nginx main
 ```
 
-The `[signed-by=...]` bracket scopes trust to exactly this repository line — nothing else on the system is affected by this key. The file lives under `/etc/apt/sources.list.d/`, entirely separate from the shared `/etc/apt/sources.list` governing Ubuntu's own default repositories.
+The `[signed-by=...]` bracket ties trust to exactly this repository line. Nothing else on the system is affected by this key. The file lives under `/etc/apt/sources.list.d/`, separate from the shared `/etc/apt/sources.list` that holds Ubuntu's own repositories.
+
+At this point `astrona submit` should pass the trust check.
 
 ---
 
-## Step 4: Refresh and confirm the repository registered
+## Step 4: Refresh and check that the repository registered
+
+Apply it:
 
 ```bash
 sudo apt update
+```
+
+Then check the result:
+
+```bash
 apt-cache policy nginx
 ```
 
-If the key or `signed-by=` path is wrong, `apt update` reports it here — a `NO_PUBKEY` or signature-verification error — rather than silently failing later. `apt-cache policy nginx` should now show a version table with (at least) two entries: one from `http://127.0.0.1:8100`, one from Ubuntu's own archive, exactly the "two sources, same package name" situation a real vendor repository creates.
+If the key or the `signed-by=` path is wrong, `apt update` reports it here with a `NO_PUBKEY` or signature error, instead of failing silently later. `apt-cache policy nginx` should now show a version table with at least two entries: one from `http://127.0.0.1:8100` and one from Ubuntu's own archive. That is the "two depots, one package name" situation a real vendor repository creates.
 
 ```text
 nginx:
@@ -56,7 +66,7 @@ nginx:
         500 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages
 ```
 
-Copy the vendor's exact version string (`1.25.4-1~vendorfake1`) from this output for the next step.
+This output is shortened: the `Candidate:` line and Ubuntu's version are placeholders. Both lines have priority `500`, so the higher version wins the Candidate slot. Copy the vendor's exact version string (`1.25.4-1~vendorfake1`) from your own output for the next step.
 
 ---
 
@@ -66,7 +76,9 @@ Copy the vendor's exact version string (`1.25.4-1~vendorfake1`) from this output
 sudo apt install nginx=1.25.4-1~vendorfake1
 ```
 
-The `=version` syntax is an exact match — every character, including the `~` and the revision suffix, matters. A single mismatched character makes APT report it can't find a matching candidate at all.
+The `=version` form is an exact match. Every character counts, including the `~` and the revision suffix. One wrong character and APT reports that it cannot find a matching version at all.
+
+At this point `astrona submit` should pass the exact-version check.
 
 ---
 
@@ -76,9 +88,9 @@ The `=version` syntax is an exact match — every character, including the `~` a
 sudo apt-mark hold nginx
 ```
 
-This marks `nginx` so `apt upgrade`/`apt full-upgrade` skip it, without uninstalling it or making it any less usable. The vendor repository stays active and fully configured — the hold only stops *automatic* upgrade operations from touching this one package.
+This marks `nginx` so `apt upgrade` and `apt full-upgrade` skip it, without removing it or making it less usable. The vendor repository stays active and fully configured: the hold only stops *automatic* upgrades from touching this one package.
 
-Confirm the hold actually took:
+Confirm that the hold took:
 
 ```bash
 apt-mark showhold
@@ -95,7 +107,11 @@ nginx
 ```bash
 sudo install -d -m 0755 /etc/apt/keyrings
 curl -fsSL http://127.0.0.1:8100/vendor-nginx-archive-keyring.asc | sudo gpg --dearmor -o /etc/apt/keyrings/vendor-nginx.gpg
-echo "deb [signed-by=/etc/apt/keyrings/vendor-nginx.gpg] http://127.0.0.1:8100 vendor-nginx main" | sudo tee /etc/apt/sources.list.d/vendor-nginx.list
+```
+
+Save `/etc/apt/sources.list.d/vendor-nginx.list` with the line from Step 3, then:
+
+```bash
 sudo apt update
 apt-cache policy nginx
 sudo apt install nginx=1.25.4-1~vendorfake1
@@ -103,4 +119,8 @@ sudo apt-mark hold nginx
 apt-mark showhold
 ```
 
-Once verified, run the local validation suite to pass the lab!
+When every check looks right, send the lab for grading:
+
+```bash
+astrona submit -c sections/section-050/module-01/labs/lab-01
+```

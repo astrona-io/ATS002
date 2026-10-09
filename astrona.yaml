@@ -807,13 +807,13 @@ modules:
         title: "Third-Party Repositories & Package Pinning"
         path: sections/section-050/module-01/course.md
       - type: reading
-        title: "Scoped trust: keyrings and `signed-by`"
+        title: "Scoped Trust With Keyrings And signed-by"
         path: sections/section-050/module-01/course-01-scoped-trust.md
       - type: reading
-        title: "Adding the repository and confirming it registered"
+        title: "Adding The Repository And Checking It"
         path: sections/section-050/module-01/course-02-adding-the-repository.md
       - type: reading
-        title: "Installing an exact version, and locking it"
+        title: "Installing An Exact Version And Holding It"
         path: sections/section-050/module-01/course-03-exact-version-and-hold.md
       - type: reading
         title: Question
@@ -854,16 +854,19 @@ modules:
           - name: "apt_preferences(5) manual page"
             url: https://manpages.debian.org/bookworm/apt/apt_preferences.5.en.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-050/module-01/course-04-wrap-up.md
+      - type: reading
         title: "dpkg Low-Level Package Management"
         path: sections/section-050/module-02/course.md
       - type: reading
-        title: "What `dpkg` knows, and inspecting a `.deb` before you trust it"
+        title: "What dpkg Knows And Inspecting A .deb"
         path: sections/section-050/module-02/course-01-dpkg-scope-and-inspecting-a-deb.md
       - type: reading
-        title: "Installing directly, and ownership queries in both directions"
+        title: "Installing Directly And Asking Who Owns What"
         path: sections/section-050/module-02/course-02-installing-and-ownership-queries.md
       - type: reading
-        title: "Status codes and recovering an interrupted package"
+        title: "Status Codes And Recovering An Interrupted Package"
         path: sections/section-050/module-02/course-03-status-codes-and-recovery.md
       - type: reading
         title: Question
@@ -886,16 +889,19 @@ modules:
           - name: "dpkg-deb(1) manual page"
             url: https://manpages.debian.org/bookworm/dpkg/dpkg-deb.1.en.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-050/module-02/course-04-wrap-up.md
+      - type: reading
         title: "APT Basic Package Operations"
         path: sections/section-050/module-03/course.md
       - type: reading
-        title: "`apt update` is not `apt upgrade`"
+        title: "Update Is Not Upgrade"
         path: sections/section-050/module-03/course-01-update-is-not-upgrade.md
       - type: reading
-        title: "Applying upgrades, and installing"
+        title: "Applying Upgrades And Installing"
         path: sections/section-050/module-03/course-02-applying-upgrades-and-installing.md
       - type: reading
-        title: "Removing cleanly"
+        title: "Removing Cleanly"
         path: sections/section-050/module-03/course-03-removing-cleanly.md
       - type: reading
         title: Question
@@ -918,13 +924,16 @@ modules:
           - name: "apt-get(8) manual page"
             url: https://manpages.debian.org/bookworm/apt/apt-get.8.en.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-050/module-03/course-04-wrap-up.md
+      - type: reading
         title: "APT Package Information Lookup"
         path: sections/section-050/module-04/course.md
       - type: reading
-        title: "Finding a package, and describing it"
+        title: "Finding And Describing A Package"
         path: sections/section-050/module-04/course-01-finding-and-describing.md
       - type: reading
-        title: "Installed vs. candidate, and which source wins"
+        title: "Installed Versus Candidate"
         path: sections/section-050/module-04/course-02-installed-vs-candidate.md
       - type: reading
         title: Question
@@ -947,13 +956,16 @@ modules:
           - name: "apt(8) manual page"
             url: https://manpages.debian.org/bookworm/apt/apt.8.en.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-050/module-04/course-03-wrap-up.md
+      - type: reading
         title: "APT Package Groups & Bulk Operations"
         path: sections/section-050/module-05/course.md
       - type: reading
-        title: "One transaction, and finding a family by pattern"
+        title: "One Transaction And Finding A Family"
         path: sections/section-050/module-05/course-01-one-transaction-and-finding-a-family.md
       - type: reading
-        title: "Bulk actions across a matched set"
+        title: "Bulk Actions Across A Matched Set"
         path: sections/section-050/module-05/course-02-bulk-actions-across-a-set.md
       - type: reading
         title: Question
@@ -974,6 +986,9 @@ modules:
             url: https://manpages.debian.org/bookworm/apt/apt-mark.8.en.html
           - name: "dpkg-query(1) manual page"
             url: https://manpages.debian.org/bookworm/dpkg/dpkg-query.1.en.html
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-050/module-05/course-03-wrap-up.md
       - type: reading
         title: "Section 050 Knowledge Check: Debian Package Management: Repositories, dpkg & APT"
         path: sections/section-050/quiz.md

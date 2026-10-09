@@ -1,32 +1,34 @@
-# Part 2 — Installing directly, and ownership queries in both directions
+# Installing Directly And Asking Who Owns What
 
-> Prerequisite: [Part 1 — What `dpkg` knows, and inspecting a `.deb` before you trust it](./course-01-dpkg-scope-and-inspecting-a-deb.md). Next: [Part 3 — Status codes and recovering an interrupted package](./course-03-status-codes-and-recovery.md).
+`dpkg -i` installs a standalone `.deb`, and it shows you exactly where `dpkg`'s blindness to repositories stops it. After that come two questions from every real incident: what installed this file, and what did this package install? This part covers the install-and-fix habit and the map of which flag takes a file path and which takes a package name.
 
-`dpkg -i` installs a standalone `.deb` — and shows you exactly where `dpkg`'s lack of repository awareness stops it. Then two questions that come up in every real incident: what installed this file, and what did this package install. This part is the install-plus-fixup reflex and the file-path-vs-package-name flag map.
+## `dpkg -i` and the `--fix-broken` habit
 
-## `dpkg -i` and the `--fix-broken` reflex
+Installing a crate by hand is one command:
 
 ```bash
 # shell: host, root
 sudo dpkg -i /home/candidate/downloads/logtail-utils_2.3.1_amd64.deb
 ```
 
-If every declared dependency is already present, this finishes clean. If a dependency is **missing**, `dpkg -i` does not fetch it — it cannot, no repository — so it unpacks the package, reports the unmet dependency, leaves it half-configured, and usually exits non-zero.
+If every **dependency** the package declares is already on the ship, this finishes cleanly. A dependency is another crate this one needs in order to work. If one is **missing**, `dpkg -i` cannot fetch it, because it has no repository. So `dpkg` unpacks the package, reports the unmet dependency, leaves the package half-configured, and usually exits with a non-zero code.
 
-The recovery is one reflex, two commands:
+The recovery is one habit made of two commands:
 
 ```bash
 sudo dpkg -i /home/candidate/downloads/logtail-utils_2.3.1_amd64.deb
 sudo apt --fix-broken install
 ```
 
-`apt --fix-broken install` (also `apt-get -f install`) reads the dependency gap `dpkg` reported, fetches the missing packages from APT's configured repositories, and finishes configuring `logtail-utils` in the same pass. The layer division in one line: `dpkg` *detects* "needs libfoo, libfoo absent"; only `apt` can go *get* libfoo.
+`apt --fix-broken install` (also written `apt-get -f install`) reads the dependency gap that `dpkg` reported. It fetches the missing packages from APT's configured repositories and finishes configuring `logtail-utils` in the same pass. The split between the two tools in one line: `dpkg` *notices* "needs libfoo, libfoo is missing"; only `apt` can go and *get* libfoo.
 
-(`apt install ./logtail-utils_2.3.1_amd64.deb` — note the leading `./` — does both steps at once when you have repo access and just want it installed. `dpkg -i` is the tool when the task is specifically about the low-level path.)
+`apt install ./logtail-utils_2.3.1_amd64.deb` (note the leading `./`) does both steps at once when you have repository access and just want the package installed. Use `dpkg -i` when the task is specifically about the low-level path.
 
-## Ownership, both directions
+## Ownership, in both directions
 
-### File → package: "what installed this, can I touch it?"
+Two questions come up again and again: "which package put this file here?" and "which files did this package put here?". `dpkg` answers both from its database, but each question takes a different kind of argument.
+
+### File to package: "what installed this, and can I touch it?"
 
 ```bash
 dpkg -S /usr/bin/logtail
@@ -36,17 +38,19 @@ dpkg -S /usr/bin/logtail
 logtail-utils: /usr/bin/logtail
 ```
 
-`-S` (`--search`) scans every installed package's recorded file list for the path. The direction you reach for in an incident: you found a mystery file and want to know whose it is before you delete or edit it. Takes a **file path**.
+`-S` (`--search`) looks through every installed package's recorded file list for the path. Reach for it in an incident: you found a mystery file and want to know whose it is before you delete or edit it. It takes a **file path**.
 
-### Package → files: "what did this put on my system?"
+### Package to files: "what did this put on my system?"
 
 ```bash
 dpkg -L logtail-utils
 ```
 
-`-L` (`--listfiles`) is the inverse: given a package **name**, list every path its `.deb` placed. Run it *before* removing a package so "what disappears" is never a surprise.
+`-L` (`--listfiles`) is the reverse. Given a package **name**, it lists every path its `.deb` placed. Run it *before* removing a package, so what disappears is never a surprise.
 
-### The flag map — the easiest place to lose time
+### The flag map: the easiest place to lose time
+
+Most `dpkg` mistakes come from giving a flag the wrong kind of argument. This map groups the flags by what they take:
 
 ```
   operates on a .deb FILE PATH          operates on an installed PACKAGE NAME
@@ -64,27 +68,23 @@ dpkg -L logtail-utils
 |---|---|---|
 | `-I` / `--info` | a `.deb` **file** | metadata, before install |
 | `-c` / `--contents` | a `.deb` **file** | file list, before install |
-| `-s` / `--status` | a package **name** | installed metadata + `Status:` line |
-| `-L` / `--listfiles` | a package **name** | package → files |
-| `-S` / `--search` | a **file path** | file → package |
+| `-s` / `--status` | a package **name** | installed metadata and the `Status:` line |
+| `-L` / `--listfiles` | a package **name** | package to files |
+| `-S` / `--search` | a **file path** | file to package |
 
-General checks:
+Two quick checks show whether an install really finished:
 
 ```bash
 dpkg -s logtail-utils          # Status: should read "install ok installed"
-dpkg -l | grep logtail-utils   # compact status-code column (Part 3)
+dpkg -l | grep logtail-utils   # compact status-code column
 ```
 
+`dpkg -s` prints a `Status:` line, and `dpkg -l` prints a short two-letter status code in its first column. A cleanly installed package shows `ii` there.
+
+## Common pitfalls
+
 > [!WARNING]
-> - **Stopping after a non-zero `dpkg -i`** → the package is half-installed. `sudo apt --fix-broken install` is the second half of the same operation.
-> - **`dpkg -S` with a package name, or `dpkg -L` with a path** → they are opposite: `-S` takes a path, `-L` takes a name. Swapped, you get "no path found" / "package not installed".
-> - **Deleting a file because it "looks unowned"** → run `dpkg -S <path>` first; a package may own it and expect it.
-> - **`dpkg -L` on a not-installed package** → errors. Confirm with `dpkg -s` first.
-
-> *`dpkg -i` installs one `.deb` and, on a missing dependency, leaves it half-configured until `apt --fix-broken install` fetches the gap; `-S` maps a file path → owning package, `-L` maps a package name → its files, and the file-path vs package-name split is the flag map to memorise.*
-
-## Reference
-
-- `man dpkg` — `-i`, `-S`, `-L`, `-s`, `-l`, and the `--fix-broken` note pointing at `apt-get -f install`.
-- `man apt-get` — `-f` / `--fix-broken install`: what it does with a partially-configured package.
-- `man dpkg-query` — the query backend behind `-s` / `-L` / `-S` / `-l`, with `-W --showformat` for scripting.
+> - **Stopping after a non-zero `dpkg -i`.** The package is half-installed. `sudo apt --fix-broken install` is the second half of the same job.
+> - **Giving `dpkg -S` a package name, or `dpkg -L` a path.** They are opposites: `-S` takes a path, `-L` takes a name. Swapped, you get "no path found" or "package not installed".
+> - **Deleting a file because it "looks unowned".** Run `dpkg -S <path>` first; a package may own it and expect it to be there.
+> - **Running `dpkg -L` on a package that is not installed.** It errors. Check with `dpkg -s` first.

@@ -1,10 +1,12 @@
 # Section 050 Knowledge Check: Debian Package Management: Repositories, dpkg & APT
 
-Test your understanding of third-party repository trust, low-level `dpkg` recovery, the daily APT maintenance loop, read-only package research, and bulk group operations.
+Test your understanding, astronaut, of third-party repository trust, low-level `dpkg` recovery, the daily APT maintenance loop, read-only package research, and bulk group operations.
 
 ---
 
 ## Scenario-Based Questions
+
+Each question describes a real situation on a training ship. Pick one answer, then open the answer box to check your reasoning.
 
 ### Question 1
 You need to add a vendor's third-party APT repository for `nginx` the modern, non-deprecated way. You've already run `curl -fsSL https://vendor.example.com/nginx/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/vendor-nginx.gpg`. What is the correct next step, and why does it matter?
@@ -39,7 +41,7 @@ You inherit a system where `dpkg -l | grep acme-agent` shows `iF acme-agent 4.2.
 
 **Correct Answer: D**
 
-*   **Why D is correct:** In `dpkg -l`'s status column, the second letter reflects current status; `F` specifically means "half-conFigured" — the package's files are present, but its configuration step (running the postinst script) was interrupted before finishing. The standard, expected recovery sequence is `dpkg --configure -a` (resume configuration for every pending package) followed immediately by `apt --fix-broken install` as a safety net for any genuinely missing dependency `dpkg` alone can't resolve.
+*   **Why D is correct:** In `dpkg -l`'s status column, the second letter reflects current status; `F` specifically means "half-conFigured" — the package's files are present, but its configuration step (running the post-install script, called `postinst`) was interrupted before finishing. The standard, expected recovery sequence is `dpkg --configure -a` (resume configuration for every pending package) followed immediately by `apt --fix-broken install` as a safety net for any genuinely missing dependency `dpkg` alone can't resolve.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because `iF` is a mid-step state, not a failed-and-absent one — the package's files are already on disk; reinstalling from scratch is unnecessary and not the standard recovery pattern.
     *   *Option B* is incorrect because `F` denotes "half-configured," an interrupted state, not a note about install source.
@@ -93,7 +95,7 @@ A task asks you to fully retire the `ftp` package, "including any dependency pac
 ### Question 5
 A host has an installed PHP 8.1 module family (`php8.1-cli`, `php8.1-fpm`, `php8.1-mysql`, and others sharing the `php8.1-` prefix). You need to hold the *entire* family together ahead of a risky, unrelated upgrade elsewhere on the system. Which approach is correct, and why does holding only `php8.1-cli` and `php8.1-fpm` (leaving the rest unheld) create a real risk?
 *   **A)** `sudo apt-mark hold php8.1-cli php8.1-fpm` is sufficient — holding the two most commonly used modules protects the family well enough.
-*   **B)** `apt list --installed 2>/dev/null | grep -E '^php8\.1-' | cut -d/ -f1 | xargs sudo apt-mark hold`, then confirm with `apt-mark showhold` — a partial hold risks the unheld modules drifting to a different PHP minor version than the held ones, breaking ABI compatibility across the family.
+*   **B)** `apt list --installed 2>/dev/null | grep -E '^php8\.1-' | cut -d/ -f1 | xargs sudo apt-mark hold`, then confirm with `apt-mark showhold` — a partial hold risks the unheld modules drifting to a different PHP minor version than the held ones, breaking application binary interface (ABI) compatibility across the family.
 *   **C)** `sudo apt-mark hold php8.1-*` — the shell glob is expanded automatically by `apt-mark`, holding every matching package in one call.
 *   **D)** Holding is unnecessary here; `apt full-upgrade` never touches packages outside the one named in the task.
 
@@ -102,7 +104,7 @@ A host has an installed PHP 8.1 module family (`php8.1-cli`, `php8.1-fpm`, `php8
 
 **Correct Answer: B**
 
-*   **Why B is correct:** Pattern-matching the installed list with an anchored, extended-regex `grep -E '^php8\.1-'`, extracting clean names with `cut -d/ -f1`, and piping the full set into a single `xargs sudo apt-mark hold` call holds every matching package together in one atomic action — then `apt-mark showhold` audits that the result actually matches what was intended, rather than trusting the pipeline blindly. A partial hold is genuinely risky: if the family is interdependent (built against the same PHP ABI), the unheld members can drift to a newer PHP release during a future upgrade while the held ones stay behind, producing a version-mismatched, potentially broken installation.
+*   **Why B is correct:** Pattern-matching the installed list with an anchored, extended-regex `grep -E '^php8\.1-'`, extracting clean names with `cut -d/ -f1`, and piping the full set into a single `xargs sudo apt-mark hold` call holds every matching package together in one atomic action — then `apt-mark showhold` audits that the result actually matches what was intended, rather than trusting the pipeline blindly. A partial hold is genuinely risky: if the family is interdependent (built against the same PHP application binary interface), the unheld members can drift to a newer PHP release during a future upgrade while the held ones stay behind, producing a version-mismatched, potentially broken installation.
 *   **Why others are incorrect:**
     *   *Option A* is incorrect because it's exactly the partial-hold risk the question describes — protecting some members of an interdependent set while leaving others exposed can be worse than protecting none.
     *   *Option C* is incorrect because `apt-mark hold` does not perform its own glob expansion against installed packages; `php8.1-*` would either be expanded by the shell against literal filenames in the current directory (almost never matching real package names) or passed through literally and fail to match anything.
