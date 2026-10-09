@@ -6,6 +6,8 @@ Astronaut, test what you know before you take on the capstone. The questions cov
 
 ## Scenario-Based Questions
 
+Each question describes a real situation on a training ship. Pick one answer, then open the answer box to check your reasoning.
+
 ### Question 1
 You are migrating a job off `/etc/cron.d/data-sync`, which currently reads `45 3 * * * etl-runner /opt/scripts/sync.sh`, into the crontab owned by the user `etl-runner`. You run `sudo crontab -u etl-runner -e` and paste the line in completely unchanged, then save. What actually happens at 3:45am?
 *   **A)** The job runs correctly, since `etl-runner` is simply a valid path component.

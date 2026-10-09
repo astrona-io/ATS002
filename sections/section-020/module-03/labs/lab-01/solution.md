@@ -6,6 +6,8 @@ Each task needs a `.service` that says what to run and a `.timer` that says when
 
 ## Task 1: the report timer
 
+First you build a new scheduled job from scratch: a service that runs the report script, and a timer that starts it on Mondays and Thursdays.
+
 ### Step 1: Write the two unit files
 
 Save this as `/etc/systemd/system/report.service`:
@@ -58,6 +60,8 @@ You enable the **`.timer`**. `report.service` stays `dead` between runs, which i
 ---
 
 ## Task 2: convert the dbclean cron job
+
+Next you move an existing cron job to a timer, then remove the cron job so the script does not run from two places.
 
 ### Step 4: Read the cron line
 
