@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You taught the dock master to recognise one cargo bay by its hull serial number, whatever order the bays arrive in. Before you move on, look back at what you learned, check yourself, and clean up anything still running.
 
@@ -102,3 +102,5 @@ astrona destroy ats-002-lab-014
 ```
 
 > *Match the hull serial number, not the bay number, and always trigger after you reload.*
+
+<!-- astrona:playground:destroy -->

@@ -6,6 +6,8 @@
 
 Installing a crate by hand is one command:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: host, root
 sudo dpkg -i /home/candidate/downloads/logtail-utils_2.3.1_amd64.deb

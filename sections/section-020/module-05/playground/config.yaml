@@ -1,0 +1,32 @@
+# Container Images, Volumes And Networks (PLAYGROUND) - Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+
+metadata:
+  name: "container-build-bay"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Makes sure Docker is running, pulls nginx:alpine and alpine, and stages /opt/demo/status-page with an index.html to build an image from."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      cpus: 2
+      memoryMB: 3072
+      diskSizeGB: 20
+      display: false
+      sshPasswordAuth: false

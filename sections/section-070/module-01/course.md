@@ -23,17 +23,16 @@ Check that you have the knowledge and the tools this module expects before you b
 - **How to type a command at a prompt** and how to use `sudo`.
 - **What a package and a repository are.** A package is a supply crate with a parts list, a version and the crates it needs. A repository is a supply depot that ships those crates.
 
-### What you need
+### What is in your playground
 
-This module has no playground. The training ship (the lab virtual machine) runs Ubuntu 24.04, which has no `zypper`. Each lab in this module starts Docker on that ship and runs a real openSUSE Leap 15.6 container called `zypperbox` next to it. A container is a sealed pod docked to the ship: it has its own crew and its own files, but shares the ship's reactor.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine. That machine has no tools of this package family, so the playground runs a real openSUSE Leap 15.6 **container** named `zypperbox` on it. A container is a sealed pod docked to the ship: it has its own files and tools but shares the ship's reactor core (the kernel). Inside it, the package tools and the package database are all real.
 
-To try the examples, start the mission at the end of the last part, then step into the pod:
+- The community `network:utilities` repository added inside `zypperbox`.
+- `telnet-server` installed. `fail2ban` not installed.
 
-```sh
-docker exec -it zypperbox bash
-```
+Start the playground, then open a terminal on it with `astrona ssh astro-zypper-everyday`. Step into the pod with `docker exec -it zypperbox bash` and run every package command in that shell. If Docker refuses with a permission error, put `sudo` in front. It is already set up with a container with one package to remove and one to install.
 
-Run every `zypper` command inside that shell. If Docker refuses with a permission error, run the same command with `sudo` in front.
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

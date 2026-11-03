@@ -26,12 +26,17 @@ Check that you have the knowledge and the tools this module expects.
 
 You do not need any experience with compiling software. Every command block says which folder and which rights it expects.
 
-### What you need
+### What is in your playground
 
-- An Ubuntu 24.04 machine with build tools installed (a C compiler such as `gcc`, `make`, and library headers). The `build-essential` package gives you all of them.
-- Or the mission's lab machine: it already has `build-essential` and a source tarball waiting in `/tools`. The mission section gives you the exact commands.
+Your playground is one workshop: an Ubuntu 24.04 training ship with a C compiler and `make`, and one source tarball, `/tools/links-2.14.tar.bz2`, waiting on the bench. The tarball holds a small project with a real `configure` script, so every step of the module really builds and installs. It is a throwaway machine with no task and no grading, so experiment freely.
 
-This module has no playground. The examples use a small program (`links`), so the lesson is the build steps, not the wait.
+Start it, then open a terminal on it with `astrona ssh astro-source-build-bay`:
+
+<!-- astrona:playground -->
+
+Every command block in the parts also says which shell and which rights it expects, so you can follow the text on any Ubuntu 24.04 machine too. When you are finished, remove the playground with `astrona destroy source-build-bay`.
+
+
 
 ## How this module is laid out
 

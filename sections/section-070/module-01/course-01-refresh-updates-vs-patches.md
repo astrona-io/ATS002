@@ -8,6 +8,8 @@ This part covers `zypper refresh` and the two lists it feeds. Run every command 
 
 Start by downloading a fresh copy of each depot's catalogue:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the zypperbox container
 zypper refresh          # shorthand: zypper ref

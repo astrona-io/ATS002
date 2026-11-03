@@ -25,10 +25,18 @@ Check that you have the knowledge and the tools this module expects before you b
 - **How to mount a filesystem** and list its files.
 - **That disks use one of two partition table formats:** MBR, the old format, or GPT, the modern one.
 
-### What you need
+### What is in your playground
 
-- This module has no playground. The commands in the parts change a disk's partition table, so only run them against a disk you can afford to lose.
-- The mission gives you a ready-made training ship with a second, disposable disk. Nothing needs to be faked here: every command is exactly what you would run on a real secondary disk, and your ship stays reachable the whole time.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine, already set up with a spare GPT disk with two partitions and marker files.
+
+- A second, 2 GB disk with the serial `lab083-vdc`. Find it at `/dev/disk/by-id/virtio-lab083-vdc`.
+- On that disk, a GPT partition table with two ext4 partitions, each holding a marker file.
+- `sgdisk`, `blkid` and `lsblk`.
+- Your own machine stays healthy and reachable; the broken system lives on the spare disk.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-partition-table-bench`. The hands-on steps in the parts build on each other on this one running ship. Every command block says which shell and which rights it expects.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

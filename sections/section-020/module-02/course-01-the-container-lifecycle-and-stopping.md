@@ -47,6 +47,8 @@ A **signal** is a short order the kernel delivers to a process. `SIGTERM` means 
 
 Stop a container named `web_demo` like this (add `sudo` if your user is not in the `docker` group):
 
+<!-- astrona:playground:renew -->
+
 ```bash
 docker stop web_demo
 ```

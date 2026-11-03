@@ -26,6 +26,8 @@ The full form is `DayOfWeek Year-Month-Day Hour:Minute:Second`. Any field can be
 
 `systemd-analyze calendar` reads an expression the same way systemd will, and tells you when it fires next:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 systemd-analyze calendar 'Mon,Thu 11:15'
 ```

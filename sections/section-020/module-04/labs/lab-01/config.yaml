@@ -1,0 +1,42 @@
+metadata:
+  name: "ats-002-lab-024"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-024-setup"
+      description: "Installs at, anacron and cron, enables atd, creates the user ops-monitor and installs /usr/local/sbin/archive-logs.sh"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-at-job"
+      description: "Confirms an at job is queued for 03:00 that runs /usr/local/sbin/archive-logs.sh"
+      type: "file"
+      source: "validation/validate-at-job.sh"
+    - name: "verify-anacrontab"
+      description: "Confirms /etc/anacrontab has the weekly-archive job and passes anacron -T"
+      type: "file"
+      source: "validation/validate-anacrontab.sh"
+    - name: "verify-cron-deny"
+      description: "Confirms ops-monitor is listed in /etc/cron.deny and no cron.allow file exists"
+      type: "file"
+      source: "validation/validate-cron-deny.sh"
+
+teardown:
+  keepCluster: false

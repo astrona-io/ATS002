@@ -1,0 +1,300 @@
+# Knowledge check for section 010. Listed in astrona.yaml as a `type: quiz` entry after the last module.
+schema_version: 1
+kind: question_bank
+id: ats002-010
+course_id: ATS002
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-010
+  title: "Kernel Tuning, Process Limits, and Device Forensics"
+questions:
+  - id: ats002-010-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Write the live value of a kernel parameter into a file as a bare value"
+    source_readings:
+      - sections/section-010/module-01/course-03-reading-the-live-value.md
+    prompt: |-
+      You need to record the current value of `net.ipv4.ip_forward` into a script-friendly file containing nothing but the bare value, no parameter name, no `=` sign. Which command accomplishes this correctly?
+    options:
+      - id: a
+        text: "`sysctl net.ipv4.ip_forward > /opt/course/ip_forward`"
+        explanation: "This option is incorrect because a bare `sysctl` call prints `net.ipv4.ip_forward = 0`, the key name and an `=` sign are included, polluting the file's contents."
+      - id: b
+        text: "`sysctl -n net.ipv4.ip_forward > /opt/course/ip_forward`"
+        explanation: "Correct. `man sysctl` documents `-n` under `OPTIONS` as disabling the printing of the key, leaving only the bare value. This is exactly the script-friendly form needed when redirecting into a file that must hold nothing but the value itself."
+      - id: c
+        text: "`sysctl -w net.ipv4.ip_forward > /opt/course/ip_forward`"
+        explanation: "This option is incorrect because `-w` is the *write* flag, used to set a new value, not read the existing one; used without a value to assign, it will not behave as a clean read."
+      - id: d
+        text: "`uname -r net.ipv4.ip_forward > /opt/course/ip_forward`"
+        explanation: "This option is incorrect because `uname` reports kernel identity information (release, version, hostname), not `/proc/sys` tunables, it has no concept of a sysctl parameter name."
+    correct_option: b
+    explanation: "`man sysctl` documents `-n` under `OPTIONS` as disabling the printing of the key, leaving only the bare value. This is exactly the script-friendly form needed when redirecting into a file that must hold nothing but the value itself."
+
+  - id: ats002-010-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Raise kernel.pid_max live and persistently and tell which of the three ceilings is the one that is hit"
+    source_readings:
+      - sections/section-010/module-02/course-03-raising-the-kernel-and-user-ceilings.md
+    prompt: |-
+      A batch job running as the `dataproc` user fails partway through a nightly run with `pthread_create failed`, even though `free -m` and `top` show plenty of idle CPU and memory. You raise `kernel.pid_max` to `4194304`, both live and persistently, and confirm the change with `sysctl -n kernel.pid_max`. The next night, the exact same failure happens again. What is the most likely explanation?
+    options:
+      - id: a
+        text: "`kernel.pid_max` did not actually persist, so the machine silently reverted it on its own overnight."
+        explanation: "This option is incorrect because the scenario states the change was persisted and confirmed, a value that reverts on its own without any recorded cause is not the expected behavior of a correctly persisted sysctl setting."
+      - id: b
+        text: "The `dataproc` user's own `ulimit -u` (`RLIMIT_NPROC`) ceiling is a separate, independently enforced limit that raising `pid_max` does nothing to change."
+        explanation: "Correct. `kernel.pid_max` governs the whole system's shared pool of process and thread ID numbers (PIDs and TIDs), but a per-user process/thread ceiling (`RLIMIT_NPROC`, surfaced as `ulimit -u`) is a completely separate, independently enforced accounting path scoped to the real UID running the workload. Raising the global pool does nothing to widen a per-user cap that is still set below what the job needs. If the job runs as a systemd unit, a third ceiling, `TasksMax=`, could also independently be the culprit."
+      - id: c
+        text: "`pthread_create` failures are always caused by insufficient memory, regardless of what `free -m` reports."
+        explanation: "This option is incorrect because the scenario explicitly rules out memory pressure via `free -m`, and `pthread_create` failures are commonly caused by hitting a process/thread ceiling, not only memory exhaustion."
+      - id: d
+        text: "`kernel.pid_max` only applies to processes, not threads, so a thread-heavy workload was never affected by the change in the first place."
+        explanation: "This option is incorrect because Linux does not maintain a separate thread-ID namespace, every thread consumes a slot from the exact same shared `pid_max` pool as processes."
+    correct_option: b
+    explanation: "`kernel.pid_max` governs the whole system's shared pool of process and thread ID numbers (PIDs and TIDs), but a per-user process/thread ceiling (`RLIMIT_NPROC`, surfaced as `ulimit -u`) is a completely separate, independently enforced accounting path scoped to the real UID running the workload. Raising the global pool does nothing to widen a per-user cap that is still set below what the job needs. If the job runs as a systemd unit, a third ceiling, `TasksMax=`, could also independently be the culprit."
+
+  - id: ats002-010-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Load a module at every boot with a module parameter using the two drop-in locations"
+    source_readings:
+      - sections/section-010/module-03/course-03-loading-at-boot-with-options.md
+    prompt: |-
+      You need the `dummy` kernel module to load automatically on every future boot, with `numdummies=2` applied every time, not just for the current session. Which pair of files must you create together to achieve both halves of this requirement?
+    options:
+      - id: a
+        text: "A single file under `/etc/modprobe.d/` containing both the module name and its parameter."
+        explanation: "This option is incorrect because `/etc/modprobe.d/` alone does not trigger a boot-time load, it only supplies options *if and when* the module is loaded by some other mechanism."
+      - id: b
+        text: "A file under `/etc/modules-load.d/` naming the module, and a separate file under `/etc/modprobe.d/` with an `options` line providing the parameter."
+        explanation: "Correct. These are two deliberately separate, single-purpose file families. `/etc/modules-load.d/*.conf` (read by `systemd-modules-load.service`) answers only \"should this module load at boot\", one bare module name per line, with no room for parameters. `/etc/modprobe.d/*.conf`, using an `options` directive, answers \"with what arguments\", consulted by `modprobe` and the boot-time loader regardless of what triggered the load. Both files are required together to get a parameterized module loading automatically at boot."
+      - id: c
+        text: "A file under `/etc/sysctl.d/` naming the module, and a file under `/etc/modprobe.d/` with the parameter."
+        explanation: "This option is incorrect because `/etc/sysctl.d/` governs live kernel *parameters* under `/proc/sys`, an entirely unrelated subsystem from kernel module loading."
+      - id: d
+        text: "Only a file under `/etc/modules-load.d/`, parameters are inferred automatically from the module's `modinfo -p` defaults."
+        explanation: "This option is incorrect because `modinfo -p` only shows what parameters a module *accepts*, it never supplies actual runtime values; those must be explicitly configured."
+    correct_option: b
+    explanation: "These are two deliberately separate, single-purpose file families. `/etc/modules-load.d/*.conf` (read by `systemd-modules-load.service`) answers only \"should this module load at boot\", one bare module name per line, with no room for parameters. `/etc/modprobe.d/*.conf`, using an `options` directive, answers \"with what arguments\", consulted by `modprobe` and the boot-time loader regardless of what triggered the load. Both files are required together to get a parameterized module loading automatically at boot."
+
+  - id: ats002-010-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a udev rule does not act on a device that was already attached and how to apply it"
+    source_readings:
+      - sections/section-010/module-04/course-03-applying-verifying-and-using.md
+    prompt: |-
+      You write a udev rule matching `ATTRS{serial}=="WD-XA123456"` to create a persistent `/dev/backup-drive` symlink, then run `sudo udevadm control --reload-rules`. The disk was already attached before you wrote the rule. When you check `ls -l /dev/backup-drive`, it does not exist. What is the most likely cause?
+    options:
+      - id: a
+        text: "The rule file was placed in `/etc/udev/rules.d/`, which is the wrong directory for custom rules."
+        explanation: "This option is incorrect because `/etc/udev/rules.d/` is precisely the correct, package-manager-untouched location for custom administrator rules, `/lib/udev/rules.d/` and `/usr/lib/udev/rules.d/` are the ones to avoid, since package updates can overwrite them."
+      - id: b
+        text: "`SYMLINK+=` should have been written as `SYMLINK=` instead, since `+=` only works for already-existing symlinks."
+        explanation: "This option is incorrect because `SYMLINK+=` is intentionally additive syntax, appending a new symlink name without erasing symlinks the distribution's built-in rules already created; a plain `=` would be the wrong, destructive choice here, not the fix."
+      - id: c
+        text: "`--reload-rules` only tells udev to re-read the rule files from disk; it does not re-evaluate already-connected devices against the newly loaded rules. A `udevadm trigger` pass is still required."
+        explanation: "Correct. `udevadm control --reload-rules` and applying those rules to already-present hardware are two genuinely separate steps. Reloading rules tells the running `udevd` daemon to re-read rule files, it does not synthesize new `add`/`change` events for devices that are already sitting there. `sudo udevadm trigger --subsystem-match=block` is required afterward to force udev to re-run its complete rule chain, including the new rule, against already-connected devices. This is a common trap because `--reload-rules` runs cleanly with no error, making it look like it worked."
+      - id: d
+        text: "Custom udev rules can only apply to devices connected after the rule file is created, never to devices already attached at boot."
+        explanation: "This option is incorrect because `udevadm trigger` exists specifically to make a custom rule apply to already-attached hardware without requiring a reboot."
+    correct_option: c
+    explanation: "`udevadm control --reload-rules` and applying those rules to already-present hardware are two genuinely separate steps. Reloading rules tells the running `udevd` daemon to re-read rule files, it does not synthesize new `add`/`change` events for devices that are already sitting there. `sudo udevadm trigger --subsystem-match=block` is required afterward to force udev to re-run its complete rule chain, including the new rule, against already-connected devices. This is a common trap because `--reload-rules` runs cleanly with no error, making it look like it worked."
+
+  - id: ats002-010-q05
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Confirm a suspect process with strace before stopping it, and clean up safely"
+    source_readings:
+      - sections/section-010/module-05/course-03-from-confirmed-process-to-safe-cleanup.md
+    prompt: |-
+      You are investigating a process suspected of periodically calling the `kill()` syscall. You run `sudo strace -p 4821 -e trace=kill` and, after a short wait, see the process call `kill()`. Before terminating it, what must you do, and why does the order matter?
+    options:
+      - id: a
+        text: "Immediately run `sudo kill -9 4821`, since a confirmed offender should be stopped as fast as possible regardless of order."
+        explanation: "This option is incorrect because killing first destroys the only reliable evidence of the process's real backing file, potentially leaving a disguised or renamed offending binary untouched on disk while creating a false sense the incident is closed."
+      - id: b
+        text: "Run `sudo readlink -f /proc/4821/exe` first to capture the real on-disk executable path, because `/proc/PID/`, and the information it holds, ceases to exist the instant the process is terminated."
+        explanation: "Correct. `/proc/PID/exe` is a magic symlink the kernel maintains only while the process is alive, pointing at the exact inode currently mapped as its executable image. The moment the process is killed, `/proc/PID/` disappears entirely, there is nothing left to resolve. Capturing the real, canonicalized path with `readlink -f` *before* terminating the process is the one ordering detail a grader (or a real review after an incident) is most likely to specifically check for."
+      - id: c
+        text: "Run `ps aux | grep 4821` first to double-check the process's displayed name, since the name is always authoritative for identifying the correct binary."
+        explanation: "This option is incorrect because a process's displayed name (`argv[0]`/`comm`) is not guaranteed to match its actual backing file, it could be a renamed copy, a symlink, or a script whose displayed name is really its interpreter's."
+      - id: d
+        text: "Order does not matter, since the executable's path on disk never changes regardless of whether the process is still running."
+        explanation: "This option is incorrect because while the file itself may not move, your only reliable *means of discovering* its exact path, `/proc/PID/exe`, vanishes together with the process, making order the entire point."
+    correct_option: b
+    explanation: "`/proc/PID/exe` is a magic symlink the kernel maintains only while the process is alive, pointing at the exact inode currently mapped as its executable image. The moment the process is killed, `/proc/PID/` disappears entirely, there is nothing left to resolve. Capturing the real, canonicalized path with `readlink -f` *before* terminating the process is the one ordering detail a grader (or a real review after an incident) is most likely to specifically check for."
+
+  - id: ats002-010-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain that sysctl -w changes only live memory"
+    source_readings:
+      - sections/section-010/module-01/course-04-runtime-changes-live-in-memory.md
+    prompt: |-
+      You run `sudo sysctl -w vm.swappiness=10` on a running machine and change nothing else. What happens to the value after the machine reboots?
+    options:
+      - id: a
+        text: "The value 10 stays, because `sysctl -w` also writes a line into `/etc/sysctl.conf`."
+        explanation: "`sysctl -w` never writes a file."
+      - id: b
+        text: "The kernel starts again with the value that the default and the configuration files give, and 10 is lost."
+        explanation: "Correct. `sysctl -w` changes the live value in memory only. To keep a value you must save it in a file under `/etc/sysctl.d/` and apply it with `sudo sysctl --system`."
+      - id: c
+        text: "The value 10 stays, because the kernel saves every changed parameter in `/proc/sys`."
+        explanation: "`/proc/sys` is a live view of memory, not a place that survives a restart."
+      - id: d
+        text: "The machine refuses to boot until you run `sysctl --system`."
+        explanation: "A reboot does not need any such step."
+    correct_option: b
+    explanation: "`sysctl -w` changes the live value in memory only. To keep a value you must save it in a file under `/etc/sysctl.d/` and apply it with `sudo sysctl --system`."
+
+  - id: ats002-010-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Predict which sysctl drop-in file wins when two files set the same key"
+    source_readings:
+      - sections/section-010/module-01/course-05-persistent-changes-and-which-file-wins.md
+    prompt: |-
+      `/etc/sysctl.d/10-network.conf` sets `net.ipv4.ip_forward = 0` and `/etc/sysctl.d/99-router.conf` sets `net.ipv4.ip_forward = 1`. You run `sudo sysctl --system`. What is the live value afterwards?
+    options:
+      - id: a
+        text: "0, because the file with the lower number is read first and the first value wins."
+        explanation: "The files are read in order and the later value replaces the earlier one."
+      - id: b
+        text: "The command stops with an error because the key is set twice."
+        explanation: "Setting a key twice is allowed. The last value read wins."
+      - id: c
+        text: "1, because the files are read in name order and the later file overrides the earlier one."
+        explanation: "Correct. `sysctl --system` reads the files in name order. The value from `99-router.conf` is read last, so it wins. This is why the `99-` prefix is used for local overrides."
+      - id: d
+        text: "0, because `sysctl --system` only reads `/etc/sysctl.conf`."
+        explanation: "`sysctl --system` reads every drop-in folder, not just that file."
+    correct_option: c
+    explanation: "`sysctl --system` reads the files in name order. The value from `99-router.conf` is read last, so it wins. This is why the `99-` prefix is used for local overrides."
+
+  - id: ats002-010-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Fix a service that hits its own task limit with a drop-in that sets TasksMax"
+    source_readings:
+      - sections/section-010/module-02/course-04-raising-tasksmax-and-the-triage-order.md
+    prompt: |-
+      A service `data-ingest.service` fails with `Resource temporarily unavailable` when it starts new workers. The user limit and `kernel.pid_max` are both high. `systemctl show -p TasksMax data-ingest.service` prints `TasksMax=64`. What is the correct fix?
+    options:
+      - id: a
+        text: "Raise `ulimit -u` in the shell of the administrator who starts the service."
+        explanation: "A shell limit does not apply to a service that systemd starts."
+      - id: b
+        text: "Run `sudo sysctl -w kernel.pid_max=4194304`."
+        explanation: "`kernel.pid_max` is already high and is not the ceiling that is hit."
+      - id: c
+        text: "Reboot the machine so that the limit resets."
+        explanation: "The limit comes from the unit, so a reboot brings the same limit back."
+      - id: d
+        text: "Run `sudo systemctl edit data-ingest.service`, set `TasksMax=` to a higher value under `[Service]`, then restart the service."
+        explanation: "Correct. `TasksMax=` is a limit on the unit's cgroup (the station), set by systemd. A drop-in from `systemctl edit` raises it, and a restart makes the service use it."
+    correct_option: d
+    explanation: "`TasksMax=` is a limit on the unit's cgroup (the station), set by systemd. A drop-in from `systemctl edit` raises it, and a restart makes the service use it."
+
+  - id: ats002-010-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Tell the difference between a blacklist line and an install line for a module"
+    source_readings:
+      - sections/section-010/module-03/course-04-blacklisting-modules.md
+    prompt: |-
+      You add the line `blacklist pcspkr` to a file in `/etc/modprobe.d/`. Later an administrator runs `sudo modprobe pcspkr` by hand. What happens?
+    options:
+      - id: a
+        text: "The module loads, because a `blacklist` line only stops automatic loading by alias and does not stop a load by name."
+        explanation: "Correct. `blacklist` only stops the automatic loading of a module by its alias. To block a load by name too, use a line such as `install pcspkr /bin/false`."
+      - id: b
+        text: "The command fails, because a blacklisted module can never load."
+        explanation: "A blacklist does not block a load by name."
+      - id: c
+        text: "The module loads and removes the blacklist line from the file."
+        explanation: "modprobe never edits its configuration files."
+      - id: d
+        text: "The machine reboots to apply the blacklist."
+        explanation: "No reboot is involved."
+    correct_option: a
+    explanation: "`blacklist` only stops the automatic loading of a module by its alias. To block a load by name too, use a line such as `install pcspkr /bin/false`."
+
+  - id: ats002-010-q10
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain why a process can ignore SIGTERM but not SIGKILL"
+    source_readings:
+      - sections/section-010/module-07/course-02-signals-and-stopping-processes.md
+    prompt: |-
+      You run `kill 3150` (a plain `kill`) on a process, wait, and `ps -p 3150` still lists it. Which next step is the right escalation?
+    options:
+      - id: a
+        text: "Run `kill -9 3150` or `kill -KILL 3150`, because `SIGKILL` cannot be caught or ignored."
+        explanation: "Correct. A plain `kill` sends `SIGTERM`, which a process may catch or ignore. `SIGKILL` goes to the kernel, which ends the process without asking it. Use it after a polite `SIGTERM` has failed."
+      - id: b
+        text: "Run `kill -STOP 3150`, because that ends the process for good."
+        explanation: "`SIGSTOP` only pauses the process. It does not end it."
+      - id: c
+        text: "Run `renice -n 19 -p 3150`, because that stops a stuck process."
+        explanation: "`renice` changes priority, not the life of a process."
+      - id: d
+        text: "Run `kill 3150` again, because a second `SIGTERM` is always stronger."
+        explanation: "The process can ignore `SIGTERM` as often as you send it."
+    correct_option: a
+    explanation: "A plain `kill` sends `SIGTERM`, which a process may catch or ignore. `SIGKILL` goes to the kernel, which ends the process without asking it. Use it after a polite `SIGTERM` has failed."
+
+  - id: ats002-010-q11
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain why only root can lower a niceness value"
+    source_readings:
+      - sections/section-010/module-07/course-03-priority-and-jobs.md
+    prompt: |-
+      As a normal user you run `renice -n -5 -p 4100` on your own background job. The command is refused. Why?
+    options:
+      - id: a
+        text: "`renice` can only be used on processes that belong to root."
+        explanation: "A normal user may renice their own processes."
+      - id: b
+        text: "A normal user may only raise the niceness of a process, which makes it nicer to others. Lowering it needs root."
+        explanation: "Correct. A lower niceness number means a higher priority. A normal user can only make a process nicer (a higher number). Lowering the number is for root."
+      - id: c
+        text: "Negative numbers are not allowed by `renice` in any case."
+        explanation: "Root may use negative values."
+      - id: d
+        text: "The process must be stopped with `SIGSTOP` before it can be reniced."
+        explanation: "Reniceing needs no stop."
+    correct_option: b
+    explanation: "A lower niceness number means a higher priority. A normal user can only make a process nicer (a higher number). Lowering the number is for root."
+
+  - id: ats002-010-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain what a zombie process is and how to clear it"
+    source_readings:
+      - sections/section-010/module-07/course-01-finding-and-reading-processes.md
+    prompt: |-
+      `ps` shows a process in state `Z` (`<defunct>`). `kill -9` on it changes nothing. What is the right way to clear it?
+    options:
+      - id: a
+        text: "Run `kill -9` again with `sudo`."
+        explanation: "The process is already dead. There is nothing left to kill."
+      - id: b
+        text: "Run `renice -n 19` on it so that it uses fewer resources."
+        explanation: "It uses no CPU. Priority does not matter."
+      - id: c
+        text: "Find its parent with `ps -o ppid= -p <PID>` and make the parent collect it, or end the parent so that init collects it."
+        explanation: "Correct. A zombie has already finished. Only its slot in the process table stays until the parent reads its exit status. Fix the parent, not the zombie."
+      - id: d
+        text: "Remove its folder in `/proc`."
+        explanation: "`/proc` is a live view. You cannot remove entries from it."
+    correct_option: c
+    explanation: "A zombie has already finished. Only its slot in the process table stays until the parent reads its exit status. Fix the parent, not the zombie."

@@ -24,10 +24,17 @@ Check that you have the knowledge and the tools this module expects before you b
 - **How to run a command with `sudo`.** Installing and recovering packages needs the captain's authority.
 - **The basics of `apt`.** `apt install <name>` fetches a package and the packages it needs from configured repositories.
 
-### What you need
+### What is in your playground
 
-- A terminal on an Ubuntu 24.04 machine. The examples use the internal tool `logtail-utils` and its file `/home/candidate/downloads/logtail-utils_2.3.1_amd64.deb`; on another machine, try the read-only commands on any `.deb` file you have.
-- Or a running lab machine: start the mission with `astrona run` and open a terminal on it with `astrona ssh <lab name>`. The mission gives you the exact commands.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine, already set up with a standalone `.deb` file and a package stuck half-configured.
+
+- A `logtail-utils` `.deb` file (version 2.3.1) in `/home/candidate/downloads/`. No repository publishes it, and it is not installed.
+- The `cowsay` package left in the half-configured state, so `dpkg -l` shows it with the status code `iF`.
+- The normal `dpkg`, `dpkg-deb` and `dpkg-query` tools of Ubuntu 24.04.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-dpkg-low-level`. The hands-on steps in the parts build on each other on this one running ship. Every command block says which shell and which rights it expects.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

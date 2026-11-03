@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have worked through every part and every mission in this module. Before you move on, look back at what you learned, check yourself, and clean up anything still running.
 
@@ -117,3 +117,5 @@ astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/m
 ```
 
 > *Every process and every thread needs a slot in the pool, a place under its user's limit and a place under its service's limit. Check all three, and raise only the one that is really too low.*
+
+<!-- astrona:playground:destroy -->

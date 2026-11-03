@@ -25,10 +25,17 @@ Check that you have the knowledge and the tools this module expects before you b
 - **What a hold is.** `apt-mark hold <name>` puts a "do not replace" tag on one installed package, and `apt-mark showhold` lists the tagged ones.
 - **`apt list --installed` and basic `grep` patterns.** The parts explain the two pattern details that matter here.
 
-### What you need
+### What is in your playground
 
-- A terminal on an Ubuntu 24.04 machine where you may install packages.
-- Or a running lab machine: start the mission with `astrona run` and open a terminal on it with `astrona ssh <lab name>`. The mission gives you the exact commands.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine, already set up with a family of installed packages that share a name prefix.
+
+- Six small `php8.1-*` packages installed (version `8.1.2-1ubuntu2.14`), built on the machine as stand-ins. They share one name prefix and install no real PHP program.
+- `build-essential`, `git`, `cmake` and `pkg-config` not installed, so installing them is a real transaction.
+- The normal `apt`, `apt-mark` and `dpkg` tools.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-apt-package-families`. The hands-on steps in the parts build on each other on this one running ship. Every command block says which shell and which rights it expects.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

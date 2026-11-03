@@ -8,6 +8,8 @@ The examples use a running container named `web_demo`. Use any container you hav
 
 Start with the whole record, so you know what you are searching:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 docker inspect web_demo        # the full JSON, a hundred lines or more
 ```

@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have finished every part and every mission in this module. Before you move on, look back at what you learned, check yourself, and land the playground cleanly.
 
@@ -158,3 +158,5 @@ No astrona labs running.
 You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean, so nothing you broke carries over.
 
 > *Read the verdict with `systemctl status`, the evidence with `journalctl -u`, fix the first real error, and prove the fix with `is-active` and `is-enabled`.*
+
+<!-- astrona:playground:destroy -->

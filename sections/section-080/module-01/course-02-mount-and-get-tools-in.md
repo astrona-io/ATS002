@@ -8,6 +8,8 @@ In these examples the healthy machine you work from is called the **repair host*
 
 The first job is to know exactly which partition holds the broken root filesystem. Run this on the repair host:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: the rescue shell / repair host
 lsblk -f

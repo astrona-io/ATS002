@@ -36,6 +36,8 @@ Here is a crontab line that runs an archive script at 06:45 every Tuesday and Fr
 
 Save this as `/etc/systemd/system/archive.service`:
 
+<!-- astrona:playground:renew -->
+
 ```ini
 [Unit]
 Description=Twice-weekly archive

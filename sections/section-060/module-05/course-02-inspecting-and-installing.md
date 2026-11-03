@@ -8,6 +8,8 @@ Astronaut, never order a bundle without reading its packing list. A group's memb
 
 ### Read a group's members
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the rpmbox container
 dnf group info "Development Tools"

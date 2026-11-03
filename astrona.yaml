@@ -83,7 +83,7 @@ modules:
         title: "Persistent Changes And Which File Wins"
         path: sections/section-010/module-01/course-05-persistent-changes-and-which-file-wins.md
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-010/module-01/course-06-wrap-up.md
       - type: reading
         title: "Process Limits — pid_max, ulimit, and the Three Ceilings"
@@ -161,7 +161,7 @@ modules:
           - name: "systemctl manual page"
             url: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-010/module-02/course-05-wrap-up.md
       - type: reading
         title: "Kernel Modules: Loading, Parameters, and Blacklisting"
@@ -200,7 +200,7 @@ modules:
           - name: "modules-load.d(5) manual page"
             url: https://www.freedesktop.org/software/systemd/man/latest/modules-load.d.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-010/module-03/course-05-wrap-up.md
       - type: reading
         title: "udev: Giving a Device a Name It Can Keep"
@@ -235,7 +235,7 @@ modules:
           - name: "udevadm manual page"
             url: https://www.freedesktop.org/software/systemd/man/latest/udevadm.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-010/module-04/course-04-wrap-up.md
       - type: reading
         title: "Catching a Process in the Act with strace"
@@ -270,7 +270,7 @@ modules:
           - name: "proc(5): /proc/pid/exe"
             url: https://man7.org/linux/man-pages/man5/proc_pid_exe.5.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-010/module-05/course-04-wrap-up.md
       - type: reading
         title: "Debugging A Service That Will Not Start"
@@ -414,11 +414,49 @@ modules:
           - name: "systemctl: set-default"
             url: https://www.freedesktop.org/software/systemd/man/latest/systemctl.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-010/module-06/course-08-wrap-up.md
       - type: reading
-        title: "Section 010 Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics"
-        path: sections/section-010/quiz.md
+        title: "Process Inspection And Control"
+        path: sections/section-010/module-07/course.md
+      - type: reading
+        title: "Finding And Reading Processes"
+        path: sections/section-010/module-07/course-01-finding-and-reading-processes.md
+      - type: reading
+        title: "Signals And Stopping Processes"
+        path: sections/section-010/module-07/course-02-signals-and-stopping-processes.md
+      - type: reading
+        title: "Priority And Jobs"
+        path: sections/section-010/module-07/course-03-priority-and-jobs.md
+      - type: reading
+        title: Question
+        path: sections/section-010/module-07/labs/lab-01/question.md
+      - type: lab
+        title: "Process Inspection And Control Lab"
+        path: sections/section-010/module-07/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: process-forensics
+        task_kind: troubleshooting
+        tags: [ps, pgrep, signals, kill, renice]
+        learning_goals:
+          - Stop a process that ignores the default signal by sending the signal it cannot ignore
+          - Change the niceness of a running process without ending it
+          - Find a process ID with pgrep and record it in a file
+        resources:
+          - name: "kill(1) manual page"
+            url: https://man7.org/linux/man-pages/man1/kill.1.html
+          - name: "renice(1) manual page"
+            url: https://man7.org/linux/man-pages/man1/renice.1.html
+          - name: "signal(7) manual page"
+            url: https://man7.org/linux/man-pages/man7/signal.7.html
+      - type: reading
+        title: "Summary"
+        path: sections/section-010/module-07/course-04-wrap-up.md
+      - type: quiz
+        title: "Knowledge Check: Kernel Tuning, Process Limits, and Device Forensics"
+        path: sections/section-010/quiz.yaml
+        pass_score: 70
       - type: reading
         title: Question
         path: sections/section-010/capstone/labs/lab-01/question.md
@@ -488,7 +526,7 @@ modules:
           - name: "crontab(1) manual page"
             url: https://man7.org/linux/man-pages/man1/crontab.1.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-020/module-01/course-03-wrap-up.md
       - type: reading
         title: "Docker Container Lifecycle: Inspect, Stop, and Launch"
@@ -523,7 +561,7 @@ modules:
           - name: "docker container inspect"
             url: https://docs.docker.com/reference/cli/docker/container/inspect/
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-020/module-02/course-04-wrap-up.md
       - type: reading
         title: "systemd Timers"
@@ -561,11 +599,115 @@ modules:
           - name: "systemd.time: calendar events"
             url: https://www.freedesktop.org/software/systemd/man/latest/systemd.time.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-020/module-03/course-05-wrap-up.md
       - type: reading
-        title: "Section 020 Knowledge Check: Scheduled & Containerized Workloads"
-        path: sections/section-020/quiz.md
+        title: "One-Shot And Missed Jobs: at, batch And anacron"
+        path: sections/section-020/module-04/course.md
+      - type: reading
+        title: "One-Shot Jobs With at"
+        path: sections/section-020/module-04/course-01-one-shot-jobs-with-at.md
+      - type: reading
+        title: "anacron And Cron Access Control"
+        path: sections/section-020/module-04/course-02-anacron-and-cron-access-control.md
+      - type: reading
+        title: Question
+        path: sections/section-020/module-04/labs/lab-01/question.md
+      - type: lab
+        title: "One-Shot And Missed Jobs Lab"
+        path: sections/section-020/module-04/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: scheduling
+        task_kind: build
+        tags: [at, atd, anacron, crontab, cron-allow-deny]
+        learning_goals:
+          - Queue a one-time job for a set time with at and check it with atq and at -c
+          - Add a job to /etc/anacrontab with the right four fields and test the file
+          - Refuse a user for crontab with /etc/cron.deny
+        resources:
+          - name: "at(1) manual page"
+            url: https://man7.org/linux/man-pages/man1/at.1p.html
+          - name: "anacrontab(5) manual page"
+            url: https://man7.org/linux/man-pages/man5/anacrontab.5.html
+          - name: "crontab(1) manual page"
+            url: https://man7.org/linux/man-pages/man1/crontab.1.html
+      - type: reading
+        title: "Summary"
+        path: sections/section-020/module-04/course-03-wrap-up.md
+      - type: reading
+        title: "Container Images, Volumes And Networks"
+        path: sections/section-020/module-05/course.md
+      - type: reading
+        title: "Building An Image From A Dockerfile"
+        path: sections/section-020/module-05/course-01-building-an-image-from-a-dockerfile.md
+      - type: reading
+        title: "Volumes And Bind Mounts"
+        path: sections/section-020/module-05/course-02-volumes-and-bind-mounts.md
+      - type: reading
+        title: "Networks, Logs And Exec"
+        path: sections/section-020/module-05/course-03-networks-logs-and-exec.md
+      - type: reading
+        title: Question
+        path: sections/section-020/module-05/labs/lab-01/question.md
+      - type: lab
+        title: "Container Images, Volumes And Networks Lab"
+        path: sections/section-020/module-05/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: containers
+        task_kind: build
+        tags: [docker, dockerfile, image, volume, network]
+        learning_goals:
+          - Build an image from a Dockerfile with a tag
+          - Create a named volume and a user-defined network
+          - Run a container that uses the volume and the network
+        resources:
+          - name: "docker image build"
+            url: https://docs.docker.com/reference/cli/docker/buildx/build/
+          - name: "docker volume create"
+            url: https://docs.docker.com/reference/cli/docker/volume/create/
+          - name: "docker network create"
+            url: https://docs.docker.com/reference/cli/docker/network/create/
+      - type: reading
+        title: "Summary"
+        path: sections/section-020/module-05/course-04-wrap-up.md
+      - type: reading
+        title: "Podman And Rootless Containers"
+        path: sections/section-020/module-06/course.md
+      - type: reading
+        title: "Podman As A Docker-Compatible Engine"
+        path: sections/section-020/module-06/course-01-podman-as-a-docker-compatible-engine.md
+      - type: reading
+        title: "Rootless Containers And systemd"
+        path: sections/section-020/module-06/course-02-rootless-containers-and-systemd.md
+      - type: reading
+        title: Question
+        path: sections/section-020/module-06/labs/lab-01/question.md
+      - type: lab
+        title: "Rootless Podman Container Lab"
+        path: sections/section-020/module-06/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: containers
+        task_kind: build
+        tags: [podman, rootless, linger, subuid]
+        learning_goals:
+          - Run a rootless Podman container with a published high port
+          - Save a container's image ID with podman inspect
+          - Keep a user's services running after logout with enable-linger
+        resources:
+          - name: "podman-run(1) manual page"
+            url: https://docs.podman.io/en/latest/markdown/podman-run.1.html
+          - name: "loginctl enable-linger"
+            url: https://www.freedesktop.org/software/systemd/man/latest/loginctl.html
+      - type: reading
+        title: "Summary"
+        path: sections/section-020/module-06/course-03-wrap-up.md
+      - type: quiz
+        title: "Knowledge Check: Scheduled & Containerized Workloads"
+        path: sections/section-020/quiz.yaml
+        pass_score: 70
       - type: reading
         title: Question
         path: sections/section-020/capstone/labs/lab-01/question.md
@@ -631,7 +773,7 @@ modules:
           - name: "GNU make manual"
             url: https://www.gnu.org/software/make/manual/make.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-030/module-01/course-04-wrap-up.md
       - type: reading
         title: "libvirt Virtual Machine Lifecycle"
@@ -713,11 +855,12 @@ modules:
           - name: "virt-install manual page"
             url: https://manpages.ubuntu.com/manpages/noble/man1/virt-install.1.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-030/module-02/course-07-wrap-up.md
-      - type: reading
-        title: "Section 030 Knowledge Check: Building & Virtualizing Systems"
-        path: sections/section-030/quiz.md
+      - type: quiz
+        title: "Knowledge Check: Building & Virtualizing Systems"
+        path: sections/section-030/quiz.yaml
+        pass_score: 70
       - type: reading
         title: Question
         path: sections/section-030/capstone/labs/lab-01/question.md
@@ -813,11 +956,44 @@ modules:
         title: "Persistent SELinux Fixes And The AppArmor Contrast"
         path: sections/section-040/module-01/course-06-selinux-persistent-fixes-and-contrast.md
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-040/module-01/course-07-wrap-up.md
       - type: reading
-        title: "Section 040 Knowledge Check: Mandatory Access Control — SELinux & AppArmor"
-        path: sections/section-040/quiz.md
+        title: "SELinux In Practice: Contexts, Booleans And Ports"
+        path: sections/section-040/module-02/course.md
+      - type: reading
+        title: "Contexts And restorecon"
+        path: sections/section-040/module-02/course-01-contexts-and-restorecon.md
+      - type: reading
+        title: "Booleans, Ports And Reading Denials"
+        path: sections/section-040/module-02/course-02-booleans-ports-and-reading-denials.md
+      - type: reading
+        title: Question
+        path: sections/section-040/module-02/labs/lab-01/question.md
+      - type: lab
+        title: "SELinux Fix Script Lab"
+        path: sections/section-040/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: mandatory-access-control
+        task_kind: build
+        tags: [selinux, semanage, restorecon, setsebool, file-contexts, booleans]
+        learning_goals:
+          - Make a file label last with semanage fcontext and restorecon
+          - Turn on a boolean persistently with setsebool -P
+          - Allow a new TCP port with semanage port
+        resources:
+          - name: "semanage-fcontext(8) manual page"
+            url: https://man7.org/linux/man-pages/man8/semanage-fcontext.8.html
+          - name: "setsebool(8) manual page"
+            url: https://man7.org/linux/man-pages/man8/setsebool.8.html
+      - type: reading
+        title: "Summary"
+        path: sections/section-040/module-02/course-03-wrap-up.md
+      - type: quiz
+        title: "Knowledge Check: Mandatory Access Control — SELinux & AppArmor"
+        path: sections/section-040/quiz.yaml
+        pass_score: 70
       - type: reading
         title: Question
         path: sections/section-040/capstone/labs/lab-01/question.md
@@ -902,7 +1078,7 @@ modules:
           - name: "apt_preferences(5) manual page"
             url: https://manpages.debian.org/bookworm/apt/apt_preferences.5.en.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-050/module-01/course-04-wrap-up.md
       - type: reading
         title: "dpkg Low-Level Package Management"
@@ -937,7 +1113,7 @@ modules:
           - name: "dpkg-deb(1) manual page"
             url: https://manpages.debian.org/bookworm/dpkg/dpkg-deb.1.en.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-050/module-02/course-04-wrap-up.md
       - type: reading
         title: "APT Basic Package Operations"
@@ -972,7 +1148,7 @@ modules:
           - name: "apt-get(8) manual page"
             url: https://manpages.debian.org/bookworm/apt/apt-get.8.en.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-050/module-03/course-04-wrap-up.md
       - type: reading
         title: "APT Package Information Lookup"
@@ -1004,7 +1180,7 @@ modules:
           - name: "apt(8) manual page"
             url: https://manpages.debian.org/bookworm/apt/apt.8.en.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-050/module-04/course-03-wrap-up.md
       - type: reading
         title: "APT Package Groups & Bulk Operations"
@@ -1035,11 +1211,12 @@ modules:
           - name: "dpkg-query(1) manual page"
             url: https://manpages.debian.org/bookworm/dpkg/dpkg-query.1.en.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-050/module-05/course-03-wrap-up.md
-      - type: reading
-        title: "Section 050 Knowledge Check: Debian Package Management: Repositories, dpkg & APT"
-        path: sections/section-050/quiz.md
+      - type: quiz
+        title: "Knowledge Check: Debian Package Management: Repositories, dpkg & APT"
+        path: sections/section-050/quiz.yaml
+        pass_score: 70
       - type: reading
         title: Question
         path: sections/section-050/capstone/labs/lab-01/question.md
@@ -1109,7 +1286,7 @@ modules:
           - name: "rpm(8) manual page"
             url: https://rpm-software-management.github.io/rpm/man/rpm.8.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-060/module-01/course-04-wrap-up.md
       - type: reading
         title: "Rebuilding a Corrupted RPM Database"
@@ -1159,7 +1336,7 @@ modules:
           - name: "DNF command reference"
             url: https://dnf.readthedocs.io/en/latest/command_ref.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-060/module-02/course-03-wrap-up.md
       - type: reading
         title: "DNF Basic Package Operations"
@@ -1190,7 +1367,7 @@ modules:
           - name: "DNF command reference: history"
             url: https://dnf.readthedocs.io/en/latest/command_ref.html#history-command
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-060/module-03/course-03-wrap-up.md
       - type: reading
         title: "DNF Package Information Lookup"
@@ -1222,7 +1399,7 @@ modules:
           - name: "DNF command reference: provides"
             url: https://dnf.readthedocs.io/en/latest/command_ref.html#provides-command
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-060/module-04/course-03-wrap-up.md
       - type: reading
         title: "DNF Package Groups"
@@ -1255,11 +1432,12 @@ modules:
           - name: "DNF command reference: group"
             url: https://dnf.readthedocs.io/en/latest/command_ref.html#group-command
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-060/module-05/course-04-wrap-up.md
-      - type: reading
-        title: "Section 060 Knowledge Check: RPM/DNF Package Management"
-        path: sections/section-060/quiz.md
+      - type: quiz
+        title: "Knowledge Check: RPM/DNF Package Management"
+        path: sections/section-060/quiz.yaml
+        pass_score: 70
       - type: reading
         title: Question
         path: sections/section-060/capstone/labs/lab-01/question.md
@@ -1327,7 +1505,7 @@ modules:
           - name: "openSUSE Leap reference: managing software with zypper"
             url: https://doc.opensuse.org/documentation/leap/reference/html/book-reference/cha-sw-cl.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-070/module-01/course-04-wrap-up.md
       - type: reading
         title: "Zypper Package Information Lookup"
@@ -1358,11 +1536,12 @@ modules:
           - name: "openSUSE Leap reference: managing software with zypper"
             url: https://doc.opensuse.org/documentation/leap/reference/html/book-reference/cha-sw-cl.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-070/module-02/course-03-wrap-up.md
-      - type: reading
-        title: "Section 070 Knowledge Check: SUSE Package Management: Zypper"
-        path: sections/section-070/quiz.md
+      - type: quiz
+        title: "Knowledge Check: SUSE Package Management: Zypper"
+        path: sections/section-070/quiz.yaml
+        pass_score: 70
       - type: reading
         title: Question
         path: sections/section-070/capstone/labs/lab-01/question.md
@@ -1390,7 +1569,8 @@ modules:
       chroot-based root filesystem and password repair, GPT partition table
       backup and restoration, and GRUB bootloader reinstallation — every
       boot-breaking scenario safely re-staged onto a disposable secondary disk
-      so the grading VM always stays SSH-reachable.
+      so the grading VM always stays SSH-reachable. Also covers LVM and software RAID
+      recovery and disk health diagnosis.
 
     content:
       - type: reading
@@ -1453,7 +1633,7 @@ modules:
           - name: "chroot(1) manual page"
             url: https://man7.org/linux/man-pages/man1/chroot.1.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-080/module-01/course-05-wrap-up.md
       - type: reading
         title: "Password Reset & Single-User Recovery"
@@ -1484,7 +1664,7 @@ modules:
           - name: "openssl-passwd manual page"
             url: https://docs.openssl.org/3.0/man1/openssl-passwd/
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-080/module-02/course-03-wrap-up.md
       - type: reading
         title: "Partition Table Backup & Recovery"
@@ -1516,7 +1696,7 @@ modules:
           - name: "sgdisk(8) manual page"
             url: https://manpages.ubuntu.com/manpages/noble/man8/sgdisk.8.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-080/module-03/course-04-wrap-up.md
       - type: reading
         title: "GRUB Corruption Recovery"
@@ -1550,11 +1730,167 @@ modules:
           - name: "grub-install manual page"
             url: https://manpages.ubuntu.com/manpages/noble/man8/grub-install.8.html
       - type: reading
-        title: "Wrap-Up: Mission Debrief"
+        title: "Summary"
         path: sections/section-080/module-04/course-04-wrap-up.md
       - type: reading
-        title: "Section 080 Knowledge Check: System Disaster Recovery"
-        path: sections/section-080/quiz.md
+        title: "Filesystem Check & Repair"
+        path: sections/section-080/module-05/course.md
+      - type: reading
+        title: "The Superblock And Checking Safely"
+        path: sections/section-080/module-05/course-01-superblock-and-checking-safely.md
+      - type: reading
+        title: "Find A Backup Superblock And Repair"
+        path: sections/section-080/module-05/course-02-backup-superblock-and-repair.md
+      - type: reading
+        title: "Question"
+        path: sections/section-080/module-05/labs/lab-01/question.md
+      - type: lab
+        title: "Filesystem Check & Repair Lab"
+        path: sections/section-080/module-05/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: system-recovery
+        task_kind: troubleshooting
+        tags: [fsck, superblock, block-devices, blkid, mount]
+        learning_goals:
+          - Find a backup superblock for an ext4 filesystem whose primary superblock was wiped
+          - Repair the filesystem with e2fsck and prove its files survived
+        resources:
+          - name: "e2fsck(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/e2fsck.8.html
+          - name: "mke2fs(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/mke2fs.8.html
+      - type: reading
+        title: "Summary"
+        path: sections/section-080/module-05/course-03-wrap-up.md
+      - type: reading
+        title: "Initramfs Rebuild"
+        path: sections/section-080/module-06/course.md
+      - type: reading
+        title: "What The Initramfs Is"
+        path: sections/section-080/module-06/course-01-what-the-initramfs-is.md
+      - type: reading
+        title: "Inspect And Rebuild The Initramfs"
+        path: sections/section-080/module-06/course-02-inspect-and-rebuild.md
+      - type: reading
+        title: "Question"
+        path: sections/section-080/module-06/labs/lab-01/question.md
+      - type: lab
+        title: "Initramfs Rebuild Lab"
+        path: sections/section-080/module-06/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: system-recovery
+        task_kind: troubleshooting
+        tags: [initramfs, update-initramfs, boot-recovery, block-devices]
+        learning_goals:
+          - Create the initramfs image of the running kernel after it was deleted
+          - Check the new image with lsinitramfs and check the /boot/initrd.img link
+        resources:
+          - name: "update-initramfs(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/update-initramfs.8.html
+          - name: "lsinitramfs(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/lsinitramfs.8.html
+      - type: reading
+        title: "Summary"
+        path: sections/section-080/module-06/course-03-wrap-up.md
+      - type: reading
+        title: "LVM Recovery"
+        path: sections/section-080/module-07/course.md
+      - type: reading
+        title: "The Three LVM Layers"
+        path: sections/section-080/module-07/course-01-the-three-lvm-layers.md
+      - type: reading
+        title: "Restore Lost LVM Metadata"
+        path: sections/section-080/module-07/course-02-restore-lost-lvm-metadata.md
+      - type: reading
+        title: "Question"
+        path: sections/section-080/module-07/labs/lab-01/question.md
+      - type: lab
+        title: "LVM Recovery Lab"
+        path: sections/section-080/module-07/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: system-recovery
+        task_kind: troubleshooting
+        tags: [lvm, pvcreate, vgcfgrestore, vgchange, block-devices]
+        learning_goals:
+          - Rebuild a wiped physical volume with its old UUID and restore the volume group from its metadata backup
+          - Activate the logical volume and mount it with its files intact
+        resources:
+          - name: "vgcfgrestore(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/vgcfgrestore.8.html
+          - name: "pvcreate(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/pvcreate.8.html
+      - type: reading
+        title: "Summary"
+        path: sections/section-080/module-07/course-03-wrap-up.md
+      - type: reading
+        title: "Software RAID With mdadm"
+        path: sections/section-080/module-08/course.md
+      - type: reading
+        title: "Reading A RAID Array"
+        path: sections/section-080/module-08/course-01-reading-a-raid-array.md
+      - type: reading
+        title: "Replace A Failed Member"
+        path: sections/section-080/module-08/course-02-replace-a-failed-member.md
+      - type: reading
+        title: "Question"
+        path: sections/section-080/module-08/labs/lab-01/question.md
+      - type: lab
+        title: "Software RAID Recovery Lab"
+        path: sections/section-080/module-08/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: system-recovery
+        task_kind: troubleshooting
+        tags: [mdadm, raid, mdstat, boot-recovery, block-devices]
+        learning_goals:
+          - Replace a failed RAID 1 member with a spare disk and wait for the rebuild
+          - Save the array in mdadm.conf and prove the data is intact
+        resources:
+          - name: "mdadm(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/mdadm.8.html
+          - name: "mdadm.conf(5) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man5/mdadm.conf.5.html
+      - type: reading
+        title: "Summary"
+        path: sections/section-080/module-08/course-03-wrap-up.md
+      - type: reading
+        title: "Disk Health And Diagnosis"
+        path: sections/section-080/module-09/course.md
+      - type: reading
+        title: "Identify The Disk And Read Its Health"
+        path: sections/section-080/module-09/course-01-identify-and-read-health.md
+      - type: reading
+        title: "Kernel Log And Bad Blocks"
+        path: sections/section-080/module-09/course-02-kernel-log-and-bad-blocks.md
+      - type: reading
+        title: "Question"
+        path: sections/section-080/module-09/labs/lab-01/question.md
+      - type: lab
+        title: "Disk Health Diagnosis Lab"
+        path: sections/section-080/module-09/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: system-recovery
+        task_kind: troubleshooting
+        tags: [smartctl, dmesg, badblocks, lsblk, block-devices]
+        learning_goals:
+          - Find a disk by serial and report its size, SMART answer and kernel I/O errors
+          - Run a read-only bad-block scan that leaves the data intact
+        resources:
+          - name: "smartctl(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/smartctl.8.html
+          - name: "badblocks(8) manual page"
+            url: https://manpages.ubuntu.com/manpages/noble/man8/badblocks.8.html
+      - type: reading
+        title: "Summary"
+        path: sections/section-080/module-09/course-03-wrap-up.md
+      - type: quiz
+        title: "Knowledge Check: System Disaster Recovery"
+        path: sections/section-080/quiz.yaml
+        pass_score: 70
       - type: reading
         title: Question
         path: sections/section-080/capstone/labs/lab-01/question.md
@@ -1578,11 +1914,12 @@ modules:
   - id: module-090
     title: "LFCS Operations Deployment Domain Certification Quiz"
     description: >
-      A comprehensive, scenario-based final assessment covering all 26 modules
+      A comprehensive, scenario-based final assessment covering all 38 modules
       across the 8 sections of this domain, simulating actual Linux Foundation
       exam pressure.
 
     content:
-      - type: reading
+      - type: quiz
         title: "Final Domain Certification Quiz"
-        path: sections/final-domain-quiz.md
+        path: sections/final-domain-quiz.yaml
+        pass_score: 70

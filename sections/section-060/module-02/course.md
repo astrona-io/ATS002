@@ -23,9 +23,16 @@ Check that you have the knowledge and the tools this module expects.
 - **Basic `rpm` queries.** `rpm -qa` lists every installed package, `rpm -qi <name>` shows one package's details, and `rpm -q <name>` says whether a package is installed.
 - **How to use a Linux shell.** You can run commands with `sudo` and read error messages.
 
-### What you need
+### What is in your playground
 
-There is no playground for this module. The lab machines run Ubuntu 24.04, so each mission starts a real Rocky Linux 9 **container** named `rpmbox` on the Ubuntu machine. A container is a sealed pod docked to the ship, with its own tools and its own RPM database. You open a shell inside it with `docker exec -it rpmbox bash`. The damage you repair there is real: the mission's setup really breaks that container's database file.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine. That machine has no tools of this package family, so the playground runs a real Rocky Linux 9 **container** named `rpmbox` on it. A container is a sealed pod docked to the ship: it has its own files and tools but shares the ship's reactor core (the kernel). Inside it, the package tools and the package database are all real.
+
+- `vim-enhanced`, `wget` and `tree` installed inside `rpmbox`, so the database holds real data.
+- The database file `/var/lib/rpm/rpmdb.sqlite` inside `rpmbox`, deliberately damaged: part of it holds random bytes and the end is cut off. The installed programs themselves are untouched.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-rpm-database-repair`. Step into the pod with `docker exec -it rpmbox bash` and run every package command in that shell. If Docker refuses with a permission error, put `sudo` in front. It is already set up with an RPM database that is really damaged.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

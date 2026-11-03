@@ -20,10 +20,13 @@ Work through the modules in order. Each one ends with a graded mission that runs
 1. [Per-User Cron Job Scheduling](./module-01/course.md): where cron jobs live, the six-field and five-field line formats, and moving a job safely into a service account's crontab.
 2. [Docker Container Lifecycle: Inspect, Stop, and Launch](./module-02/course.md): container states, `docker stop` and `docker kill`, `docker inspect --format`, and launching a container with a memory limit and a port mapping.
 3. [systemd Timers](./module-03/course.md): the timer and service pair, schedule expressions, converting a cron job, and running timers day to day.
+4. [One-Shot And Missed Jobs: at, batch And anacron](./module-04/course.md): one-time jobs with `at` and `batch`, missed jobs with `anacron`, and who may use cron.
+5. [Container Images, Volumes And Networks](./module-05/course.md): building an image from a Dockerfile, named volumes and bind mounts, user-defined networks, logs and `docker exec`.
+6. [Podman And Rootless Containers](./module-06/course.md): Podman as a daemonless engine, rootless containers, lingering, and Quadlet units.
 
 ## Knowledge check and capstone
 
-When you have finished the modules, test yourself with the [section quiz](./quiz.md).
+When you have finished the modules, test yourself with the [section quiz](./quiz.yaml).
 
 Then take on the capstone, Scheduled Container Recovery. It joins the skills of the section: you retire an old container that holds a port, launch its replacement with limits, and schedule a per-user cron job that starts the new container again if it ever stops. Start it and open a terminal on it:
 

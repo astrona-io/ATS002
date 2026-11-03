@@ -26,10 +26,16 @@ Check that you have the knowledge and the tools this module expects.
 
 You need no earlier experience with cron.
 
-### What you need
+### What is in your playground
 
-- A terminal on an Ubuntu 24.04 machine with `cron` installed. Any such machine works for the examples in the parts.
-- Or a running lab machine: the mission in this module gives you the exact commands to start it and open a terminal on it.
+Your playground is one training ship with the `cron` daemon running. The service accounts `archivist` and `asset-manager` exist with the scripts their jobs would run. Two system-wide cron files are waiting to be moved: `/etc/cron.d/log-archive` runs `archive-logs.sh` for `archivist` at 22:00, and `/etc/cron.d/asset-cleanup` runs a sync script for `asset-manager` at 20:30. Neither account has a crontab of its own yet. It is a throwaway machine with no task and no grading, so experiment freely.
+
+Start it, then open a terminal on it with `astrona ssh astro-cron-schedule-bay`:
+
+<!-- astrona:playground -->
+
+Every command block in the parts also says which shell and which rights it expects, so you can follow the text on any Ubuntu 24.04 machine too. When you are finished, remove the playground with `astrona destroy cron-schedule-bay`.
+
 
 ## How this module is laid out
 

@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have opened a kit of parts, read its fitting plan, built the part and bolted it into place. Before you move on, look back at what you learned, check yourself, and clean up any mission that is still running.
 
@@ -86,7 +86,7 @@ It copies the files into a staging tree under `/tmp/stage` (for example `/tmp/st
 
 ## Clean up
 
-This module has no playground. If a mission is still running, remove it.
+Your playground and each mission run a virtual machine on your computer. When you are done with this module, remove the playground, and any mission that is still running.
 
 First, see what is still running:
 
@@ -94,10 +94,20 @@ First, see what is still running:
 astrona list
 ```
 
-Remove the mission. The command takes its **name**, not its folder path:
+If a mission is still there, remove it. The command takes its **name**, not its folder path:
 
 ```sh
 astrona destroy ats-002-lab-031
 ```
 
+Then remove the playground the same way:
+
+```sh
+astrona destroy source-build-bay
+```
+
+You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean.
+
 > *Open the crate with the right flag, ask the script for its flags, build and install, then prove the path and the feature on the built program.*
+
+<!-- astrona:playground:destroy -->

@@ -1,0 +1,37 @@
+# GRUB Recovery (PLAYGROUND) - Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+
+metadata:
+  name: "grub-repair-bench"
+  docs:
+    guide: "docs/overview.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    # This lab operates on the VM's own primary disk. Bootstrap only
+    # removes the on-disk grub.cfg -- it never touches the currently
+    # running kernel, so the VM's CURRENT boot (already in progress
+    # before bootstrap runs) stays fully SSH-reachable. Only the NEXT
+    # reboot would be affected, which is the honest framing this lab uses
+    # ("fix it before that happens" rather than "you're already down").
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Saves a copy of the current GRUB menu file to /root/grub.cfg.original and changes nothing else."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false

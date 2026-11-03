@@ -10,6 +10,8 @@ Each command below answers one question about the timer or its last run.
 
 ### Check, run, read and pause
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # is it armed, and pointing at the right service?
 systemctl list-timers archive.timer
@@ -67,7 +69,13 @@ The `.timer` needs `[Install]` with `WantedBy=timers.target`, and you must run `
 
 You can now write a `.service` and `.timer` pair, test its schedule, convert a cron job, and check the result. The mission asks you to build a new twice-weekly timer with catch-up, and to replace an existing cron job with a timer that fires every six hours.
 
-The mission runs on its own training ship. Start it and open a terminal on it:
+The mission runs on its own training ship. Pause your playground first, so it is not running while you work on the mission:
+
+```sh
+astrona stop systemd-timer-bay
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/module-03/labs/lab-01
@@ -80,8 +88,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-020/module-03/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and wake your playground again:
 
 ```sh
 astrona destroy ats-002-lab-023
+astrona start systemd-timer-bay
 ```

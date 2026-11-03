@@ -14,6 +14,8 @@ You find groups the same way you find packages: by asking `dnf` to read the cata
 
 ### dnf group list
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the rpmbox container
 dnf group list

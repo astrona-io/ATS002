@@ -24,6 +24,8 @@ Redrawing the deck plan, that is restoring the partition table, says **nothing**
 
 Every command in this module writes to a whole disk. So the most important step comes first: identify the target disk without guessing.
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: repair host, unprivileged for the read
 lsblk -f

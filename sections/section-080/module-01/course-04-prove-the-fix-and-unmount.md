@@ -8,6 +8,8 @@ The commands below run inside the chroot you entered with `sudo chroot /mnt/repa
 
 Ask `mount` to do what systemd would do at boot:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 mount -a
 echo $?
@@ -67,7 +69,13 @@ On a real system, this is where you reboot and watch it come up without help. On
 
 You can now mount a broken root, build a working chroot, fix a bad fstab line against `blkid` and prove it with `mount -a`. The mission asks you to repair a stand-in system whose `/etc/fstab` has a mistyped UUID.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy chroot-rescue-bench
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-01/labs/lab-01
@@ -80,17 +88,24 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-080/module-01/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-081
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-01/playground
 ```
 
 ## Your mission: chroot Repair: Wrong fstab Filesystem Type Lab
 
 You can now check every field of an fstab line, not just the device. The mission asks you to repair a stand-in system whose `/data` line points at the right device but still will not mount.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy chroot-rescue-bench
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-01/labs/lab-02
@@ -103,8 +118,9 @@ Read the task in [`question.md`](./labs/lab-02/question.md) and solve it on your
 astrona submit -c sections/section-080/module-01/labs/lab-02
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-085
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-01/playground
 ```

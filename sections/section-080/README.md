@@ -13,6 +13,11 @@ Astronaut, this section is about the night your ship will not cooperate. One bad
 - **chroot repair:** mounting a broken system's root filesystem from outside, bind-mounting a set of tools plus `/dev`, `/proc` and `/sys`, stepping in with `chroot`, fixing a bad `/etc/fstab` line, and proving it with `mount -a` before any reboot.
 - **Password recovery without rescue media:** interrupting GRUB for one boot with `rd.break` or `init=/bin/bash`, and resetting a lost root password, by `passwd` or by writing a hash into `/etc/shadow`.
 - **Partition table backup and restore:** backing up a GPT table with `sgdisk --backup`, checking the backup, restoring it after a wipe, and checking the partition table and the filesystems as two separate layers.
+- **Filesystem check and repair:** reading an ext4 superblock, checking a filesystem read-only with `fsck -n`, and repairing a damaged one from a backup superblock with `e2fsck -b`.
+- **Initramfs rebuild:** what the initramfs does at boot, listing an image with `lsinitramfs`, and creating or updating one with `update-initramfs`.
+- **LVM recovery:** reading physical volumes, volume groups and logical volumes, and restoring a volume group from its metadata backup with `pvcreate --uuid --restorefile`, `vgcfgrestore` and `vgchange -ay`.
+- **Software RAID recovery:** reading `/proc/mdstat` and `mdadm --detail`, replacing a failed RAID 1 member, and saving the array in `mdadm.conf`.
+- **Disk health diagnosis:** finding a disk by serial, reading `smartctl` and the kernel log, and scanning it read-only with `badblocks`.
 - **GRUB reinstallation:** telling a broken GRUB (a bare `grub>` prompt) from a failing menu entry, reinstalling GRUB's boot code with `grub-install`, and writing a fresh `grub.cfg` with `update-grub`.
 
 ---
@@ -62,9 +67,54 @@ Work through the modules in this order. Each part teaches one idea. A mission (a
    - Mission: [GRUB Corruption Recovery Lab](module-04/labs/lab-01/README.md)
 4. [Wrap-Up: Mission Debrief](module-04/course-04-wrap-up.md)
 
+### [Filesystem Check & Repair](module-05/course.md)
+
+2 parts and 1 mission:
+
+1. [The Superblock And Checking Safely](module-05/course-01-superblock-and-checking-safely.md)
+2. [Find A Backup Superblock And Repair](module-05/course-02-backup-superblock-and-repair.md)
+   - Mission: [Filesystem Check & Repair Lab](module-05/labs/lab-01/README.md)
+3. [Summary](module-05/course-03-wrap-up.md)
+
+### [Initramfs Rebuild](module-06/course.md)
+
+2 parts and 1 mission:
+
+1. [What The Initramfs Is](module-06/course-01-what-the-initramfs-is.md)
+2. [Inspect And Rebuild The Initramfs](module-06/course-02-inspect-and-rebuild.md)
+   - Mission: [Initramfs Rebuild Lab](module-06/labs/lab-01/README.md)
+3. [Summary](module-06/course-03-wrap-up.md)
+
+### [LVM Recovery](module-07/course.md)
+
+2 parts and 1 mission:
+
+1. [The Three LVM Layers](module-07/course-01-the-three-lvm-layers.md)
+2. [Restore Lost LVM Metadata](module-07/course-02-restore-lost-lvm-metadata.md)
+   - Mission: [LVM Recovery Lab](module-07/labs/lab-01/README.md)
+3. [Summary](module-07/course-03-wrap-up.md)
+
+### [Software RAID With mdadm](module-08/course.md)
+
+2 parts and 1 mission:
+
+1. [Reading A RAID Array](module-08/course-01-reading-a-raid-array.md)
+2. [Replace A Failed Member](module-08/course-02-replace-a-failed-member.md)
+   - Mission: [Software RAID Recovery Lab](module-08/labs/lab-01/README.md)
+3. [Summary](module-08/course-03-wrap-up.md)
+
+### [Disk Health And Diagnosis](module-09/course.md)
+
+2 parts and 1 mission:
+
+1. [Identify The Disk And Read Its Health](module-09/course-01-identify-and-read-health.md)
+2. [Kernel Log And Bad Blocks](module-09/course-02-kernel-log-and-bad-blocks.md)
+   - Mission: [Disk Health Diagnosis Lab](module-09/labs/lab-01/README.md)
+3. [Summary](module-09/course-03-wrap-up.md)
+
 ### Knowledge check
 
-Before the capstone, test your reasoning with the [Section 080 Knowledge Check](./quiz.md).
+Before the capstone, test your reasoning with the [Section 080 Knowledge Check](./quiz.yaml).
 
 ### Capstone
 

@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You clipped a flight recorder onto a crew member, caught the one forbidden request, and cleaned up without losing the evidence. Before you move on, look back at what you learned, check yourself, and clean up anything still running.
 
@@ -102,3 +102,5 @@ astrona destroy ats-002-lab-015
 ```
 
 > *Confirm with evidence, record the real path, then end only the guilty process.*
+
+<!-- astrona:playground:destroy -->

@@ -51,6 +51,8 @@ flowchart TB
 
 The diagram shows that `dpkg --configure -a` alone brings most interrupted packages back to `ii`, and `apt --fix-broken install` covers the case where a dependency is really missing.
 
+<!-- astrona:playground:renew -->
+
 ```bash
 sudo dpkg --configure -a
 sudo apt --fix-broken install
@@ -75,7 +77,13 @@ This pair, in this order, is the standard answer to "this system's package state
 
 You can now inspect a `.deb`, install it with `dpkg`, ask who owns what, and recover a package left half-configured. The mission asks you to do all of that on one ship: install an internal tool from a `.deb` file and bring an unrelated stuck package back to a clean state.
 
-The mission runs on its own training ship. Start it and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy dpkg-low-level
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-02/labs/lab-01
@@ -88,8 +96,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-050/module-02/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-052
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-02/playground
 ```

@@ -8,6 +8,8 @@ The commands below assume the target root is mounted at `/mnt/repair`, with `/us
 
 `chroot` is short for "change root". Run it as root on the repair host:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: the repair host, root
 sudo chroot /mnt/repair /bin/bash

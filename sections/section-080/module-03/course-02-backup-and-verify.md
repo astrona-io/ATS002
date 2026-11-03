@@ -6,6 +6,8 @@ Astronaut, the best moment to save a deck plan is before anything goes wrong. A 
 
 `sgdisk` is the script-friendly member of the GPT fdisk tools (`gdisk`, `sgdisk`). It works on GPT disks. Run it as root against the whole disk, not a partition:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: repair host, root
 sudo sgdisk --backup=/root/vdc-ptable-backup.bin /dev/vdc

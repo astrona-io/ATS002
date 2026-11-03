@@ -22,6 +22,8 @@ The diagram shows the three kinds of argument: a `.deb` file you can read or ins
 
 Picture a colleague handing you `/home/candidate/downloads/logtail-utils_2.3.1_amd64.deb`. Before anything else, read its label:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: any host, unprivileged
 dpkg -I /home/candidate/downloads/logtail-utils_2.3.1_amd64.deb

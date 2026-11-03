@@ -12,7 +12,7 @@ You do all your `zypper` work inside that pod:
 docker exec -it zypperbox bash
 ```
 
-Inside it, `zypper`, the RPM database and the openSUSE repositories are all real. Only the host underneath is different. The Ubuntu host itself has no `zypper`, so a `zypper` command typed there fails with "command not found". The modules in this section have no playground; you try the examples inside a running lab.
+Inside it, `zypper`, the RPM database and the openSUSE repositories are all real. Only the host underneath is different. The Ubuntu host itself has no `zypper`, so a `zypper` command typed there fails with "command not found". Each module has a playground that starts the container for you, and the graded labs use the same container.
 
 ## What you will learn
 
@@ -29,7 +29,7 @@ By the end of this section you can:
 
 ## Check yourself, then the capstone
 
-Test your understanding with the [section knowledge check](./quiz.md).
+Test your understanding with the [section knowledge check](./quiz.yaml).
 
 Then put both skill sets together in one maintenance window: research two requested changes, save your findings, apply only patches, install one package and remove another. Start the capstone and open a terminal on it:
 

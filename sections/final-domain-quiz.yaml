@@ -1,0 +1,972 @@
+# Final domain quiz for ATS002. Listed in astrona.yaml as a `type: quiz` entry at the end of the course.
+schema_version: 1
+kind: question_bank
+id: ats002-final
+course_id: ATS002
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: course
+  id: ats002
+  title: "LFCS Operations Deployment"
+questions:
+  - id: ats002-final-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read a live kernel value with sysctl -n"
+    source_readings:
+      - sections/section-010/module-01/course.md
+    prompt: |-
+      You need to write the live value of `net.ipv4.ip_forward` into a file for an audit report, and the file must contain only the bare value — no key name, no `=` sign. Which command gives you exactly that?
+    options:
+      - id: a
+        text: "`sysctl -n net.ipv4.ip_forward > /opt/course/1/ip_forward`"
+        explanation: "Correct. The `-n` flag tells `sysctl` to suppress the `key = value` label and print only the bare value, which is exactly what a script-friendly audit file needs."
+      - id: b
+        text: "`sysctl net.ipv4.ip_forward > /opt/course/1/ip_forward`"
+        explanation: "Plain `sysctl <key>` prints the full `net.ipv4.ip_forward = 0` labeled line."
+      - id: c
+        text: "`sysctl -w net.ipv4.ip_forward > /opt/course/1/ip_forward`"
+        explanation: "`-w` is the **write** flag — it requires a value to set (`key=value`) and modifies live kernel state rather than reading it."
+      - id: d
+        text: "`cat /etc/sysctl.conf | grep ip_forward > /opt/course/1/ip_forward`"
+        explanation: "It reads whatever is written in the persistent config file, not the kernel's actual live, in-memory value — the two can disagree if someone ran `sysctl -w` earlier without persisting it."
+    correct_option: a
+    explanation: "Correct. The `-n` flag tells `sysctl` to suppress the `key = value` label and print only the bare value, which is exactly what a script-friendly audit file needs."
+
+  - id: ats002-final-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Raise and persist the process ceilings"
+    source_readings:
+      - sections/section-010/module-02/course.md
+    prompt: |-
+      A batch job on a busy host suddenly starts failing with `fork: retry: Resource temporarily unavailable`, even though `top` and `free -m` show plenty of spare CPU and memory. You confirm the ceiling being hit is `kernel.pid_max`. After raising it live with `sysctl -w kernel.pid_max=4194304`, is the fix complete?
+    options:
+      - id: a
+        text: "Yes — `sysctl -w` writes directly to the kernel, so the fix is permanent and complete."
+        explanation: "`sysctl -w` is explicitly the non-persistent half of the fix."
+      - id: b
+        text: "No — the change is live-only and will revert on reboot unless it's also written into a file under `/etc/sysctl.d/` and reloaded with `sysctl --system`; the workload user's `ulimit -u` and any systemd `TasksMax=` ceiling should also be checked independently."
+        explanation: "Correct. `sysctl -w` only pokes the live in-memory value — it reverts to whatever `/etc/sysctl.d/*.conf` says on the next reboot unless persisted there and reloaded. Separately, `pid_max` is one of *three independent* ceilings — a per-user `ulimit -u` or a systemd unit's `TasksMax=` can each independently cap the same fork-heavy workload even after `pid_max` is raised."
+      - id: c
+        text: "No — `pid_max` cannot be changed at runtime at all; it requires a kernel recompile."
+        explanation: "`pid_max` is a genuine runtime-tunable `/proc/sys` value, no recompile needed."
+      - id: d
+        text: "Yes, and no other ceiling could possibly still be capping the same workload once `pid_max` is raised."
+        explanation: "Exactly the trap the scenario is testing: three independent ceilings can each cap the same workload, and fixing one doesn't guarantee the others aren't also binding."
+    correct_option: b
+    explanation: "Correct. `sysctl -w` only pokes the live in-memory value — it reverts to whatever `/etc/sysctl.d/*.conf` says on the next reboot unless persisted there and reloaded. Separately, `pid_max` is one of *three independent* ceilings — a per-user `ulimit -u` or a systemd unit's `TasksMax=` can each independently cap the same fork-heavy workload even after `pid_max` is raised."
+
+  - id: ats002-final-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Stop a kernel module from loading permanently"
+    source_readings:
+      - sections/section-010/module-03/course.md
+    prompt: |-
+      You need the `pcspkr` kernel module to never load again on this host, even though the hardware it drives would normally cause the kernel to auto-detect and load it on every boot. Simply running `sudo rmmod pcspkr` right now would:
+    options:
+      - id: a
+        text: "Permanently prevent it from ever loading again, including after a reboot."
+        explanation: "That persistence requires the separate blacklist step."
+      - id: b
+        text: "Corrupt the module's on-disk `.ko` file, permanently disabling it."
+        explanation: "`rmmod` never touches the on-disk module file."
+      - id: c
+        text: "Only unload it from the currently running kernel; it will very likely be auto-loaded again on the next boot or hardware re-detection unless it's also blacklisted in a file under `/etc/modprobe.d/`."
+        explanation: "Correct. `rmmod` only affects the module's currently-loaded state in the running kernel. To stop the kernel from auto-loading it again on future boots or hardware re-detection passes, you must add a `blacklist pcspkr` line to a file under `/etc/modprobe.d/`."
+      - id: d
+        text: "Require the module to first be blacklisted before it can be unloaded at all."
+        explanation: "`rmmod` and blacklisting are independent actions; neither is a prerequisite for the other."
+    correct_option: c
+    explanation: "Correct. `rmmod` only affects the module's currently-loaded state in the running kernel. To stop the kernel from auto-loading it again on future boots or hardware re-detection passes, you must add a `blacklist pcspkr` line to a file under `/etc/modprobe.d/`."
+
+  - id: ats002-final-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Give a device a stable name with a udev rule"
+    source_readings:
+      - sections/section-010/module-04/course.md
+    prompt: |-
+      A backup script hardcodes `/dev/sdb1` for an external USB drive, but the device letter keeps shifting whenever a second USB drive is temporarily attached. What is the correct, permanent fix?
+    options:
+      - id: a
+        text: "Edit the script to always sleep 10 seconds before running, hoping device enumeration settles down."
+        explanation: "Timing hacks don't fix a fundamentally unstable identifier and are unreliable."
+      - id: b
+        text: "Physically label the USB port so the same port is always used."
+        explanation: "Linux doesn't guarantee a fixed device letter per physical port by default."
+      - id: c
+        text: "Use `fdisk -l` immediately before every backup run to look up whatever letter it currently has."
+        explanation: "This works but requires manual intervention every run instead of a permanent, scriptable fix."
+      - id: d
+        text: "Create a udev rule matching a stable hardware attribute of the drive (like `ATTRS{serial}`) that creates a persistent symlink such as `/dev/backup-drive`, then update the script to reference that symlink instead of the raw device letter."
+        explanation: "Correct. Kernel-assigned device letters (`sdb`, `sdc`, ...) are assigned by discovery order, which is inherently unstable. A udev rule keyed on a stable hardware attribute like the drive's serial number creates a persistent, human-readable symlink that always points to the correct physical drive regardless of enumeration order."
+    correct_option: d
+    explanation: "Correct. Kernel-assigned device letters (`sdb`, `sdc`, ...) are assigned by discovery order, which is inherently unstable. A udev rule keyed on a stable hardware attribute like the drive's serial number creates a persistent, human-readable symlink that always points to the correct physical drive regardless of enumeration order."
+
+  - id: ats002-final-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find why a per-user cron job does not run"
+    source_readings:
+      - sections/section-020/module-01/course.md
+    prompt: |-
+      A per-user cronjob you just added with `crontab -e` as user `asset-manager` doesn't seem to run, but a nearly identical line already exists in `/etc/cron.d/legacy-job` naming `asset-manager` as the run-as user. What's the most likely underlying issue and correct fix?
+    options:
+      - id: a
+        text: "The job is likely running fine from *both* sources — the fix is to remove it from the system-wide `/etc/cron.d/` source once it's confirmed present in the per-user crontab, so it doesn't fire twice under two different scheduling mechanisms."
+        explanation: "Correct. System-wide cron sources (`/etc/cron.d/`, `/etc/crontab`) and per-user crontabs (`crontab -e`) are two independent scheduling mechanisms. Having the same logical job defined in both silently causes it to fire twice. Migrating a job means removing it from the old source once it's confirmed live in the new one."
+      - id: b
+        text: "Per-user crontabs are disabled by default and must be enabled in `sshd_config` first."
+        explanation: "Per-user crontabs work independently of SSH configuration."
+      - id: c
+        text: "Nothing is wrong — cron will simply run the job twice, which is expected and harmless."
+        explanation: "Running a job twice is a real bug, not expected/harmless behavior, especially for anything non-idempotent."
+      - id: d
+        text: "`crontab -e` edits require a reboot to take effect."
+        explanation: "`cron` picks up crontab changes automatically; no reboot or service restart is needed."
+    correct_option: a
+    explanation: "Correct. System-wide cron sources (`/etc/cron.d/`, `/etc/crontab`) and per-user crontabs (`crontab -e`) are two independent scheduling mechanisms. Having the same logical job defined in both silently causes it to fire twice. Migrating a job means removing it from the old source once it's confirmed live in the new one."
+
+  - id: ats002-final-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Extract one value from docker inspect with a format"
+    source_readings:
+      - sections/section-020/module-02/course.md
+    prompt: |-
+      You need to extract just the IP address of a running Docker container named `frontend_v2` for an audit report, in a single command with no manual JSON parsing. Which is correct?
+    options:
+      - id: a
+        text: "`docker ps | grep frontend_v2 | awk '{print $NF}'`"
+        explanation: "`docker ps` output doesn't include the container's IP address at all."
+      - id: b
+        text: "`docker inspect --format '{{.NetworkSettings.IPAddress}}' frontend_v2`"
+        explanation: "Correct. `docker inspect --format` with a Go template lets you pull one exact field out of a container's full metadata JSON precisely and reliably, without eyeballing or manually parsing raw output."
+      - id: c
+        text: "`docker logs frontend_v2 | grep -i \"ip address\"`"
+        explanation: "Container logs are application output, not guaranteed to mention the container's own IP."
+      - id: d
+        text: "`docker exec frontend_v2 cat /etc/hosts | tail -1`"
+        explanation: "`/etc/hosts` inside the container is not a reliable source for the container's own externally-visible IP."
+    correct_option: b
+    explanation: "Correct. `docker inspect --format` with a Go template lets you pull one exact field out of a container's full metadata JSON precisely and reliably, without eyeballing or manually parsing raw output."
+
+  - id: ats002-final-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find build options with configure --help"
+    source_readings:
+      - sections/section-030/module-01/course.md
+    prompt: |-
+      You're compiling `links2` from source and need to know which flag disables IPv6 support and where to install the resulting binary. What's the fastest, most reliable way to find both?
+    options:
+      - id: a
+        text: "Guess based on flag names used by similar tools you've seen before."
+        explanation: "Flag names and semantics vary project to project; guessing risks silently misconfiguring the build."
+      - id: b
+        text: "Search a random internet forum for the exact command someone else used for a different version."
+        explanation: "Forum answers may target a different version or platform and aren't authoritative."
+      - id: c
+        text: "Run `./configure --help` inside the extracted source directory and read the project's own documented flags directly."
+        explanation: "Correct. Every well-formed autotools-based source project documents its own install-location and feature-toggle flags via `./configure --help`. This is the authoritative, version-correct source — exactly matching how the real LFCS exam expects you to work without internet access."
+      - id: d
+        text: "Skip `configure` entirely and edit the `Makefile` by hand to remove IPv6-related object files."
+        explanation: "Hand-editing a generated Makefile is fragile and bypasses the project's actual supported configuration mechanism."
+    correct_option: c
+    explanation: "Correct. Every well-formed autotools-based source project documents its own install-location and feature-toggle flags via `./configure --help`. This is the authoritative, version-correct source — exactly matching how the real LFCS exam expects you to work without internet access."
+
+  - id: ats002-final-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Shut down a libvirt domain gracefully or by force"
+    source_readings:
+      - sections/section-030/module-02/course.md
+    prompt: |-
+      You run `virsh shutdown inventory-db` on a persistent libvirt domain, but the domain doesn't stop after several minutes. What's happening, and what's the correct next step if this is a genuine emergency?
+    options:
+      - id: a
+        text: "The domain is transient, not persistent, so `shutdown` silently does nothing."
+        explanation: "A persistent domain (defined with `virsh define`) fully supports `shutdown`; being transient vs. persistent affects whether the domain definition survives being stopped, not whether shutdown signals work."
+      - id: b
+        text: "`virsh shutdown` always takes exactly 5 minutes by design; just wait longer."
+        explanation: "There's no fixed timer; it depends entirely on the guest OS's own shutdown sequence."
+      - id: c
+        text: "`virsh shutdown` only works on domains that are already stopped."
+        explanation: "`shutdown` is meant to be run against a currently-running domain."
+      - id: d
+        text: "`virsh shutdown` sends an ACPI power-button signal that the guest OS can ignore or delay if it's busy or hung; if you need it stopped immediately, use `virsh destroy` for an unconditional, hard power-off."
+        explanation: "Correct. `virsh shutdown` is a graceful, ACPI-based request — exactly like pressing a physical power button — which a hung or busy guest OS can fail to honor. `virsh destroy`, despite its alarming name, is the hard, unconditional power-off equivalent of pulling the power cord, appropriate when a graceful shutdown isn't responding."
+    correct_option: d
+    explanation: "Correct. `virsh shutdown` is a graceful, ACPI-based request — exactly like pressing a physical power button — which a hung or busy guest OS can fail to honor. `virsh destroy`, despite its alarming name, is the hard, unconditional power-off equivalent of pulling the power cord, appropriate when a graceful shutdown isn't responding."
+
+  - id: ats002-final-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Repair an AppArmor denial in enforce mode"
+    source_readings:
+      - sections/section-040/module-01/course.md
+    prompt: |-
+      An AppArmor-confined service was reconfigured to write logs to `/srv/applogs` instead of its default location. Standard Unix ownership and permissions on `/srv/applogs` are already correct, but the service still can't write there. What's the correct diagnostic and fix sequence?
+    options:
+      - id: a
+        text: "Check for a DENIED entry in the audit log (`journalctl -k` / `dmesg`), close the gap by adding the correct path rule to the service's AppArmor profile (hand-edit or via `aa-logprof`), reload the profile, and confirm it's back in **enforce** mode — not left in complain mode."
+        explanation: "Correct. This is the \"double gate\" pattern: DAC and MAC are independent gates, and both must allow an action. The correct fix diagnoses the specific denial from the audit trail, closes exactly that gap in the profile, and confirms enforcement is genuinely restored — not bypassed."
+      - id: b
+        text: "Since DAC permissions are correct, the problem must be elsewhere (e.g. SELinux); AppArmor isn't relevant on Ubuntu."
+        explanation: "AppArmor is Ubuntu's actively-enforcing, real, kernel-level MAC system; correct DAC permissions don't rule it out."
+      - id: c
+        text: "Immediately run `aa-complain` on the profile to unblock the service — this is the fastest and fully sufficient permanent fix."
+        explanation: "`complain` mode logs violations but no longer blocks them, which \"fixes\" the symptom by disabling protection rather than correctly scoping it; it should only be a temporary diagnostic step before returning to `enforce`."
+      - id: d
+        text: "Delete the AppArmor profile file entirely so the service is never confined again."
+        explanation: "Removing confinement entirely is a security regression, not a fix."
+    correct_option: a
+    explanation: "Correct. This is the \"double gate\" pattern: DAC and MAC are independent gates, and both must allow an action. The correct fix diagnoses the specific denial from the audit trail, closes exactly that gap in the profile, and confirms enforcement is genuinely restored — not bypassed."
+
+  - id: ats002-final-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make an SELinux label fix persistent"
+    source_readings:
+      - sections/section-040/module-01/course.md
+    prompt: |-
+      On a RHEL-family host running SELinux in enforcing mode, you use `chcon` to fix a mislabeled file so a service can read it again. The fix works immediately — but a colleague warns you it won't survive a filesystem relabel. Why, and what's the correct persistent alternative?
+    options:
+      - id: a
+        text: "`chcon` changes are always permanent; the colleague is mistaken."
+        explanation: "This is exactly the failure mode being tested."
+      - id: b
+        text: "`chcon` only edits the file's live security context directly, without updating SELinux's policy database — a relabel (`restorecon`, or a full `/.autorelabel`) restores the context based on policy, wiping out the manual `chcon` change. The persistent fix is `semanage fcontext` to add a policy rule, followed by `restorecon` to apply it."
+        explanation: "Correct. `chcon` is a direct, one-off context edit that SELinux's policy database knows nothing about. `restorecon` (run during a relabel or on its own) resets contexts back to whatever the *policy* says they should be, silently reverting an unregistered `chcon` change. `semanage fcontext` registers the new expected context in policy itself, so `restorecon` reapplies (rather than reverts) it."
+      - id: c
+        text: "The colleague means you must run `setenforce 0` permanently to avoid the problem."
+        explanation: "Disabling enforcement is a security regression, not a fix for context persistence."
+      - id: d
+        text: "`chcon` and `semanage fcontext` are exactly equivalent; either works identically for persistence."
+        explanation: "Only `semanage fcontext` writes to the policy database that `restorecon` reads from."
+    correct_option: b
+    explanation: "Correct. `chcon` is a direct, one-off context edit that SELinux's policy database knows nothing about. `restorecon` (run during a relabel or on its own) resets contexts back to whatever the *policy* says they should be, silently reverting an unregistered `chcon` change. `semanage fcontext` registers the new expected context in policy itself, so `restorecon` reapplies (rather than reverts) it."
+
+  - id: ats002-final-q11
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Add a third-party APT repository with signed-by"
+    source_readings:
+      - sections/section-050/module-01/course.md
+    prompt: |-
+      You need to add a vendor's third-party APT repository and are being careful to follow the current, non-deprecated key-trust approach. Which method is correct?
+    options:
+      - id: a
+        text: "`sudo apt-key add vendor-key.gpg`"
+        explanation: "This is the deprecated, overly-broad trust mechanism."
+      - id: b
+        text: "Add the repository line with no key at all and pass `--allow-unauthenticated` to every future `apt install`."
+        explanation: "This disables authentication entirely, a real security risk."
+      - id: c
+        text: "Download the vendor's GPG key into `/etc/apt/keyrings/`, then reference it explicitly with a `signed-by=/etc/apt/keyrings/vendor.gpg` option in the repository's `.list` (or `.sources`) entry."
+        explanation: "Correct. `apt-key` is deprecated because it trusts a key for *every* repository system-wide. The modern approach scopes trust per-repository: the key lives in `/etc/apt/keyrings/`, and the repository's own source entry explicitly references it via `signed-by=`, so it only authenticates that one repository."
+      - id: d
+        text: "Copy the vendor's key directly into `/etc/apt/trusted.gpg` without any reference in the repo entry."
+        explanation: "`/etc/apt/trusted.gpg` is also part of the deprecated global-trust mechanism, and without a `signed-by` reference the scoping benefit is lost anyway."
+    correct_option: c
+    explanation: "Correct. `apt-key` is deprecated because it trusts a key for *every* repository system-wide. The modern approach scopes trust per-repository: the key lives in `/etc/apt/keyrings/`, and the repository's own source entry explicitly references it via `signed-by=`, so it only authenticates that one repository."
+
+  - id: ats002-final-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Recover a half-configured dpkg package"
+    source_readings:
+      - sections/section-050/module-02/course.md
+    prompt: |-
+      A colleague's `dpkg -i` of an unrelated package was interrupted mid-install, leaving the package in a half-configured state and `apt`/`dpkg` refusing further actions. What's the correct recovery sequence?
+    options:
+      - id: a
+        text: "`sudo rm -rf /var/lib/dpkg/status` to reset the package database from scratch."
+        explanation: "Deleting the dpkg status database destroys the record of every installed package on the system, an extremely destructive overreaction."
+      - id: b
+        text: "Reinstall the operating system."
+        explanation: "Wildly disproportionate to a routine, well-documented recovery scenario."
+      - id: c
+        text: "`sudo apt purge --force-all` on every installed package to start clean."
+        explanation: "Purging every package would remove software that isn't actually broken."
+      - id: d
+        text: "`sudo dpkg --configure -a` to resume any interrupted package configurations, followed by `sudo apt --fix-broken install` if dependency issues remain."
+        explanation: "Correct. `dpkg --configure -a` specifically resumes any package left in a half-configured state from an interrupted install. If that surfaces unmet dependencies, `apt --fix-broken install` (`apt-get -f install`) resolves them. This is the standard, safe recovery path."
+    correct_option: d
+    explanation: "Correct. `dpkg --configure -a` specifically resumes any package left in a half-configured state from an interrupted install. If that surfaces unmet dependencies, `apt --fix-broken install` (`apt-get -f install`) resolves them. This is the standard, safe recovery path."
+
+  - id: ats002-final-q13
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Remove a package completely"
+    source_readings:
+      - sections/section-050/module-03/course.md
+    prompt: |-
+      You need to remove the `ftp` package so thoroughly that a future reinstall would start from a genuinely clean state — no leftover configuration files, and no orphaned dependencies that only `ftp` needed. Which command accomplishes this correctly?
+    options:
+      - id: a
+        text: "`sudo apt purge ftp && sudo apt autoremove`"
+        explanation: "Correct. `apt remove` alone leaves configuration files under `/etc` behind. `apt purge` removes the package's config files too. `apt autoremove` afterward cleans up any dependency packages that were pulled in only for `ftp` and are no longer needed by anything else."
+      - id: b
+        text: "`sudo apt remove ftp`"
+        explanation: "`remove` leaves `/etc` config files in place, failing the \"genuinely clean state\" requirement."
+      - id: c
+        text: "`sudo rm -rf /usr/bin/ftp`"
+        explanation: "Manually deleting one binary file leaves the package still registered in dpkg's database, along with all its other files and orphaned dependencies."
+      - id: d
+        text: "`sudo dpkg -r ftp`"
+        explanation: "Equivalent to `apt remove`, not `purge`; config files remain, and no dependency cleanup happens."
+    correct_option: a
+    explanation: "Correct. `apt remove` alone leaves configuration files under `/etc` behind. `apt purge` removes the package's config files too. `apt autoremove` afterward cleans up any dependency packages that were pulled in only for `ftp` and are no longer needed by anything else."
+
+  - id: ats002-final-q14
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Inspect an uninstalled .rpm file"
+    source_readings:
+      - sections/section-060/module-01/course.md
+    prompt: |-
+      You've been handed a standalone `.rpm` file for an internal tool. Before installing it, you need to see its declared version, dependencies, and full file list — without installing anything yet. Which commands do that?
+    options:
+      - id: a
+        text: "`sudo rpm -i package.rpm` followed by `rpm -ql package-name`"
+        explanation: "This installs the package first, which is exactly what the scenario says not to do yet."
+      - id: b
+        text: "`rpm -qip package.rpm` for metadata, and `rpm -qlp package.rpm` for the file list"
+        explanation: "Correct. The `-p` flag tells `rpm` to query an uninstalled package *file* directly rather than the installed-package database. `-qip` shows metadata (version, vendor, dependencies); `-qlp` lists every file the package would place on disk — both entirely without installing."
+      - id: c
+        text: "`unzip package.rpm` to inspect its contents directly"
+        explanation: "RPM is not a zip archive; this won't produce meaningful package metadata."
+      - id: d
+        text: "`dnf install --assumeno package.rpm`"
+        explanation: "Even with `--assumeno`, this is a needlessly roundabout and less precise way to get the same information `rpm -qip`/`-qlp` give directly."
+    correct_option: b
+    explanation: "Correct. The `-p` flag tells `rpm` to query an uninstalled package *file* directly rather than the installed-package database. `-qip` shows metadata (version, vendor, dependencies); `-qlp` lists every file the package would place on disk — both entirely without installing."
+
+  - id: ats002-final-q15
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Rebuild a corrupted RPM database"
+    source_readings:
+      - sections/section-060/module-02/course.md
+    prompt: |-
+      On a Rocky Linux host, `rpm -qa` errors out partway through instead of listing installed packages, and `dnf` fails at the transaction-check stage with a database-related error — even though every already-installed package's files on disk are untouched. What's the correct diagnosis and fix?
+    options:
+      - id: a
+        text: "This is a dependency conflict; run `dnf install --skip-broken` to work around it."
+        explanation: "`--skip-broken` addresses dependency resolution conflicts, not a corrupted query database."
+      - id: b
+        text: "This means the disk is out of space; run `dnf clean all` to free space."
+        explanation: "The scenario explicitly states files on disk are untouched/fine; nothing points to disk space."
+      - id: c
+        text: "This is RPM database corruption, not a package or disk-space problem; back up `/var/lib/rpm` before touching anything, then rebuild the database (e.g. `rpm --rebuilddb`), and verify the system is queryable again afterward."
+        explanation: "Correct. Errors specifically at the database-query/transaction-check stage, with intact on-disk package files, point to RPM database corruption rather than a package, dependency, or disk-space issue. The safe recovery is to back up the database first (in case rebuild doesn't fully resolve it), then rebuild it and confirm queries work cleanly afterward."
+      - id: d
+        text: "Reinstall every package currently shown by `rpm -qa` to force-repair the database."
+        explanation: "You can't reliably `rpm -qa` a corrupted database in the first place to know what to reinstall, and this skips the actual root cause."
+    correct_option: c
+    explanation: "Correct. Errors specifically at the database-query/transaction-check stage, with intact on-disk package files, point to RPM database corruption rather than a package, dependency, or disk-space issue. The safe recovery is to back up the database first (in case rebuild doesn't fully resolve it), then rebuild it and confirm queries work cleanly afterward."
+
+  - id: ats002-final-q16
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Install a dnf group and understand its tiers"
+    source_readings:
+      - sections/section-060/module-05/course.md
+    prompt: |-
+      You need to install the real, repository-published "Development Tools" group on a Rocky Linux host, but first you want to see exactly which packages are mandatory versus merely default versus optional members — without installing anything yet. Which command shows that?
+    options:
+      - id: a
+        text: "`dnf group install \"Development Tools\"`"
+        explanation: "This installs the group immediately, skipping the review step the scenario asks for."
+      - id: b
+        text: "`dnf list installed | grep -i development`"
+        explanation: "This only shows what's currently installed, not the group's defined membership."
+      - id: c
+        text: "`dnf search \"Development Tools\"`"
+        explanation: "`dnf search` finds packages/groups by keyword; it doesn't show a specific group's membership tiers."
+      - id: d
+        text: "`dnf group info \"Development Tools\"`"
+        explanation: "Correct. `dnf group info <name>` shows a group's real membership broken down by mandatory, default, and optional package tiers, entirely read-only, letting you review before committing to an install."
+    correct_option: d
+    explanation: "Correct. `dnf group info <name>` shows a group's real membership broken down by mandatory, default, and optional package tiers, entirely read-only, letting you review before committing to an install."
+
+  - id: ats002-final-q17
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose zypper patch or zypper update"
+    source_readings:
+      - sections/section-070/module-01/course.md
+    prompt: |-
+      On an openSUSE host, your team's policy is conservative: apply only curated security patches during a maintenance window, not a full raw package update. Which command follows that policy correctly?
+    options:
+      - id: a
+        text: "`sudo zypper patch`"
+        explanation: "Correct. `zypper patch` applies only the curated, often security-focused patch stream — a distinctly SUSE concept layered on top of ordinary package version bumps. It intentionally leaves out routine version-bump updates that aren't part of an official patch."
+      - id: b
+        text: "`sudo zypper update`"
+        explanation: "`zypper update` applies raw package version updates, exactly what the conservative policy says to avoid."
+      - id: c
+        text: "`sudo zypper dup`"
+        explanation: "`zypper dup` performs a full distribution-version upgrade, far more aggressive than a patch-only policy."
+      - id: d
+        text: "`sudo zypper install --force-resolution`"
+        explanation: "This forces dependency resolution on an explicit install, unrelated to applying curated patches."
+    correct_option: a
+    explanation: "Correct. `zypper patch` applies only the curated, often security-focused patch stream — a distinctly SUSE concept layered on top of ordinary package version bumps. It intentionally leaves out routine version-bump updates that aren't part of an official patch."
+
+  - id: ats002-final-q18
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find the package that provides a file"
+    source_readings:
+      - sections/section-070/module-02/course.md
+    prompt: |-
+      You want to find out which openSUSE package would provide the missing `/usr/sbin/ip` command, without installing anything yet. Which zypper command answers that directly?
+    options:
+      - id: a
+        text: "`zypper search ip`"
+        explanation: "A keyword search on \"ip\" would return a noisy, imprecise list of loosely-related package names, not a direct file-to-package resolution."
+      - id: b
+        text: "`zypper what-provides /usr/sbin/ip`"
+        explanation: "Correct. `zypper what-provides <path>` is purpose-built to resolve a specific file path back to the package that would provide it, entirely read-only."
+      - id: c
+        text: "`zypper install /usr/sbin/ip`"
+        explanation: "Passing a file path to `zypper install` doesn't do a provider lookup, and would attempt an install rather than research."
+      - id: d
+        text: "`find / -name ip 2>/dev/null`"
+        explanation: "`find` only locates a file that already exists on this system; it can't tell you which package would provide a *missing* file."
+    correct_option: b
+    explanation: "Correct. `zypper what-provides <path>` is purpose-built to resolve a specific file path back to the package that would provide it, entirely read-only."
+
+  - id: ats002-final-q19
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Prove a chroot fstab repair"
+    source_readings:
+      - sections/section-080/module-01/course.md
+    prompt: |-
+      This lab platform's harness can only grade a VM by SSHing into it — it can't script an interactive GRUB rescue prompt or a genuinely unreachable machine. A lab teaches root filesystem repair via `chroot` by safely re-staging the scenario onto a disposable secondary disk. Inside that chroot, after fixing a bad `/etc/fstab` entry, what's the correct way to prove the fix works before ever rebooting?
+    options:
+      - id: a
+        text: "Reboot the primary VM immediately and see if it comes back up."
+        explanation: "On the real primary VM this risks losing SSH reachability if the fix is wrong, exactly what the safe re-staging approach is designed to avoid."
+      - id: b
+        text: "Just re-read the fstab file visually; if it looks right, that's sufficient proof."
+        explanation: "A visual read can miss a wrong UUID or device identifier that only fails at actual mount time."
+      - id: c
+        text: "Run `mount -a` inside the chroot — if it completes without error, the fstab entry is now syntactically and referentially correct."
+        explanation: "Correct. `mount -a` inside the chroot attempts to mount every entry in that filesystem's own `/etc/fstab` exactly as the real boot sequence would, so a clean, error-free run is direct proof the fix works — without ever needing to actually reboot the machine to find out."
+      - id: d
+        text: "Run `fsck` on the mounted root filesystem from inside the chroot."
+        explanation: "`fsck` checks filesystem integrity, not whether an fstab entry is correctly formed and resolvable."
+    correct_option: c
+    explanation: "Correct. `mount -a` inside the chroot attempts to mount every entry in that filesystem's own `/etc/fstab` exactly as the real boot sequence would, so a clean, error-free run is direct proof the fix works — without ever needing to actually reboot the machine to find out."
+
+  - id: ats002-final-q20
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Back up a GPT partition table"
+    source_readings:
+      - sections/section-080/module-03/course.md
+    prompt: |-
+      You need to back up a secondary GPT disk's partition table before doing risky repartitioning work on it, so a mistake can be undone without reconstructing partitions from memory. Which command creates that backup correctly?
+    options:
+      - id: a
+        text: "`sudo dd if=/dev/vdc of=backup.img bs=4M`"
+        explanation: "`dd`-ing the entire disk backs up all data too, which is far heavier than a partition-table-only backup and not what `sgdisk --load-backup` expects as input."
+      - id: b
+        text: "`sudo cp /dev/vdc /root/vdc-backup`"
+        explanation: "`cp` on a block device doesn't meaningfully copy a live disk's structure the way a proper backup tool does, and isn't restorable via `sgdisk`."
+      - id: c
+        text: "`sudo fdisk -l /dev/vdc > /root/vdc-table.txt`"
+        explanation: "`fdisk -l` output is human-readable text, not a structured, restorable backup format."
+      - id: d
+        text: "`sudo sgdisk --backup=/root/vdc-table.bin /dev/vdc`"
+        explanation: "Correct. `sgdisk --backup=<file> <disk>` writes a compact, purpose-built binary snapshot of exactly the GPT partition table structure, which can later be restored precisely with `sgdisk --load-backup`."
+    correct_option: d
+    explanation: "Correct. `sgdisk --backup=<file> <disk>` writes a compact, purpose-built binary snapshot of exactly the GPT partition table structure, which can later be restored precisely with `sgdisk --load-backup`."
+
+  - id: ats002-final-q21
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Follow child processes with strace"
+    source_readings:
+      - sections/section-010/module-05/course.md
+    prompt: |-
+      A launcher script starts a worker as a child process, and you want to see the system calls of both. Which `strace` option follows the children?
+    options:
+      - id: a
+        text: "`strace -f ./launcher.sh`"
+        explanation: "Correct. `-f` follows child processes created by `fork` and `clone`."
+      - id: b
+        text: "`strace -c ./launcher.sh`"
+        explanation: "`-c` prints a summary table of calls and does not follow children."
+      - id: c
+        text: "`strace -e trace=none ./launcher.sh`"
+        explanation: "This turns off the trace output."
+      - id: d
+        text: "`strace -o ./launcher.sh`"
+        explanation: "`-o` names the output file and would use the script as the file name."
+    correct_option: a
+    explanation: "Correct. `-f` follows child processes created by `fork` and `clone`."
+
+  - id: ats002-final-q22
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read a systemd exit status to find why a service will not start"
+    source_readings:
+      - sections/section-010/module-06/course.md
+    prompt: |-
+      `systemctl status acme.service` shows `status=203/EXEC`. What does this point to?
+    options:
+      - id: a
+        text: "The program ran and exited with the error code 203."
+        explanation: "203/EXEC is reported by systemd for a failed exec, before the program starts."
+      - id: b
+        text: "systemd could not execute the `ExecStart` program: the path is wrong, the file is missing or it is not executable."
+        explanation: "Correct. 203/EXEC is an exec failure."
+      - id: c
+        text: "The service was stopped by SIGKILL."
+        explanation: "A kill shows as a signal, not as 203/EXEC."
+      - id: d
+        text: "A dependency of the unit failed."
+        explanation: "A failed dependency shows as `dependency`, not 203/EXEC."
+    correct_option: b
+    explanation: "Correct. 203/EXEC is an exec failure."
+
+  - id: ats002-final-q23
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Stop a process politely before using SIGKILL"
+    source_readings:
+      - sections/section-010/module-07/course.md
+    prompt: |-
+      A process ignores a plain `kill PID`. Why is `kill -9 PID` the last resort and not the first?
+    options:
+      - id: a
+        text: "SIGKILL only works for processes you started in the same terminal."
+        explanation: "It works for any process you have the rights to signal."
+      - id: b
+        text: "SIGKILL restarts the process after it dies."
+        explanation: "The signal ends the process. A restart needs a supervisor such as systemd."
+      - id: c
+        text: "SIGKILL cannot be caught, so the process gets no chance to flush data or clean up."
+        explanation: "Correct. The default `kill` sends SIGTERM, which the process can handle and use to shut down cleanly."
+      - id: d
+        text: "`kill -9` is not a valid command on modern systems."
+        explanation: "It is valid. It is just a last resort."
+    correct_option: c
+    explanation: "Correct. The default `kill` sends SIGTERM, which the process can handle and use to shut down cleanly."
+
+  - id: ats002-final-q24
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read a cron schedule"
+    source_readings:
+      - sections/section-020/module-01/course.md
+    prompt: |-
+      When does the crontab line `30 2 * * 1 /usr/local/bin/backup.sh` run?
+    options:
+      - id: a
+        text: "Every day at 02:30."
+        explanation: "The last field limits it to Monday."
+      - id: b
+        text: "Every 30 minutes on the 2nd of the month."
+        explanation: "The first field is the minute 30, not an interval, and the day of month is `*`."
+      - id: c
+        text: "Every Monday at 30:02."
+        explanation: "There is no hour 30. The hour is 2 and the minute is 30."
+      - id: d
+        text: "Every Monday at 02:30."
+        explanation: "Correct. The fields are minute, hour, day of month, month and day of week, and 1 is Monday."
+    correct_option: d
+    explanation: "Correct. The fields are minute, hour, day of month, month and day of week, and 1 is Monday."
+
+  - id: ats002-final-q25
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Run a missed systemd timer after downtime"
+    source_readings:
+      - sections/section-020/module-03/course.md
+    prompt: |-
+      A systemd timer with `OnCalendar=daily` did not run last night because the machine was off. Which setting makes it run at the next boot?
+    options:
+      - id: a
+        text: "`Persistent=true` in the `[Timer]` section"
+        explanation: "Correct. The time of the last run is stored and a missed run is made up."
+      - id: b
+        text: "`WantedBy=timers.target` in the `[Timer]` section"
+        explanation: "This belongs to `[Install]` and only enables the timer. It does not make up missed runs."
+      - id: c
+        text: "`RemainAfterExit=yes` in the `[Timer]` section"
+        explanation: "This is a service option, not a timer option."
+      - id: d
+        text: "`Restart=always` in the `[Timer]` section"
+        explanation: "This is a service option and does nothing for missed runs."
+    correct_option: a
+    explanation: "Correct. The time of the last run is stored and a missed run is made up."
+
+  - id: ats002-final-q26
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Keep container data across container removal"
+    source_readings:
+      - sections/section-020/module-05/course.md
+    prompt: |-
+      A database container must keep its data when the container is removed and recreated. What is the right setup?
+    options:
+      - id: a
+        text: "Write the data into the container's own filesystem."
+        explanation: "It is deleted when the container is removed."
+      - id: b
+        text: "Mount a named volume at the data directory, for example `docker run -v dbdata:/var/lib/mysql ...`."
+        explanation: "Correct. A named volume lives outside the container's writable layer."
+      - id: c
+        text: "Run the container with `--rm`."
+        explanation: "`--rm` deletes the container and its anonymous data on exit."
+      - id: d
+        text: "Use `docker stop` instead of `docker rm`."
+        explanation: "The data would stay, but then the container is never removed, which was not the goal."
+    correct_option: b
+    explanation: "Correct. A named volume lives outside the container's writable layer."
+
+  - id: ats002-final-q27
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Know where rootless Podman keeps its data"
+    source_readings:
+      - sections/section-020/module-06/course.md
+    prompt: |-
+      A regular user runs `podman run` without sudo. Where does Podman keep that user's images and containers?
+    options:
+      - id: a
+        text: "In `/var/lib/docker`."
+        explanation: "That is the storage of the Docker daemon."
+      - id: b
+        text: "In `/var/lib/containers`, shared with root."
+        explanation: "That is the storage of rootful Podman. Rootless Podman uses the user's own."
+      - id: c
+        text: "Under the user's home directory, in `~/.local/share/containers`."
+        explanation: "Correct. Rootless Podman uses per-user storage."
+      - id: d
+        text: "In `/tmp`, so it disappears on reboot."
+        explanation: "Rootless storage is persistent and is not placed in `/tmp`."
+    correct_option: c
+    explanation: "Correct. Rootless Podman uses per-user storage."
+
+  - id: ats002-final-q28
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Install a source build without touching system directories"
+    source_readings:
+      - sections/section-030/module-01/course.md
+    prompt: |-
+      You build a tool from a tarball and want it installed under `/opt/acme` instead of `/usr/local`. Which step chooses the location?
+    options:
+      - id: a
+        text: "`make --prefix=/opt/acme`"
+        explanation: "`make` has no such option. The location is decided by `configure`."
+      - id: b
+        text: "`make install /opt/acme`"
+        explanation: "The directory is not an argument of `make install`."
+      - id: c
+        text: "Run `./configure` and then copy the binary into `/opt/acme`."
+        explanation: "The binary would find its other files in the default prefix, not in the new one."
+      - id: d
+        text: "`./configure --prefix=/opt/acme`, then `make` and `make install`."
+        explanation: "Correct. The prefix is set when you configure, before building."
+    correct_option: d
+    explanation: "Correct. The prefix is set when you configure, before building."
+
+  - id: ats002-final-q29
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Allow a service on a non-default port under SELinux"
+    source_readings:
+      - sections/section-040/module-02/course.md
+    prompt: |-
+      An SELinux-enforcing host runs a web server on TCP port 8081 and connections are denied by SELinux. Which command allows the port permanently?
+    options:
+      - id: a
+        text: "`sudo semanage port -a -t http_port_t -p tcp 8081`"
+        explanation: "Correct. It adds the port to the `http_port_t` type permanently."
+      - id: b
+        text: "`sudo chcon -t http_port_t 8081`"
+        explanation: "`chcon` labels files and does not label ports."
+      - id: c
+        text: "`sudo setenforce 0`"
+        explanation: "This sets permissive mode until reboot and turns off the protection for everything."
+      - id: d
+        text: "`sudo restorecon -R 8081`"
+        explanation: "`restorecon` restores file labels and 8081 is not a path."
+    correct_option: a
+    explanation: "Correct. It adds the port to the `http_port_t` type permanently."
+
+  - id: ats002-final-q30
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Compare installed and candidate versions of a package"
+    source_readings:
+      - sections/section-050/module-04/course.md
+    prompt: |-
+      `apt-cache policy nginx` shows `Installed: 1.24.0-1` and `Candidate: 1.26.1-1`. What does that mean?
+    options:
+      - id: a
+        text: "The newer version is already installed."
+        explanation: "The Installed line names the version that is on the system."
+      - id: b
+        text: "A newer version is available, and `apt install nginx` or `apt upgrade` would move to it."
+        explanation: "Correct. The candidate is what APT would install."
+      - id: c
+        text: "The package is held back by a pin."
+        explanation: "A pin would show in the priority table, and the candidate would then match the pinned version."
+      - id: d
+        text: "The installed version is broken."
+        explanation: "The two lines only compare versions and say nothing about the state of the package."
+    correct_option: b
+    explanation: "Correct. The candidate is what APT would install."
+
+  - id: ats002-final-q31
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find the package that provides a missing command"
+    source_readings:
+      - sections/section-060/module-04/course.md
+    prompt: |-
+      A script on Rocky Linux fails with `dig: command not found`. Which command finds the package to install?
+    options:
+      - id: a
+        text: "`rpm -qa dig`"
+        explanation: "`rpm -qa` only lists installed packages, and `dig` is not installed."
+      - id: b
+        text: "`dnf history dig`"
+        explanation: "`history` shows past transactions and not what provides a file."
+      - id: c
+        text: "`dnf provides '*/bin/dig'`"
+        explanation: "Correct. It searches the file lists of the enabled repositories."
+      - id: d
+        text: "`rpm --rebuilddb`"
+        explanation: "This rebuilds the RPM database and is unrelated to a missing command."
+    correct_option: c
+    explanation: "Correct. It searches the file lists of the enabled repositories."
+
+  - id: ats002-final-q32
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find the package that provides a file on openSUSE"
+    source_readings:
+      - sections/section-070/module-02/course.md
+    prompt: |-
+      Which zypper command finds the package that provides the file `/usr/sbin/ip`?
+    options:
+      - id: a
+        text: "`zypper list-patches /usr/sbin/ip`"
+        explanation: "`list-patches` lists patches and takes no file path."
+      - id: b
+        text: "`zypper refresh /usr/sbin/ip`"
+        explanation: "`refresh` takes repository names and not paths."
+      - id: c
+        text: "`zypper remove /usr/sbin/ip`"
+        explanation: "This tries to remove a package and does not search."
+      - id: d
+        text: "`zypper what-provides /usr/sbin/ip`"
+        explanation: "Correct. It shows the packages that provide the file or capability."
+    correct_option: d
+    explanation: "Correct. It shows the packages that provide the file or capability."
+
+  - id: ats002-final-q33
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose a way into a system with a lost root password"
+    source_readings:
+      - sections/section-080/module-02/course.md
+    prompt: |-
+      The root password is lost on a server that still boots. Which approach needs no external rescue media?
+    options:
+      - id: a
+        text: "Interrupt the GRUB menu once and boot with `rd.break` or `init=/bin/bash`, then reset the password."
+        explanation: "Correct. Both are one-boot changes of the kernel command line."
+      - id: b
+        text: "Reinstall the operating system."
+        explanation: "This is not needed and loses data."
+      - id: c
+        text: "Edit `/etc/shadow` from another session on the running server."
+        explanation: "With no usable login there is no other session."
+      - id: d
+        text: "Delete `/etc/passwd`."
+        explanation: "This breaks every login and does not reset a password."
+    correct_option: a
+    explanation: "Correct. Both are one-boot changes of the kernel command line."
+
+  - id: ats002-final-q34
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Decide when it is safe to repair a filesystem"
+    source_readings:
+      - sections/section-080/module-05/course.md
+    prompt: |-
+      A data partition shows errors and is mounted at `/data`. What is the correct order before `e2fsck` repairs it?
+    options:
+      - id: a
+        text: "Run `e2fsck -y` on the mounted device and remount afterwards."
+        explanation: "Repairing a mounted filesystem can make the damage worse."
+      - id: b
+        text: "Stop the users of it, unmount `/data`, and then run the check."
+        explanation: "Correct. A repair must never run on a mounted filesystem."
+      - id: c
+        text: "Run `mke2fs` to refresh it first."
+        explanation: "This creates a new filesystem and destroys the data."
+      - id: d
+        text: "Reboot and ignore the errors."
+        explanation: "The errors stay and may grow."
+    correct_option: b
+    explanation: "Correct. A repair must never run on a mounted filesystem."
+
+  - id: ats002-final-q35
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name the initramfs tool of each distribution family"
+    source_readings:
+      - sections/section-080/module-06/course.md
+    prompt: |-
+      Which tool builds the initramfs on Rocky Linux, and which one on Ubuntu?
+    options:
+      - id: a
+        text: "`update-initramfs` on Rocky Linux and `dracut` on Ubuntu."
+        explanation: "This is the wrong way round."
+      - id: b
+        text: "`mkinitrd` on both."
+        explanation: "`mkinitrd` is an older tool and is not what current systems use."
+      - id: c
+        text: "`dracut` on Rocky Linux and `update-initramfs` on Ubuntu."
+        explanation: "Correct. The two families use different tools."
+      - id: d
+        text: "`grub-install` on both."
+        explanation: "`grub-install` writes boot code and does not build an initramfs."
+    correct_option: c
+    explanation: "Correct. The two families use different tools."
+
+  - id: ats002-final-q36
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Tell a GRUB repair from a menu entry problem"
+    source_readings:
+      - sections/section-080/module-04/course.md
+    prompt: |-
+      A machine stops at a bare `grub>` prompt after a power loss. What does that tell you?
+    options:
+      - id: a
+        text: "The kernel panicked."
+        explanation: "GRUB runs before the kernel starts."
+      - id: b
+        text: "The root filesystem needs `fsck` from the initramfs."
+        explanation: "The initramfs is loaded after GRUB. It has not started yet."
+      - id: c
+        text: "Only one menu entry is wrong."
+        explanation: "With a menu entry problem the GRUB menu still appears."
+      - id: d
+        text: "GRUB could not find its configuration, so GRUB itself needs a rescue boot and then a repair."
+        explanation: "Correct. A bare prompt with no menu means no usable `grub.cfg` or modules."
+    correct_option: d
+    explanation: "Correct. A bare prompt with no menu means no usable `grub.cfg` or modules."
+
+  - id: ats002-final-q37
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Restore a volume group from its metadata backup"
+    source_readings:
+      - sections/section-080/module-07/course-02-restore-lost-lvm-metadata.md
+    prompt: |-
+      A volume group vanished after the LVM label on its only disk was wiped. The disk is still there and `/etc/lvm/backup` holds a backup of the group. What is the correct recovery path?
+    options:
+      - id: a
+        text: "Recreate the physical volume with `pvcreate --uuid <old-uuid> --restorefile <backup-file> <disk>`, restore the group with `vgcfgrestore`, then activate it with `vgchange -ay`."
+        explanation: "Correct. The label must carry the old UUID so the restored metadata matches the disk, then the metadata is restored and the group activated."
+      - id: b
+        text: "Run `pvcreate` on the disk without options and run `lvcreate` again with the old sizes."
+        explanation: "A fresh label gets a new UUID, and recreating volumes by hand does not bring back the old metadata or data."
+      - id: c
+        text: "Run `mkfs.ext4` on the disk so the volumes appear again."
+        explanation: "`mkfs` creates a new filesystem and destroys the data you want to recover."
+      - id: d
+        text: "Reboot. LVM rebuilds a wiped label on its own."
+        explanation: "LVM never recreates a wiped label by itself."
+    correct_option: a
+    explanation: "Correct. The label must carry the old UUID so the restored metadata matches the disk, then the metadata is restored and the group activated."
+
+  - id: ats002-final-q38
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read a degraded software RAID 1 array"
+    source_readings:
+      - sections/section-080/module-08/course-01-reading-a-raid-array.md
+    prompt: |-
+      `cat /proc/mdstat` shows a two-disk mirror with the status `[U_]`. What does it mean?
+    options:
+      - id: a
+        text: "The array is healthy and one disk is idle."
+        explanation: "A healthy two-disk mirror shows `[UU]`."
+      - id: b
+        text: "The array is degraded: one member is missing or failed, so there is no redundancy left."
+        explanation: "Correct. Each `U` is a member that is up, and `_` marks a missing one."
+      - id: c
+        text: "The array is being created and has not started yet."
+        explanation: "A rebuild or creation shows a progress line, not just `[U_]`."
+      - id: d
+        text: "The filesystem on the array is unmounted."
+        explanation: "`/proc/mdstat` reports array members, not mounts."
+    correct_option: b
+    explanation: "Correct. Each `U` is a member that is up, and `_` marks a missing one."
+
+  - id: ats002-final-q39
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Replace a failed member and keep the array across reboots"
+    source_readings:
+      - sections/section-080/module-08/course-02-replace-a-failed-member.md
+    prompt: |-
+      A mirror member has failed. Which sequence replaces it and leaves the array safe across a reboot?
+    options:
+      - id: a
+        text: "Remove the failed member with `mdadm --remove`, add the new disk with `mdadm --add`, wait for the rebuild with `mdadm --wait`, then save the `ARRAY` line from `mdadm --detail --scan` in `/etc/mdadm/mdadm.conf` and run `update-initramfs -u`."
+        explanation: "Correct. The array only has redundancy again after the rebuild, and the saved line makes it assemble under the same name at boot."
+      - id: b
+        text: "Run `mkfs.ext4` on the new disk and mount it next to the array."
+        explanation: "A filesystem on a loose disk does not join the array."
+      - id: c
+        text: "Run `mdadm --create` on the surviving disk and the new disk."
+        explanation: "`--create` writes new labels and can destroy the data. A repair uses `--add`."
+      - id: d
+        text: "Reboot and let the kernel pick the new disk."
+        explanation: "The kernel does not add a disk to an array on its own."
+    correct_option: a
+    explanation: "Correct. The array only has redundancy again after the rebuild, and the saved line makes it assemble under the same name at boot."
+
+  - id: ats002-final-q40
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose the safe badblocks mode"
+    source_readings:
+      - sections/section-080/module-09/course-02-kernel-log-and-bad-blocks.md
+    prompt: |-
+      You need to scan a disk that holds data you cannot lose. Which `badblocks` command is safe?
+    options:
+      - id: a
+        text: "`badblocks -wsv /dev/vdb`, because `-w` is the most thorough."
+        explanation: "`-w` overwrites the whole disk and destroys all data."
+      - id: b
+        text: "`badblocks -sv /dev/vdb`, the default read-only scan, on a disk that is not mounted."
+        explanation: "Correct. It only reads, so the data stays as it is."
+      - id: c
+        text: "`badblocks -wsv /dev/vdb` with the filesystem mounted."
+        explanation: "It is destructive and a mounted filesystem makes the result unreliable."
+      - id: d
+        text: "`mkfs.ext4 -c /dev/vdb`, because it checks first and keeps the data."
+        explanation: "`mkfs` creates a new filesystem and erases what was there."
+    correct_option: b
+    explanation: "Correct. It only reads, so the data stays as it is."

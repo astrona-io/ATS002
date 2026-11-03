@@ -8,6 +8,8 @@ Before `apt` installs a crate from a depot outside Ubuntu's own archive, it want
 
 The old way to give `apt` a key was `apt-key add`. Its own manual page now warns you off it:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 man apt-key      # note the deprecation banner at the very top
 ```

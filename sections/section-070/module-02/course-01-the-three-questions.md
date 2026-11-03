@@ -10,6 +10,8 @@ Run every command inside the `zypperbox` container (`docker exec -it zypperbox b
 
 Look for a package by a word you know:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the zypperbox container
 zypper search fail2ban          # shorthand: zypper se

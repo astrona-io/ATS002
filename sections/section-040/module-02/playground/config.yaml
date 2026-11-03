@@ -1,0 +1,32 @@
+# SELinux Commands (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+
+metadata:
+  name: "selinux-commands-bay"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Creates /srv/web with a sample index.html and an empty notes file, so the file-context scenario has real paths to name. SELinux is not active on this machine."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 15
+      display: false
+      sshPasswordAuth: false

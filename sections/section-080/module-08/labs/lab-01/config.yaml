@@ -1,0 +1,58 @@
+metadata:
+  name: "ats-002-lab-089"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    # Three spare 1 GB disks, found by their serials. The degraded array
+    # lives on these disks only, so the main machine stays reachable over SSH.
+    extraDisks:
+      - sizeGB: 1
+        serial: "lab089-raid-a"
+      - sizeGB: 1
+        serial: "lab089-raid-b"
+      - sizeGB: 1
+        serial: "lab089-raid-c"
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-089-setup"
+      description: "Builds a RAID 1 array /dev/md/cargo on disks a and b with two known files, then fails and removes disk b. Disk c is blank"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-array-healthy"
+      description: "Confirms /dev/md/cargo is clean with two active devices and no failed devices"
+      type: "file"
+      source: "validation/validate-array-healthy.sh"
+
+    - name: "verify-spare-added"
+      description: "Confirms disk c is an active member and failed disk b is not"
+      type: "file"
+      source: "validation/validate-spare-added.sh"
+
+    - name: "verify-array-saved"
+      description: "Confirms /etc/mdadm/mdadm.conf has an ARRAY line with the array's UUID"
+      type: "file"
+      source: "validation/validate-array-saved.sh"
+
+    - name: "verify-data-intact"
+      description: "Confirms the array mounts and both original files have their original content"
+      type: "file"
+      source: "validation/validate-data-intact.sh"
+
+teardown:
+  keepCluster: false

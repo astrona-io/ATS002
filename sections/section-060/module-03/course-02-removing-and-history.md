@@ -8,6 +8,8 @@ Before you remove anything, confirm the package is installed and note its exact 
 
 ### dnf remove
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside rpmbox
 dnf list installed | grep telnet
@@ -88,7 +90,13 @@ sudo dnf history undo <id>
 
 You can now check for and apply upgrades, install and remove packages, clean up leftovers and undo a transaction from the log. The mission runs a full maintenance window on a Rocky Linux 9 container, including undoing a deliberately mixed install.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy dnf-everyday
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-03/labs/lab-01
@@ -101,8 +109,9 @@ On the lab machine, open a shell inside the `rpmbox` container with `docker exec
 astrona submit -c sections/section-060/module-03/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-063
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-03/playground
 ```

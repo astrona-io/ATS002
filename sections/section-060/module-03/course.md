@@ -23,9 +23,16 @@ Check that you have the knowledge and the tools this module expects.
 - **How to use a Linux shell.** You can run commands with `sudo` and read their output.
 - **What a package and a repository are.** A package is a file that holds a program and a list of what it needs. A repository is a server that offers packages to download.
 
-### What you need
+### What is in your playground
 
-There is no playground for this module. The lab machines run Ubuntu 24.04, so the mission starts a real Rocky Linux 9 **container** named `rpmbox` on the Ubuntu machine, with the extra EPEL repository already enabled. A container is a sealed pod docked to the ship, with its own tools and its own package database. You open a shell inside it with `docker exec -it rpmbox bash` and run every command there. Any Rocky Linux 9 machine works for the examples too.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine. That machine has no tools of this package family, so the playground runs a real Rocky Linux 9 **container** named `rpmbox` on it. A container is a sealed pod docked to the ship: it has its own files and tools but shares the ship's reactor core (the kernel). Inside it, the package tools and the package database are all real.
+
+- The EPEL repository enabled inside `rpmbox`.
+- `telnet` installed. `fail2ban` and `mtr` not installed.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-dnf-everyday`. Step into the pod with `docker exec -it rpmbox bash` and run every package command in that shell. If Docker refuses with a permission error, put `sudo` in front. It is already set up with a container with EPEL enabled, one package to remove and one to install.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

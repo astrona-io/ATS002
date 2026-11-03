@@ -26,10 +26,17 @@ Check that you have the knowledge and the tools this module expects before you b
 - **That `apt` reads its repositories from `/etc/apt/sources.list` and `/etc/apt/sources.list.d/`.**
 - **The `dpkg -l` status codes.** `ii` means installed and configured; `rc` means removed with configuration files left behind.
 
-### What you need
+### What is in your playground
 
-- A terminal on an Ubuntu 24.04 machine where you may install and remove packages.
-- Or a running lab machine: start the mission with `astrona run` and open a terminal on it with `astrona ssh <lab name>`. The mission gives you the exact commands.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine, already set up with a package with a configuration file to purge and a package to install.
+
+- The `ftp` client installed, with a tracked configuration file `/etc/ftp.conf`, so `apt remove ftp` leaves that file behind and `apt purge ftp` deletes it.
+- `fail2ban` not installed.
+- The normal `apt`, `apt-get`, `apt-cache` and `dpkg` tools. The machine reaches the Ubuntu repositories, so `apt update` and `apt install` work for real.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-apt-basic-operations`. The hands-on steps in the parts build on each other on this one running ship. Every command block says which shell and which rights it expects.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

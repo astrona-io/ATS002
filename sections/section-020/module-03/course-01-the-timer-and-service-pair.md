@@ -12,6 +12,8 @@ Say you want `/usr/local/sbin/backup.sh` to run every night. You write **two** u
 
 Save this as `/etc/systemd/system/nightly-backup.service`:
 
+<!-- astrona:playground:renew -->
+
 ```ini
 [Unit]
 Description=Nightly backup

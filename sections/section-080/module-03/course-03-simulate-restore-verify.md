@@ -8,6 +8,8 @@ The commands below assume a GPT disk at `/dev/vdc` and a checked backup at `/roo
 
 This step really destroys the partition table. Run it only against a disk you have just identified again, and never against one you cannot afford to lose.
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: repair host, root
 lsblk -f            # re-confirm the target ONE MORE TIME, immediately before
@@ -76,7 +78,13 @@ Getting the boundaries back and having a healthy filesystem inside are two separ
 
 You can now back up a GPT partition table, check the backup, restore it after a wipe and verify both layers. The mission asks you to run that full cycle on a secondary disk whose two partitions each hold a file that must survive.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy partition-table-bench
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-03/labs/lab-01
@@ -89,8 +97,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-080/module-03/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-083
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-03/playground
 ```

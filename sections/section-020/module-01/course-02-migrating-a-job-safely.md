@@ -12,6 +12,8 @@ When you run plain `crontab -e` as root, you edit **root's own** crontab. That i
 
 Run this as a user with `sudo` rights:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 sudo crontab -u archivist -e
 ```
@@ -98,7 +100,13 @@ This is what the `cron` daemon will really run for that account. If a job is not
 
 You can now move a job from the shared roster into one account's crontab without a gap and without a duplicate. The mission asks you to move a system-wide job into a service account's own crontab, add a new job with a two-day weekly schedule, and remove the original.
 
-The mission runs on its own training ship. Start it and open a terminal on it:
+The mission runs on its own training ship. Pause your playground first, so it is not running while you work on the mission:
+
+```sh
+astrona stop cron-schedule-bay
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/module-01/labs/lab-01
@@ -111,8 +119,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-020/module-01/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and wake your playground again:
 
 ```sh
 astrona destroy ats-002-lab-021
+astrona start cron-schedule-bay
 ```

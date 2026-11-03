@@ -6,6 +6,8 @@ Astronaut, the GRUB keystrokes are only a way onto the bridge. What really reset
 
 `rd.break` and `init=/bin/bash` are two ways to reach one place: **root access to the target's filesystem, so you can run `passwd` or edit the password file directly.** A chroot gets you to that same place from outside. Mount the target root, bind-mount a set of tools plus `/dev`, `/proc` and `/sys` into it, step in with `chroot`, then reset the password:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: repair host, root — target root already mounted at /mnt/repair with /dev,/proc,/sys bound
 sudo chroot /mnt/repair /bin/bash
@@ -70,7 +72,13 @@ When you are done, leave the chroot with `exit` and unmount in reverse order, or
 
 You can now reach a locked-out system's files through a chroot and put a new password hash into its `/etc/shadow`. The mission asks you to unlock the root account on a stand-in system whose `/etc/shadow` has root locked.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy password-reset-bench
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-02/labs/lab-01
@@ -83,8 +91,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-080/module-02/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-082
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-02/playground
 ```

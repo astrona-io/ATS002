@@ -24,10 +24,18 @@ Check that you have the knowledge and the tools this module expects before you b
 - **The chroot repair steps:** mount the target root, bind-mount a set of tools plus `/dev`, `/proc` and `/sys` into it, then run `chroot`.
 - **That `/etc/shadow` holds the password hashes**, one line per user, with fields separated by colons.
 
-### What you need
+### What is in your playground
 
-- This module has no playground. The `rd.break` and `init=/bin/bash` steps are worked walkthroughs only: they need a real console at the boot menu, and you cannot type into one on the training ships. Learn the keystrokes for the exam by reading them carefully.
-- The mission gives you a ready-made training ship with a second, disposable disk. That disk holds a stand-in system whose root account is locked. You run the chroot and password reset steps against it, while your own ship stays healthy and reachable.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine, already set up with a spare disk that holds a stand-in system with a locked root account.
+
+- A second, 1 GB disk with the serial `lab082-data001`. Find it at `/dev/disk/by-id/virtio-lab082-data001`.
+- On that disk, a stand-in root filesystem with its own `/etc/shadow`, where the root password field is `!`, which means the account is locked.
+- `chroot`, `mount` and `passwd`, the tools you need to set a new password inside the stand-in system.
+- Your own machine stays healthy and reachable; the broken system lives on the spare disk.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-password-reset-bench`. The hands-on steps in the parts build on each other on this one running ship. Every command block says which shell and which rights it expects.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

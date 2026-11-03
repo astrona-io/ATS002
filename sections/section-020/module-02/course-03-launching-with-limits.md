@@ -10,6 +10,8 @@ One `docker run` command sets the name, the memory limit and the port mapping to
 
 Start an `nginx:alpine` container named `api_demo` with a 128 MB memory limit, and patch the ship's port 8080 through to the pod's port 80 (add `sudo` if your user is not in the `docker` group):
 
+<!-- astrona:playground:renew -->
+
 ```bash
 docker run -d \
   --name api_demo \
@@ -54,7 +56,13 @@ docker stats --no-stream api_demo
 
 You can now stop a container cleanly, pull one fact out of its record with `--format`, and launch a container with a memory limit and a port mapping. The mission asks you to stop one container, save two facts about another one into files, and start a third container with exact limits.
 
-The mission runs on its own training ship. Start it and open a terminal on it:
+The mission runs on its own training ship. Pause your playground first, so it is not running while you work on the mission:
+
+```sh
+astrona stop docker-lifecycle-bay
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/module-02/labs/lab-01
@@ -67,8 +75,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-020/module-02/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and wake your playground again:
 
 ```sh
 astrona destroy ats-002-lab-022
+astrona start docker-lifecycle-bay
 ```

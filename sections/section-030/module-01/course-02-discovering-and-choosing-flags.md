@@ -10,6 +10,8 @@ A **flag** is an option you pass to a command, such as `--bindir=/usr/bin`. A `c
 
 Run this inside the unpacked source folder:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the extracted source dir, unprivileged
 ./configure --help

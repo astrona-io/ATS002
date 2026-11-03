@@ -6,6 +6,8 @@ The vendor's key now sits in its own keyring file. Next comes the repository lin
 
 A repository line tells `apt` the depot's address and which part of its catalogue to read. It goes in a small file of its own.
 
+<!-- astrona:playground:renew -->
+
 Save this as `/etc/apt/sources.list.d/vendor-nginx.list`:
 
 ```text

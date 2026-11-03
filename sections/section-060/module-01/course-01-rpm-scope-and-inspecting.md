@@ -16,6 +16,8 @@ A `.rpm` file has two halves: the payload (the files themselves, packed as a cpi
 
 A colleague hands you `/home/candidate/downloads/logship-agent-2.1.0-1.x86_64.rpm`. You want to know what it is before you trust it:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the rpmbox container, unprivileged
 rpm -qip /home/candidate/downloads/logship-agent-2.1.0-1.x86_64.rpm

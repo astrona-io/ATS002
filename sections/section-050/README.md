@@ -28,7 +28,7 @@ Each module ends with one or more graded missions that run on their own training
 
 ## Check your knowledge
 
-When you have finished the modules, test your understanding with the [knowledge check quiz](./quiz.md).
+When you have finished the modules, test your understanding with the [knowledge check quiz](./quiz.yaml).
 
 ## The capstone mission: New App Server Onboarding
 

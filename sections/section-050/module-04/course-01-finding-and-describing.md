@@ -6,6 +6,8 @@ Before you commit to any change, there is a read-only layer of `apt` tools whose
 
 A task often describes what a package *does*, not its name: "something that blocks repeated failed SSH logins", not "install fail2ban". Search the depots' catalogue by keyword:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: any host, unprivileged
 apt search fail2ban

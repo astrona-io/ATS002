@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have finished both parts and the mission in this module. Before you move on, look back at what you learned, check yourself, and clean up anything still running.
 
@@ -78,7 +78,7 @@ Recreate it in the user's crontab, check it with `crontab -u <user> -l`, delete 
 
 ## Clean up
 
-Each mission runs a virtual machine on your computer. When you are done with this module, remove any mission that is still running.
+Your playground and each mission run a virtual machine on your computer. When you are done with this module, remove the playground, and any mission that is still running.
 
 First, see what is still running:
 
@@ -86,8 +86,18 @@ First, see what is still running:
 astrona list
 ```
 
-If the mission is still there, remove it. The command takes its **name**, not its folder path:
+If a mission is still there, remove it. The command takes its **name**, not its folder path:
 
 ```sh
 astrona destroy ats-002-lab-021
 ```
+
+Then remove the playground the same way:
+
+```sh
+astrona destroy cron-schedule-bay
+```
+
+You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean.
+
+<!-- astrona:playground:destroy -->

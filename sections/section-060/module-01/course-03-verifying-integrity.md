@@ -8,6 +8,8 @@ Astronaut, loading a crate is not the end of the story. Files change after insta
 
 ### Run a verify
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside rpmbox
 rpm -V logship-agent
@@ -77,7 +79,13 @@ To go the other way round, `rpm -q --whatprovides <capability>` names the instal
 
 You can now inspect a `.rpm` file, install it with `rpm`, answer ownership questions both ways and verify a package against its install-time record. The mission hands you a standalone `.rpm` and asks you to do all of that on a real Rocky Linux 9 container.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy rpm-low-level
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-01/labs/lab-01
@@ -90,8 +98,9 @@ On the lab machine, open a shell inside the `rpmbox` container with `docker exec
 astrona submit -c sections/section-060/module-01/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-061
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-01/playground
 ```

@@ -1,0 +1,276 @@
+# Knowledge check for section 050. Listed in astrona.yaml as a `type: quiz` entry after the last module.
+schema_version: 1
+kind: question_bank
+id: ats002-050
+course_id: ATS002
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-050
+  title: "Section 050: Debian Package Management: Repositories, dpkg And APT"
+questions:
+  - id: ats002-050-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Add a third-party APT repository with scoped trust using signed-by"
+    source_readings:
+      - sections/section-050/module-01/course-02-adding-the-repository.md
+    prompt: |-
+      You need to add a vendor's third-party APT repository for `nginx` the modern, non-deprecated way. You've already run `curl -fsSL https://vendor.example.com/nginx/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/vendor-nginx.gpg`. What is the correct next step, and why does it matter?
+    options:
+      - id: a
+        text: "Add a line to `/etc/apt/sources.list.d/vendor-nginx.list` reading `deb [signed-by=/etc/apt/keyrings/vendor-nginx.gpg] https://vendor.example.com/nginx/ubuntu jammy main`, scoping trust to only this repository line."
+        explanation: "Correct. The `signed-by=` option inside the repository's own `.list` file is what ties the dedicated keyring to *only that repository line*. Without it, APT has no repository definition to fetch packages from at all, and even with the key dearmored correctly, nothing about this vendor's software is reachable yet."
+      - id: b
+        text: "Run `sudo apt-key add /etc/apt/keyrings/vendor-nginx.gpg`, which registers the key in APT's global trusted keyring so every repository can use it."
+        explanation: "`apt-key add` is deprecated specifically because it places a key in one shared, global keyring trusted for *every* configured repository — the opposite of the scoped trust `signed-by=` provides."
+      - id: c
+        text: "Copy the key directly into `/etc/apt/trusted.gpg.d/` and skip the `sources.list.d` entry entirely, since the key alone is sufficient."
+        explanation: "A key with no repository definition referencing it verifies nothing; APT still needs a `deb` line telling it where to fetch packages and at what priority."
+      - id: d
+        text: "Run `sudo apt update` immediately — no repository definition file is needed once the key exists."
+        explanation: "`apt update` only refreshes indexes for repositories APT already knows about — without a `.list` file, this vendor repository was never configured in the first place."
+    correct_option: a
+    explanation: "Correct. The `signed-by=` option inside the repository's own `.list` file is what ties the dedicated keyring to *only that repository line*. Without it, APT has no repository definition to fetch packages from at all, and even with the key dearmored correctly, nothing about this vendor's software is reachable yet."
+
+  - id: ats002-050-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read a dpkg status code and recover a half-configured package"
+    source_readings:
+      - sections/section-050/module-02/course-03-status-codes-and-recovery.md
+    prompt: |-
+      You inherit a system where `dpkg -l | grep acme-agent` shows `iF acme-agent 4.2.0 amd64`. What does the `iF` status mean, and what is the correct first recovery command?
+    options:
+      - id: a
+        text: "The package failed to install entirely and must be reinstalled from scratch with `dpkg -i`."
+        explanation: "`iF` is a mid-step state, not a failed-and-absent one — the package's files are already on disk; reinstalling from scratch is unnecessary and not the standard recovery pattern."
+      - id: b
+        text: "The package is \"half-configured\" — files are on disk but its post-install configuration step never finished; run `sudo dpkg --configure -a` first, then `sudo apt --fix-broken install` as a safety net."
+        explanation: "Correct. In `dpkg -l`'s status column, the second letter reflects current status; `F` specifically means \"half-conFigured\" — the package's files are present, but its configuration step (running the post-install script, called `postinst`) was interrupted before finishing. The standard, expected recovery sequence is `dpkg --configure -a` (resume configuration for every pending package) followed immediately by `apt --fix-broken install` as a safety net for any genuinely missing dependency `dpkg` alone can't resolve."
+      - id: c
+        text: "The package is fully installed and functioning; `iF` simply denotes it was installed from a flat/file source rather than a repository."
+        explanation: "`F` denotes \"half-configured,\" an interrupted state, not a note about install source."
+      - id: d
+        text: "The package is \"Unpacked\" but not yet configured; run `sudo apt --fix-broken install` first, since only `apt` has repository awareness."
+        explanation: "`dpkg --configure -a` — not `apt --fix-broken install` — is the correct *first* step for resuming an interrupted configuration; `apt --fix-broken install` is the follow-up safety net for a missing-dependency scenario specifically, since `dpkg` alone has no repository access to fetch anything."
+    correct_option: b
+    explanation: "Correct. In `dpkg -l`'s status column, the second letter reflects current status; `F` specifically means \"half-conFigured\" — the package's files are present, but its configuration step (running the post-install script, called `postinst`) was interrupted before finishing. The standard, expected recovery sequence is `dpkg --configure -a` (resume configuration for every pending package) followed immediately by `apt --fix-broken install` as a safety net for any genuinely missing dependency `dpkg` alone can't resolve."
+
+  - id: ats002-050-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain kept back packages and when to use full-upgrade"
+    source_readings:
+      - sections/section-050/module-03/course-02-applying-upgrades-and-installing.md
+    prompt: |-
+      During a routine maintenance window, `apt upgrade` finishes and its output ends with "The following packages have been kept back: libfoo". What does this mean, and what should you do next?
+    options:
+      - id: a
+        text: "`libfoo` has no available update; the message is informational only and requires no action."
+        explanation: "\"kept back\" specifically means an update *is* available but was deliberately skipped — it is not the same as \"no update exists.\"."
+      - id: b
+        text: "`libfoo` is held via `apt-mark hold`; run `sudo apt-mark unhold libfoo` and re-run `apt upgrade`."
+        explanation: "\"kept back\" is a distinct mechanism from `apt-mark hold`; nothing in the scenario indicates a manual hold was ever applied, and `apt-mark showhold` would confirm whether one exists before assuming so."
+      - id: c
+        text: "Upgrading `libfoo` would require installing or removing some other package, which plain `apt upgrade` refuses to do on its own; run `sudo apt full-upgrade` after confirming the add/remove it implies is expected and safe."
+        explanation: "Correct. \"Kept back\" specifically means a package's upgrade would change the installed package set beyond a simple version bump — a new dependency needed, or an obsolete one to drop — and plain `apt upgrade` deliberately won't do that on its own to keep upgrades predictable. `apt full-upgrade` (equivalently `apt-get dist-upgrade`) is the command willing to make that add/remove to complete the upgrade, and should be run only after reviewing that the implied change is expected."
+      - id: d
+        text: "The package index is stale; re-run `sudo apt update` and then `apt upgrade` again."
+        explanation: "A stale index would more likely show the package as not upgradable at all, or with an outdated candidate version — \"kept back\" is APT's deliberate refusal to add/remove packages under plain `upgrade`, not a caching problem."
+    correct_option: c
+    explanation: "Correct. \"Kept back\" specifically means a package's upgrade would change the installed package set beyond a simple version bump — a new dependency needed, or an obsolete one to drop — and plain `apt upgrade` deliberately won't do that on its own to keep upgrades predictable. `apt full-upgrade` (equivalently `apt-get dist-upgrade`) is the command willing to make that add/remove to complete the upgrade, and should be run only after reviewing that the implied change is expected."
+
+  - id: ats002-050-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Remove a package completely with purge and autoremove"
+    source_readings:
+      - sections/section-050/module-03/course-03-removing-cleanly.md
+    prompt: |-
+      A task asks you to fully retire the `ftp` package, "including any dependency packages nothing else needs, and its configuration, so a future reinstall starts clean." Which sequence satisfies this completely?
+    options:
+      - id: a
+        text: "`sudo apt remove ftp`"
+        explanation: "Plain `remove` leaves `ftp`'s configuration files under `/etc` in place — exactly the leftover state the task says to avoid."
+      - id: b
+        text: "`sudo apt purge ftp`"
+        explanation: "`purge` alone handles the configuration-file requirement but does nothing about orphaned dependency packages that only `ftp` needed."
+      - id: c
+        text: "`sudo apt remove ftp` followed by `sudo apt-mark hold ftp`"
+        explanation: "On two counts: plain `remove` still leaves configuration files behind, and holding an already-removed package is nonsensical — `apt-mark hold` only affects packages still installed."
+      - id: d
+        text: "`sudo apt purge ftp` followed by `sudo apt autoremove`"
+        explanation: "Correct. The task has two distinct requirements: configuration files gone (which requires `purge`, not plain `remove`) and orphaned dependencies gone (which requires the separate, deliberate `autoremove` step — removing `ftp` itself never automatically cascades to dependencies it alone pulled in). Only the combination of both commands satisfies the full request."
+    correct_option: d
+    explanation: "Correct. The task has two distinct requirements: configuration files gone (which requires `purge`, not plain `remove`) and orphaned dependencies gone (which requires the separate, deliberate `autoremove` step — removing `ftp` itself never automatically cascades to dependencies it alone pulled in). Only the combination of both commands satisfies the full request."
+
+  - id: ats002-050-q05
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Hold a whole package family together with one pipeline and audit it"
+    source_readings:
+      - sections/section-050/module-05/course-02-bulk-actions-across-a-set.md
+    prompt: |-
+      A host has an installed PHP 8.1 module family (`php8.1-cli`, `php8.1-fpm`, `php8.1-mysql`, and others sharing the `php8.1-` prefix). You need to hold the *entire* family together ahead of a risky, unrelated upgrade elsewhere on the system. Which approach is correct, and why does holding only `php8.1-cli` and `php8.1-fpm` (leaving the rest unheld) create a real risk?
+    options:
+      - id: a
+        text: "`apt list --installed 2>/dev/null | grep -E '^php8\\.1-' | cut -d/ -f1 | xargs sudo apt-mark hold`, then confirm with `apt-mark showhold` — a partial hold risks the unheld modules drifting to a different PHP minor version than the held ones, breaking application binary interface (ABI) compatibility across the family."
+        explanation: "Correct. Pattern-matching the installed list with an anchored, extended-regex `grep -E '^php8\\.1-'`, extracting clean names with `cut -d/ -f1`, and piping the full set into a single `xargs sudo apt-mark hold` call holds every matching package together in one atomic action — then `apt-mark showhold` audits that the result actually matches what was intended, rather than trusting the pipeline blindly. A partial hold is genuinely risky: if the family is interdependent (built against the same PHP application binary interface), the unheld members can drift to a newer PHP release during a future upgrade while the held ones stay behind, producing a version-mismatched, potentially broken installation."
+      - id: b
+        text: "`sudo apt-mark hold php8.1-cli php8.1-fpm` is sufficient — holding the two most commonly used modules protects the family well enough."
+        explanation: "It's exactly the partial-hold risk the question describes — protecting some members of an interdependent set while leaving others exposed can be worse than protecting none."
+      - id: c
+        text: "`sudo apt-mark hold php8.1-*` — the shell glob is expanded automatically by `apt-mark`, holding every matching package in one call."
+        explanation: "`apt-mark hold` does not perform its own glob expansion against installed packages; `php8.1-*` would either be expanded by the shell against literal filenames in the current directory (almost never matching real package names) or passed through literally and fail to match anything."
+      - id: d
+        text: "Holding is unnecessary here; `apt full-upgrade` never touches packages outside the one named in the task."
+        explanation: "An unrelated `apt full-upgrade` can still touch any package with a newer available candidate, including every unheld member of the PHP family, regardless of which single package a task happens to name."
+    correct_option: a
+    explanation: "Correct. Pattern-matching the installed list with an anchored, extended-regex `grep -E '^php8\\.1-'`, extracting clean names with `cut -d/ -f1`, and piping the full set into a single `xargs sudo apt-mark hold` call holds every matching package together in one atomic action — then `apt-mark showhold` audits that the result actually matches what was intended, rather than trusting the pipeline blindly. A partial hold is genuinely risky: if the family is interdependent (built against the same PHP application binary interface), the unheld members can drift to a newer PHP release during a future upgrade while the held ones stay behind, producing a version-mismatched, potentially broken installation."
+
+  - id: ats002-050-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Block a package from ever being installed from a repository with an apt preference"
+    source_readings:
+      - sections/section-050/module-01/course-03-exact-version-and-hold.md
+    prompt: |-
+      You want APT to refuse to install any package from a vendor repository's origin, while keeping the repository configured. Which line in a file under `/etc/apt/preferences.d/` does that?
+    options:
+      - id: a
+        text: "`Pin-Priority: 0` in a stanza that matches the vendor's origin."
+        explanation: "Priority 0 is not a block. Only a negative priority prevents installation."
+      - id: b
+        text: "`Pin-Priority: -1` in a stanza that matches the vendor's origin."
+        explanation: "Correct. A negative priority prevents the matched packages from ever being installed."
+      - id: c
+        text: "`Pin-Priority: 1001` in a stanza that matches the vendor's origin."
+        explanation: "A priority above 1000 makes the packages preferred, even when that means a downgrade. It is the opposite of a block."
+      - id: d
+        text: "`apt-mark hold` for the repository name."
+        explanation: "`apt-mark hold` applies to installed package names, not to a repository."
+    correct_option: b
+    explanation: "Correct. A negative priority prevents the matched packages from ever being installed."
+
+  - id: ats002-050-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Install an exact package version and keep it from being upgraded"
+    source_readings:
+      - sections/section-050/module-01/course-03-exact-version-and-hold.md
+    prompt: |-
+      A vendor repository offers several versions of `acme-agent`. You must install version `4.1.2-1` and make sure the next `apt upgrade` leaves it alone. Which sequence does that?
+    options:
+      - id: a
+        text: "`sudo apt install acme-agent` and then `sudo apt-mark hold acme-agent`."
+        explanation: "Without `=version` APT installs the candidate version, which may not be `4.1.2-1`."
+      - id: b
+        text: "`sudo apt install acme-agent=4.1.2-1` and nothing else."
+        explanation: "The install works, but the next `apt upgrade` is free to replace it with a newer version."
+      - id: c
+        text: "`sudo apt install acme-agent=4.1.2-1` and then `sudo apt-mark hold acme-agent`."
+        explanation: "Correct. `package=version` installs that exact version, and the hold keeps upgrades from moving it."
+      - id: d
+        text: "`sudo dpkg --purge acme-agent=4.1.2-1`."
+        explanation: "`dpkg --purge` removes a package and does not accept `=version`."
+    correct_option: c
+    explanation: "Correct. `package=version` installs that exact version, and the hold keeps upgrades from moving it."
+
+  - id: ats002-050-q08
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Find which installed package owns a file and list what a .deb contains before installing"
+    source_readings:
+      - sections/section-050/module-02/course-02-installing-and-ownership-queries.md
+    prompt: |-
+      You have a downloaded file `tool_1.0_amd64.deb` that you have not installed. Which command lists the files it would put on the system?
+    options:
+      - id: a
+        text: "`dpkg -L tool_1.0_amd64.deb`"
+        explanation: "`dpkg -L` lists the files of an installed package by package name, not of a `.deb` file."
+      - id: b
+        text: "`dpkg -S tool_1.0_amd64.deb`"
+        explanation: "`dpkg -S` searches for the package that owns a path. It does not list the contents of a file."
+      - id: c
+        text: "`apt-cache policy tool_1.0_amd64.deb`"
+        explanation: "`apt-cache policy` shows versions and priorities for package names known to APT, not the contents of a file."
+      - id: d
+        text: "`dpkg -c tool_1.0_amd64.deb`"
+        explanation: "Correct. `dpkg -c` lists the contents of a `.deb` archive without installing it."
+    correct_option: d
+    explanation: "Correct. `dpkg -c` lists the contents of a `.deb` archive without installing it."
+
+  - id: ats002-050-q09
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Tell apt update from apt upgrade"
+    source_readings:
+      - sections/section-050/module-03/course-01-update-is-not-upgrade.md
+    prompt: |-
+      After `sudo apt update` the last line says `12 packages can be upgraded`. What has happened to those 12 packages so far?
+    options:
+      - id: a
+        text: "Nothing. `apt update` only refreshed the package lists, and `apt upgrade` is what installs the newer versions."
+        explanation: "Correct. `update` downloads indexes and changes no installed package."
+      - id: b
+        text: "They are installed in their new versions already."
+        explanation: "`apt update` never installs or replaces packages."
+      - id: c
+        text: "They are held back and need `apt-mark unhold`."
+        explanation: "The message only says newer versions exist. It is not a hold."
+      - id: d
+        text: "They were downloaded and wait for a reboot."
+        explanation: "`apt update` downloads package lists, not package files."
+    correct_option: a
+    explanation: "Correct. `update` downloads indexes and changes no installed package."
+
+  - id: ats002-050-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read installed and candidate versions with apt-cache policy"
+    source_readings:
+      - sections/section-050/module-04/course-02-installed-vs-candidate.md
+    prompt: |-
+      You must tell whether `openssl` has a newer version available than the one installed, and from which repository, without changing anything. Which command shows both?
+    options:
+      - id: a
+        text: "`apt install --dry-run openssl`"
+        explanation: "A dry run says what would happen but does not show the repository list and priorities."
+      - id: b
+        text: "`apt-cache policy openssl`"
+        explanation: "Correct. It prints the Installed and Candidate versions and the repositories that offer each version."
+      - id: c
+        text: "`dpkg -L openssl`"
+        explanation: "`dpkg -L` lists files of the installed package and knows nothing about the repositories."
+      - id: d
+        text: "`apt autoremove openssl`"
+        explanation: "`autoremove` removes unneeded packages. It is not a query."
+    correct_option: b
+    explanation: "Correct. It prints the Installed and Candidate versions and the repositories that offer each version."
+
+  - id: ats002-050-q11
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find every installed package of a family with a pattern"
+    source_readings:
+      - sections/section-050/module-05/course-01-one-transaction-and-finding-a-family.md
+    prompt: |-
+      Which command lists the installed packages whose names start with `php8.1-`, with their status?
+    options:
+      - id: a
+        text: "`apt-mark showhold 'php8.1-*'`"
+        explanation: "`apt-mark showhold` lists held packages. It does not list installed packages by pattern."
+      - id: b
+        text: "`apt-cache policy php8.1`"
+        explanation: "This shows the single package named `php8.1`, not a family."
+      - id: c
+        text: "`dpkg -l 'php8.1-*'`"
+        explanation: "Correct. `dpkg -l` accepts a name pattern and prints the status column. Quote it so the shell does not expand it."
+      - id: d
+        text: "`dpkg -S 'php8.1-*'`"
+        explanation: "`dpkg -S` searches for the owner of a file path, not for package names."
+    correct_option: c
+    explanation: "Correct. `dpkg -l` accepts a name pattern and prints the status column. Quote it so the shell does not expand it."

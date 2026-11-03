@@ -1,0 +1,54 @@
+metadata:
+  name: "ats-002-lab-086"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    # A spare 1 GB disk, found by its serial. The damaged filesystem lives
+    # on this disk only, so the main machine stays reachable over SSH.
+    extraDisks:
+      - sizeGB: 1
+        serial: "lab086-data001"
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-086-setup"
+      description: "Creates one ext4 partition on the spare disk, writes two known files, then zeroes the primary superblock"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-superblock-valid"
+      description: "Confirms the partition has a readable ext4 superblock again"
+      type: "file"
+      source: "validation/validate-superblock-valid.sh"
+
+    - name: "verify-fsck-clean"
+      description: "Confirms fsck.ext4 -n -f finds no errors and the partition is not mounted"
+      type: "file"
+      source: "validation/validate-fsck-clean.sh"
+
+    - name: "verify-data-intact"
+      description: "Confirms the filesystem mounts and both original files have their original content"
+      type: "file"
+      source: "validation/validate-data-intact.sh"
+
+    - name: "verify-backup-superblock-noted"
+      description: "Confirms /root/backup-superblock.txt names one of the filesystem's backup superblocks"
+      type: "file"
+      source: "validation/validate-backup-superblock-noted.sh"
+
+teardown:
+  keepCluster: false

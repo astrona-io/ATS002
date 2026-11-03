@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have finished every part and the mission in this module. Before you move on, look back at what you learned, check yourself, and clean up anything still running.
 
@@ -68,9 +68,9 @@ The other family members can still upgrade to a newer PHP release, which leaves 
 Run `apt-mark showhold` and compare it line for line with the names your pattern matched.
 </details>
 
-## Clean up
+## Clean up the playground
 
-Each mission runs a virtual machine on your computer. When you are done with this module, remove any mission that is still running.
+When you are done with this module, remove the playground and any mission that is still running.
 
 First, see what is still running:
 
@@ -78,14 +78,18 @@ First, see what is still running:
 astrona list
 ```
 
-If the mission is still there, remove it. The command takes its **name**, not its folder path:
+Remove the playground. The command takes its **name**, not its folder path:
+
+```sh
+astrona destroy apt-package-families
+```
+
+If `astrona list` also showed a mission, remove it the same way, for example:
 
 ```sh
 astrona destroy ats-002-lab-055
 ```
 
-Then check that everything is gone:
+Run `astrona list` again to check that everything is gone. You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean, so nothing you broke carries over.
 
-```sh
-astrona list
-```
+<!-- astrona:playground:destroy -->

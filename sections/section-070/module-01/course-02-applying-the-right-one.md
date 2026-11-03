@@ -8,6 +8,8 @@ Run every command inside the `zypperbox` container as root. `docker exec` opens 
 
 Apply the safety notices the depot has published:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the zypperbox container, root
 zypper patch

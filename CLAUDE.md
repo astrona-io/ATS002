@@ -193,9 +193,9 @@ section is only true for this one.
   | 050 | Debian Package Management: Repositories, dpkg & APT | Packages and repositories (Debian family) |
   | 060 | RPM/DNF Package Management: rpm, dnf & Package Groups | Packages and repositories (RHEL family) |
   | 070 | SUSE Package Management: Zypper | Packages and repositories (SUSE family) |
-  | 080 | System Disaster Recovery | Recovering from boot, filesystem and disk failures |
+  | 080 | System Disaster Recovery | Recovering from boot, filesystem, LVM, software RAID and disk failures, and diagnosing disk health |
 
-  A final domain quiz (`sections/final-domain-quiz.md`) closes the course.
+  A final domain quiz (`sections/final-domain-quiz.yaml`) closes the course.
 - **The version:** every lab and playground runs on **Ubuntu 24.04** in a
   `qemu` virtual machine built from
   `ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}`, with **bash**
@@ -363,10 +363,14 @@ Use these names exactly as the scripts create them:
 | `ats-002-lab-019` | `section-010/module-06/labs/lab-04` | `ingest.service` requires a broken `ingest-db.service` and has hit its start limit |
 | `ats-002-lab-016e` | `section-010/module-06/labs/lab-05` | `journald` at its defaults: volatile, no size cap |
 | `ats-002-lab-016f` | `section-010/module-06/labs/lab-06` | Default target set to `graphical.target` |
+| `ats-002-lab-01a` | `section-010/module-07/labs/lab-01` | User `crew` and three services: `cpuburn.sh`, `stubborn.sh` (ignores SIGTERM) and `crew-sleeper.sh` |
 | `ats-002-lab-010` | `section-010/capstone/labs/lab-01` | Low `kernel.pid_max`, `pcspkr` loaded, a telemetry disk (serial `lab010-telemetry`), a hung `telemetry-agent.service` |
 | `ats-002-lab-021` | `section-020/module-01/labs/lab-01` | User `asset-manager` with `nightly-sync.sh` and `clean.sh`, and `/etc/cron.d/asset-cleanup` |
 | `ats-002-lab-022` | `section-020/module-02/labs/lab-01` | Docker with containers `frontend_v1` and `frontend_v2` |
 | `ats-002-lab-023` | `section-020/module-03/labs/lab-01` | `/usr/local/sbin/report.sh`, `/usr/local/sbin/dbclean.sh` and a cron job for `dbclean.sh` |
+| `ats-002-lab-024` | `section-020/module-04/labs/lab-01` | `at`, `anacron` and `cron` installed, user `ops-monitor` and `/usr/local/sbin/archive-logs.sh` |
+| `ats-002-lab-025` | `section-020/module-05/labs/lab-01` | Docker, `nginx:alpine` and `/opt/course/25/build` with an `index.html` |
+| `ats-002-lab-026` | `section-020/module-06/labs/lab-01` | Podman and user `pilot` with subordinate ID ranges, lingering off |
 | `ats-002-lab-020` | `section-020/capstone/labs/lab-01` | Docker, container `billing_v1` holding host port 9090, user `ops-monitor` |
 | `ats-002-lab-031` | `section-030/module-01/labs/lab-01` | `/tools/links-2.14.tar.bz2` and `build-essential` |
 | `ats-002-lab-032` | `section-030/module-02/labs/lab-01` | libvirt with its `default` network and `/var/lib/libvirt/images/inventory-db.qcow2` |
@@ -375,6 +379,7 @@ Use these names exactly as the scripts create them:
 | `ats-002-lab-030` | `section-030/capstone/labs/lab-01` | `/tools/vmreport-1.0.tar.gz`, libvirt and `/var/lib/libvirt/images/build-agent.qcow2` |
 | `ats-002-lab-041` | `section-040/module-01/labs/lab-01` | The `appservice` daemon and a too-strict AppArmor profile in enforce mode |
 | `ats-002-lab-042` | `section-040/module-01/labs/lab-02` | The `credsync` daemon; its profile denies `/etc/credsync/api.key` |
+| `ats-002-lab-043` | `section-040/module-02/labs/lab-01` | `/srv/web` with a sample page; SELinux is not active, the lab grades the script the learner writes |
 | `ats-002-lab-040` | `section-040/capstone/labs/lab-01` | Services `logshipper` and `metrics-agent`, each with a too-strict profile |
 | `ats-002-lab-051` | `section-050/module-01/labs/lab-01` | A local signed APT repository on `127.0.0.1` with a stub `nginx` package |
 | `ats-002-lab-051b` | `section-050/module-01/labs/lab-02` | `curl` with a newer version in `noble-updates` than in `noble` |
@@ -398,6 +403,11 @@ Use these names exactly as the scripts create them:
 | `ats-002-lab-082` | `section-080/module-02/labs/lab-01` | A 1 GB disk (serial `lab082-data001`) holding a stand-in root with a locked root account |
 | `ats-002-lab-083` | `section-080/module-03/labs/lab-01` | A 2 GB disk (serial `lab083-vdc`) with a GPT table, two ext4 partitions and marker files |
 | `ats-002-lab-084` | `section-080/module-04/labs/lab-01` | `/boot/grub/grub.cfg` removed from the running machine |
+| `ats-002-lab-086` | `section-080/module-05/labs/lab-01` | A 1 GB disk (serial `lab086-data001`) with one ext4 partition and two known files; the primary superblock is zeroed |
+| `ats-002-lab-087` | `section-080/module-06/labs/lab-01` | The initramfs image of the running kernel deleted from `/boot`; no reboot |
+| `ats-002-lab-088` | `section-080/module-07/labs/lab-01` | A 1 GB disk (serial `lab088-pv001`): volume group `cargo_vg`, logical volume `deck` with two known files, group deactivated, first MiB wiped |
+| `ats-002-lab-089` | `section-080/module-08/labs/lab-01` | Three 1 GB disks (serials `lab089-raid-a`, `-b`, `-c`): RAID 1 `/dev/md/cargo` on `a` and `b` with two known files, `b` failed and removed, `c` blank |
+| `ats-002-lab-08a` | `section-080/module-09/labs/lab-01` | Two 1 GB disks (serials `lab08a-suspect`, `lab08a-other`): a known pattern on the suspect disk, an I/O error about it in the kernel log, `/var/tmp/disk-report/` |
 | `ats-002-lab-080` | `section-080/capstone/labs/lab-01` | `grub.cfg` removed, and a 2 GB disk (serial `lab080-vdc`) whose GPT table was wiped |
 
 The playgrounds (no task, no grading):
@@ -412,11 +422,40 @@ The playgrounds (no task, no grading):
 | `systemd-service-debugging` | `section-010/module-06/playground` | `apache2`, failing because port 80 is already taken |
 | `libvirt-vm-lifecycle` | `section-030/module-02/playground` | libvirt with its `default` network and `/var/lib/libvirt/images/inventory-db.qcow2` |
 | `apparmor-mac-enforcement` | `section-040/module-01/playground` | The `appservice` daemon writing to `/srv/applogs` and a too-strict profile in enforce mode |
+| `process-control-bay` | `section-010/module-07/playground` | User `crew` and three background services: a CPU burner, `stubborn.sh` and a sleeper; `crew-restart` starts them again |
+| `cron-schedule-bay` | `section-020/module-01/playground` | `cron`, service accounts `archivist` and `asset-manager` with scripts, two system-wide cron files |
+| `docker-lifecycle-bay` | `section-020/module-02/playground` | Docker, `nginx:alpine` and container `web_demo` with one bind-mounted folder |
+| `systemd-timer-bay` | `section-020/module-03/playground` | Maintenance scripts and an old `dbclean` cron job to convert to a timer |
+| `at-anacron-bay` | `section-020/module-04/playground` | `at`, `anacron`, user `ops-monitor` and `/usr/local/sbin/archive-logs.sh` |
+| `container-build-bay` | `section-020/module-05/playground` | Docker, `nginx:alpine`, `alpine` and `/opt/demo/status-page` with an `index.html` |
+| `podman-rootless-bay` | `section-020/module-06/playground` | Podman, rootless helpers and user `pilot` with lingering enabled |
+| `source-build-bay` | `section-030/module-01/playground` | `gcc`, `make` and `/tools/links-2.14.tar.bz2` |
+| `selinux-commands-bay` | `section-040/module-02/playground` | `/srv/web` with a sample page and an empty notes file; SELinux is not active |
+| `apt-repos-and-pinning` | `section-050/module-01/playground` | A local vendor repository on `127.0.0.1:8100`, `curl` with two competing versions |
+| `dpkg-low-level` | `section-050/module-02/playground` | A `logtail-utils` `.deb` in `/home/candidate/downloads/` and a half-configured `cowsay` |
+| `apt-basic-operations` | `section-050/module-03/playground` | `ftp` installed with a tracked config file, `fail2ban` not installed |
+| `apt-package-research` | `section-050/module-04/playground` | Some `python3-*` packages and `/opt/course/apt-research` |
+| `apt-package-families` | `section-050/module-05/playground` | Six stand-in `php8.1-*` packages; no build tools installed |
+| `rpm-low-level` | `section-060/module-01/playground` | `rpmbox` with a built `logship-agent-2.1.0-1` package |
+| `rpm-database-repair` | `section-060/module-02/playground` | `rpmbox` with a corrupted RPM database |
+| `dnf-everyday` | `section-060/module-03/playground` | `rpmbox` with EPEL, `telnet` installed, `fail2ban` and `mtr` not installed |
+| `dnf-package-research` | `section-060/module-04/playground` | `rpmbox` with EPEL and some `python3-*` packages |
+| `dnf-package-groups` | `section-060/module-05/playground` | `rpmbox` with `automake` installed outside any group |
+| `zypper-everyday` | `section-070/module-01/playground` | `zypperbox` with `telnet-server` installed and `fail2ban` not installed |
+| `zypper-package-research` | `section-070/module-02/playground` | `zypperbox` with `python3-base`, `python3-pip` and `/root/answers` |
+| `chroot-rescue-bench` | `section-080/module-01/playground` | A 2 GB disk (serial `lab081-data001`) with a stand-in root and a mistyped UUID in its `fstab` |
+| `password-reset-bench` | `section-080/module-02/playground` | A 1 GB disk (serial `lab082-data001`) with a stand-in root and a locked root account |
+| `partition-table-bench` | `section-080/module-03/playground` | A 2 GB disk (serial `lab083-vdc`) with a GPT table, two ext4 partitions and marker files |
+| `grub-repair-bench` | `section-080/module-04/playground` | A healthy machine; `/root/grub.cfg.original` is a copy of `grub.cfg` |
+| `fsck-repair-bench` | `section-080/module-05/playground` | A 1 GB disk (serial `lab086-data001`) with a healthy ext4 filesystem `CARGO` |
+| `initramfs-bench` | `section-080/module-06/playground` | A healthy `/boot` and `/root/boot-listing.original.txt` |
+| `lvm-recovery-bench` | `section-080/module-07/playground` | A 1 GB disk (serial `lab088-pv001`) with volume group `cargo_vg` and volume `deck` |
+| `raid-recovery-bench` | `section-080/module-08/playground` | Three 1 GB disks (serials `lab089-raid-a`, `-b`, `-c`): a healthy RAID 1 `/dev/md/cargo` on `a` and `b`, `c` blank |
+| `disk-health-bench` | `section-080/module-09/playground` | Two 1 GB disks (serials `lab08a-suspect`, `lab08a-other`) and an I/O error about the suspect disk in the kernel log |
 
-Modules in sections 020, 030 (module 1) and 050 to 080 have no
-playground. Course pages there use small examples the reader can try on
-any Ubuntu 24.04 machine or inside a running lab. When a page shows a
-lab's own names, they must match the tables above.
+Every module in sections 010 to 080 has its own playground. A
+course page that shows a lab's or playground's own names must match the
+tables above.
 
 ### Environment facts the text must respect
 
@@ -433,7 +472,8 @@ lab's own names, they must match the tables above.
   When the command line tool supports `qemu` stop and start, switch to
   `astrona stop` and `astrona start`.
 - **Extra disks are found by serial.** Labs in sections 010 and 080 and the
-  udev playground add a small disk. Its device letter is not fixed, so
+  udev playground add small disks (section 080 modules 8 and 9 add two or
+  three). Its device letter is not fixed, so
   scripts reach it through `/dev/disk/by-id/virtio-<serial>`. Never tell
   the reader the disk is always `/dev/vdb`.
 - **Recovery is practised on a spare disk.** Section 080 stages the broken
@@ -462,8 +502,8 @@ lab's own names, they must match the tables above.
 | Overview, sections table, how to run things | `README.md` |
 | Section overview and its modules | `sections/section-0N0/README.md` |
 | Module reading: landing page, deep-dive parts, wrap-up | `sections/section-0N0/module-0M/course.md`, `course-0N-*.md` |
-| Section knowledge check (multiple choice) | `sections/section-0N0/quiz.md` |
-| Final domain quiz | `sections/final-domain-quiz.md` |
+| Section knowledge check (multiple choice) | `sections/section-0N0/quiz.yaml` |
+| Final domain quiz | `sections/final-domain-quiz.yaml` |
 | Graded lab: task, walkthrough, setup, grader | `.../labs/lab-0N/` (`question.md`, `solution.md`, `bootstrap/`, `validation/`) |
 | Ungraded sandbox for a module | `.../playground/` (`config.yaml`, `bootstrap/`, `docs/overview.md` says what is in the box) |
 | One graded integration lab per section | `sections/section-0N0/capstone/labs/lab-01/` |
@@ -538,7 +578,8 @@ this order:
 - Kernel: `uname`, `sysctl`, `proc-sys`, `sysctl-d`, `kernel-modules`,
   `modprobe`, `modprobe-d`, `module-parameters`, `blacklist`, `lsmod`
 - Processes and limits: `pid-max`, `ulimit`, `limits-conf`, `tasksmax`,
-  `cgroups`, `strace`, `syscalls`, `signals`, `kill`, `pgrep`
+  `cgroups`, `strace`, `syscalls`, `signals`, `kill`, `pgrep`, `ps`,
+  `renice`
 - Devices and disks: `udev`, `udev-rules`, `udevadm`, `disk-serial`,
   `block-devices`, `blkid`, `mount`
 - Services: `systemd`, `systemctl`, `unit-files`, `drop-in-override`,
@@ -546,14 +587,16 @@ this order:
   `file-permissions`, `port-conflict`, `unit-dependencies`,
   `restart-policy`, `boot-target`, `timedatectl`, `redirection`
 - Scheduling: `cron`, `crontab`, `cron-d`, `cron-syntax`, `systemd-timers`,
-  `oncalendar`
+  `oncalendar`, `at`, `atd`, `anacron`, `cron-allow-deny`
 - Containers: `docker`, `container-lifecycle`, `docker-inspect`,
-  `port-mapping`, `bind-mounts`, `resource-limits`
+  `port-mapping`, `bind-mounts`, `resource-limits`, `dockerfile`, `image`,
+  `volume`, `network`, `podman`, `rootless`, `linger`, `subuid`
 - Building and virtual machines: `source-build`, `tarball`, `configure`,
   `make`, `libvirt`, `virsh`, `virt-install`, `domain-xml`, `qcow2`,
   `autostart`, `transient-domain`, `vm-resources`
 - Mandatory access control: `apparmor`, `aa-status`, `apparmor-profiles`,
-  `enforce-mode`, `complain-mode`, `audit-log`, `selinux`
+  `enforce-mode`, `complain-mode`, `audit-log`, `selinux`, `semanage`,
+  `restorecon`, `setsebool`, `file-contexts`, `booleans`
 - Debian packages: `apt`, `apt-cache`, `dpkg`, `apt-repositories`,
   `gpg-keyring`, `signed-by`, `apt-pinning`, `apt-mark-hold`,
   `package-versions`, `purge`, `autoremove`, `package-search`,
@@ -565,7 +608,10 @@ this order:
   `zypper-search`, `zypper-what-provides`, `zypper-repositories`
 - Recovery: `chroot`, `fstab`, `rescue-shell`, `password-reset`,
   `etc-shadow`, `partition-table`, `gpt`, `sgdisk`, `grub`,
-  `grub-install`, `update-grub`, `boot-recovery`
+  `grub-install`, `update-grub`, `boot-recovery`, `initramfs`,
+  `update-initramfs`, `fsck`, `superblock`, `lvm`, `pvcreate`,
+  `vgcfgrestore`, `vgchange`, `mdadm`, `raid`, `mdstat`, `smartctl`,
+  `dmesg`, `badblocks`, `lsblk`
 
 ### Running things
 
@@ -592,7 +638,8 @@ Names: a playground keeps its short topic name (`sysctl-live-kernel`,
 `ats-002-lab-<section><module>` (`ats-002-lab-011`) and capstones
 `ats-002-lab-<section>0` (`ats-002-lab-010`); extra labs in one module
 took a letter (`ats-002-lab-012b`) or the next free number
-(`ats-002-lab-066`). Keep those names. A new lab takes a name no other lab
+(`ats-002-lab-066`). Modules 7 to 9 of section 080 use `088`, `089` and
+`08a` (the same style as `01a` in section 010). Keep those names. A new lab takes a name no other lab
 uses. The local developer build of `astrona validate` may report
 `unknown field "solution"` and `"question"` in `metadata.docs`; that is a
 validator issue, not a lab issue.

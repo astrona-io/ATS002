@@ -1,0 +1,49 @@
+metadata:
+  name: "ats-002-lab-088"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    # A spare 1 GB disk, found by its serial. The damaged LVM label lives
+    # on this disk only, so the main machine stays reachable over SSH.
+    extraDisks:
+      - sizeGB: 1
+        serial: "lab088-pv001"
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-088-setup"
+      description: "Builds volume group cargo_vg with logical volume deck and two known files on the spare disk, then deactivates the group and wipes the first megabyte of the disk"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-group-restored"
+      description: "Confirms cargo_vg exists again on the spare disk with the original physical volume UUID"
+      type: "file"
+      source: "validation/validate-group-restored.sh"
+
+    - name: "verify-volume-active"
+      description: "Confirms the logical volume cargo_vg/deck is active"
+      type: "file"
+      source: "validation/validate-volume-active.sh"
+
+    - name: "verify-deck-mounted"
+      description: "Confirms the deck is mounted at /srv/deck and both original files have their original content"
+      type: "file"
+      source: "validation/validate-deck-mounted.sh"
+
+teardown:
+  keepCluster: false

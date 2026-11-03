@@ -1,0 +1,276 @@
+# Knowledge check for section 030. Listed in astrona.yaml as a `type: quiz` entry after the last module.
+schema_version: 1
+kind: question_bank
+id: ats002-030
+course_id: ATS002
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-030
+  title: "Building & Virtualizing Systems"
+questions:
+  - id: ats002-030-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Match the tar flag to the tarball compression"
+    source_readings:
+      - sections/section-030/module-01/course-01-unpacking-and-the-build-pipeline.md
+    prompt: |-
+      You have been handed `monitor-agent-3.2.tar.bz2` and need to unpack it before building. You run `tar xzf monitor-agent-3.2.tar.bz2`, and it fails at once with a decompression error. What is the most likely cause, and what should you run instead?
+    options:
+      - id: a
+        text: "The tarball is corrupted and must be downloaded again; no `tar` flag combination will fix this."
+        explanation: "This option is incorrect because a flag mismatch, not corruption, is by far the most common cause of this exact failure, and you should rule it out first."
+      - id: b
+        text: "You used `-z` (gzip) on a bzip2-compressed archive; the fix is `tar xjf monitor-agent-3.2.tar.bz2`, using `-j` for bzip2."
+        explanation: "Correct. The `.tar.bz2` extension means bzip2 compression, which `tar` opens with the `-j` flag, not `-z` (which is for gzip's `.tar.gz` or `.tgz`). The wrong decompression flag does not produce a partial or garbled extract. It fails outright, because the gzip decompressor cannot read bzip2 data."
+      - id: c
+        text: "You forgot to run `chmod +x` on the tarball before extracting it."
+        explanation: "This option is incorrect because the permissions on the archive file have nothing to do with whether `tar` can decompress it."
+      - id: d
+        text: "`.tar.bz2` files can only be extracted with `unzip`, not `tar`."
+        explanation: "This option is incorrect because `tar` handles bzip2 archives itself with `-j`; `unzip` is for `.zip` archives only."
+    correct_option: b
+    explanation: "The `.tar.bz2` extension means bzip2 compression, which `tar` opens with the `-j` flag, not `-z` (which is for gzip's `.tar.gz` or `.tgz`). The wrong decompression flag does not produce a partial or garbled extract. It fails outright, because the gzip decompressor cannot read bzip2 data."
+
+  - id: ats002-030-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Install a binary to an exact path with the right configure flag"
+    source_readings:
+      - sections/section-030/module-01/course-02-discovering-and-choosing-flags.md
+    prompt: |-
+      A task requires a binary built from source to land at the exact path `/opt/tools/bin/reportd`. You run `./configure --prefix=/opt/tools`, then `make` and `sudo make install`, but the binary ends up at `/opt/tools/bin/reportd-cli` instead, the project's own name for it. What should you have done differently?
+    options:
+      - id: a
+        text: "Nothing, `--prefix` always guarantees an exact binary filename match; the task's requested name must be wrong."
+        explanation: "This option is incorrect because `--prefix` never guarantees a file name, only a folder tree. The mismatch described is a normal, common result, not a mistake in the task."
+      - id: b
+        text: "Used `--bindir=/opt/tools/bin` instead of `--prefix`, which still would not have fixed the filename mismatch, since `--bindir` (like `--prefix`) only controls the install *directory*, not the binary's filename."
+        explanation: "Correct. `--prefix` sets the root of the whole install tree, and the binary lands at `$prefix/bin/<the-name-the-project-gives-its-output>`, which is not always the name a task wants. `--bindir` is more precise about *which folder* the binary goes into, but neither flag controls the *file name* that the project's `Makefile` installs. If the name still does not match after you use the right folder flag, the last step is an explicit rename (for example `sudo mv /opt/tools/bin/reportd-cli /opt/tools/bin/reportd`). Never assume the flags alone finish the job; check the installed file."
+      - id: c
+        text: "Skipped `./configure` entirely and just run `make install` with a `DESTDIR` override."
+        explanation: "This option is incorrect because without `./configure` there is no `Makefile` for `make install` to work from."
+      - id: d
+        text: "Renamed the source tarball itself to `reportd.tar.bz2` before extracting it."
+        explanation: "This option is incorrect because the name of the source tarball has no effect on what the project's build system calls its compiled output."
+    correct_option: b
+    explanation: "`--prefix` sets the root of the whole install tree, and the binary lands at `$prefix/bin/<the-name-the-project-gives-its-output>`, which is not always the name a task wants. `--bindir` is more precise about *which folder* the binary goes into, but neither flag controls the *file name* that the project's `Makefile` installs. If the name still does not match after you use the right folder flag, the last step is an explicit rename (for example `sudo mv /opt/tools/bin/reportd-cli /opt/tools/bin/reportd`). Never assume the flags alone finish the job; check the installed file."
+
+  - id: ats002-030-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Tell define from create for a persistent domain"
+    source_readings:
+      - sections/section-030/module-02/course-04-persistent-vs-transient-lifecycle.md
+    prompt: |-
+      You need to define a KVM virtual machine that still appears in `virsh list --all` after a full host reboot and after the domain is powered off. Which command gives that result, and why does the other one not?
+    options:
+      - id: a
+        text: "`virsh create domain.xml`, because `create` always writes a permanent record to `/etc/libvirt/qemu/`."
+        explanation: "This option is incorrect because it reverses the real behaviour: `create` is the transient one."
+      - id: b
+        text: "`virsh define domain.xml`, because `define` registers the XML persistently in libvirt's configuration store, while `virsh create` only starts a transient domain that vanishes entirely once it stops."
+        explanation: "Correct. `virsh define` and `virsh create` accept the same XML, but they behave completely differently afterwards. `define` writes the domain's XML into libvirt's permanent store (the file `/etc/libvirt/qemu/<name>.xml`), so the domain shows up in `virsh list --all` for good, running or shut off, until someone runs `virsh undefine`. `virsh create` instead starts a *transient* domain that exists only in the libvirt daemon's memory while it runs. The moment it stops, for any reason, its definition is gone, and nothing is left to start again."
+      - id: c
+        text: "Either command works identically; persistence is a property of the qcow2 disk image, not the `virsh` subcommand used."
+        explanation: "This option is incorrect because persistence depends only on how the domain was registered with libvirt, not on anything in the disk image."
+      - id: d
+        text: "`virsh start domain.xml`, because `start` is the only subcommand that writes to `/etc/libvirt/qemu/`."
+        explanation: "This option is incorrect because `virsh start` does not take an XML file path like this. It starts an already defined domain by name."
+    correct_option: b
+    explanation: "`virsh define` and `virsh create` accept the same XML, but they behave completely differently afterwards. `define` writes the domain's XML into libvirt's permanent store (the file `/etc/libvirt/qemu/<name>.xml`), so the domain shows up in `virsh list --all` for good, running or shut off, until someone runs `virsh undefine`. `virsh create` instead starts a *transient* domain that exists only in the libvirt daemon's memory while it runs. The moment it stops, for any reason, its definition is gone, and nothing is left to start again."
+
+  - id: ats002-030-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain that autostart is a link and not part of the XML"
+    source_readings:
+      - sections/section-030/module-02/course-05-autostart-and-reading-true-state.md
+    prompt: |-
+      After running `virsh autostart inventory-db` on one host, you copy that domain's `virsh dumpxml inventory-db` output to a second host and run `virsh define` there. After a reboot of the second host, the domain does not start by itself. What is the most likely explanation?
+    options:
+      - id: a
+        text: "`dumpxml` output is corrupted during copy between hosts and must be hand-edited before reuse."
+        explanation: "This option is incorrect because `dumpxml` output is plain, well-formed XML, and a normal copy does not corrupt it."
+      - id: b
+        text: "Autostart is tracked by libvirt as separate metadata (a symlink under `/etc/libvirt/qemu/autostart/`) rather than a field inside the portable domain XML, so it does not travel with a copied `dumpxml` file and must be re-enabled on the new host."
+        explanation: "Correct. `virsh autostart` does not change the domain XML at all. It creates a symlink in `/etc/libvirt/qemu/autostart/` that points back at the domain's persistent definition. `dumpxml` prints only the portable XML, not libvirt's separate autostart link, so copying that XML to a new host and defining it there carries no autostart setting with it. You have to run `virsh autostart inventory-db` again on the second host."
+      - id: c
+        text: "`virsh autostart` only applies to transient domains created with `virsh create`."
+        explanation: "This option is incorrect because autostart applies to persistently defined domains. A transient domain has no persistent definition for the autostart symlink to point at."
+      - id: d
+        text: "Autostart requires the domain to be actively running at the moment `dumpxml` is captured."
+        explanation: "This option is incorrect because the autostart setting does not depend on whether the domain was running when you saved its XML."
+    correct_option: b
+    explanation: "`virsh autostart` does not change the domain XML at all. It creates a symlink in `/etc/libvirt/qemu/autostart/` that points back at the domain's persistent definition. `dumpxml` prints only the portable XML, not libvirt's separate autostart link, so copying that XML to a new host and defining it there carries no autostart setting with it. You have to run `virsh autostart inventory-db` again on the second host."
+
+  - id: ats002-030-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why virsh shutdown can leave a domain running"
+    source_readings:
+      - sections/section-030/module-02/course-06-graceful-shutdown-vs-hard-destroy.md
+    prompt: |-
+      You run `virsh shutdown inventory-db`, then check `virsh list --all` two minutes later and see that the domain is still `running`. What is the most likely explanation, and what is the right next step?
+    options:
+      - id: a
+        text: "`virsh shutdown` always takes at least five minutes; simply wait longer with no further action."
+        explanation: "This option is incorrect because `shutdown` has no fixed minimum time. A cooperating guest usually powers off within seconds, and one that does not cooperate never will, however long you wait."
+      - id: b
+        text: "The guest operating system has no ACPI shutdown handling (or is hung) and never acted on the power-button signal; escalate with `virsh destroy inventory-db` for an immediate hard power-off."
+        explanation: "Correct. `virsh shutdown` sends an ACPI (Advanced Configuration and Power Interface) power-button *event* into the guest. It is a polite request, not a command that forces anything. If the guest operating system has no handler for that event, or is hung, it never reacts, and the domain stays `running` for ever. The right escalation for a guest that does not respond is `virsh destroy`, which ends the underlying QEMU process at once, the software version of pulling the power cord, whatever is happening inside the guest."
+      - id: c
+        text: "`virsh shutdown` failed silently and must be retried with `sudo` even though the first attempt already used `sudo`."
+        explanation: "This option is incorrect because `sudo` has nothing to do with whether the *guest operating system* acts on an ACPI event it received."
+      - id: d
+        text: "The domain must be `virsh undefine`d before it will accept any shutdown signal."
+        explanation: "This option is incorrect because `undefine` deletes the domain's persistent definition and does nothing to power off a running domain."
+    correct_option: b
+    explanation: "`virsh shutdown` sends an ACPI (Advanced Configuration and Power Interface) power-button *event* into the guest. It is a polite request, not a command that forces anything. If the guest operating system has no handler for that event, or is hung, it never reacts, and the domain stays `running` for ever. The right escalation for a guest that does not respond is `virsh destroy`, which ends the underlying QEMU process at once, the software version of pulling the power cord, whatever is happening inside the guest."
+
+  - id: ats002-030-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Find the build flags a source tree supports"
+    source_readings:
+      - sections/section-030/module-01/course-02-discovering-and-choosing-flags.md
+    prompt: |-
+      You must build a tool without IPv6 support. How do you find out which switch the source tree offers for this?
+    options:
+      - id: a
+        text: "Run `./configure --help` and read the list of options."
+        explanation: "Correct. `./configure --help` is the reference for the flags of that exact source tree, both path flags and feature switches."
+      - id: b
+        text: "Run `make --help`."
+        explanation: "`make` does not know the project's own feature switches."
+      - id: c
+        text: "Guess `--no-ipv6`, since the names are always the same."
+        explanation: "Names differ from project to project."
+      - id: d
+        text: "Read `/etc/os-release`."
+        explanation: "That file describes the operating system, not the project."
+    correct_option: a
+    explanation: "`./configure --help` is the reference for the flags of that exact source tree, both path flags and feature switches."
+
+  - id: ats002-030-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Stage an install into a temporary folder with DESTDIR"
+    source_readings:
+      - sections/section-030/module-01/course-03-building-installing-verifying.md
+    prompt: |-
+      You run `make install DESTDIR=/tmp/stage` after `./configure --prefix=/usr/local`. Where does the binary end up?
+    options:
+      - id: a
+        text: "In `/usr/local/bin`, because `DESTDIR` is ignored."
+        explanation: "`DESTDIR` is added in front of every installed path."
+      - id: b
+        text: "In `/tmp/stage/bin`."
+        explanation: "The prefix is still part of the path."
+      - id: c
+        text: "In `/tmp/stage/usr/local/bin`."
+        explanation: "Correct. `DESTDIR` puts a temporary root in front of every path, so the file lands in `/tmp/stage/usr/local/bin`. It is used to stage an install without touching the real system."
+      - id: d
+        text: "In `/tmp/stage` itself, with no subfolder."
+        explanation: "The installed folder layout is kept below `DESTDIR`."
+    correct_option: c
+    explanation: "`DESTDIR` puts a temporary root in front of every path, so the file lands in `/tmp/stage/usr/local/bin`. It is used to stage an install without touching the real system."
+
+  - id: ats002-030-q08
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain what virt-install --import does"
+    source_readings:
+      - sections/section-030/module-02/course-03-defining-around-an-existing-disk.md
+    prompt: |-
+      What does `virt-install --import` do differently from a normal `virt-install` run?
+    options:
+      - id: a
+        text: "It defines a domain around an existing disk image and skips the operating system installer."
+        explanation: "Correct. `--import` tells `virt-install` that a bootable disk already exists. It then writes the domain definition and starts the domain, without running an installer."
+      - id: b
+        text: "It copies the disk image to a second host."
+        explanation: "Nothing is copied to another host."
+      - id: c
+        text: "It creates an empty disk and installs the operating system from the internet."
+        explanation: "That is a normal install, not an import."
+      - id: d
+        text: "It converts the domain XML into a shell script."
+        explanation: "No script is made."
+    correct_option: a
+    explanation: "`--import` tells `virt-install` that a bootable disk already exists. It then writes the domain definition and starts the domain, without running an installer."
+
+  - id: ats002-030-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a domain is missing when the connection differs"
+    source_readings:
+      - sections/section-030/module-02/course-01-domain-and-the-libvirt-stack.md
+    prompt: |-
+      A user defined the domain `lab-web` with `virsh` as a normal user. Later `sudo virsh list --all` shows no `lab-web`. What is the most likely reason?
+    options:
+      - id: a
+        text: "The domain was removed when the user logged out."
+        explanation: "Domains do not disappear at logout."
+      - id: b
+        text: "The two commands talk to different libvirt instances: `qemu:///session` for the user and `qemu:///system` for root."
+        explanation: "Correct. A normal user's `virsh` uses `qemu:///session` by default, a private set of domains. Root uses `qemu:///system`. Pass `-c qemu:///system` to reach the system instance."
+      - id: c
+        text: "`sudo` hides every domain from `virsh list`."
+        explanation: "`sudo` has no such effect."
+      - id: d
+        text: "`virsh list --all` only shows running domains."
+        explanation: "`--all` includes domains that are shut off."
+    correct_option: b
+    explanation: "A normal user's `virsh` uses `qemu:///session` by default, a private set of domains. Root uses `qemu:///system`. Pass `-c qemu:///system` to reach the system instance."
+
+  - id: ats002-030-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make a running transient domain persistent"
+    source_readings:
+      - sections/section-030/module-02/course-04-persistent-vs-transient-lifecycle.md
+    prompt: |-
+      The domain `metrics-cache` is running but was started with `virsh create`. You want it to survive being stopped. What do you do?
+    options:
+      - id: a
+        text: "Run `virsh autostart metrics-cache`."
+        explanation: "`autostart` needs a persistent definition first."
+      - id: b
+        text: "Run `virsh dumpxml metrics-cache > metrics-cache.xml`, then `virsh define metrics-cache.xml`."
+        explanation: "Correct. `dumpxml` writes the live blueprint to a file and `define` files it as a persistent definition. Then `autostart` and a later `start` work."
+      - id: c
+        text: "Run `virsh start metrics-cache` again."
+        explanation: "It is already running. That does not file a definition."
+      - id: d
+        text: "Nothing. A running domain is always persistent."
+        explanation: "A transient domain vanishes when it stops."
+    correct_option: b
+    explanation: "`dumpxml` writes the live blueprint to a file and `define` files it as a persistent definition. Then `autostart` and a later `start` work."
+
+  - id: ats002-030-q11
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read the memory units in virsh dominfo"
+    source_readings:
+      - sections/section-030/module-02/course-05-autostart-and-reading-true-state.md
+    prompt: |-
+      `virsh dominfo web-db` prints `Max memory: 2097152 KiB`. How much memory is that?
+    options:
+      - id: a
+        text: "2 MiB"
+        explanation: "That is the number read as MiB. The unit is KiB."
+      - id: b
+        text: "2 GiB"
+        explanation: "Correct. `virsh dominfo` reports in KiB. 2097152 KiB divided by 1024 is 2048 MiB, which is 2 GiB."
+      - id: c
+        text: "20 GiB"
+        explanation: "The value is 2097152 KiB, which is 2048 MiB."
+      - id: d
+        text: "2 TiB"
+        explanation: "That is far too large."
+    correct_option: b
+    explanation: "`virsh dominfo` reports in KiB. 2097152 KiB divided by 1024 is 2048 MiB, which is 2 GiB."

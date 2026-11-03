@@ -1,0 +1,276 @@
+# Knowledge check for section 060. Listed in astrona.yaml as a `type: quiz` entry after the last module.
+schema_version: 1
+kind: question_bank
+id: ats002-060
+course_id: ATS002
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-060
+  title: "Section 060: RPM And DNF Package Management"
+questions:
+  - id: ats002-060-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Inspect an uninstalled .rpm file for metadata and file list"
+    source_readings:
+      - sections/section-060/module-01/course-01-rpm-scope-and-inspecting.md
+    prompt: |-
+      A colleague hands you `/home/candidate/downloads/acme-tool-3.2.0-1.x86_64.rpm`. It is an internal tool that no repository publishes. Before you install anything, you want to see exactly which files it would place on disk. Which command should you run, and why?
+    options:
+      - id: a
+        text: "`rpm -qlp acme-tool-3.2.0-1.x86_64.rpm` — the `-p` modifier tells `rpm` to read the archive file on disk directly, rather than looking for an already-installed package of the same name."
+        explanation: "Correct. `rpm` treats a file path and an installed package name as two different kinds of argument. The `-p` modifier tells `rpm -ql` to read the `.rpm` file directly from disk and report the files it *would* place. Nothing has to be installed first. This is exactly the \"look before you leap\" step: read the crate's label before you open it."
+      - id: b
+        text: "`rpm -ql acme-tool-3.2.0-1.x86_64.rpm` — lists the files of an already-installed package by name."
+        explanation: "Without `-p`, `rpm -ql` searches the *installed* package database for a package literally named `acme-tool-3.2.0-1.x86_64.rpm`. No such package exists, because nothing has been installed yet."
+      - id: c
+        text: "`rpm -qa | grep acme-tool` — lists every installed package on the system and filters the output."
+        explanation: "`rpm -qa` only reports what is already installed. A new `.rpm` file that was never installed does not appear in it at all."
+      - id: d
+        text: "`dnf provides acme-tool-3.2.0-1.x86_64.rpm` — queries repository metadata for anything that would provide a file matching that literal filename."
+        explanation: "`dnf provides` answers \"which package provides this file or capability?\", not \"which files does this archive contain?\". It also searches repository metadata, not a local file."
+    correct_option: a
+    explanation: "Correct. `rpm` treats a file path and an installed package name as two different kinds of argument. The `-p` modifier tells `rpm -ql` to read the `.rpm` file directly from disk and report the files it *would* place. Nothing has to be installed first. This is exactly the \"look before you leap\" step: read the crate's label before you open it."
+
+  - id: ats002-060-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Back up, rebuild and verify a corrupted RPM database"
+    source_readings:
+      - sections/section-060/module-02/course-02-backup-rebuild-verify.md
+    prompt: |-
+      On a Rocky Linux 9 host, `rpm -qa` fails with output like `error: rpmdb: BDB0113 Thread/process ... : unable to lock ...` mixed in with otherwise normal package listings. What is the correct diagnosis, and what should you do about it?
+    options:
+      - id: a
+        text: "This is a dependency conflict; the fix is `sudo dnf distro-sync` to reconcile mismatched package versions."
+        explanation: "A real dependency conflict clearly names a missing or conflicting package. This error is about the database's internal consistency, not any package's dependencies."
+      - id: b
+        text: "This is genuine RPM database corruption; confirm the actual backend with `ls -la /var/lib/rpm`, back up `/var/lib/rpm` before touching anything, then run `sudo rpm --rebuilddb`."
+        explanation: "Correct. The error text complains about the database layer itself (`rpmdb`). It does not name a missing or conflicting package, and it does not say \"no space left\". That is the fingerprint of database corruption. (`BDB` is the prefix of Berkeley DB's own messages. Rocky Linux 9 normally uses a `sqlite`-based database instead, which is exactly why you check the real backend before following advice written for one or the other.) Backing up before `--rebuilddb` costs seconds and is your only way back if the repair does not go as expected."
+      - id: c
+        text: "This is a disk-space problem; the fix is to expand the underlying disk immediately, with no further diagnosis needed."
+        explanation: "A disk-space problem is confirmed or ruled out with `df -h /var`, and `rpm` and `dnf` usually say \"no space left\" outright. Expanding a disk without confirming the cause skips the diagnosis entirely."
+      - id: d
+        text: "This is expected, harmless output whenever EPEL is enabled, and requires no action."
+        explanation: "This error text is never expected or harmless. EPEL being enabled has nothing to do with local RPM database locking or consistency errors."
+    correct_option: b
+    explanation: "Correct. The error text complains about the database layer itself (`rpmdb`). It does not name a missing or conflicting package, and it does not say \"no space left\". That is the fingerprint of database corruption. (`BDB` is the prefix of Berkeley DB's own messages. Rocky Linux 9 normally uses a `sqlite`-based database instead, which is exactly why you check the real backend before following advice written for one or the other.) Backing up before `--rebuilddb` costs seconds and is your only way back if the repair does not go as expected."
+
+  - id: ats002-060-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Reverse a whole dnf transaction using history"
+    source_readings:
+      - sections/section-060/module-03/course-02-removing-and-history.md
+    prompt: |-
+      You accidentally installed `fail2ban` and `mtr` together in a single `dnf install` command, so a package nobody asked for came along. You want to remove the *entire* transaction as one unit, not just uninstall the unwanted package by hand. What is the correct approach?
+    options:
+      - id: a
+        text: "Run `sudo dnf remove mtr` — removes just the unwanted package, leaving `fail2ban` and the original transaction record in place."
+        explanation: "It only deals with `mtr`. The original transaction still mixed in an unwanted package, and you get no clean way to redo just the intended part afterwards."
+      - id: b
+        text: "Run `sudo dnf autoremove` — this only cleans up orphaned dependency packages that nothing else needs, not a mixed transaction you explicitly requested."
+        explanation: "`autoremove` only targets leftover dependencies nothing else needs. `mtr` was requested by name in the transaction, not pulled in as a dependency, so `autoremove` does not touch it."
+      - id: c
+        text: "Identify the transaction with `dnf history list` / `dnf history info <id>`, then run `sudo dnf history undo <id>` to undo the whole transaction as a single, atomic unit."
+        explanation: "Correct. `dnf` keeps a real transaction history, something Debian's `apt` has no direct match for. `dnf history undo <id>` reverses a whole past transaction as one unit. It undoes exactly what that transaction did (installing both `fail2ban` and `mtr`), so you do not have to work out and reverse each change by hand."
+      - id: d
+        text: "Run `sudo dnf reinstall fail2ban mtr` — reinstalls both packages fresh, without undoing anything."
+        explanation: "Reinstalling both packages undoes nothing. It leaves `mtr` installed, the opposite of the goal."
+    correct_option: c
+    explanation: "Correct. `dnf` keeps a real transaction history, something Debian's `apt` has no direct match for. `dnf history undo <id>` reverses a whole past transaction as one unit. It undoes exactly what that transaction did (installing both `fail2ban` and `mtr`), so you do not have to work out and reverse each change by hand."
+
+  - id: ats002-060-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find the package that provides a missing command"
+    source_readings:
+      - sections/section-060/module-04/course-02-provides-and-cross-referencing.md
+    prompt: |-
+      A colleague reports that a script fails because the `ip` command is not found on a fresh Rocky Linux 9 host. You want to find which package would need to be installed to provide it, without installing anything yet and without guessing the package name from memory. Which command actually answers this?
+    options:
+      - id: a
+        text: "`rpm -qf /usr/sbin/ip` — searches the local RPM database for whatever already-installed package owns that path."
+        explanation: "`rpm -qf` only searches the *local, installed* database. `ip` is not installed and the file does not exist locally, so this cannot answer \"what would provide it?\"."
+      - id: b
+        text: "`dnf list installed | grep ip` — lists currently installed packages matching a naming pattern."
+        explanation: "`ip` is not installed in this scenario, so it can never appear in `dnf list installed`, whatever the grep pattern."
+      - id: c
+        text: "`dnf search ip` — matches package names and summary text against the keyword `ip`, which is a very broad, imprecise match for a specific command name."
+        explanation: "`dnf search` matches loosely against names and summary text. A bare keyword search for `ip` returns a flood of unrelated results instead of the one package that provides that exact command."
+      - id: d
+        text: "`dnf provides '*/ip'` — searches every configured repository's metadata for any package that declares it would place a file matching that name, regardless of current install state."
+        explanation: "Correct. `dnf provides` (also spelled `whatprovides`) answers a question `rpm -qf` cannot: \"which package would I need to install to get this?\". It searches repository metadata, which exists whether or not anything is installed. The `*/ip` glob matches the command in any directory, which is more robust than guessing an exact path."
+    correct_option: d
+    explanation: "Correct. `dnf provides` (also spelled `whatprovides`) answers a question `rpm -qf` cannot: \"which package would I need to install to get this?\". It searches repository metadata, which exists whether or not anything is installed. The `*/ip` glob matches the command in any directory, which is more robust than guessing an exact path."
+
+  - id: ats002-060-q05
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Read how a dnf group install treats packages that are already installed"
+    source_readings:
+      - sections/section-060/module-05/course-02-inspecting-and-installing.md
+    prompt: |-
+      On a host, `automake` was already installed on its own, for an unrelated reason, before anyone touched the `"Development Tools"` group. Later, someone runs `sudo dnf group install "Development Tools"` (`automake` is also a member of that group), and afterwards runs `sudo dnf group remove "Development Tools"`. Does that group removal remove `automake`?
+    options:
+      - id: a
+        text: "No — `dnf` only removes packages it tracked as having been installed *specifically as part of* that group transaction; `automake` predates the group install, so its removal was never tracked as belonging to it, and it survives."
+        explanation: "Correct. `dnf group remove` works from `dnf`'s own records, not from the group's member list. It removes what it recorded as installed *because of* that group transaction. A package that was already installed on its own is not swept up just because the group also lists it. What `dnf` recorded decides the removal, not the overlap between \"what is installed\" and \"what the group lists\"."
+      - id: b
+        text: "Yes — `automake` is a member of the group's metadata, and `dnf group remove` removes every package the group lists as a member."
+        explanation: "It describes removal by membership, which is exactly the common wrong assumption that `dnf`'s record-based behaviour avoids."
+      - id: c
+        text: "Yes — because `--with-optional` was never passed during the install, `dnf` falls back to removing every package the group could possibly include."
+        explanation: "`--with-optional` only controls whether Optional members are pulled in *at install time*. It has no effect on which packages a later group removal targets."
+      - id: d
+        text: "No — because `automake` is classified as a \"mandatory\" tier member, and mandatory-tier packages are permanently protected from any future removal."
+        explanation: "Mandatory, Default and Optional are install-time tiers. They say whether a package installs with the group, not whether it is protected from removal, and no such protection exists."
+    correct_option: a
+    explanation: "Correct. `dnf group remove` works from `dnf`'s own records, not from the group's member list. It removes what it recorded as installed *because of* that group transaction. A package that was already installed on its own is not swept up just because the group also lists it. What `dnf` recorded decides the removal, not the overlap between \"what is installed\" and \"what the group lists\"."
+
+  - id: ats002-060-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read rpm -V output to see what changed in an installed package"
+    source_readings:
+      - sections/section-060/module-01/course-03-verifying-integrity.md
+    prompt: |-
+      `rpm -V httpd` prints `S.5....T.  c /etc/httpd/conf/httpd.conf`. What does it tell you?
+    options:
+      - id: a
+        text: "The package `httpd` is not installed."
+        explanation: "A missing package gives an error such as `package httpd is not installed`, not a line with flags."
+      - id: b
+        text: "The size, the digest and the modification time of the configuration file differ from the package's records."
+        explanation: "Correct. S is size, 5 is the digest, T is the modification time, and the `c` marks a configuration file."
+      - id: c
+        text: "The file is missing from disk."
+        explanation: "A missing file is shown as `missing` in the flags column."
+      - id: d
+        text: "Only the file's permissions changed."
+        explanation: "A permission change shows as `M`, not as S, 5 and T."
+    correct_option: b
+    explanation: "Correct. S is size, 5 is the digest, T is the modification time, and the `c` marks a configuration file."
+
+  - id: ats002-060-q07
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Find which installed package owns a file"
+    source_readings:
+      - sections/section-060/module-01/course-02-installing-and-ownership.md
+    prompt: |-
+      You need to know which installed package provides `/usr/bin/ssh` on a Rocky Linux host. Which command answers it?
+    options:
+      - id: a
+        text: "`rpm -ql /usr/bin/ssh`"
+        explanation: "`rpm -ql` lists the files of a package name. It does not accept a path to find an owner."
+      - id: b
+        text: "`rpm -qa /usr/bin/ssh`"
+        explanation: "`rpm -qa` lists all installed packages and does not take a file path for this."
+      - id: c
+        text: "`rpm -qf /usr/bin/ssh`"
+        explanation: "Correct. `rpm -qf` queries the package that owns a file."
+      - id: d
+        text: "`rpm -V /usr/bin/ssh`"
+        explanation: "`rpm -V` verifies a package, and a path is not a package name."
+    correct_option: c
+    explanation: "Correct. `rpm -qf` queries the package that owns a file."
+
+  - id: ats002-060-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Use the exit status of dnf check-update"
+    source_readings:
+      - sections/section-060/module-03/course-01-the-dnf-loop.md
+    prompt: |-
+      A script must know whether updates are waiting without installing anything. Which fact about `dnf check-update` lets it decide?
+    options:
+      - id: a
+        text: "It exits with 0 when updates are available and 1 when none are."
+        explanation: "It is the other way round: 0 means no updates are waiting, and 100 means updates are available."
+      - id: b
+        text: "It always exits with 0, so the script must count the lines of output."
+        explanation: "The exit status differs, which is what a script should use."
+      - id: c
+        text: "It installs the updates and exits with the number installed."
+        explanation: "`check-update` never installs anything."
+      - id: d
+        text: "It exits with status 100 when updates are available, 0 when none are, and 1 on an error."
+        explanation: "Correct. The exit status is made for scripts."
+    correct_option: d
+    explanation: "Correct. The exit status is made for scripts."
+
+  - id: ats002-060-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Undo a dnf transaction from history"
+    source_readings:
+      - sections/section-060/module-03/course-02-removing-and-history.md
+    prompt: |-
+      Transaction 14 in `dnf history` installed three packages by mistake. Which command reverses exactly that transaction?
+    options:
+      - id: a
+        text: "`sudo dnf history undo 14`"
+        explanation: "Correct. It reverts the changes of transaction 14."
+      - id: b
+        text: "`sudo dnf history info 14`"
+        explanation: "`info` only shows the details of the transaction and changes nothing."
+      - id: c
+        text: "`sudo dnf remove 14`"
+        explanation: "`14` is a transaction ID, not a package name, so this finds no package."
+      - id: d
+        text: "`sudo dnf clean all`"
+        explanation: "`clean all` removes cached metadata and packages. It does not reverse a transaction."
+    correct_option: a
+    explanation: "Correct. It reverts the changes of transaction 14."
+
+  - id: ats002-060-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find the package that provides a file that is not installed"
+    source_readings:
+      - sections/section-060/module-04/course-02-provides-and-cross-referencing.md
+    prompt: |-
+      A script fails because `/usr/bin/dig` is missing on a Rocky Linux host. Which command finds the package from the enabled repositories that would provide it?
+    options:
+      - id: a
+        text: "`rpm -qf /usr/bin/dig`"
+        explanation: "`rpm -qf` only queries installed packages, and the file is not installed."
+      - id: b
+        text: "`dnf provides /usr/bin/dig` or `dnf provides '*/bin/dig'`"
+        explanation: "Correct. `dnf provides` searches the repository file lists for the path."
+      - id: c
+        text: "`dnf list /usr/bin/dig`"
+        explanation: "`dnf list` filters by package name, not by file path."
+      - id: d
+        text: "`dnf group info dig`"
+        explanation: "`group info` describes a package group and is not a file search."
+    correct_option: b
+    explanation: "Correct. `dnf provides` searches the repository file lists for the path."
+
+  - id: ats002-060-q11
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Know which tiers a dnf group install pulls in"
+    source_readings:
+      - sections/section-060/module-05/course-02-inspecting-and-installing.md
+    prompt: |-
+      You run `sudo dnf group install "Development Tools"` with no extra options. Which packages of the group are installed?
+    options:
+      - id: a
+        text: "Only the mandatory packages."
+        explanation: "Default packages are installed too."
+      - id: b
+        text: "All packages, including the optional ones."
+        explanation: "Optional packages are skipped unless `--with-optional` is given."
+      - id: c
+        text: "The mandatory and the default packages. Optional ones need `--with-optional`."
+        explanation: "Correct. Optional packages are only added when you ask for them."
+      - id: d
+        text: "None. `group install` only marks the group as installed."
+        explanation: "It installs the packages of the group."
+    correct_option: c
+    explanation: "Correct. Optional packages are only added when you ask for them."

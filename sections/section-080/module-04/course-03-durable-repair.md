@@ -10,6 +10,8 @@ Run these commands on the target system itself. If the target cannot boot, run t
 
 ### Check the disk and the firmware type
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: the working shell on the target (chroot or real), root
 lsblk                                   # confirm the disk before writing to it
@@ -87,7 +89,13 @@ On a real machine the final proof is still a real reboot: a normal menu, or a bo
 
 You can now reinstall GRUB's boot code, write a fresh `grub.cfg` and check both without a reboot. The mission asks you to repair a training ship whose `/boot/grub/grub.cfg` is gone, before its next reboot.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy grub-repair-bench
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-04/labs/lab-01
@@ -100,8 +108,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-080/module-04/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-084
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-04/playground
 ```

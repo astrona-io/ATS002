@@ -6,6 +6,8 @@ Package work rarely happens one package at a time. This part covers installing s
 
 Give every related package to one `apt install` call:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: host, root
 sudo apt install build-essential git cmake pkg-config

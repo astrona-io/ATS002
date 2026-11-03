@@ -1,0 +1,276 @@
+# Knowledge check for section 070. Listed in astrona.yaml as a `type: quiz` entry after the last module.
+schema_version: 1
+kind: question_bank
+id: ats002-070
+course_id: ATS002
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-070
+  title: "Section 070: Zypper Package Management"
+questions:
+  - id: ats002-070-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Know where zypper runs in this course and what the host lacks"
+    source_readings:
+      - sections/section-070/module-01/course-01-refresh-updates-vs-patches.md
+    prompt: |-
+      You open a terminal on the lab virtual machine with SSH (secure shell) and type `zypper refresh` directly at the shell prompt, expecting to see the openSUSE repositories sync. Instead you get `zypper: command not found`. What is the cause, and what should you do instead?
+    options:
+      - id: a
+        text: "The virtual machine itself is Ubuntu 24.04, not openSUSE — `zypper` only exists inside the `zypperbox` container. You need to run `docker exec -it zypperbox bash` first, then run zypper commands inside that shell."
+        explanation: "Correct. This lab's virtual machine boots from the platform's only available base image, Ubuntu 24.04, which has no zypper or openSUSE package database at all. To provide a genuine openSUSE experience anyway, bootstrap installs Docker and starts a long-lived `opensuse/leap:15.6` container named `zypperbox`. All zypper work happens inside that container, reached via `docker exec -it zypperbox bash` — not on the Ubuntu host directly."
+      - id: b
+        text: "The virtual machine's `zypper` program is corrupted and needs to be reinstalled with `apt`."
+        explanation: "There is no zypper binary to corrupt on an Ubuntu host — it was never installed there in the first place, by design."
+      - id: c
+        text: "`zypper` requires a reboot of the virtual machine before it becomes available on the PATH (the list of folders the shell searches for commands)."
+        explanation: "No reboot would install a package manager that doesn't exist for this distribution on this host."
+      - id: d
+        text: "`zypper` must be prefixed with `sudo` for the shell to recognize it as a valid command."
+        explanation: "`sudo` changes privilege level, not command lookup — a genuinely missing binary returns \"command not found\" regardless of `sudo`."
+    correct_option: a
+    explanation: "Correct. This lab's virtual machine boots from the platform's only available base image, Ubuntu 24.04, which has no zypper or openSUSE package database at all. To provide a genuine openSUSE experience anyway, bootstrap installs Docker and starts a long-lived `opensuse/leap:15.6` container named `zypperbox`. All zypper work happens inside that container, reached via `docker exec -it zypperbox bash` — not on the Ubuntu host directly."
+
+  - id: ats002-070-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose between zypper patch and zypper update by policy"
+    source_readings:
+      - sections/section-070/module-01/course-02-applying-the-right-one.md
+    prompt: |-
+      Your team's policy for this openSUSE host is strictly conservative: apply security-tracked fixes promptly, but do not chase every routine package version bump during the maintenance window. Which single command matches that policy?
+    options:
+      - id: a
+        text: "`zypper update`"
+        explanation: "`zypper update` applies every available update regardless of patch coverage — a more aggressive outcome than the stated conservative policy calls for."
+      - id: b
+        text: "`zypper patch`"
+        explanation: "Correct. `zypper patch` applies only the updates covered by currently published, curated patch definitions — the layer where SUSE tracks security and bug-fix bundles deliberately. It leaves any raw package version bump not covered by a published patch untouched, which is precisely the \"security patches promptly, don't chase every bump\" posture."
+      - id: c
+        text: "`zypper dup`"
+        explanation: "`zypper dup` (distribution upgrade) performs a full upgrade or sync to a new distribution version, an even larger and riskier operation than a routine update, nowhere near what a conservative policy would call for."
+      - id: d
+        text: "`zypper install --force`"
+        explanation: "`install --force` reinstalls or forces a specific package installation; it has nothing to do with applying updates or patches across the system."
+    correct_option: b
+    explanation: "Correct. `zypper patch` applies only the updates covered by currently published, curated patch definitions — the layer where SUSE tracks security and bug-fix bundles deliberately. It leaves any raw package version bump not covered by a published patch untouched, which is precisely the \"security patches promptly, don't chase every bump\" posture."
+
+  - id: ats002-070-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Tell list-updates from list-patches"
+    source_readings:
+      - sections/section-070/module-01/course-01-refresh-updates-vs-patches.md
+    prompt: |-
+      While auditing an openSUSE host, you run both `zypper list-updates` and `zypper list-patches` right after a fresh `zypper refresh`. The two commands return different sets of package names. A colleague says this must mean one of the commands is broken. Are they right?
+    options:
+      - id: a
+        text: "Yes — after a refresh, both commands should always report identical results, so a mismatch indicates a stale cache."
+        explanation: "A fresh refresh does not force these two structurally different reports to converge — they answer different questions by design."
+      - id: b
+        text: "Yes — `list-patches` is deprecated in openSUSE Leap 15.6 and should never return results."
+        explanation: "`list-patches` is a fully supported, current subcommand on openSUSE Leap 15.6."
+      - id: c
+        text: "No — `list-updates` reports every installed package with a newer version available (a raw version comparison), while `list-patches` reports only the curated, tracked patch bundles a maintainer has explicitly published; a package can have a newer version with no patch covering it yet, so the two lists legitimately differ."
+        explanation: "Correct. These two commands answer genuinely different questions. `list-updates` is a straightforward package-by-package version comparison with no curation involved. `list-patches` lists SUSE's tracked patch objects — named bundles a repository maintainer explicitly assembled and classified by category and severity. A package appearing in one list without appearing in the other is expected behavior, not a malfunction."
+      - id: d
+        text: "No — but only because `list-updates` ignores security-classified packages entirely."
+        explanation: "`list-updates` doesn't filter by security classification at all — it has no concept of patch categories; that classification only exists on the patch side."
+    correct_option: c
+    explanation: "Correct. These two commands answer genuinely different questions. `list-updates` is a straightforward package-by-package version comparison with no curation involved. `list-patches` lists SUSE's tracked patch objects — named bundles a repository maintainer explicitly assembled and classified by category and severity. A package appearing in one list without appearing in the other is expected behavior, not a malfunction."
+
+  - id: ats002-070-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Know that zypper has no undo history and how to reverse a remove"
+    source_readings:
+      - sections/section-070/module-01/course-03-install-remove-history.md
+    prompt: |-
+      You mistakenly ran `zypper remove` on a package that turned out to still be needed. You want to reverse the mistake and ask a colleague whether `zypper history` can undo it for you the way `dnf history undo <id>` would on a Red Hat family system. What is the accurate answer?
+    options:
+      - id: a
+        text: "Yes — `zypper history undo <id>` mechanically reverses any past zypper transaction, identically to dnf."
+        explanation: "No such `undo` subcommand exists under `zypper history` at all — this is a real, documented difference from dnf, not a missing flag."
+      - id: b
+        text: "Yes, but only for `patch` operations, not for `install` or `remove` operations."
+        explanation: "There's no partial undo capability scoped to just patch operations either — the log format doesn't support mechanical reversal for any operation type."
+      - id: c
+        text: "No — `zypper history` cannot be read at all once a new operation has been performed."
+        explanation: "`zypper history` remains fully readable and continues accumulating entries indefinitely; new operations don't erase or block access to prior ones."
+      - id: d
+        text: "No — `zypper history` is an ordered, timestamped audit log of what zypper has done; it has no undo/rollback subcommand, so reversing the removal means manually reinstalling the package, informed by what the log shows happened."
+        explanation: "Correct. `zypper history` is a genuine audit trail — it records what was installed, removed, or patched, and when, in order. It is not a transactional rollback mechanism. There is no `zypper history undo` equivalent to `dnf history undo`. Reversing a mistaken removal means manually reinstalling the specific package, using the log only to confirm exactly what happened and when."
+    correct_option: d
+    explanation: "Correct. `zypper history` is a genuine audit trail — it records what was installed, removed, or patched, and when, in order. It is not a transactional rollback mechanism. There is no `zypper history undo` equivalent to `dnf history undo`. Reversing a mistaken removal means manually reinstalling the specific package, using the log only to confirm exactly what happened and when."
+
+  - id: ats002-070-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find the package that provides a missing file"
+    source_readings:
+      - sections/section-070/module-02/course-01-the-three-questions.md
+    prompt: |-
+      A colleague reports that a script on your openSUSE host fails because the `ip` command can't be found at `/usr/sbin/ip`. You need to determine which package would need to be installed to provide that exact file — without installing anything yet, since you first want to confirm the correct package name. Which command answers this?
+    options:
+      - id: a
+        text: "`zypper what-provides /usr/sbin/ip`"
+        explanation: "Correct. `zypper what-provides` searches configured repositories' published metadata for any package that declares it would place a file at that exact path, regardless of whether it's currently installed. This is exactly what's needed here, since the file isn't on the system yet — the question is which package *would* provide it."
+      - id: b
+        text: "`rpm -qf /usr/sbin/ip`"
+        explanation: "`rpm -qf` only queries the local RPM database for files that are already installed on the system; since `/usr/sbin/ip` doesn't exist locally yet, it would report the file isn't owned by any installed package, answering nothing useful here."
+      - id: c
+        text: "`zypper search --installed-only ip`"
+        explanation: "`search --installed-only` filters to packages already present on the system, which is the opposite of what's needed when researching an uninstalled dependency."
+      - id: d
+        text: "`zypper info ip`"
+        explanation: "`zypper info` requires the exact package name as its argument — but the package name (likely `iproute2`) is precisely what's unknown here; `info` does not resolve file paths to package names."
+    correct_option: a
+    explanation: "Correct. `zypper what-provides` searches configured repositories' published metadata for any package that declares it would place a file at that exact path, regardless of whether it's currently installed. This is exactly what's needed here, since the file isn't on the system yet — the question is which package *would* provide it."
+
+  - id: ats002-070-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Refresh the repositories before judging what is available"
+    source_readings:
+      - sections/section-070/module-01/course-01-refresh-updates-vs-patches.md
+    prompt: |-
+      On an openSUSE host, which command refreshes the repository metadata so that `zypper list-patches` shows current information?
+    options:
+      - id: a
+        text: "`zypper patch`"
+        explanation: "`patch` applies patches. It does not just refresh metadata."
+      - id: b
+        text: "`zypper refresh`"
+        explanation: "Correct. `zypper refresh` (short `zypper ref`) downloads current repository metadata."
+      - id: c
+        text: "`zypper clean`"
+        explanation: "`clean` removes cached data and does not fetch new metadata."
+      - id: d
+        text: "`zypper verify`"
+        explanation: "`verify` checks dependencies of installed packages and does not refresh anything."
+    correct_option: b
+    explanation: "Correct. `zypper refresh` (short `zypper ref`) downloads current repository metadata."
+
+  - id: ats002-070-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Apply only security patches"
+    source_readings:
+      - sections/section-070/module-01/course-02-applying-the-right-one.md
+    prompt: |-
+      Policy says to apply only security patches on an openSUSE host. Which command does that?
+    options:
+      - id: a
+        text: "`sudo zypper update`"
+        explanation: "`update` upgrades all packages with newer versions, not just security fixes."
+      - id: b
+        text: "`sudo zypper dist-upgrade`"
+        explanation: "`dist-upgrade` moves the whole system to the versions of the repositories."
+      - id: c
+        text: "`sudo zypper patch --category security`"
+        explanation: "Correct. `--category` restricts the patches that are applied."
+      - id: d
+        text: "`sudo zypper list-patches --category security`"
+        explanation: "This only lists the patches and applies none."
+    correct_option: c
+    explanation: "Correct. `--category` restricts the patches that are applied."
+
+  - id: ats002-070-q08
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Install and remove with zypper"
+    source_readings:
+      - sections/section-070/module-01/course-03-install-remove-history.md
+    prompt: |-
+      Which pair of commands installs and then removes the package `htop` on openSUSE?
+    options:
+      - id: a
+        text: "`sudo zypper add htop` and `sudo zypper delete htop`"
+        explanation: "`add` and `delete` are not zypper commands for packages."
+      - id: b
+        text: "`sudo zypper get htop` and `sudo zypper purge htop`"
+        explanation: "`get` and `purge` are not zypper commands."
+      - id: c
+        text: "`sudo rpm -i htop` and `sudo rpm -r htop`"
+        explanation: "`rpm -i` needs a package file, and `rpm -r` is not the remove option. It also skips repository dependency handling."
+      - id: d
+        text: "`sudo zypper install htop` and `sudo zypper remove htop`"
+        explanation: "Correct. They also have the short forms `in` and `rm`."
+    correct_option: d
+    explanation: "Correct. They also have the short forms `in` and `rm`."
+
+  - id: ats002-070-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Search only installed packages"
+    source_readings:
+      - sections/section-070/module-02/course-02-installed-only-and-rpm-fallback.md
+    prompt: |-
+      You want to search the packages that are already installed on an openSUSE host for names containing `ssh`, and leave out what the repositories offer. Which command?
+    options:
+      - id: a
+        text: "`zypper search --installed-only ssh` (short `zypper se -i ssh`)"
+        explanation: "Correct. The option limits the search to installed packages."
+      - id: b
+        text: "`zypper search ssh`"
+        explanation: "This also lists packages that are only available in the repositories."
+      - id: c
+        text: "`zypper info ssh`"
+        explanation: "`info` describes one package. It is not a search."
+      - id: d
+        text: "`zypper repos ssh`"
+        explanation: "`repos` lists the repositories. It does not search packages."
+    correct_option: a
+    explanation: "Correct. The option limits the search to installed packages."
+
+  - id: ats002-070-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Show the versions and repositories behind a search result"
+    source_readings:
+      - sections/section-070/module-02/course-01-the-three-questions.md
+    prompt: |-
+      A `zypper search openssh` result shows one line per package. Which option also shows the versions and the repository each one comes from?
+    options:
+      - id: a
+        text: "`zypper search --installed-only openssh`"
+        explanation: "This limits the result to installed packages and does not add the version and repository columns."
+      - id: b
+        text: "`zypper search --details openssh` (short `-s`)"
+        explanation: "Correct. The detail view adds version, architecture and repository columns."
+      - id: c
+        text: "`zypper refresh openssh`"
+        explanation: "`refresh` takes repository names, not package names."
+      - id: d
+        text: "`zypper verify openssh`"
+        explanation: "`verify` checks dependencies and is not a search."
+    correct_option: b
+    explanation: "Correct. The detail view adds version, architecture and repository columns."
+
+  - id: ats002-070-q11
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "List the configured repositories with their URIs"
+    source_readings:
+      - sections/section-070/module-01/course-01-refresh-updates-vs-patches.md
+    prompt: |-
+      Which command lists the configured openSUSE repositories together with their URIs?
+    options:
+      - id: a
+        text: "`zypper search --repos`"
+        explanation: "`search` has no such option for listing repositories."
+      - id: b
+        text: "`zypper info --repos`"
+        explanation: "`info` describes packages, not repositories."
+      - id: c
+        text: "`zypper repos --uri` (short `zypper lr -u`)"
+        explanation: "Correct. The option adds the URI column."
+      - id: d
+        text: "`zypper refresh --uri`"
+        explanation: "`refresh` downloads metadata and does not list repositories."
+    correct_option: c
+    explanation: "Correct. The option adds the URI column."

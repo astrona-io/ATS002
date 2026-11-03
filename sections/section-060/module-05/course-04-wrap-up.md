@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You can now fit a ship out with a whole bundle of crates in one order, and retire it again knowing exactly what leaves. Look back at what you learned, check yourself, and clean up anything still running.
 
@@ -72,9 +72,9 @@ No. `dnf` only removes what it recorded as installed by that group. `automake` w
 No. `dnf` recorded it as part of the group, so the removal takes it. Install it again yourself if something still needs it.
 </details>
 
-## Clean up
+## Clean up the playground
 
-Each mission runs a virtual machine on your computer. When you are done with this module, remove any mission that is still running.
+When you are done with this module, remove the playground and any mission that is still running.
 
 First, see what is still running:
 
@@ -82,8 +82,18 @@ First, see what is still running:
 astrona list
 ```
 
-If the mission is still there, remove it. The command takes its **name**, not its folder path:
+Remove the playground. The command takes its **name**, not its folder path:
+
+```sh
+astrona destroy dnf-package-groups
+```
+
+If `astrona list` also showed a mission, remove it the same way, for example:
 
 ```sh
 astrona destroy ats-002-lab-065
 ```
+
+Run `astrona list` again to check that everything is gone. You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean, so nothing you broke carries over.
+
+<!-- astrona:playground:destroy -->

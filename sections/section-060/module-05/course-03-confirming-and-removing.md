@@ -8,6 +8,8 @@ Two read-only commands show the group from both sides: its members and its insta
 
 ### Read the members again
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the rpmbox container
 dnf group info "Development Tools"
@@ -71,7 +73,13 @@ Confirm that `"Development Tools"` no longer appears. It is the same check as ab
 
 You can now find a group, read its tiers, install it, confirm it and predict what its removal takes. The mission asks you to run that whole cycle with `"Development Tools"` on a ship where `automake` was installed beforehand, and to find out for yourself which packages survive.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy dnf-package-groups
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-05/labs/lab-01
@@ -84,8 +92,9 @@ On the lab machine, open a shell inside the `rpmbox` container with `docker exec
 astrona submit -c sections/section-060/module-05/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-065
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-05/playground
 ```

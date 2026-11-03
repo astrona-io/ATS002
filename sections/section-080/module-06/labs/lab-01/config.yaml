@@ -1,0 +1,44 @@
+metadata:
+  name: "ats-002-lab-087"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-087-setup"
+      description: "Deletes the initramfs image of the running kernel from /boot. The machine is not rebooted"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-initramfs-exists"
+      description: "Confirms /boot/initrd.img-<running kernel> exists, is not empty and was created after the lab started"
+      type: "file"
+      source: "validation/validate-initramfs-exists.sh"
+
+    - name: "verify-initramfs-content"
+      description: "Confirms lsinitramfs can read the image and it holds the initramfs boot scripts"
+      type: "file"
+      source: "validation/validate-initramfs-content.sh"
+
+    - name: "verify-initrd-link"
+      description: "Confirms the /boot/initrd.img link resolves to an existing file"
+      type: "file"
+      source: "validation/validate-initrd-link.sh"
+
+teardown:
+  keepCluster: false

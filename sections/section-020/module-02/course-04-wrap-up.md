@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have finished every part and the mission in this module. Before you move on, look back at what you learned, check yourself, and clean up anything still running.
 
@@ -85,7 +85,7 @@ The container is not on the default bridge network, so the top-level field is em
 
 ## Clean up
 
-Each mission runs a virtual machine on your computer. When you are done with this module, remove any mission that is still running.
+Your playground and each mission run a virtual machine on your computer. When you are done with this module, remove the playground, and any mission that is still running.
 
 First, see what is still running:
 
@@ -93,8 +93,18 @@ First, see what is still running:
 astrona list
 ```
 
-If the mission is still there, remove it. The command takes its **name**, not its folder path:
+If a mission is still there, remove it. The command takes its **name**, not its folder path:
 
 ```sh
 astrona destroy ats-002-lab-022
 ```
+
+Then remove the playground the same way:
+
+```sh
+astrona destroy docker-lifecycle-bay
+```
+
+You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean.
+
+<!-- astrona:playground:destroy -->

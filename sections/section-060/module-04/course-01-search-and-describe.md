@@ -10,6 +10,8 @@ Astronaut, before you order a crate you look it up in the depot's catalogue. Thi
 
 You have a rough idea, not a name: "something that blocks brute-force login attempts".
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the rpmbox container
 dnf search fail2ban

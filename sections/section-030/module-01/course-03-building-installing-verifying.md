@@ -8,6 +8,8 @@ Two commands do the work here. `make` reads the `Makefile` and calls the compile
 
 ### Run the build
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the source dir
 make
@@ -85,7 +87,13 @@ Many source trees already build the exact name. Moving a file that is already ri
 
 You can now unpack a source tarball, find the flags you need, build and install a program, and prove the result on the program itself. The mission asks you to build a terminal web browser from source so it lands at an exact path with one feature switched off.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Pause your playground first, so it is not running while you work on the mission:
+
+```sh
+astrona stop source-build-bay
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-01/labs/lab-01
@@ -98,8 +106,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-030/module-01/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and wake your playground again:
 
 ```sh
 astrona destroy ats-002-lab-031
+astrona start source-build-bay
 ```

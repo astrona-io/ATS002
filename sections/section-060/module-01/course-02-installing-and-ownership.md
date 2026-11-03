@@ -10,6 +10,8 @@ Astronaut, you have read the label on the crate. Now you load it, and then you a
 
 Install the file you inspected:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside rpmbox, root
 sudo rpm -ivh /home/candidate/downloads/logship-agent-2.1.0-1.x86_64.rpm

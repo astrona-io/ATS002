@@ -8,6 +8,8 @@ The first question of any maintenance window is "what is waiting?". `dnf` answer
 
 ### dnf check-update
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the rpmbox container
 dnf check-update

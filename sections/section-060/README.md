@@ -30,7 +30,7 @@ Work through the modules in order. Each one ends with at least one graded missio
 4. [DNF Package Information Lookup](./module-04/course.md): `dnf search`, `dnf info`, `dnf provides`, and when to trust `rpm` instead.
 5. [DNF Package Groups](./module-05/course.md): group tiers, installing a group and what a group removal leaves behind.
 
-After the modules, test yourself with the [section knowledge check](./quiz.md).
+After the modules, test yourself with the [section knowledge check](./quiz.yaml).
 
 ## The capstone
 

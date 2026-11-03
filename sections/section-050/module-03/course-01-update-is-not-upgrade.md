@@ -6,6 +6,8 @@ Two commands one word apart do completely different things, and mixing them up i
 
 Run it first in every session:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: host, root
 sudo apt update

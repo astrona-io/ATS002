@@ -6,6 +6,8 @@
 
 A plain `apt install nginx` takes whatever the `Candidate:` line of `apt-cache policy` says. To get one specific build, name the version:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: host, root
 sudo apt install nginx=1.24.0-1~jammy
@@ -89,7 +91,13 @@ A hold can also be overridden on purpose: `apt-get dist-upgrade --allow-change-h
 
 You can now trust a vendor's depot with a scoped key, install an exact version from it and hold that version. The mission asks you to do all of that against a real signed repository running on the lab machine itself.
 
-The mission runs on its own training ship. Start it and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy apt-repos-and-pinning
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-01/labs/lab-01
@@ -102,17 +110,24 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-050/module-01/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-051
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-01/playground
 ```
 
 ## Your mission: APT Pinning (not a hold) Lab
 
 You can now tell a pin from a hold and read a pin's effect in `apt-cache policy`. The mission asks you to write a pin so that `apt` prefers the older version of `curl` from Ubuntu's release pocket over the newer one in the updates pocket.
 
-The mission runs on its own training ship. Start it and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy apt-repos-and-pinning
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-01/labs/lab-02
@@ -125,8 +140,9 @@ Read the task in [`question.md`](./labs/lab-02/question.md) and solve it on your
 astrona submit -c sections/section-050/module-01/labs/lab-02
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-051b
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-01/playground
 ```

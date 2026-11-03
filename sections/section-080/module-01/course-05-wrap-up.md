@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have finished every part and both missions in this module. Before you move on, look back at what you learned, check yourself, and clean up anything still running.
 
@@ -88,9 +88,9 @@ That every line in that `/etc/fstab` can be mounted as written, which is the sam
 Other mounts (the bind mounts or `/mnt/repair/data`) are still mounted inside it. Unmount them first, in reverse order, or use `sudo umount -R /mnt/repair`.
 </details>
 
-## Clean up
+## Clean up the playground
 
-Each mission runs a virtual machine on your computer. When you are done with this module, remove any mission that is still running.
+When you are done with this module, remove the playground and any mission that is still running.
 
 First, see what is still running:
 
@@ -98,11 +98,19 @@ First, see what is still running:
 astrona list
 ```
 
-If a mission is still there, remove it. The command takes its **name**, not its folder path:
+Remove the playground. The command takes its **name**, not its folder path:
+
+```sh
+astrona destroy chroot-rescue-bench
+```
+
+If `astrona list` also showed a mission, remove it the same way, for example:
 
 ```sh
 astrona destroy ats-002-lab-081
 astrona destroy ats-002-lab-085
 ```
 
-Then run `astrona list` again to check that everything is gone.
+Run `astrona list` again to check that everything is gone. You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean, so nothing you broke carries over.
+
+<!-- astrona:playground:destroy -->

@@ -1,0 +1,61 @@
+metadata:
+  name: "ats-002-lab-08a"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    # Two spare 1 GB disks, found by their serials. Only these are scanned,
+    # so the main machine stays reachable over SSH.
+    extraDisks:
+      - sizeGB: 1
+        serial: "lab08a-suspect"
+      - sizeGB: 1
+        serial: "lab08a-other"
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-08a-setup"
+      description: "Writes a known pattern to the suspect disk, stores its hash and logs an I/O error about it in the kernel log"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-device-and-size"
+      description: "Confirms device.txt names the suspect disk and size.txt holds its exact size in bytes"
+      type: "file"
+      source: "validation/validate-device-and-size.sh"
+
+    - name: "verify-smart-report"
+      description: "Confirms smart.txt holds the output of smartctl for the suspect disk"
+      type: "file"
+      source: "validation/validate-smart-report.sh"
+
+    - name: "verify-kernel-errors"
+      description: "Confirms kernel-errors.txt holds the I/O error line about the suspect disk"
+      type: "file"
+      source: "validation/validate-kernel-errors.sh"
+
+    - name: "verify-badblocks-report"
+      description: "Confirms badblocks.txt holds the result of a finished bad-block scan"
+      type: "file"
+      source: "validation/validate-badblocks-report.sh"
+
+    - name: "verify-data-intact"
+      description: "Confirms the first MiB of the suspect disk still has its original hash"
+      type: "file"
+      source: "validation/validate-data-intact.sh"
+
+teardown:
+  keepCluster: false

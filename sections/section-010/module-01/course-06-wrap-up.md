@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have worked through every part and the mission in this module. Before you move on, look back at what you learned, check yourself, and clean up anything still running.
 
@@ -120,3 +120,5 @@ astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/m
 ```
 
 > *A read shows the kernel's memory; `sysctl -w` changes only memory; a drop-in under `/etc/sysctl.d/` plus `sysctl --system` changes it now and on every boot.*
+
+<!-- astrona:playground:destroy -->

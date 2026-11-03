@@ -25,10 +25,18 @@ Check that you have the knowledge and the tools this module expects before you b
 - **That `apt install` gets software from configured repositories.** You do not need to know how yet.
 - **A little about `curl`.** It downloads a file from an address. Knowing GPG (the tool that handles signing keys) helps, but every key step is shown.
 
-### What you need
+### What is in your playground
 
-- A terminal on an Ubuntu 24.04 machine. The examples in the parts use a made-up vendor address (`vendor.example.com`), so read them as patterns; the missions give you a real local repository to work against.
-- Or a running lab machine: start a mission with `astrona run` and open a terminal on it with `astrona ssh <lab name>`. Each mission gives you the exact commands.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine, already set up with a vendor repository you can add to `apt` and a package with two competing versions.
+
+- A fake vendor repository, built on the machine and served over plain HTTP on `127.0.0.1:8100` by the `vendor-repo-server.service` unit. The files live in `/srv/vendor-repo`. Its suite is called `vendor-nginx`, and it holds one package, `nginx`, at version `1.25.4-1~vendorfake1`.
+- The vendor's public signing key, published at `http://127.0.0.1:8100/vendor-nginx-archive-keyring.asc`. `apt` does not trust this repository yet: adding the key, the source file, the pin and the hold is your job.
+- `curl` installed, and both the `noble` and `noble-updates` pockets enabled, so `apt-cache policy curl` shows two competing versions. No pin exists yet.
+- `reprepro` and `gnupg`, the tools that built the repository.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-apt-repos-and-pinning`. The hands-on steps in the parts build on each other on this one running ship. Every command block says which shell and which rights it expects.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

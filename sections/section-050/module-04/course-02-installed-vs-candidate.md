@@ -6,6 +6,8 @@
 
 Ask about one package:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: any host, unprivileged
 apt-cache policy nginx
@@ -74,7 +76,13 @@ dpkg -s nginx 2>/dev/null || echo 'nginx not installed'
 
 You can now search for a package, read its metadata, compare installed and candidate versions, and list packages by pattern, all without changing anything. The mission asks you to research five questions on one ship and save each answer to a file.
 
-The mission runs on its own training ship. Start it and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy apt-package-research
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-04/labs/lab-01
@@ -87,8 +95,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-050/module-04/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-054
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-04/playground
 ```

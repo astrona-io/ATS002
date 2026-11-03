@@ -26,10 +26,16 @@ Check that you have the knowledge and the tools this module expects.
 - **What a process is.** A process is one running program, a crew member doing one job.
 - **What JSON looks like.** JSON is a text format of names and values inside curly brackets, for example `{"Name": "web"}`.
 
-### What you need
+### What is in your playground
 
-- A terminal on an Ubuntu 24.04 machine with Docker installed, if you want to try the examples in the parts. Add `sudo` to the `docker` commands if your user is not in the `docker` group.
-- Or a running lab machine: the mission in this module gives you the exact commands to start it and open a terminal on it.
+Your playground is one docking bay: an Ubuntu 24.04 training ship with the Docker engine running and the `nginx:alpine` image already pulled. One container, `web_demo`, is already docked, with one folder of the ship mounted into it. The examples in the parts use `web_demo` and a second container, `api_demo`, that you launch yourself. Add `sudo` to the `docker` commands if your user is not in the `docker` group. It is a throwaway machine with no task and no grading, so experiment freely.
+
+Start it, then open a terminal on it with `astrona ssh astro-docker-lifecycle-bay`:
+
+<!-- astrona:playground -->
+
+Every command block in the parts also says which shell and which rights it expects, so you can follow the text on any Ubuntu 24.04 machine too. When you are finished, remove the playground with `astrona destroy docker-lifecycle-bay`.
+
 
 ## How this module is laid out
 

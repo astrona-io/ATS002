@@ -24,10 +24,17 @@ Check that you have the knowledge and the tools this module expects before you b
 - **The chroot repair steps:** mount the target root, bind-mount `/dev`, `/proc` and `/sys` into it, then run `chroot`. You need them when the broken system cannot boot at all.
 - **The two firmware types:** older BIOS machines and modern UEFI machines start a bootloader in different ways.
 
-### What you need
+### What is in your playground
 
-- This module has no playground. The `grub>` prompt steps are a worked walkthrough only: they need a real console during boot, which you cannot reach on the training ships.
-- The mission gives you a ready-made training ship whose `/boot/grub/grub.cfg` has been removed. Its current boot already finished, so SSH keeps working; only the next reboot would fail. You run the real repair before that reboot happens.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine, already set up with a healthy machine with a copy of its GRUB menu to compare against.
+
+- A healthy Ubuntu 24.04 machine with a working `/boot/grub/grub.cfg`. The setup script saves a copy at `/root/grub.cfg.original`.
+- `update-grub`, `grub-mkconfig`, `grub-install` and `grub-probe`.
+- No broken boot menu: a ship that really fails to boot cannot be reached over SSH. You practise the repair commands on a healthy ship, and the `grub>` prompt steps stay a worked walkthrough.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-grub-repair-bench`. The hands-on steps in the parts build on each other on this one running ship. Every command block says which shell and which rights it expects. The `grub>` prompt steps need a real console during boot, so they stay a worked walkthrough.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have fitted, tuned and blocked plug-in reactor parts on a live ship. Before you move on, look back at what you learned, check yourself, and clean up anything still running.
 
@@ -118,3 +118,5 @@ astrona destroy ats-002-lab-013
 ```
 
 > *Load it now, keep it for every boot, and remember that a blacklist only stops the automatic path.*
+
+<!-- astrona:playground:destroy -->

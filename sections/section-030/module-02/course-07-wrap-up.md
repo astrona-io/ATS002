@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have registered, launched, inspected and landed smaller ships in your hangar. Before you move on, look back at what you learned, check yourself, and land the playground cleanly.
 
@@ -143,3 +143,5 @@ astrona destroy ats-002-lab-032
 Then run `astrona list` again to check that everything is gone. You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean.
 
 > *A domain is a blueprint plus a process: `define` files the blueprint, `start` launches the ship, `autostart` adds a link, `shutdown` asks, `destroy` forces, and only `undefine` deletes.*
+
+<!-- astrona:playground:destroy -->

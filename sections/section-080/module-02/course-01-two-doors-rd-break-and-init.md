@@ -42,6 +42,8 @@ linux  /boot/vmlinuz-... root=/dev/mapper/... rd.break
 
 The boot stops inside the initramfs, before the real root becomes `/`. The real root is mounted **read-only at `/sysroot`**:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 mount -o remount,rw /sysroot
 chroot /sysroot

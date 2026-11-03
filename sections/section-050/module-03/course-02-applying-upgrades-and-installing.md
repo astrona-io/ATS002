@@ -6,6 +6,8 @@
 
 Apply the available upgrades:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: host, root
 sudo apt upgrade

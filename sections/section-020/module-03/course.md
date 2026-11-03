@@ -26,10 +26,16 @@ Check that you have the knowledge and the tools this module expects.
 - **What a systemd service is.** A service is a program systemd starts and watches, described by a unit file with sections such as `[Unit]` and `[Service]`.
 - **What a cron line looks like.** A per-user cron line has five time fields (minute, hour, day of month, month, day of week) and then the command, for example `0 22 * * * /usr/local/sbin/backup.sh`.
 
-### What you need
+### What is in your playground
 
-- A terminal on an Ubuntu 24.04 machine, if you want to try the examples in the parts. Any machine that runs systemd works.
-- Or a running lab machine: the mission in this module gives you the exact commands to start it and open a terminal on it.
+Your playground is one training ship with `systemd` as its duty officer. Four small maintenance scripts wait in `/usr/local/sbin` (`backup.sh`, `archive.sh`, `report.sh` and `dbclean.sh`), each writing one line to a log file under `/var/log/maint`. An old cron job, `/etc/cron.d/dbclean`, runs `dbclean.sh` every 6 hours, ready for you to convert. No timer of your own exists yet. It is a throwaway machine with no task and no grading, so experiment freely.
+
+Start it, then open a terminal on it with `astrona ssh astro-systemd-timer-bay`:
+
+<!-- astrona:playground -->
+
+Every command block in the parts also says which shell and which rights it expects, so you can follow the text on any Ubuntu 24.04 machine too. When you are finished, remove the playground with `astrona destroy systemd-timer-bay`.
+
 
 ## How this module is laid out
 

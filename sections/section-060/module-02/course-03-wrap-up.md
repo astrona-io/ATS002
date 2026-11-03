@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You can now tell a damaged ledger from its look-alikes, and repair it safely when it really is damaged. Look back at what you learned, check yourself, and clean up anything still running.
 
@@ -68,9 +68,9 @@ No. The rebuild only rebuilds the database's indexes from the stored headers. Us
 `dnf`'s own checks were what failed in the first place. `dnf check` proves they work against the rebuilt database, and `dnf check-update` proves a full pass completes.
 </details>
 
-## Clean up
+## Clean up the playground
 
-Each mission runs a virtual machine on your computer. When you are done with this module, remove any mission that is still running.
+When you are done with this module, remove the playground and any mission that is still running.
 
 First, see what is still running:
 
@@ -78,9 +78,19 @@ First, see what is still running:
 astrona list
 ```
 
-If a mission is still there, remove it. The command takes its **name**, not its folder path:
+Remove the playground. The command takes its **name**, not its folder path:
 
 ```sh
-astrona destroy ats-002-lab-066
-astrona destroy ats-002-lab-062
+astrona destroy rpm-database-repair
 ```
+
+If `astrona list` also showed a mission, remove it the same way, for example:
+
+```sh
+astrona destroy ats-002-lab-062
+astrona destroy ats-002-lab-066
+```
+
+Run `astrona list` again to check that everything is gone. You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean, so nothing you broke carries over.
+
+<!-- astrona:playground:destroy -->

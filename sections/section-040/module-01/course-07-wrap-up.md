@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have met the ship's security chief in both of its forms: AppArmor, which checks paths, and SELinux, which checks labels. Before you move on, look back at what you learned, check yourself, and land the playground cleanly.
 
@@ -133,3 +133,5 @@ astrona destroy ats-002-lab-042
 Run `astrona list` again to check that everything is gone. You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean, so nothing you broke carries over.
 
 > *Two gates sit between a process and a file. When the permissions look right and the action still fails, ask the security chief: read the denial, add exactly the rule it names, reload, and leave the gate enforcing.*
+
+<!-- astrona:playground:destroy -->

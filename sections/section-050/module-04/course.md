@@ -24,10 +24,17 @@ Check that you have the knowledge and the tools this module expects before you b
 - **How to save command output to a file with `>`.** The mission asks you to record your answers in files.
 - **What `grep` does.** It prints only the lines that match a pattern.
 
-### What you need
+### What is in your playground
 
-- A terminal on an Ubuntu 24.04 machine. Every command in this module is read-only, so you can try them on any machine without changing it.
-- Or a running lab machine: start the mission with `astrona run` and open a terminal on it with `astrona ssh <lab name>`. The mission gives you the exact commands.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine, already set up with a machine for read-only package research.
+
+- A few `python3-*` packages installed, so `apt list --installed` has something to match.
+- The folder `/opt/course/apt-research`, owned by the `student` user, for saving what you find.
+- The normal `apt`, `apt-cache` and `dpkg` tools. Every research command is read-only.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-apt-package-research`. The hands-on steps in the parts build on each other on this one running ship. Every command block says which shell and which rights it expects.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

@@ -6,6 +6,8 @@
 
 The two commands differ only in what they leave under `/etc`. Start with `remove`:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: host, root
 sudo apt remove ftp
@@ -67,7 +69,13 @@ man apt      # note: CLI and output are NOT guaranteed stable across releases
 
 You can now refresh the catalogue, preview and apply upgrades, install a package, and retire one completely. The mission asks you to run that whole maintenance loop on one ship, ending with a package purged and its orphans cleaned up.
 
-The mission runs on its own training ship. Start it and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy apt-basic-operations
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-03/labs/lab-01
@@ -80,8 +88,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-050/module-03/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-053
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-050/module-03/playground
 ```

@@ -10,6 +10,8 @@ The **RPM database** lives under `/var/lib/rpm`. `rpm -qa`, `rpm -qi` and every 
 
 Ask `rpm` for the installed packages:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the rpmbox container
 rpm -qa | tail -5
@@ -74,7 +76,13 @@ The rebuild works the same either way, because `rpm --rebuilddb` finds and works
 
 You can now read an `rpm` or `dnf` error and decide whether it is database corruption, a dependency problem or a full disk. The mission gives you a ship where `dnf check` fails loudly and a colleague is sure the database is corrupt: check that claim and fix the real problem.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy rpm-database-repair
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-02/labs/lab-02
@@ -87,8 +95,9 @@ On the lab machine, open a shell inside the `rpmbox` container with `docker exec
 astrona submit -c sections/section-060/module-02/labs/lab-02
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-066
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-02/playground
 ```

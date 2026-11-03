@@ -69,9 +69,16 @@ Work through the modules in order. Each module has a landing page with its goals
 7. Proving The Fix And Boot Targets (mission: Set the Default Boot Target Lab)
 8. Wrap-Up: Mission Debrief
 
+### 7. [Process Inspection And Control](./module-07/course.md)
+
+1. Finding And Reading Processes
+2. Signals And Stopping Processes
+3. Priority And Jobs (mission: the process control lab)
+4. Wrap-Up: Mission Debrief
+
 ## Check yourself
 
-Before the final mission, test what you know with the [section knowledge check](./quiz.md). It has scenario questions with explanations for every answer.
+Before the final mission, test what you know with the [section knowledge check](./quiz.yaml). It has scenario questions with explanations for every answer.
 
 ## The capstone mission
 

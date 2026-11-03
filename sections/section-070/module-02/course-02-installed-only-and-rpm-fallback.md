@@ -8,6 +8,8 @@ Run every command inside the `zypperbox` container (`docker exec -it zypperbox b
 
 List installed packages whose names start with `python3-`:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: inside the zypperbox container
 zypper search --installed-only 'python3-*'      # shorthand: zypper se -i 'python3-*'
@@ -70,7 +72,13 @@ In short: `zypper se -i '<pattern>'` filters to installed matches by itself, wit
 
 You can now find a package by keyword, read its details, find which package supplies a file, and list installed packages by pattern, all without changing the system. The mission asks you to answer four research questions on an openSUSE host and save each answer to a file, without installing anything.
 
-Start the mission and open a terminal on it:
+The mission runs on its own training ship. Your playground cannot be paused, so remove it first. It always starts clean, so you lose nothing you need:
+
+```sh
+astrona destroy zypper-package-research
+```
+
+Then start the mission and open a terminal on it:
 
 ```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-070/module-02/labs/lab-01
@@ -83,8 +91,9 @@ Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your
 astrona submit -c sections/section-070/module-02/labs/lab-01
 ```
 
-When the mission is done, remove it:
+When the mission is done, remove it and start your playground again:
 
 ```sh
 astrona destroy ats-002-lab-072
+astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-070/module-02/playground
 ```

@@ -44,4 +44,4 @@ astrona destroy ats-002-lab-030
 
 ## Ready for assessment?
 
-Test your knowledge and your reasoning before the capstone with the [knowledge check quiz](./quiz.md).
+Test your knowledge and your reasoning before the capstone with the [knowledge check quiz](./quiz.yaml).

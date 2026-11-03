@@ -25,10 +25,18 @@ Check that you have the knowledge and the tools this module expects before you b
 - **What mounting a filesystem means**, and that a UUID is a unique ID written inside each filesystem.
 - **Basic `sed`.** You have seen `sed -i 's/old/new/' file` replace text in a file.
 
-### What you need
+### What is in your playground
 
-- This module has no playground. The examples in the parts are safe to read on any Ubuntu 24.04 machine. Only run the repair commands against a disk you can afford to lose.
-- The missions give you a ready-made training ship. The grader reaches it only over SSH, so it cannot type into a boot menu or rescue a ship that will not start. Instead, each mission adds a second, disposable disk that holds a stand-in "broken system" with its own `/etc/fstab`. Your own ship stays healthy and reachable. Every repair step is the real one; only the target disk is different.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine, already set up with a spare disk that holds a stand-in system with a broken `/etc/fstab`.
+
+- A second, 2 GB disk with the serial `lab081-data001`. Find it at `/dev/disk/by-id/virtio-lab081-data001`. Its device letter is not fixed, so never type a raw `/dev/vdX` name.
+- On that disk, a small root partition that holds a stand-in `data-001` system with its own `/etc/fstab`, and a data partition. The `fstab` line for the data partition has a mistyped UUID.
+- `chroot`, `blkid`, `lsblk` and `mount`, the tools you need to step into the stand-in system and fix it.
+- Your own machine stays healthy and reachable; the broken system lives on the spare disk.
+
+Start the playground, then open a terminal on it with `astrona ssh astro-chroot-rescue-bench`. The hands-on steps in the parts build on each other on this one running ship. Every command block says which shell and which rights it expects.
+
+<!-- astrona:playground -->
 
 ## How this module is laid out
 

@@ -8,6 +8,8 @@ A **source tarball** is one archive file that holds a program's source code, pac
 
 Here is a real example:
 
+<!-- astrona:playground:renew -->
+
 ```bash
 # shell: any host, unprivileged
 tar xjf links-2.14.tar.bz2
