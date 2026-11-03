@@ -22,7 +22,7 @@ Check that you have the knowledge and the tools this module expects before you b
 
 - **How to use a Linux shell and `sudo`.**
 - **How to mount a filesystem** and list its files.
-- **That a disk holds a partition table and filesystems** as two separate layers (module 03 of this section).
+- **That a disk holds a partition table and filesystems** as two separate layers.
 
 ### What is in your playground
 

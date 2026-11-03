@@ -33,7 +33,7 @@ The image should have a plausible size (tens of megabytes), `lsinitramfs` should
 
 ## Rebuilding from a rescue chroot
 
-When the machine does not boot, you work from a rescue shell, as in module 01 of this section. Mount the root filesystem and `/boot`, bind the virtual filesystems, chroot in, and rebuild for the **installed** kernel, whose release you read from `/boot`:
+When the machine does not boot, you work from a rescue shell. Mount the root filesystem and `/boot`, bind the virtual filesystems, chroot in, and rebuild for the **installed** kernel, whose release you read from `/boot`:
 
 ```bash
 # shell: rescue shell, root
