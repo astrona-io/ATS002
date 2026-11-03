@@ -1,30 +1,32 @@
 # Solution Walkthrough
 
-Follow these steps to migrate the job and add the new one without leaving a duplicate-execution bug behind.
+Follow these steps to move the job and add the new one without leaving a job that runs twice. The shared, root-only roster is `/etc/crontab` plus the files in `/etc/cron.d/`. The account's own crontab is the one `crontab -u asset-manager -e` edits.
 
 ---
 
-## Step 1: Locate the existing system-wide 8:30pm job
+## Step 1: Find the system-wide 8:30 pm job
 
 ```bash
 sudo grep -rn "30 20" /etc/crontab /etc/cron.d/ 2>/dev/null
 ```
 
-8:30pm in 24-hour cron time is `30 20` (minute 30, hour 20). System-wide cron sources are `/etc/crontab` itself and any file dropped under `/etc/cron.d/`. This turns up:
+8:30 pm on the 24-hour clock that cron uses is `30 20` (minute 30, hour 20). The system-wide cron sources are `/etc/crontab` itself and any file under `/etc/cron.d/`. The search turns up:
 
 ```
 /etc/cron.d/asset-cleanup:30 20 * * * asset-manager /home/asset-manager/nightly-sync.sh
 ```
 
-The sixth field, `asset-manager`, is the username field unique to system-wide cron syntax — it tells cron which account to run the command as, even though the file itself is controlled by root.
+Because of `-n`, `grep` also prints the line number between the file name and the line (here `:1:`). The output above leaves it out.
 
-## Step 2: Confirm the exact command before migrating it
+The sixth field, `asset-manager`, is the username field that only system-wide cron lines have. It tells the `cron` daemon which account runs the command, even though root owns the file.
+
+## Step 2: Read the exact command before you move it
 
 ```bash
 sudo cat /etc/cron.d/asset-cleanup
 ```
 
-Copy the exact command (`/home/asset-manager/nightly-sync.sh`) so the migrated job does precisely what the old one did.
+Note the exact command, `/home/asset-manager/nightly-sync.sh`, so the moved job does exactly what the old one did.
 
 ## Step 3: Create the per-user crontab entry for asset-manager
 
@@ -32,23 +34,23 @@ Copy the exact command (`/home/asset-manager/nightly-sync.sh`) so the migrated j
 sudo crontab -u asset-manager -e
 ```
 
-Running plain `crontab -e` as root would instead edit *root's own* crontab — the wrong owner entirely. `-u asset-manager` tells `crontab` to operate on the spool file for that specific user. In the editor, add:
+Plain `crontab -e` as root would edit root's own crontab, which is the wrong owner. `-u asset-manager` tells `crontab` to work on that account's spool file. In the editor, add:
 
 ```cron
 30 20 * * * /home/asset-manager/nightly-sync.sh
 ```
 
-Notice there is **no username field** — in a per-user crontab, ownership is implicit from whose crontab file it is. Leaving the username field in would be interpreted as part of the command itself and break the job.
+There is **no username field**. In a per-user crontab the owner is implied by whose crontab it is. If you kept `asset-manager` in the line, cron would read it as the command and the job would fail.
 
-## Step 4: Add the new twice-weekly cleanup job in the same crontab
+## Step 4: Add the twice-weekly cleanup job in the same crontab
 
-While still in `crontab -u asset-manager -e` (or by reopening it), add a second line:
+While you are still in `crontab -u asset-manager -e` (or after opening it again), add a second line:
 
 ```cron
 15 11 * * MON,THU bash /home/asset-manager/clean.sh
 ```
 
-Field breakdown: minute `15`, hour `11` (11:15am, 24-hour clock), day-of-month `*`, month `*`, day-of-week `MON,THU`. Named days are safer than numbers under exam pressure — you don't have to remember whether a given cron flavor treats `0` or `7` as Sunday. Save and exit; `crontab` validates syntax on save and refuses to install a malformed file.
+The fields are: minute `15`, hour `11` (11:15 am on the 24-hour clock), day of month `*`, month `*`, day of week `MON,THU`. Names are safer than numbers under exam pressure, because you do not have to remember whether this cron counts Sunday as `0` or `7`. Save and exit. `crontab` checks the syntax when you save and refuses to install a broken file.
 
 ## Step 5: Remove the original system-wide entry
 
@@ -56,9 +58,9 @@ Field breakdown: minute `15`, hour `11` (11:15am, 24-hour clock), day-of-month `
 sudo rm /etc/cron.d/asset-cleanup
 ```
 
-This step is not optional. Skipping it means the exact same command fires from *two* independent schedules at 8:30pm every day — on a data script, that means double-processing or race conditions on the same files.
+This step is required. Without it, the same command runs from *two* schedules at 8:30 pm every day. On a data script, that means the data is processed twice, or two copies change the same files at the same time.
 
-## Step 6: Verify
+## Step 6: Check the result
 
 ```bash
 sudo crontab -u asset-manager -l
@@ -69,7 +71,13 @@ sudo grep -rn "nightly-sync.sh" /etc/crontab /etc/cron.d/ 2>/dev/null
 # (no output expected)
 ```
 
-`crontab -u asset-manager -l` is the only verification that actually matters — it's exactly what cron itself will execute. If a job doesn't show up there under the right user, it isn't owned by that account no matter what you typed into an editor.
+`crontab -u asset-manager -l` is the check that matters: it shows exactly what the `cron` daemon will run for that account. If a job does not show up there, it does not belong to that account, whatever you typed into an editor. The empty `grep` result proves that no system-wide copy is left.
+
+When both checks look right, send the lab for grading:
+
+```sh
+astrona submit -c sections/section-020/module-01/labs/lab-01
+```
 
 ---
 
@@ -85,5 +93,3 @@ sudo crontab -u asset-manager -e
 sudo rm /etc/cron.d/asset-cleanup
 sudo crontab -u asset-manager -l
 ```
-
-Once verified, run the local validation suite to pass the lab!

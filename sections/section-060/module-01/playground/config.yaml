@@ -1,0 +1,31 @@
+# RPM Low-Level Package Management (PLAYGROUND) - Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+
+metadata:
+  name: "rpm-low-level"
+  docs:
+    guide: "docs/overview.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 3072
+    diskSizeGB: 20
+    display: false
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Runs every script in bootstrap/ to build the starting state that docs/overview.md describes. No task and no grading."
+      type: "folder"
+      source: "bootstrap/"
+  manifests: []
+
+teardown:
+  keepCluster: false

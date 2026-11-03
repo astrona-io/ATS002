@@ -1,13 +1,31 @@
-# section-020 / module-03 / lab-01: systemd Timers
+# systemd Timers Lab
 
-QEMU VM for the LFCS course. Create a `.service` + `.timer` pair that runs a
-maintenance script `OnCalendar=Mon,Thu 11:15` with `Persistent=true`, enable
-and start the timer; then convert an existing `/etc/cron.d/` job to an
-equivalent 6-hourly timer and remove the cron line so it doesn't fire twice.
-Verify with `systemctl list-timers`.
+Welcome to an alarm clock mission, astronaut. This ship has two maintenance scripts, and one of them still runs from an old cron job.
 
-## Run
+Your job is to build a `.service` and `.timer` pair that runs a report every Monday and Thursday at 11:15 with catch-up after downtime, and to replace the old cron job with a timer that fires every six hours, without leaving the job running twice.
+
+## Launching the Lab
+
+Run this command to start the virtual machine:
 
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-020/module-03/labs/lab-01
+```
+
+Open a terminal on it:
+
+```bash
+astrona ssh ats-002-lab-023
+```
+
+When you think you have finished, send it for grading:
+
+```bash
+astrona submit -c sections/section-020/module-03/labs/lab-01
+```
+
+When you are done, remove the lab:
+
+```bash
+astrona destroy ats-002-lab-023
 ```

@@ -2,22 +2,15 @@
 
 Solve this question on: `terminal`
 
-The `credsync` daemon reads its API key from `/etc/credsync/api.key` on
-every cycle. The key used to live under `/var/lib/credsync/`. Standard Unix
-ownership and permissions on `/etc/credsync/api.key` are already correct for
-the `credsync` user, but the daemon still cannot read it.
+Astronaut, the `credsync` daemon on this ship reads its API key from `/etc/credsync/api.key` on every cycle. The key used to live under `/var/lib/credsync/`. The normal Unix owner and permissions on `/etc/credsync/api.key` are already correct for the `credsync` user, but the daemon still cannot read the key. This time AppArmor blocks a **read**, not a write.
 
-1. Check the mode of the `credsync` AppArmor profile with `aa-status`.
-2. Find the exact denial in the kernel audit trail (`journalctl -k`,
-   searching for `apparmor="DENIED"`). Note what `operation=`,
-   `requested_mask=`, `denied_mask=`, and `name=` say — this is a **read**
-   denial, not a write.
-3. Inspect the profile at `/etc/apparmor.d/usr.sbin.credsync` and identify
-   why `/etc/credsync/api.key` is not covered.
-4. Add a rule permitting the daemon to **read** `/etc/credsync/api.key`
-   (by hand in `/etc/apparmor.d/local/`, or via `aa-logprof`).
-5. Reload the profile with `apparmor_parser -r`.
-6. Confirm the profile is still in `enforce` mode (not switched to
-   `complain`) and that the daemon is now reading the key with no further
-   denials. The daemon writes `/run/credsync/ready` only while the read is
-   succeeding.
+Repair it so that all of the following are true:
+
+1. The daemon can read `/etc/credsync/api.key` again. You can see this from the file `/run/credsync/ready`: the daemon writes it fresh every cycle, but only while the read works.
+2. No new `apparmor="DENIED"` entries for `credsync` appear in the kernel log.
+3. The AppArmor profile for `/usr/sbin/credsync` is loaded in **enforce** mode. A profile left in complain mode fails the task.
+4. `credsync.service` is running.
+
+The profile file is `/etc/apparmor.d/usr.sbin.credsync`, and its local override is `/etc/apparmor.d/local/usr.sbin.credsync`. You may add the rule by hand or with `aa-logprof`. The daemon only reads the key, so a read rule is all it needs.
+
+The grader checks the live machine: the profile's mode in `aa-status`, the service state, that `/run/credsync/ready` exists and was updated in the last few seconds, and the recent kernel log.

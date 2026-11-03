@@ -1,12 +1,16 @@
-# Part 2 — AppArmor: profiles, modes, and what's loaded
+# AppArmor Profiles And Modes
 
-> Prerequisite: [Part 1 — Two gates: DAC, MAC, and which system you're on](./course-01-two-gates-dac-mac-and-which-system.md). Next: [Part 3 — AppArmor: diagnosing and fixing a path denial](./course-03-apparmor-diagnosing-and-fixing.md).
-
-Part 1 said AppArmor matches on the filesystem path. This part is the object model behind that: what a **profile** is, where it lives, how to read one, and the two **modes** a profile can be in — because a profile that is loaded but in the wrong mode is doing nothing, and that is a favourite exam trap. By the end you can look at `aa-status` output and a profile file and say exactly what a given program is and is not allowed to touch.
+AppArmor decides by the file's path. This part shows what that looks like in practice: what a **profile** is, where it lives, how to read one, and the two **modes** a profile can be in. A profile that is loaded but in the wrong mode stops nothing, and that is a favourite exam trap. By the end you can read `aa-status` and a profile file and say exactly what one program may and may not touch.
 
 ## What `aa-status` tells you
 
-`aa-status` — read it as **A**pp**A**rmor **status** — is the first command every time, before you diagnose anything:
+`aa-status` stands for **A**pp**A**rmor **status**. Run it first, every time, before you diagnose anything. It asks the AppArmor module in the kernel what it has loaded right now.
+
+### See it in your playground
+
+Run it on your playground:
+
+<!-- astrona:playground:renew -->
 
 ```bash
 # shell: playground host, root
@@ -26,36 +30,35 @@ apparmor module is loaded.
    /usr/sbin/appservice (1287) /usr/sbin/appservice
 ```
 
-It answers three separate questions in one shot:
+The profile counts change from image to image, so yours may differ. The facts that matter: `apparmor module is loaded`, `/usr/sbin/appservice` is under **enforce mode** (not complain), and it also appears in the "processes ... in enforce mode" block. So the running `appservice` daemon really is held in check by AppArmor at this moment.
 
-1. **Is the AppArmor LSM active at all?** — `apparmor module is loaded.` If this line is missing, nothing below matters; MAC is not your problem.
-2. **Which profiles exist, and in which mode?** — the "enforce mode" and "complain mode" lists. A profile name appears in exactly one.
-3. **Which running processes are actually confined right now?** — the "processes ... in enforce mode" block. A profile can be loaded for a program that is not currently running, in which case it is in the profile list but not the process list.
+### Three questions in one output
 
-> [!TIP]
-> **Try it — confirm AppArmor is active and find the demo profile.** On the playground host:
->
-> ```bash
-> sudo aa-status
-> ```
->
-> Expect something like the output above. Profile counts vary with the image. The load-bearing facts: `apparmor module is loaded`, `/usr/sbin/appservice` is under **enforce mode** (not complain), and it also appears in the "processes ... in enforce mode" block — so the running `appservice` daemon really is confined at this moment.
+`aa-status` answers three separate questions at once:
+
+1. **Is AppArmor active at all?** Look for `apparmor module is loaded.` If this line is missing, nothing below matters, and MAC is not your problem.
+2. **Which profiles exist, and in which mode?** Look at the "enforce mode" and "complain mode" lists. A profile name appears in exactly one of them.
+3. **Which running processes are held by a profile right now?** Look at the "processes ... in enforce mode" block. A profile can be loaded for a program that is not running. Then it is in the profile list but not in the process list.
 
 ## Where profiles live and how they are named
 
-Profiles are plain text under `/etc/apparmor.d/`. The filename is the confined program's path with `/` turned into `.`:
+An AppArmor **profile** is the security chief's list of hatches that one crew member may use, by path. It is plain text under `/etc/apparmor.d/`. The file name is the path of the program it guards, with each `/` turned into a `.`:
 
 ```
   program:  /usr/sbin/appservice
   profile:  /etc/apparmor.d/usr.sbin.appservice
-  override: /etc/apparmor.d/local/usr.sbin.appservice   ← your edits go here (Part 3)
+  override: /etc/apparmor.d/local/usr.sbin.appservice   ← your edits go here
 ```
 
-That `local/` file is a Debian/Ubuntu convention: the shipped profile ends with a soft include of it, so a package update can replace the main profile without discarding your site additions. Part 3 uses it; note now that it exists.
+The `local/` file is a Debian and Ubuntu habit. The main profile ends with a "soft include" of it, so a package update can replace the main profile without throwing away your own additions. Your fixes go into this `local/` file.
 
 ## Reading a profile
 
-Here is a realistic profile — the playground's is this shape:
+A profile is short once you know its parts. This section walks through a real one line by line, then shows you the gap in the one on your playground.
+
+### A profile, line by line
+
+Here is a realistic profile. The playground's profile has this shape:
 
 ```text
 #include <tunables/global>
@@ -76,65 +79,70 @@ Here is a realistic profile — the playground's is this shape:
 }
 ```
 
-Top to bottom:
+From top to bottom:
 
-- **`#include <tunables/global>` / `#include <abstractions/base>`** — shared boilerplate pulled in by name. `abstractions/base` alone covers the dozens of paths almost every program needs (shared libraries, `/dev/null`, `/dev/urandom`, locale data). You `#include` it instead of retyping it.
-- **`/usr/sbin/appservice { ... }`** — the profile *head* is the path of the program this profile confines. Everything in the braces is that program's allow-list.
-- **Each bare `path mode,` line is a path rule.** The path may contain globs: `*` (one path segment), `**` (any depth). The trailing comma is required — a missing comma is the most common syntax error.
-- **Access modes** after the path:
+- **`#include <tunables/global>` and `#include <abstractions/base>`** pull in shared building blocks by name. `abstractions/base` alone covers dozens of paths that almost every program needs: shared libraries, `/dev/null`, `/dev/urandom`, language data. You include it instead of typing it all again.
+- **`/usr/sbin/appservice { ... }`** is the profile's *head*: the path of the program this profile guards. Everything inside the braces is that program's allowed list.
+- **Each `path mode,` line is a path rule.** The path may contain wildcards: `*` matches one part of a path, `**` matches any depth. The comma at the end is required. A missing comma is the most common syntax error.
+- **Access modes** come after the path:
 
   | Mode | Means |
   |---|---|
   | `r` | read |
-  | `w` | write (implies create/append/truncate) |
-  | `k` | file lock |
-  | `m` | memory-map executable (`mmap` with `PROT_EXEC`) |
-  | `ix` | execute this file, staying under **this same** profile ("inherit") |
-  | `px` | execute, switching to that file's **own** profile ("profile transition"; needs one to exist) |
-  | `Ux` / `ux` | execute **unconfined** — dangerous, drops confinement for the child |
-  | `rix` | just `r` + `ix` together — readable and inherit-executable |
+  | `w` | write (also covers create, append and truncate) |
+  | `k` | lock the file |
+  | `m` | map the file into memory as runnable code (`mmap` with `PROT_EXEC`) |
+  | `ix` | run this file, staying under **this same** profile ("inherit") |
+  | `px` | run this file under **its own** profile ("profile transition"; that profile must exist) |
+  | `Ux` / `ux` | run this file with **no** profile at all. Dangerous: the child is not held in check |
+  | `rix` | `r` and `ix` together: readable and runnable under the same profile |
 
-- **`capability <name>,`** lines (none above) are a *different rule type*: they grant a specific Linux capability (`capability net_bind_service,`), not access to a path. Do not confuse a `capability` line with a path rule.
-- **`#include if exists <local/...>`** — a soft include: pulls in the `local/` override if present, silently does nothing if not. `#include` (no `if exists`) would be a hard error when the file is missing.
+- **`capability <name>,`** lines (there are none above) are a *different kind* of rule. They grant one Linux capability, a single piece of root power such as `capability net_bind_service,`. They do not grant access to a path. Do not mix up a `capability` line with a path rule.
+- **`#include if exists <local/...>`** is a soft include. It pulls in the `local/` file if it exists and quietly does nothing if it does not. A plain `#include` (without `if exists`) is an error when the file is missing.
 
-What this profile *permits* to disk: read + write under `/var/log/appservice/`, and nothing else writable. Point the program at any other directory and every write there is denied — not a `chmod` problem, a missing-rule problem. Part 3 is that exact scenario.
+So what does this profile let the program write to disk? Reading and writing under `/var/log/appservice/`, and nothing else. Point the program at any other directory, and every write there is denied. That is not a `chmod` problem. It is a missing rule.
 
-> [!TIP]
-> **Try it — read the real profile and spot the gap.** On the host:
->
-> ```bash
-> cat /etc/apparmor.d/usr.sbin.appservice
-> grep -c 'srv' /etc/apparmor.d/usr.sbin.appservice
-> systemctl show -p ExecStart --value appservice
-> ```
->
-> Expect the profile text above, then:
->
-> ```text
-> 0
-> /usr/sbin/appservice
-> ```
->
-> `grep -c srv` returns `0` — no rule anywhere mentions `/srv`. Yet the running daemon writes `/srv/applogs/app.log` every few seconds (Part 3 confirms it from the audit log). Correct DAC on `/srv/applogs`, no matching path rule in the profile: that is the whole bug.
+The manual page `man apparmor.d` on the ship lists the full profile syntax, including the `network` and `dbus` rule types this module does not use. To see what every profile gets for free, read `/etc/apparmor.d/abstractions/base`.
 
-## The two modes — and why the distinction bites
+### See the gap in your playground
 
-Every loaded profile is in exactly one mode:
+Read the real profile and look for the gap:
 
-- **enforce** — the profile is a hard allow-list. Anything not permitted is **blocked** and logged. This is MAC doing its job.
-- **complain** — the profile still evaluates every access and **logs** what it *would* have denied, but **allows it anyway**. Nothing is blocked.
-
-```mermaid
-stateDiagram-v2
-    state "enforce — blocks + logs" as Enforce
-    state "complain — logs only, allows all" as Complain
-    Enforce --> Complain: aa-complain PROGRAM
-    Complain --> Enforce: aa-enforce PROGRAM
+```bash
+cat /etc/apparmor.d/usr.sbin.appservice
+grep -c 'srv' /etc/apparmor.d/usr.sbin.appservice
+systemctl show -p ExecStart --value appservice
 ```
 
-`complain` exists for one legitimate job: watching what a program actually needs while you build its profile, without breaking it. It is **never a permanent fix**. A profile parked in `complain` will make a failing action "succeed" — but only because nothing is being checked, not because you closed the gap. Part 3's last checkpoint is about telling those two apart.
+You see the profile text above, then:
 
-Switch one profile without touching any other:
+```text
+0
+/usr/sbin/appservice
+```
+
+`grep -c srv` returns `0`: no rule anywhere mentions `/srv`. Yet the running daemon writes `/srv/applogs/app.log` every few seconds, which the audit log confirms. The DAC permissions on `/srv/applogs` are correct, and the profile has no matching path rule. That is the whole bug.
+
+## The two modes, and why the difference bites
+
+Every loaded profile is in exactly one of two modes. Mixing them up is the easiest way to believe a problem is fixed when it is not.
+
+### Enforce and complain
+
+- **enforce**: the profile is a strict allowed list. Anything it does not allow is **blocked** and logged. This is MAC doing its job.
+- **complain**: the profile still checks every access and **logs** what it *would* have denied, but **allows it anyway**. Nothing is blocked.
+
+```mermaid
+flowchart LR
+    E["enforce"] -->|"aa-complain"| C["complain"]
+    C -->|"aa-enforce"| E
+```
+
+The diagram shows that `aa-complain` moves a profile from enforce (blocks and logs) to complain (only logs), and `aa-enforce` moves it back.
+
+Complain mode has one honest job: watching what a program really needs while you build its profile, without breaking it. It is **never a lasting fix**. A profile left in complain makes a failing action "work", but only because nothing is checked, not because you closed the gap.
+
+You switch one profile at a time, without touching any other:
 
 ```bash
 # shell: host, root
@@ -142,36 +150,39 @@ sudo aa-complain /usr/sbin/appservice   # observe only
 sudo aa-enforce  /usr/sbin/appservice   # confine for real again
 ```
 
-Both are thin wrapper scripts (`aa-complain` edits the profile flags and reloads); their `--help` is more useful than their man pages.
+Both commands are small wrapper scripts: `aa-complain` changes the profile's flags and reloads it. Their `--help` output is more useful than their manual pages.
+
+### Switch modes in your playground
+
+Move the `appservice` profile to complain mode and back:
+
+```bash
+sudo aa-complain /usr/sbin/appservice
+sudo aa-status | grep -B1 -A0 'appservice'
+sudo aa-enforce /usr/sbin/appservice
+sudo aa-status | grep -B1 -A0 'appservice'
+```
+
+You see something like:
+
+```text
+Setting /usr/sbin/appservice to complain mode.
+   /usr/sbin/appservice
+Setting /usr/sbin/appservice to enforce mode.
+   /usr/sbin/appservice
+```
+
+The profile name moves between the "complain mode" and "enforce mode" lists of `aa-status`. Only that one profile moved. **Leave it in enforce mode**: the denial you read next only happens while the profile is enforcing.
 
 > [!TIP]
-> **Try it — move one profile between modes.** On the host:
->
-> ```bash
-> sudo aa-complain /usr/sbin/appservice
-> sudo aa-status | grep -B1 -A0 'appservice'
-> sudo aa-enforce /usr/sbin/appservice
-> sudo aa-status | grep -B1 -A0 'appservice'
-> ```
->
-> Expect something like:
->
-> ```text
-> Setting /usr/sbin/appservice to complain mode.
->    /usr/sbin/appservice
-> Setting /usr/sbin/appservice to enforce mode.
->    /usr/sbin/appservice
-> ```
->
-> The profile name moves between the "complain mode" and "enforce mode" sections of `aa-status`. Only that one profile moved. **Leave it in `enforce`** — the denial you read in Part 3 only happens while it is enforcing.
+> When you read `aa-status`, always check *which list* a profile name sits in. "Loaded" alone tells you nothing about whether it blocks anything.
+
+## Common pitfalls
 
 > [!WARNING]
-> `aa-status` showing a profile as "loaded" is **not** the same as it enforcing. Always check *which list* the name is in. A profile in `complain` mode is loaded, evaluated, and logging — and stopping nothing.
+> - **Taking "loaded" to mean "enforcing".** A profile in complain mode is loaded, checked and logging, and it stops nothing. Check which list `aa-status` puts it in.
+> - **Leaving a profile in complain mode as a fix.** The action works because nothing is checked, not because the rule exists.
+> - **Forgetting the comma.** Every path rule ends with `,`. A missing comma is the most common syntax error in a profile.
+> - **Mixing up a `capability` line with a path rule.** `capability net_bind_service,` grants a power, not access to a file or directory.
 
-> *A profile is a path allow-list under `/etc/apparmor.d/`, named after the program with `/`→`.`; `aa-status` tells you whether it is loaded and in `enforce` (blocks) or `complain` (logs only) mode, and only `enforce` is real confinement.*
-
-## Reference
-
-- `man apparmor.d` — the full profile syntax: every access mode, glob rules, `capability` / `network` / `dbus` rule types, variable expansion.
-- `aa-status --help`, `aa-enforce --help`, `aa-complain --help` — the wrapper tools; more accurate than their thin man pages.
-- `/etc/apparmor.d/abstractions/` on the host — read `base` to see what every profile inherits for free.
+> *A profile is an allowed list of paths under `/etc/apparmor.d/`, named after the program with `/` turned into `.`. `aa-status` tells you whether it is loaded and whether it is in enforce mode (blocks) or complain mode (only logs). Only enforce mode really holds a program in check.*

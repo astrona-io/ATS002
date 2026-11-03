@@ -1,0 +1,55 @@
+metadata:
+  name: "ats-002-lab-043"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-043-setup"
+      description: "Creates /srv/web with a sample page. SELinux is not active; the lab grades the script the learner writes."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-script-syntax"
+      description: "Confirms /root/selinux-fix.sh exists and passes bash -n"
+      type: "file"
+      source: "validation/validate-syntax.sh"
+
+    - name: "verify-fcontext-rule"
+      description: "Confirms a semanage fcontext rule gives /srv/web the type httpd_sys_content_t"
+      type: "file"
+      source: "validation/validate-fcontext.sh"
+
+    - name: "verify-restorecon"
+      description: "Confirms restorecon is run recursively on /srv/web after the rule is written"
+      type: "file"
+      source: "validation/validate-restorecon.sh"
+
+    - name: "verify-boolean"
+      description: "Confirms setsebool -P turns httpd_can_network_connect on"
+      type: "file"
+      source: "validation/validate-boolean.sh"
+
+    - name: "verify-port"
+      description: "Confirms semanage port allows tcp 8888 as http_port_t"
+      type: "file"
+      source: "validation/validate-port.sh"
+
+teardown:
+  keepCluster: false

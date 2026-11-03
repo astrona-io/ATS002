@@ -1,5 +1,7 @@
 # Solution Walkthrough
 
+Six steps: inspect, install, check ownership, then diagnose and recover the stuck package. Run `astrona submit` after a step to see which checks already pass.
+
 ## Step 1: Find the exact file, then inspect it before installing
 
 ```bash
@@ -11,7 +13,7 @@ dpkg -I /home/candidate/downloads/logtail-utils_2.3.1_*.deb
 dpkg -c /home/candidate/downloads/logtail-utils_2.3.1_*.deb
 ```
 
-`-I` (info) reads the embedded control file — package name, version, architecture, maintainer, and any declared dependencies — without touching the installed-package database at all. `-c` (contents) lists every path the archive would place on disk, with permissions and ownership, so nothing about the install is a surprise: a single `/usr/bin/logtail` script and its accompanying doc file, nothing under `/etc` or anywhere unexpected.
+`-I` (info) reads the control file inside the `.deb`: package name, version, architecture, maintainer and any declared dependencies. It does not touch the installed-package database at all. `-c` (contents) lists every path the archive would place on disk, with permissions and owner. Here that is a single `/usr/bin/logtail` script and its documentation file, with nothing under `/etc` or anywhere unexpected.
 
 ---
 
@@ -21,7 +23,9 @@ dpkg -c /home/candidate/downloads/logtail-utils_2.3.1_*.deb
 sudo dpkg -i /home/candidate/downloads/logtail-utils_2.3.1_*.deb
 ```
 
-Since this package declares no unmet dependencies, this finishes cleanly. (If it had, the standard reflex is `sudo apt --fix-broken install` immediately afterward — `dpkg` alone has no repository to fetch a missing dependency from.)
+This package declares no unmet dependencies, so the install finishes cleanly. If it had a missing dependency, the standard habit is to run `sudo apt --fix-broken install` right afterwards, because `dpkg` alone has no repository to fetch it from.
+
+At this point `astrona submit` should pass the install and ownership checks.
 
 ---
 
@@ -47,7 +51,7 @@ dpkg -L logtail-utils
 ...
 ```
 
-`-S` (search) is the reverse lookup — file to package. `-L` (listfiles) is the forward lookup — package to files. Both only resolve correctly once the package is genuinely, cleanly installed.
+The `dpkg -L` output is shortened. `-S` (search) is the reverse lookup, from file to package. `-L` (listfiles) is the forward lookup, from package to files. Both only answer correctly once the package is fully installed.
 
 ---
 
@@ -61,7 +65,7 @@ dpkg -l | grep cowsay
 iF  cowsay  3.03+dfsg2-8  all  configure a cow
 ```
 
-The `iF` status — half-configured — is the fingerprint of an interruption: files are on disk, but the package's post-install configuration step never finished.
+The `iF` status (half-configured) is the fingerprint of an interruption: the files are on disk, but the package's post-install configure step never finished.
 
 ---
 
@@ -71,17 +75,17 @@ The `iF` status — half-configured — is the fingerprint of an interruption: f
 sudo dpkg --configure -a
 ```
 
-The `-a`/`--pending` modifier resumes configuration for **every** package left in a pending state, not just the one you happened to notice — the right approach when you don't know the full scope of what an interruption affected.
+The `-a` (`--pending`) option finishes configuring **every** package left waiting, not just the one you happened to notice. That is the right approach when you do not know everything an interruption touched.
 
 ```bash
 sudo apt --fix-broken install
 ```
 
-Run this safety net immediately after, even if the previous command reported success — it catches a genuinely missing dependency, which `dpkg --configure -a` alone cannot resolve.
+Run this safety net right after, even if the previous command reported success. It catches a dependency that is really missing, which `dpkg --configure -a` alone cannot fix.
 
 ---
 
-## Step 6: Verify
+## Step 6: Check
 
 ```bash
 dpkg -l | grep cowsay
@@ -93,7 +97,8 @@ ii  cowsay  3.03+dfsg2-8  all  configure a cow
 ```bash
 sudo dpkg --audit
 ```
-Expected: no output — no package left in any pending/incomplete state anywhere on the system.
+
+Expected: no output. No package is left in a waiting or incomplete state anywhere on the system.
 
 ---
 
@@ -114,4 +119,8 @@ sudo apt --fix-broken install
 dpkg -l | grep cowsay
 ```
 
-Once verified, run the local validation suite to pass the lab!
+When every check looks right, send the lab for grading:
+
+```bash
+astrona submit -c sections/section-050/module-02/labs/lab-01
+```

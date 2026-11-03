@@ -1,13 +1,31 @@
-# section-080 / module-02: Password Reset & Single-User Recovery
+# Password Reset & Single-User Recovery Lab
 
-QEMU VM for the LFCS course — chroot-based root password recovery on a disposable stand-in disk representing a locked-out "data-001" host.
+Welcome to a lockout mission, astronaut. The root password on the `data-001` host is lost, and no other account can use `sudo`. On a real server you would interrupt the GRUB menu for one boot (`rd.break` or `init=/bin/bash`), but that needs a console the grader cannot reach.
 
-## How This Lab Stays Safely Gradable
+So the mission adds a second, disposable 1 GB disk (serial `lab082-data001`). It holds a stand-in `data-001` root filesystem whose `/etc/shadow` has root locked (password field `!`). Your own ship's boot is never touched. You mount the stand-in, step into it with `chroot`, and write a real password hash for root.
 
-The real-world technique for this scenario (`rd.break` or `init=/bin/bash`, interrupting a real GRUB menu) is an interactive, console-only maneuver this platform's SSH-driven grading harness cannot script. So instead of touching your primary VM's own boot process, bootstrap attaches a second, disposable disk (`extraDisks`, serial `lab082-data001`) carrying its own `/etc/shadow`, with root's password field seeded to `!` (locked). Your job is to mount that disk, chroot in, and reset root's password hash for real — the same chroot-based credential-repair mechanic taught in Module 1, applied here to a locked account instead of a bad mount.
+## Launching the Lab
 
-## Run
+Run this command to start the virtual machine:
 
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-02/labs/lab-01
+```
+
+Open a terminal on it:
+
+```bash
+astrona ssh ats-002-lab-082
+```
+
+When you think you have finished, send it for grading:
+
+```bash
+astrona submit -c sections/section-080/module-02/labs/lab-01
+```
+
+When you are done, remove the lab:
+
+```bash
+astrona destroy ats-002-lab-082
 ```

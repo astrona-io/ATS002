@@ -1,0 +1,42 @@
+metadata:
+  name: "ats-002-lab-01a"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "lab-01a-setup"
+      description: "Creates the user crew and starts three background processes as systemd services: cpuburn.sh, stubborn.sh (ignores SIGTERM) and crew-sleeper.sh. Creates /opt/course/7."
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-stubborn-stopped"
+      description: "Confirms no stubborn.sh process is running"
+      type: "file"
+      source: "validation/validate-stubborn-stopped.sh"
+    - name: "verify-cpuburn-niceness"
+      description: "Confirms cpuburn.sh is still running with niceness 15"
+      type: "file"
+      source: "validation/validate-cpuburn-niceness.sh"
+    - name: "verify-sleeper-pid-file"
+      description: "Confirms the sleeper is still running and /opt/course/7/sleeper-pid holds its PID"
+      type: "file"
+      source: "validation/validate-sleeper-pid.sh"
+
+teardown:
+  keepCluster: false

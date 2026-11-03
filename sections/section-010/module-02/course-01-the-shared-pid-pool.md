@@ -1,18 +1,26 @@
-# Part 1 — The shared PID pool and confirming exhaustion
+# The Shared PID Pool
 
-> Prerequisite: [module landing page](./course.md). Next: [Part 2 — The three independent ceilings](./course-02-the-three-independent-ceilings.md).
+Astronaut, every crew member on your ship wears a badge with a number. On Linux, a **process** is a crew member doing one job, and its badge number is its **PID** (process ID). The ship can only print a fixed number of badges. When they run out, nobody new can come aboard, even if there is plenty of air and food.
 
-Before raising any limit you need to be sure the failure is *PID exhaustion* and not memory or CPU pressure wearing the same clothes. This part is the pool itself — what draws from it, how big it is, how numbers get reused — and the three-command check that confirms "cannot fork" really means "out of task slots".
+Before you raise any limit, you must be sure the failure really is "out of badges" and not a memory or CPU problem in disguise. This part shows what draws from the badge pool, how big the pool is, how numbers get reused, and the short check that proves "cannot fork" means "out of task slots".
 
 ## Threads and processes draw from one pool
 
-Concrete: a service with 500 worker threads is not "one" task to the kernel — it is roughly 500.
+Here is a concrete case: a service with 500 worker threads is not "one" task to the kernel. It is about 500.
 
-Linux does not keep a separate thread-ID space. At the kernel level a thread *is* a task, created by `clone()` with shared address space, and it gets its own entry in the task table and its own **TID** drawn from the same integer pool that process IDs come from. For a single-threaded process `getpid()` and `gettid()` return the same number; every extra thread consumes one more slot.
+A **thread** is like an extra pair of hands of the same crew member: it shares the crew member's memory but does its own work. Linux does not keep a separate number space for threads. Inside the kernel, a thread *is* a task. The kernel creates it with the `clone()` system call (a request to the kernel), and gives it its own entry in the task table and its own **TID** (thread ID). That TID comes from the same pool of numbers as process IDs.
 
-The consequence for capacity planning: a workload that forks aggressively *and* runs large thread pools inside each fork can hit the task-slot ceiling while `top` shows CPU and memory sitting comfortably idle. Nothing in the CPU/RAM picture warns you.
+For a process with one thread, `getpid()` and `gettid()` return the same number. Every extra thread uses one more slot.
+
+This matters when you plan capacity. A workload that starts many processes, each with a large pool of threads, can run out of task slots while `top` shows CPU and memory sitting idle. Nothing in the CPU and memory picture warns you.
 
 ## `kernel.pid_max` sizes the pool
+
+The size of the badge pool is the kernel parameter `kernel.pid_max`, a dial on the reactor's control panel.
+
+<!-- astrona:playground:renew -->
+
+Read it on any machine. You do not need `sudo`:
 
 ```bash
 # shell: any host, unprivileged
@@ -24,13 +32,23 @@ cat /proc/sys/kernel/pid_max
 32768
 ```
 
-`kernel.pid_max` is **one greater than the largest PID/TID the kernel will allocate** — so `32768` means PIDs `1`..`32767`. That default is `2^15`, a number inherited from single-core-era Linux. A 64-bit kernel accepts up to `4194304` (`2^22`); raising it costs a few bytes of bookkeeping per possible task and buys enormous headroom.
+Note: `32768` is the old default built into the kernel. On Ubuntu 24.04 you will usually see `4194304`, because systemd raises the value at boot. The graded missions set `32768` on purpose so you have a real ceiling to fix.
 
-Numbers are handed out roughly sequentially and then **wrap**: after the allocator reaches `pid_max` it wraps to the low end and skips values still in use. A too-small `pid_max` on a churny box means the allocator is constantly stepping over live PIDs looking for a free slot — and when none is free, `fork()` / `clone()` returns `EAGAIN`.
+### What the number means
 
-## Confirm it is actually PID exhaustion
+`kernel.pid_max` is **one more than the largest PID or TID the kernel will hand out**. So `32768` means PIDs `1` to `32767`. That default is `2^15`, a number from the days of single-core machines. A 64-bit kernel accepts up to `4194304` (`2^22`). Raising it costs only a few bytes of bookkeeping per possible task, and buys a huge amount of room.
 
-Rule out the look-alikes first:
+### How numbers are reused
+
+The kernel hands out numbers roughly in order, then **wraps around**. When it reaches `pid_max`, it starts again at the low end and skips numbers that are still in use. If `pid_max` is too small on a busy machine, the kernel keeps stepping over live PIDs looking for a free one. When none is free, `fork()` or `clone()` fails with the error `EAGAIN` ("try again").
+
+## Confirm it is really PID exhaustion
+
+Some problems look like PID exhaustion but are not. Rule out memory and CPU pressure first, then count the tasks.
+
+### Rule out the look-alikes
+
+Check memory, the CPU summary and the kernel's own messages:
 
 ```bash
 # shell: host
@@ -39,44 +57,47 @@ top -bn1 | head -5
 dmesg | tail -30 | grep -iE 'fork|cannot allocate|out of memory|task'
 ```
 
-The signature of PID exhaustion specifically: `fork: retry: Resource temporarily unavailable`, `pthread_create failed`, `-bash: fork: Cannot allocate memory` (misleading text — still `EAGAIN`, not real OOM) **on a box whose `free -m` and `top` look healthy**. If `dmesg` shows the OOM killer firing, that is a different problem — memory, not slots.
+The signature of PID exhaustion is one of these messages **on a machine where `free -m` and `top` look healthy**:
 
-Then count what is actually scheduled and compare it to the ceiling:
+- `fork: retry: Resource temporarily unavailable`
+- `pthread_create failed`
+- `-bash: fork: Cannot allocate memory`
+
+The last one is misleading: it can appear even though plenty of memory is free. If `dmesg` shows the OOM killer (the kernel's out-of-memory killer) firing, you have a different problem: memory, not task slots.
+
+### Count every task
+
+Then count what is actually running and compare it with the ceiling:
 
 ```bash
 ps -eLf | wc -l
 ```
 
-`-L` is the flag that matters: it prints **one line per thread**, not per process, so the count is the true number of tasks competing for the pool. Compare that to `sysctl -n kernel.pid_max`. Close to the ceiling → this part's problem. Far below it → the ceiling in Part 2 that is actually clamping you is a narrower one.
+`-L` is the option that matters. It prints **one line per thread**, not per process, so the count is the true number of tasks using the pool. Compare it with `sysctl -n kernel.pid_max`. If the count is close to the ceiling, the pool itself is full. If it is far below, a narrower ceiling is stopping you: the per-user limit or the per-service limit.
 
-> [!TIP]
-> **Try it — pool size vs. what's running.** On the playground host (`astrona ssh astro-process-limits-ceilings`):
->
-> ```bash
-> sysctl -n kernel.pid_max
-> ps -e | wc -l          # processes
-> ps -eLf | wc -l        # processes AND threads
-> ```
->
-> Expect something like:
->
-> ```text
-> 4194304
-> 142
-> 380
-> ```
->
-> The thread count (`-eLf`) is well above the process count — every one of those extra lines is a slot from the same pool. On this idle VM both are a rounding error against `pid_max`, so a "cannot fork" here would point at Part 2's narrower ceilings, not this one.
+### Try it: pool size against what is running
+
+On your playground, read the pool size, then count processes and then processes plus threads:
+
+```bash
+sysctl -n kernel.pid_max
+ps -e | wc -l          # processes
+ps -eLf | wc -l        # processes AND threads
+```
+
+Expect something like:
+
+```text
+4194304
+142
+380
+```
+
+The thread count (`-eLf`) is well above the process count. Every extra line is one more slot from the same pool. On this idle machine both numbers are tiny next to `pid_max`. So a "cannot fork" here would point at one of the narrower ceilings, not at the pool.
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Trusting `top`'s task count.** The summary line counts processes; a thread-heavy workload's real task count comes from `ps -eLf | wc -l`.
-> - **Reading `Cannot allocate memory` as OOM.** `fork()` returns `EAGAIN` on PID exhaustion and glibc renders it with that string. Check `free -m` and the OOM-killer lines in `dmesg` before concluding it is memory.
-> - **Fixing before confirming.** Raising `pid_max` on a box that is actually short on RAM changes nothing and wastes the maintenance window.
-
-> *Every process and every thread takes one slot from the single pool sized by `kernel.pid_max` (one past the highest PID); confirm exhaustion with a healthy `free`/`top` plus `fork: … Resource temporarily unavailable` and `ps -eLf | wc -l` near the ceiling.*
-
-## Reference
-
-- `man 5 proc` — `/proc/sys/kernel/pid_max` defined as one greater than the maximum PID.
-- `man 2 fork` / `man 2 clone` — the `EAGAIN` return and the two limits that cause it (system-wide and `RLIMIT_NPROC` — Part 2).
-- `man 1 ps` — `-L` (per-thread rows) and `-e` (all processes).
+> - **Trusting `top`'s task count.** Its summary line counts processes. The real task count of a workload with many threads comes from `ps -eLf | wc -l`.
+> - **Reading `Cannot allocate memory` as out of memory.** `fork()` can fail with this text even when memory is free. Check `free -m` and the OOM killer lines in `dmesg` before you decide it is memory.
+> - **Fixing before confirming.** Raising `pid_max` on a machine that is really short of memory changes nothing and wastes your maintenance window.

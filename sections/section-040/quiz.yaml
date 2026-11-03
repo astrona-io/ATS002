@@ -1,0 +1,304 @@
+# Knowledge check for section 040. Listed in astrona.yaml as a `type: quiz` entry after the last module.
+schema_version: 1
+kind: question_bank
+id: ats002-040
+course_id: ATS002
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-040
+  title: "Mandatory Access Control: SELinux and AppArmor"
+questions:
+  - id: ats002-040-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Suspect Mandatory Access Control when permissions look right"
+    source_readings:
+      - sections/section-040/module-01/course-01-two-gates-dac-mac-and-which-system.md
+    prompt: |-
+      On an Ubuntu 24.04 machine, a service was set up to write its logs to `/srv/applogs` instead of its old folder. `ls -l /srv/applogs` shows the correct owner and mode bits for the service's user, but every write still fails. What is the single most useful next command to find out whether this is a Mandatory Access Control problem?
+    options:
+      - id: a
+        text: "`chmod -R 777 /srv/applogs` to rule out permissions completely."
+        explanation: "This option is wrong because the scenario already says the permissions are correct. Loosening them further does nothing if the real blocker is a missing MAC rule, and it weakens security for no gain."
+      - id: b
+        text: "`sudo aa-status`, to check whether AppArmor is active and which mode the service's profile is in."
+        explanation: "Correct. Correct DAC permissions plus a write that still fails, on an Ubuntu-family machine, is the classic sign of an AppArmor (MAC) denial rather than a DAC problem. `aa-status` reports whether AppArmor is loaded and enforcing at all, which profiles exist, and, most importantly, the current mode of each profile. That is exactly the next fact you need."
+      - id: c
+        text: "`sudo systemctl restart apparmor.service` to reset all profiles at once."
+        explanation: "This option is wrong because restarting the whole `apparmor` service is a blunt step that does not target the profile in question, and it tells you nothing."
+      - id: d
+        text: "`sudo chown -R root:root /srv/applogs` to remove ownership as a cause."
+        explanation: "This option is wrong for the same reason as A: the ownership is already correct, so changing it again gives you no new information."
+    correct_option: b
+    explanation: "Correct DAC permissions plus a write that still fails, on an Ubuntu-family machine, is the classic sign of an AppArmor (MAC) denial rather than a DAC problem. `aa-status` reports whether AppArmor is loaded and enforcing at all, which profiles exist, and, most importantly, the current mode of each profile. That is exactly the next fact you need."
+
+  - id: ats002-040-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read the name field of an AppArmor denial"
+    source_readings:
+      - sections/section-040/module-01/course-03-apparmor-reading-a-denial.md
+    prompt: |-
+      You run `sudo journalctl -k | grep 'apparmor="DENIED"'` and see this line:
+      ```
+      apparmor="DENIED" operation="open" profile="/usr/sbin/appservice" name="/srv/applogs/app.log" pid=1234 comm="appservice" requested_mask="w" denied_mask="w"
+      ```
+      Which field tells you the exact filesystem path that needs a new rule in the profile?
+    options:
+      - id: a
+        text: "`profile=\"/usr/sbin/appservice\"`"
+        explanation: "This option names the profile that said no. That tells you which file under `/etc/apparmor.d/` to edit, but it is not the path that needs a new rule."
+      - id: b
+        text: "`operation=\"open\"`"
+        explanation: "This option tells you what kind of access was tried (`open`, for writing, as `requested_mask=\"w\"` shows), not which path."
+      - id: c
+        text: "`name=\"/srv/applogs/app.log\"`"
+        explanation: "Correct. AppArmor compares exact filesystem paths with the rules written in a program's profile. No label is involved anywhere. The `name=` field is that exact path, and it is the string that must appear, with the right access, in the profile before this action can succeed."
+      - id: d
+        text: "`pid=1234`"
+        explanation: "This option is only the process number of the denied process. It helps you match it with `ps`, but it plays no part in the fix."
+    correct_option: c
+    explanation: "AppArmor compares exact filesystem paths with the rules written in a program's profile. No label is involved anywhere. The `name=` field is that exact path, and it is the string that must appear, with the right access, in the profile before this action can succeed."
+
+  - id: ats002-040-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Reload a profile after editing it"
+    source_readings:
+      - sections/section-040/module-01/course-04-apparmor-fixing-a-denial.md
+    prompt: |-
+      You edited `/etc/apparmor.d/usr.sbin.appservice` and added the rule `/srv/applogs/*.log rw,`, but the service still cannot write to that path. What is the most likely explanation?
+    options:
+      - id: a
+        text: "AppArmor profiles can never grant access to paths outside `/var/log/`."
+        explanation: "This option is false. AppArmor path rules can grant access to any path an administrator writes a rule for."
+      - id: b
+        text: "The changed profile was never reloaded into the running kernel with `apparmor_parser -r`, so the kernel still enforces the old version."
+        explanation: "Correct. Editing a profile *file* on disk has no effect on the kernel's active policy until you reload that profile with `apparmor_parser -r <profile-path>`. It is the AppArmor version of forgetting `systemctl daemon-reload` after editing a unit file: a common, easy-to-miss step that gives exactly this \"my fix did not work\" result."
+      - id: c
+        text: "The rule needs a `capability` line after it to take effect."
+        explanation: "This option is wrong because `capability` lines grant Linux capabilities, a completely different kind of rule. A plain file read or write does not need one."
+      - id: d
+        text: "AppArmor needs a full reboot after every profile edit."
+        explanation: "This option is wrong. `apparmor_parser -r` reloads one profile while the system runs, with no reboot."
+    correct_option: b
+    explanation: "Editing a profile *file* on disk has no effect on the kernel's active policy until you reload that profile with `apparmor_parser -r <profile-path>`. It is the AppArmor version of forgetting `systemctl daemon-reload` after editing a unit file: a common, easy-to-miss step that gives exactly this \"my fix did not work\" result."
+
+  - id: ats002-040-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Tell chcon from a lasting SELinux fix"
+    source_readings:
+      - sections/section-040/module-01/course-06-selinux-persistent-fixes-and-contrast.md
+    prompt: |-
+      An administrator fixes an SELinux-caused `403 Forbidden` on a moved web content folder by running `sudo chcon -t httpd_sys_content_t /srv/webdata/index.html`, and the page now loads. Weeks later, an unrelated system update triggers a filesystem relabel, and the exact same `403 Forbidden` comes back with no other changes. What went wrong?
+    options:
+      - id: a
+        text: "`chcon` only changes a file's live context, with no matching entry in SELinux's lasting file-context database. A relabel sets the file back to whatever that database says, which quietly undoes the fix."
+        explanation: "Correct. `chcon` changes the file's label on disk at once, but that change is stored nowhere else. There is no matching rule in the lasting file-context database behind `/etc/selinux/<policy>/contexts/files/file_contexts.local`. A relabel (a policy update, `restorecon -R /` and so on) applies the database again. The database was never updated, so the file quietly goes back to its old, wrong type. The lasting fix is `semanage fcontext -a` (which writes the database rule) followed by `restorecon` (which applies it). That pair survives any number of later relabels."
+      - id: b
+        text: "`chcon` is a read-only diagnostic command and could never change anything."
+        explanation: "This option is false. `chcon` really does change a file's context at once; the problem is that the change does not last."
+      - id: c
+        text: "The web server's DAC permissions expired after 30 days by default."
+        explanation: "This option is wrong. DAC permissions never expire, and the scenario says nothing about them changing."
+      - id: d
+        text: "SELinux switches itself off after any system update."
+        explanation: "This option is wrong. SELinux does not switch itself off on an update. It stayed `Enforcing` the whole time and correctly applied its database, which nobody had fixed."
+    correct_option: a
+    explanation: "`chcon` changes the file's label on disk at once, but that change is stored nowhere else. There is no matching rule in the lasting file-context database behind `/etc/selinux/<policy>/contexts/files/file_contexts.local`. A relabel (a policy update, `restorecon -R /` and so on) applies the database again. The database was never updated, so the file quietly goes back to its old, wrong type. The lasting fix is `semanage fcontext -a` (which writes the database rule) followed by `restorecon` (which applies it). That pair survives any number of later relabels."
+
+  - id: ats002-040-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Allow a new port for a service under SELinux"
+    source_readings:
+      - sections/section-040/module-01/course-06-selinux-persistent-fixes-and-contrast.md
+    prompt: |-
+      A web server must bind a new, non-default TCP port, `8443`, on an SELinux `Enforcing` machine. Which statement correctly describes what is needed?
+    options:
+      - id: a
+        text: "Nothing extra: SELinux only controls file access, never network ports."
+        explanation: "This option is false. SELinux controls network port binds through port-type policy, a real and often tested mechanism."
+      - id: b
+        text: "Adding `listen 8443;` to the web server's own configuration file is enough on its own."
+        explanation: "This option is incomplete. The configuration change alone tells SELinux's policy nothing. Without the port type, the bind can fail or produce an AVC denial, depending on the policy version."
+      - id: c
+        text: "The port must be in an SELinux port type the web server may use (for example `semanage port -a -t http_port_t -p tcp 8443`) *in addition to* the web server's own configuration change. File context and port-type policy are two separate SELinux mechanisms, and a configuration change alone does not satisfy SELinux."
+        explanation: "Correct. Port binding is controlled by its own kind of SELinux object (port types), separate from file-context policy. A confined process domain may only bind ports whose SELinux port type its policy allows. `semanage port -l | grep http_port_t` shows which ports are already covered, and `semanage port -a` adds to that set. This is separate from, and needed as well as, the web server's own `listen` setting: SELinux allowing a bind does not make the server try one, and the server trying one does not mean the policy allows it."
+      - id: d
+        text: "Binding a new port always means switching SELinux to `Permissive` mode first."
+        explanation: "This option is wrong and would seriously weaken security. Switching to `Permissive` turns off enforcement for the whole system as a \"fix\", which is never the right answer to one narrow port-policy gap."
+    correct_option: c
+    explanation: "Port binding is controlled by its own kind of SELinux object (port types), separate from file-context policy. A confined process domain may only bind ports whose SELinux port type its policy allows. `semanage port -l | grep http_port_t` shows which ports are already covered, and `semanage port -a` adds to that set. This is separate from, and needed as well as, the web server's own `listen` setting: SELinux allowing a bind does not make the server try one, and the server trying one does not mean the policy allows it."
+
+  - id: ats002-040-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Use complain mode to learn what a profile blocks"
+    source_readings:
+      - sections/section-040/module-01/course-02-apparmor-profiles-and-modes.md
+    prompt: |-
+      You want AppArmor to log what `/usr/sbin/appservice` would be blocked from doing, without blocking anything yet. Which command does this?
+    options:
+      - id: a
+        text: "`sudo aa-enforce /usr/sbin/appservice`"
+        explanation: "`aa-enforce` turns on blocking."
+      - id: b
+        text: "`sudo aa-complain /usr/sbin/appservice`"
+        explanation: "Correct. Complain mode logs what the profile would deny but allows the action. `aa-enforce` switches back to blocking. `aa-status` shows each profile's mode."
+      - id: c
+        text: "`sudo systemctl stop apparmor`"
+        explanation: "That removes protection for every profile and is not a targeted step."
+      - id: d
+        text: "`sudo setenforce 0`"
+        explanation: "`setenforce` belongs to SELinux and does not exist for AppArmor."
+    correct_option: b
+    explanation: "Complain mode logs what the profile would deny but allows the action. `aa-enforce` switches back to blocking. `aa-status` shows each profile's mode."
+
+  - id: ats002-040-q07
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Check which AppArmor profiles are loaded and in which mode"
+    source_readings:
+      - sections/section-040/module-01/course-02-apparmor-profiles-and-modes.md
+    prompt: |-
+      Which command lists the loaded AppArmor profiles and shows which are in enforce mode and which in complain mode?
+    options:
+      - id: a
+        text: "`sudo aa-status`"
+        explanation: "Correct. `aa-status` lists the profiles that are loaded, split by mode, and the processes they confine."
+      - id: b
+        text: "`getenforce`"
+        explanation: "`getenforce` reports SELinux, which is not used on Ubuntu."
+      - id: c
+        text: "`ls -Z /etc`"
+        explanation: "`-Z` shows SELinux labels, not AppArmor profiles."
+      - id: d
+        text: "`sudo journalctl -u apparmor-modes`"
+        explanation: "No such unit exists."
+    correct_option: a
+    explanation: "`aa-status` lists the profiles that are loaded, split by mode, and the processes they confine."
+
+  - id: ats002-040-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make a file label change last with semanage and restorecon"
+    source_readings:
+      - sections/section-040/module-02/course-01-contexts-and-restorecon.md
+    prompt: |-
+      Web content in `/srv/web` must keep the type `httpd_sys_content_t`, even after a full relabel. Which pair of commands does this on a RHEL-family system?
+    options:
+      - id: a
+        text: "`chcon -R -t httpd_sys_content_t /srv/web` only."
+        explanation: "`chcon` is lost at the next relabel."
+      - id: b
+        text: "`semanage fcontext -a -t httpd_sys_content_t \"/srv/web(/.*)?\"` then `restorecon -Rv /srv/web`"
+        explanation: "Correct. `semanage fcontext` writes the rule into the lasting file-context database. `restorecon` applies the rule to the files that exist now. You need both."
+      - id: c
+        text: "`setsebool -P httpd_sys_content_t on`"
+        explanation: "That is not a boolean. It is a file type."
+      - id: d
+        text: "`restorecon -Rv /srv/web` only."
+        explanation: "Without a rule for `/srv/web`, `restorecon` sets the default type for the folder, not the one you want."
+    correct_option: b
+    explanation: "`semanage fcontext` writes the rule into the lasting file-context database. `restorecon` applies the rule to the files that exist now. You need both."
+
+  - id: ats002-040-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make a boolean change survive a reboot"
+    source_readings:
+      - sections/section-040/module-02/course-02-booleans-ports-and-reading-denials.md
+    prompt: |-
+      You run `sudo setsebool httpd_can_network_connect on`. After a reboot the web server cannot make outgoing connections again. What was missing?
+    options:
+      - id: a
+        text: "The `-P` option, which writes the change to disk so that it stays."
+        explanation: "Correct. `setsebool` without `-P` changes only the running policy. With `-P` the new value is saved and used at every boot."
+      - id: b
+        text: "A restart of the `auditd` service."
+        explanation: "`auditd` only records denials."
+      - id: c
+        text: "The command `restorecon -R /`."
+        explanation: "That fixes file labels. It does not change booleans."
+      - id: d
+        text: "A relabel with `touch /.autorelabel`."
+        explanation: "A relabel does not set booleans."
+    correct_option: a
+    explanation: "`setsebool` without `-P` changes only the running policy. With `-P` the new value is saved and used at every boot."
+
+  - id: ats002-040-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find recent SELinux denials in the audit log"
+    source_readings:
+      - sections/section-040/module-02/course-02-booleans-ports-and-reading-denials.md
+    prompt: |-
+      Which command lists recent SELinux access denials from the audit log?
+    options:
+      - id: a
+        text: "`journalctl -k | grep DENIED`"
+        explanation: "That filter fits AppArmor lines, not SELinux AVC records."
+      - id: b
+        text: "`getsebool -a`"
+        explanation: "That lists booleans, not denials."
+      - id: c
+        text: "`ausearch -m avc -ts recent`"
+        explanation: "Correct. SELinux writes denials as AVC records in the audit log. `ausearch -m avc -ts recent` shows the recent ones."
+      - id: d
+        text: "`semanage port -l`"
+        explanation: "That lists port types, not denials."
+    correct_option: c
+    explanation: "SELinux writes denials as AVC records in the audit log. `ausearch -m avc -ts recent` shows the recent ones."
+
+  - id: ats002-040-q11
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain what moved and copied files do to their label"
+    source_readings:
+      - sections/section-040/module-02/course-01-contexts-and-restorecon.md
+    prompt: |-
+      You move a file with `mv` from `/home/pilot` into `/srv/web`. A web server refuses to read it under SELinux. What is the most likely reason?
+    options:
+      - id: a
+        text: "`mv` removes the label, so the file has none."
+        explanation: "`mv` keeps the old label."
+      - id: b
+        text: "The file keeps the label from its old folder, which does not match the type the web server may read."
+        explanation: "Correct. A moved file keeps its old label. A copied file gets the label of its new place. After a move, run `restorecon -Rv` on the destination."
+      - id: c
+        text: "SELinux does not allow files to be moved."
+        explanation: "Moving is allowed."
+      - id: d
+        text: "The file owner changed to root."
+        explanation: "A move inside one filesystem does not change the owner."
+    correct_option: b
+    explanation: "A moved file keeps its old label. A copied file gets the label of its new place. After a move, run `restorecon -Rv` on the destination."
+
+  - id: ats002-040-q12
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Tell permissive mode from disabled mode"
+    source_readings:
+      - sections/section-040/module-02/course-02-booleans-ports-and-reading-denials.md
+    prompt: |-
+      You want SELinux to log denials but stop blocking them, for testing, until the next reboot. Which command does this?
+    options:
+      - id: a
+        text: "`setenforce 1`"
+        explanation: "That sets enforcing mode and blocks again."
+      - id: b
+        text: "`setenforce 0`"
+        explanation: "Correct. `setenforce 0` switches SELinux to permissive mode: it logs but does not block, until the next reboot. `SELINUX=` in `/etc/selinux/config` sets the mode used at boot."
+      - id: c
+        text: "`sestatus -d`"
+        explanation: "`sestatus` only reports the state."
+      - id: d
+        text: "Edit `/etc/selinux/config` to say `SELINUX=disabled`."
+        explanation: "That needs a reboot and turns SELinux off for good, not just for a test."
+    correct_option: b
+    explanation: "`setenforce 0` switches SELinux to permissive mode: it logs but does not block, until the next reboot. `SELINUX=` in `/etc/selinux/config` sets the mode used at boot."

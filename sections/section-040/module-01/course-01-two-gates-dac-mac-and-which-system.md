@@ -1,12 +1,14 @@
-# Part 1 — Two gates: DAC, MAC, and which system you're on
+# Two Gates: DAC, MAC And Which System You Are On
 
-> Prerequisite: [module landing page](./course.md). Next: [Part 2 — AppArmor: profiles, modes, and what's loaded](./course-02-apparmor-profiles-and-modes.md).
-
-Before any command in this module makes sense you need one mental model: there are **two** independent permission checks between a process and a file, not one. This part settles what each gate is, how to recognise which one denied you, and the single structural difference between the two systems that implement the second gate. Every later part builds on these terms.
+Astronaut, before any command in this module makes sense, you need one picture in your head. Between a crew member (a process) and a crate (a file) there are **two** separate checks, not one. This part shows what each check is, how to tell which one stopped you, and the one big difference between the two systems that run the second check.
 
 ## The gate you already know, and the one behind it
 
-Concrete first. You are logged in as `alice`. You run:
+Most "Permission denied" errors come from the file permissions you already know. Some do not. This section shows a case where the permissions are fine and the access still fails, and explains which part of the system said no.
+
+### A denial with correct permissions
+
+Here is a story from an ordinary Linux machine. You are logged in as `alice`, and you run:
 
 ```bash
 # shell: any Linux host, unprivileged
@@ -27,43 +29,55 @@ ls -l /srv/reports/q3.csv
 -rw-r--r-- 1 alice alice 4096 Sep  7 09:00 /srv/reports/q3.csv
 ```
 
-`alice` owns it, the owner has `r`, and she still cannot read it. The rwx bits are the **first** gate — **Discretionary Access Control (DAC)**: "discretionary" because the file's *owner* sets who gets in, at their discretion. Here DAC says yes. Something else said no.
+`alice` owns the file, the owner has `r` (read), and she still cannot read it. The rwx bits are the **first** gate. Its name is **Discretionary Access Control (DAC)**. "Discretionary" means the file's *owner* decides who gets in. Picture DAC as the lock on each hatch of your ship: the owner of the crate behind the hatch decides who gets a key. Here DAC says yes. Something else said no.
 
-That something is the **second** gate — **Mandatory Access Control (MAC)**: a system-wide security policy, set by the administrator (or shipped by the distro), that the file's owner cannot override. It decides independently whether a process may touch a resource. Both gates must open for the action to succeed:
+### The second gate
+
+That something is **Mandatory Access Control (MAC)**. MAC is a security policy for the whole system. The administrator sets it, or the Linux distribution ships it, and the file's owner cannot override it. Picture MAC as the ship's security chief: a second check that can overrule the owner's keys. It decides on its own whether a process may touch a resource.
+
+Both gates must open before the action succeeds:
 
 ```mermaid
-flowchart TD
-    R["process wants to open a file"] --> DAC{"DAC: rwx / ACL"}
-    DAC -->|deny| E1["EACCES — Permission denied"]
-    DAC -->|allow| MAC{"MAC: LSM policy"}
-    MAC -->|deny| E2["EACCES — Permission denied, plus an audit log line"]
-    MAC -->|allow| OK["open() succeeds"]
+flowchart TB
+    P["process"] -->|"open a file"| D{"DAC check"}
+    D -->|"deny"| E1["Permission denied"]
+    D -->|"allow"| M{"MAC check"}
+    M -->|"deny"| E2["Denied and logged"]
+    M -->|"allow"| OK["open succeeds"]
 ```
 
-The kernel checks DAC first, then hands the decision to a **Linux Security Module (LSM)** — the kernel framework MAC plugs into. If the LSM's policy denies, the syscall fails with the same `EACCES` / "Permission denied" that a DAC failure gives. The error text does not tell you which gate stopped you.
+The diagram shows the order: the kernel checks DAC first, and only if DAC allows does it ask MAC, and a MAC denial also leaves an audit line in the log.
+
+The kernel (the ship's reactor core, which runs everything) does both checks. It first checks DAC. Then it hands the decision to a **Linux Security Module (LSM)**. An LSM is a slot in the kernel where a security system plugs in, like a security chief's desk built into the reactor room. If the policy behind that slot says no, the system call fails with the same `EACCES` error ("Permission denied") that a DAC failure gives. The error text does not tell you which gate stopped you.
 
 ## The signature: correct permissions, still denied
 
-The one diagnostic instinct this module is built around: **when `ls -l` shows permissions that clearly should allow the action, and it is still denied, stop adjusting `chmod` / `chown` and start looking at MAC.**
+This whole module is built around one habit. **When `ls -l` shows permissions that clearly allow the action, and the action is still denied, stop changing `chmod` and `chown`. Start looking at MAC.**
 
-- `chmod 644` on a file the owner already reads → the fix does nothing, because DAC was never the problem.
-- A service that worked yesterday, no permission change, now gets "Permission denied" writing its own log → suspect a policy that does not cover a path the service newly uses.
-- `strace` shows `openat(...) = -1 EACCES` on a path whose mode is `666` → MAC.
+Three examples of that signature:
 
-MAC denials also leave an audit-log record that a DAC denial does not. Parts 3 and 4 read those records for each system; recognising that a record *exists to look for* is the point here.
+- You run `chmod 644` on a file the owner can already read, and nothing changes. DAC was never the problem.
+- A service worked yesterday. Nobody changed any permissions. Today it gets "Permission denied" when it writes its own log. Suspect a policy that does not cover a path the service now uses.
+- `strace` shows `openat(...) = -1 EACCES` on a file whose mode is `666`. That is MAC.
 
-## Two implementations — and the distro decides
+A MAC denial also leaves an audit record in the log, which a DAC denial does not. Picture it as the security chief writing a report about the hatch they kept shut. For now, just remember that such a record exists and is worth looking for.
 
-You do not choose your MAC system per task; it is baked into the distribution:
+## Two systems, and the distribution decides
+
+You do not pick a MAC system for each task. The Linux distribution decides it for you:
 
 | MAC system | LSM | Ships enforcing on |
 |---|---|---|
 | **AppArmor** | `apparmor` | Ubuntu, Debian, openSUSE, SUSE Linux Enterprise |
 | **SELinux** | `selinux` | RHEL, CentOS Stream, Fedora, Rocky, AlmaLinux |
 
-Only one LSM of this kind is active on a given boot. This course's playground and lab are Ubuntu 24.04 → **AppArmor** is loaded and enforcing right now, and Parts 2–3 are hands-on against it. RHEL-family exam hosts run **SELinux**, so Parts 4–5 walk through it in full even though there is no SELinux kernel here to run commands on.
+Only one full MAC system of this kind is active at a time. Your playground and the missions in this module run Ubuntu 24.04, so **AppArmor** is loaded and enforcing on them right now, and the AppArmor parts are hands-on. Exam machines from the RHEL family (Red Hat Enterprise Linux and its relatives) run **SELinux**. This module explains SELinux in full as a worked walkthrough, but the Ubuntu training ship has no SELinux to run commands on.
 
-To see which you are on, on any host:
+### See it in your playground
+
+Open a terminal on your playground. You can check which system a machine runs by reading the list of active security modules:
+
+<!-- astrona:playground:renew -->
 
 ```bash
 # shell: host, unprivileged
@@ -74,23 +88,24 @@ cat /sys/kernel/security/lsm
 capability,landlock,lockdown,yama,apparmor
 ```
 
-The list is every LSM compiled in; the MAC one is `apparmor` **or** `selinux`, never both. (`capability`, `yama`, `landlock` are smaller, single-purpose LSMs, not full MAC policy.)
+The list shows every security module the kernel has switched on. The MAC one is `apparmor` **or** `selinux`, never both. `capability`, `landlock`, `lockdown` and `yama` are smaller modules with one narrow job each. They are not full MAC systems.
 
-## The one structural difference: path vs label
+## The one big difference: path or label
 
-Everything else in this module follows from *how* each system decides. Concretely:
+Everything else in this module follows from *how* each system makes its decision. The two systems answer the same question in very different ways.
 
-- **AppArmor matches on the filesystem path.** A profile for `/usr/sbin/nginx` is a list of path rules — `/var/www/** r,` — and the kernel checks the literal path string the process asked for against that list.
-- **SELinux matches on a label.** Every process and every file carries a *security context*; policy is a table of "context X may do Y to context Z." The path the file lives at is almost irrelevant.
+- **AppArmor matches the file's path.** A profile for `/usr/sbin/nginx` is a list of path rules, such as `/var/www/** r,`. The kernel compares the exact path the process asked for with that list.
+- **SELinux matches a label.** Every process and every file carries a *security context*, a label. The policy is a table that says "label X may do Y to label Z". Where the file lives hardly matters.
 
-As an analogy: it is a building where visitors are checked before an elevator moves. **AppArmor's list is by street address** — the guard only cares whether the exact address you are heading to is on this visitor's approved list. **SELinux's list is by name badge** — every person is issued a badge with a category on it, and the list says which badge categories ride which elevators. Where it breaks down: a real guard can see both your address and your badge; each MAC system deliberately ignores the other's criterion.
+In space terms: AppArmor's security chief holds a list of the exact hatches one crew member may use, by hatch address. SELinux's security chief ignores addresses. Every crew member and every crate carries a security tag, and the rules compare tags. A real guard could look at both, but each MAC system deliberately looks only at its own thing.
 
-The consequence you will see again and again: **move or rename a file, and AppArmor's old path rule stops matching entirely** (the profile has no memory that the file "used to" be somewhere permitted), whereas **SELinux's decision usually does not change**, because the label travelled with the file. Part 2 starts on the AppArmor side of that.
+This has one result you will see again and again. **Move or rename a file, and AppArmor's old path rule stops matching.** The profile does not remember that the file "used to" be somewhere allowed. **SELinux's decision usually does not change**, because the label moved with the file.
 
-> *Two independent gates sit between a process and a file: DAC (owner-set rwx) then MAC (system LSM policy); a denial with correct `ls -l` permissions means look at MAC, which is AppArmor on Debian/SUSE and SELinux on RHEL — path-matched vs label-matched.*
+## Common pitfalls
 
-## Reference
+> [!WARNING]
+> - **Fixing permissions that are already correct.** If `ls -l` allows the action and it still fails, more `chmod` or `chown` will not help. Look at MAC.
+> - **Trusting the error text.** DAC and MAC both say "Permission denied". The message never tells you which gate closed.
+> - **Expecting both systems at once.** A machine runs AppArmor or SELinux as its MAC system, not both. Check `/sys/kernel/security/lsm` before you reach for the tools of either one.
 
-- `man 7 apparmor` and `man 8 selinux` — one-screen overviews of each system's model; read whichever your host runs first.
-- `/sys/kernel/security/lsm` and `man 7 lsm` — how the kernel stacks security modules and why only one MAC LSM is active.
-- LFCS objective "Create and enforce MAC using SELinux" — the exam competency this whole module maps to; both systems are fair game to reason about.
+> *Two separate gates sit between a process and a file: DAC (owner-set rwx) and then MAC (a system-wide policy). A denial with correct `ls -l` permissions means look at MAC, which is AppArmor on Debian and SUSE and SELinux on RHEL. AppArmor matches paths; SELinux matches labels.*

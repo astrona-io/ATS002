@@ -1,0 +1,45 @@
+metadata:
+  name: "ats-002-lab-025"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 3072
+    diskSizeGB: 20
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-025-docker-and-build-folder"
+      description: "Starts Docker, pulls nginx:alpine and stages /opt/course/25/build with an index.html"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-image-built"
+      description: "Confirms the image status-page:1.0 exists and serves the page from index.html"
+      type: "file"
+      source: "validation/validate-image.sh"
+
+    - name: "verify-volume-container"
+      description: "Confirms status-web is running from status-page:1.0 with the named volume status-data at /data"
+      type: "file"
+      source: "validation/validate-volume.sh"
+
+    - name: "verify-network"
+      description: "Confirms status-web is on the user-defined network status-net"
+      type: "file"
+      source: "validation/validate-network.sh"
+
+teardown:
+  keepCluster: false

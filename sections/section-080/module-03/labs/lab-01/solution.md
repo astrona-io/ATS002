@@ -1,8 +1,12 @@
 # Solution Walkthrough
 
+This walkthrough runs the full backup, wipe and restore cycle on the secondary disk, then checks both layers: the partition table and the filesystems inside it.
+
+The commands below use `/dev/vdc` because the disk's serial is `lab083-vdc`. On these training ships a single extra disk usually appears as `/dev/vdb` instead. Use the name your own `lsblk -f` shows in every command, including the partition names (`vdb1`, `vdb2`). The path `/dev/disk/by-id/virtio-lab083-vdc` always points at the right disk.
+
 ---
 
-## Step 1: Identify the Secondary Disk
+## Step 1: Identify the secondary disk
 
 ```bash
 lsblk -f
@@ -17,39 +21,41 @@ vdc
 └─vdc2 ext4     VDC2     aabbccdd-...
 ```
 
-Confirm this is the intended secondary disk by its size and existing two-partition layout, and confirm it is **not** the disk mounted as `/`. Your actual device letter may differ — substitute your own from here on.
+This output is a shortened example. On Ubuntu 24.04, `lsblk -f` shows a few more columns and the main disk has more partitions.
+
+Confirm that this is the intended secondary disk: about 2 GB, two partitions labelled `VDC1` and `VDC2`, and **not** the disk mounted as `/`.
 
 ---
 
-## Step 2: Back Up the GPT Partition Table
+## Step 2: Back up the GPT partition table
 
 ```bash
 sudo sgdisk --backup=/root/vdc-ptable-backup.bin /dev/vdc
 ```
 
-This writes a binary snapshot of the GPT header and full partition entry array — exact start/end sectors, type GUIDs, unique GUIDs — to the given file. No file data from inside the partitions is included, by design.
+This writes the GPT headers and the full list of partition entries (exact start and end sectors, type IDs, unique IDs) to the file. No file data from inside the partitions is included, on purpose.
 
 ---
 
-## Step 3: Verify the Backup Is Sane
+## Step 3: Check that the backup is good
 
 ```bash
 sudo sgdisk --print /root/vdc-ptable-backup.bin
 ```
 
-Confirm the output shows 2 partitions with sizes matching Step 1's `lsblk -f`.
+Confirm that the output shows 2 partitions with sizes that match Step 1.
 
 ```bash
 ls -lh /root/vdc-ptable-backup.bin
 ```
 
-A non-zero, plausible file size is a quick extra sanity check.
+A file size that is not zero is a quick extra check.
 
 ---
 
-## Step 4: Simulate the Disaster
+## Step 4: Practice disaster
 
-> Genuinely destructive. Re-confirm the device identity immediately before this command, every time.
+This really destroys the table. Confirm the device name again right before you run it.
 
 ```bash
 lsblk -f    # re-confirm /dev/vdc one more time, immediately before proceeding
@@ -61,11 +67,11 @@ sudo sgdisk --zap-all /dev/vdc
 lsblk -f
 ```
 
-`/dev/vdc` should now show no partitions at all.
+The secondary disk should now show no partitions at all.
 
 ---
 
-## Step 5: Restore From the Backup
+## Step 5: Restore from the backup
 
 ```bash
 sudo sgdisk --load-backup=/root/vdc-ptable-backup.bin /dev/vdc
@@ -73,13 +79,13 @@ sudo sgdisk --load-backup=/root/vdc-ptable-backup.bin /dev/vdc
 
 ---
 
-## Step 6: Confirm Partitions Reappear — Then Separately Verify the Filesystems
+## Step 6: Confirm the partitions, then check the filesystems separately
 
 ```bash
 lsblk -f
 ```
 
-Both partitions should reappear with the original layout. This confirms the partition-table layer only — check the filesystem layer separately:
+Both partitions should be back with their original layout. That confirms the partition table layer only. Check the filesystem layer on its own:
 
 ```bash
 sudo fsck -n /dev/vdc1
@@ -97,7 +103,7 @@ cat /mnt/check2/marker.txt
 sudo umount /mnt/check2
 ```
 
-Both marker files should read back exactly as they were before the disaster. That, combined with a clean `fsck -n`, is what actually proves the disk is usable again — the partition-table restore alone only proved the boundaries were back.
+Both marker files should read exactly as before the disaster. Together with a clean `fsck -n`, that proves the disk is usable again. The table restore alone only proved the boundaries were back.
 
 ---
 
@@ -108,4 +114,8 @@ lsblk -f                                    # both partitions present
 sudo fsck -n /dev/vdc1 && sudo fsck -n /dev/vdc2   # both clean
 ```
 
-Once verified, run the local validation suite to pass the lab.
+Leave both partitions unmounted. When both checks pass, send the lab for grading from your own computer:
+
+```bash
+astrona submit -c sections/section-080/module-03/labs/lab-01
+```

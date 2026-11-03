@@ -1,10 +1,12 @@
-# Solution Guide: AppArmor — Two Services, Two Denials
+# Solution Walkthrough
 
-Both services fail for the same underlying reason — an AppArmor profile that only knows about a path the service no longer uses — but the direction of the blocked access differs. Work through each independently.
+Both services fail for the same reason: an AppArmor profile that only knows a path the service no longer uses. The direction of the blocked access is different: one is a write, the other a read. Work through each service on its own. Run every command on the lab machine (`astrona ssh ats-002-lab-040`).
 
 ---
 
-## Part 1: logshipper (write denial)
+## Service 1: logshipper (write denial)
+
+Start with the service that cannot write its log.
 
 ### Step 1: Confirm the profile's mode
 
@@ -12,7 +14,7 @@ Both services fail for the same underlying reason — an AppArmor profile that o
 sudo aa-status
 ```
 
-Confirm `/usr/sbin/logshipper` appears under **enforce mode**.
+Confirm that `/usr/sbin/logshipper` appears under **enforce mode**.
 
 ### Step 2: Find the denial
 
@@ -24,24 +26,27 @@ sudo journalctl -k | grep 'apparmor="DENIED"' | grep logshipper
 apparmor="DENIED" operation="open" profile="/usr/sbin/logshipper" name="/srv/shiplogs/ship.log" comm="logshipper" requested_mask="w" denied_mask="w"
 ```
 
+On a fresh lab the log file does not exist yet, so your line may say `operation="mknod"` with `requested_mask="c"` and `denied_mask="c"` (create) instead of `open` and `w`. The fix is the same.
+
 ### Step 3: Inspect and fix the profile
 
 ```bash
 sudo cat /etc/apparmor.d/usr.sbin.logshipper
 ```
 
-It only grants access under `/var/log/logshipper/`. Add the missing rule:
+It only allows access under `/var/log/logshipper/`. The local override already exists and holds one comment line. Save this as `/etc/apparmor.d/local/usr.sbin.logshipper` (for example with `sudo nano`):
 
-```bash
-sudo tee -a /etc/apparmor.d/local/usr.sbin.logshipper > /dev/null << 'EOF'
+```text
+# Site-specific additions and overrides for usr.sbin.logshipper go here.
 /srv/shiplogs/*.log rw,
 /srv/shiplogs/ r,
-EOF
 ```
 
-(Or trigger a fresh denial with `sudo systemctl restart logshipper` and run `sudo aa-logprof` instead.)
+Instead of editing by hand, you can trigger a fresh denial with `sudo systemctl restart logshipper` and run `sudo aa-logprof`.
 
 ### Step 4: Reload and confirm enforcement
+
+Apply it:
 
 ```bash
 sudo apparmor_parser -r /etc/apparmor.d/usr.sbin.logshipper
@@ -49,7 +54,9 @@ sudo aa-enforce /usr/sbin/logshipper   # only needed if aa-complain was used whi
 sudo aa-status | grep -A2 logshipper
 ```
 
-### Step 5: Confirm the write succeeds
+### Step 5: Confirm the write works
+
+Then check the result:
 
 ```bash
 sudo systemctl restart logshipper
@@ -61,7 +68,9 @@ sudo journalctl -k --since "10 seconds ago" | grep 'apparmor="DENIED"' | grep sh
 
 ---
 
-## Part 2: metrics-agent (read denial)
+## Service 2: metrics-agent (read denial)
+
+Now the service that cannot read its new configuration file.
 
 ### Step 1: Confirm the profile's mode
 
@@ -69,7 +78,7 @@ sudo journalctl -k --since "10 seconds ago" | grep 'apparmor="DENIED"' | grep sh
 sudo aa-status
 ```
 
-Confirm `/usr/sbin/metrics-agent` appears under **enforce mode**.
+Confirm that `/usr/sbin/metrics-agent` appears under **enforce mode**.
 
 ### Step 2: Find the denial
 
@@ -81,7 +90,7 @@ sudo journalctl -k | grep 'apparmor="DENIED"' | grep metrics-agent
 apparmor="DENIED" operation="open" profile="/usr/sbin/metrics-agent" name="/etc/metrics-agent/remote.conf" comm="metrics-agent" requested_mask="r" denied_mask="r"
 ```
 
-Note the `requested_mask="r"` — this is a **read** denial, not a write denial. AppArmor blocks reads exactly as readily as writes; the mechanism doesn't care which direction the access is.
+Note `requested_mask="r"`: this is a **read** denial, not a write denial. AppArmor blocks reads just as it blocks writes. The method does not care which direction the access goes.
 
 ### Step 3: Inspect and fix the profile
 
@@ -89,17 +98,18 @@ Note the `requested_mask="r"` — this is a **read** denial, not a write denial.
 sudo cat /etc/apparmor.d/usr.sbin.metrics-agent
 ```
 
-It only grants read access to `/etc/metrics-agent/local.conf` — the service's old config file. Add a rule for the new one:
+It only allows reading `/etc/metrics-agent/local.conf`, the service's old configuration file. The local override already exists and holds one comment line. Save this as `/etc/apparmor.d/local/usr.sbin.metrics-agent`:
 
-```bash
-sudo tee -a /etc/apparmor.d/local/usr.sbin.metrics-agent > /dev/null << 'EOF'
+```text
+# Site-specific additions and overrides for usr.sbin.metrics-agent go here.
 /etc/metrics-agent/remote.conf r,
-EOF
 ```
 
-(Or trigger a fresh denial with `sudo systemctl restart metrics-agent` and run `sudo aa-logprof` instead.)
+The grader looks for the exact path `/etc/metrics-agent/remote.conf` in the profile files, so name the file itself rather than a wildcard. Instead of editing by hand, you can trigger a fresh denial with `sudo systemctl restart metrics-agent` and run `sudo aa-logprof`; choose the exact path when it asks.
 
 ### Step 4: Reload and confirm enforcement
+
+Apply it:
 
 ```bash
 sudo apparmor_parser -r /etc/apparmor.d/usr.sbin.metrics-agent
@@ -107,7 +117,9 @@ sudo aa-enforce /usr/sbin/metrics-agent   # only needed if aa-complain was used 
 sudo aa-status | grep -A2 metrics-agent
 ```
 
-### Step 5: Confirm the read succeeds
+### Step 5: Confirm the read works
+
+Then check the result:
 
 ```bash
 sudo systemctl restart metrics-agent
@@ -120,10 +132,16 @@ sudo journalctl -k --since "10 seconds ago" | grep 'apparmor="DENIED"' | grep me
 
 ---
 
-## Final Check
+## Final check
 
 ```bash
 sudo aa-status
 ```
 
-Both `/usr/sbin/logshipper` and `/usr/sbin/metrics-agent` must appear under **enforce mode**, and neither under **complain mode**. Leaving either profile in complain mode "fixes" the symptom without actually restoring MAC enforcement, and does not satisfy the task.
+Both `/usr/sbin/logshipper` and `/usr/sbin/metrics-agent` must appear under **enforce mode**, and neither under complain mode. A profile left in complain mode hides the symptom without bringing MAC enforcement back, and it fails the task.
+
+When both services pass, send the capstone for grading from your own computer:
+
+```bash
+astrona submit -c sections/section-040/capstone/labs/lab-01
+```

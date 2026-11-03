@@ -1,0 +1,468 @@
+# Knowledge check for section 080. Listed in astrona.yaml as a `type: quiz` entry after the last module.
+schema_version: 1
+kind: question_bank
+id: ats002-080
+course_id: ATS002
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-080
+  title: "Section 080: System Disaster Recovery"
+questions:
+  - id: ats002-080-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Set up the bind mounts a chroot needs before entering it"
+    source_readings:
+      - sections/section-080/module-01/course-02-mount-and-get-tools-in.md
+    prompt: |-
+      You mount a broken system's root partition at `/mnt/sysroot` and immediately run `sudo chroot /mnt/sysroot /bin/bash`, skipping straight past any further setup. Inside the chroot, `blkid` prints nothing at all, even though you know the disk has partitions with real UUIDs. What's the cause, and what should you have done first?
+    options:
+      - id: a
+        text: "You forgot to bind-mount `/dev`, `/proc`, and `/sys` into `/mnt/sysroot` before chrooting in, so `/dev` inside the chroot is an empty directory with no device nodes for `blkid` to read."
+        explanation: "Correct. A bare chroot has no populated `/dev`, `/proc`, or `/sys` — those need to be explicitly bind-mounted in (`mount --bind /dev /mnt/sysroot/dev`, and likewise for `/proc` and `/sys`) before chrooting. Without that step, tools that depend on device nodes, kernel state, or process information fail in ways that look unrelated to the missing binds — `blkid` returning nothing despite real partitions existing is the classic symptom."
+      - id: b
+        text: "`blkid` is broken inside every chroot by design; you must exit and run it on the host instead."
+        explanation: "`blkid` works fine inside a properly-prepared chroot; it is not disabled by design."
+      - id: c
+        text: "The root partition was mounted read-only, which blocks `blkid` from functioning."
+        explanation: "A read-only mount doesn't stop `blkid` from reading device metadata — `blkid` doesn't need write access to report what it finds."
+      - id: d
+        text: "`chroot` requires a `--bind-dev` flag that was omitted."
+        explanation: "`chroot` has no such flag; bind-mounting is a separate `mount` operation performed before the chroot, not a chroot option."
+    correct_option: a
+    explanation: "Correct. A bare chroot has no populated `/dev`, `/proc`, or `/sys` — those need to be explicitly bind-mounted in (`mount --bind /dev /mnt/sysroot/dev`, and likewise for `/proc` and `/sys`) before chrooting. Without that step, tools that depend on device nodes, kernel state, or process information fail in ways that look unrelated to the missing binds — `blkid` returning nothing despite real partitions existing is the classic symptom."
+
+  - id: ats002-080-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Prove an fstab fix with mount -a before rebooting"
+    source_readings:
+      - sections/section-080/module-01/course-04-prove-the-fix-and-unmount.md
+    prompt: |-
+      Inside a chroot, you've just corrected a mistyped UUID in `/etc/fstab`. What is the single command that proves this fix actually works, without needing to reboot to find out — and what does an exit code of `0` from it confirm?
+    options:
+      - id: a
+        text: "`systemctl daemon-reload`; it confirms systemd has re-read the corrected fstab."
+        explanation: "`daemon-reload` reloads systemd unit files, not fstab mount state, and proves nothing about whether the corrected line actually mounts."
+      - id: b
+        text: "`mount -a`; exit code `0` confirms every entry currently listed in that fstab is mountable — the same check a real boot's systemd performs."
+        explanation: "Correct. `mount -a` attempts to mount every entry in `/etc/fstab` not already mounted and not marked `noauto`. This is functionally identical to what systemd does during a real boot, but runnable on demand with an immediate, unambiguous exit code instead of a hung boot process to diagnose blind. Exit `0` with no output means the fix is genuinely correct."
+      - id: c
+        text: "`df -h`; it confirms disk usage is being reported correctly across all filesystems."
+        explanation: "`df -h` only reports what's currently mounted — it won't attempt to mount the corrected entry, so it can't prove the fix works."
+      - id: d
+        text: "`fsck -y /etc/fstab`; it repairs any remaining errors in the fstab file itself."
+        explanation: "`fsck` is a filesystem checker; it does not operate on or repair `/etc/fstab`, which is a plain text configuration file, not a filesystem."
+    correct_option: b
+    explanation: "Correct. `mount -a` attempts to mount every entry in `/etc/fstab` not already mounted and not marked `noauto`. This is functionally identical to what systemd does during a real boot, but runnable on demand with an immediate, unambiguous exit code instead of a hung boot process to diagnose blind. Exit `0` with no output means the fix is genuinely correct."
+
+  - id: ats002-080-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose a way to reset a lost root password"
+    source_readings:
+      - sections/section-080/module-02/course-01-two-doors-rd-break-and-init.md
+    prompt: |-
+      The root password on a healthy, fully-booting server is lost, and there's no other account with `sudo` access. A colleague suggests booting external rescue media, mounting the root filesystem by hand, and chrooting in to fix it. Is that the right tool for this job?
+    options:
+      - id: a
+        text: "Yes — external rescue media is always required to change a root password, regardless of the system's boot health."
+        explanation: "Rescue media is not always required — it's specifically for unbootable systems, which this one is not."
+      - id: b
+        text: "No — root passwords cannot be reset without physically replacing the disk."
+        explanation: "Password resets never require physical disk replacement; the data is intact, only the credential is unknown."
+      - id: c
+        text: "No — since the system boots perfectly fine on its own, a faster technique exists: interrupt GRUB for one boot, append `rd.break` or `init=/bin/bash` to the kernel line, and reset the password directly, with no external media needed at all."
+        explanation: "Correct. External rescue media is the right tool when the installed system genuinely cannot boot on its own. Here, the system boots fine — only the credential is missing. A one-boot GRUB kernel-parameter edit (`rd.break` or `init=/bin/bash`) reaches a root-equivalent shell on the real system directly, without needing any external media, and is the faster, more appropriate technique for this specific failure mode."
+      - id: d
+        text: "Yes, but only if SELinux is disabled first."
+        explanation: "SELinux mode doesn't determine which recovery *technique* is appropriate — it only introduces an extra relabel step (`touch /.autorelabel`) after the fact if enforcing."
+    correct_option: c
+    explanation: "Correct. External rescue media is the right tool when the installed system genuinely cannot boot on its own. Here, the system boots fine — only the credential is missing. A one-boot GRUB kernel-parameter edit (`rd.break` or `init=/bin/bash`) reaches a root-equivalent shell on the real system directly, without needing any external media, and is the faster, more appropriate technique for this specific failure mode."
+
+  - id: ats002-080-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Verify the table and the filesystems after a partition table restore"
+    source_readings:
+      - sections/section-080/module-03/course-03-simulate-restore-verify.md
+    prompt: |-
+      You're about to run risky `sgdisk` operations on a secondary GPT-partitioned disk. You take a backup with `sgdisk --backup=/root/backup.bin /dev/vdc`, then move directly to your risky partitioning work without checking anything else. Later, disaster strikes and you restore with `sgdisk --load-backup=/root/backup.bin /dev/vdc`. Partitions reappear correctly in `lsblk`. Is the disk now confirmed fully recovered?
+    options:
+      - id: a
+        text: "Yes — partitions reappearing in `lsblk` is definitive proof the disk is fully usable again."
+        explanation: "Partition boundaries reappearing says nothing about whether the filesystem structures inside them are intact."
+      - id: b
+        text: "Yes, because `sgdisk --load-backup` automatically runs `fsck` on every restored partition before completing."
+        explanation: "`sgdisk --load-backup` only writes partition-table structures; it has no awareness of filesystem contents and performs no integrity checking whatsoever."
+      - id: c
+        text: "No — `sgdisk --load-backup` cannot restore a GPT table once `--zap-all` has been run; a fresh partition table must be created manually instead."
+        explanation: "`--load-backup` restoring a table after `--zap-all` is exactly what it's designed to do, and works correctly as described in the scenario."
+      - id: d
+        text: "No — you should have run `sgdisk --print` against the backup file right after creating it, and separately, `lsblk` alone only confirms the partition-table layer restored; the filesystems inside still need their own check with `fsck -n` and/or a mount-and-inspect pass."
+        explanation: "Correct. Two separate habits are missing here. First, verifying a backup's sanity (`sgdisk --print` against the backup file) should happen right after taking it, not left undiscovered until an emergency. Second, the partition table and the filesystems inside each partition are two separate layers — `lsblk` showing partitions reappear only proves the table layer is back; filesystem health needs its own explicit check (`fsck -n`, or a mount-and-`ls` pass) before the disk can be called truly recovered."
+    correct_option: d
+    explanation: "Correct. Two separate habits are missing here. First, verifying a backup's sanity (`sgdisk --print` against the backup file) should happen right after taking it, not left undiscovered until an emergency. Second, the partition table and the filesystems inside each partition are two separate layers — `lsblk` showing partitions reappear only proves the table layer is back; filesystem health needs its own explicit check (`fsck -n`, or a mount-and-`ls` pass) before the disk can be called truly recovered."
+
+  - id: ats002-080-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Boot once from a bare grub> prompt and then repair for good"
+    source_readings:
+      - sections/section-080/module-04/course-02-manual-rescue-from-grub.md
+    prompt: |-
+      A server's console shows a bare `grub>` prompt with no menu at all on boot. After manually locating and booting the installed system once from that prompt using `ls`, `set root`, `linux`, `initrd`, and `boot`, the administrator considers the incident closed and does nothing further. What will happen on the next reboot, and what step was skipped?
+    options:
+      - id: a
+        text: "The next reboot will return to the same bare `grub>` prompt, because the manual boot sequence exists only in that session's memory; `grub-install` (to reinstall GRUB's own boot-sector/EFI code) and `update-grub`/`grub-mkconfig` (to regenerate `grub.cfg`) were never run."
+        explanation: "Correct. Nothing typed at the `grub>` rescue prompt is written to disk — `set root`, `linux`, `initrd`, and `boot` only configure that one in-memory boot attempt. The underlying problem (GRUB's own installed code and/or configuration missing or corrupted) is completely unaddressed until `grub-install` reinstalls the boot-sector/EFI code and `update-grub`/`grub-mkconfig` regenerates a working `grub.cfg`, both run from inside the now-booted system."
+      - id: b
+        text: "The next reboot will succeed normally, since the manual boot sequence permanently repairs GRUB's configuration."
+        explanation: "The manual rescue-prompt sequence has no persistence mechanism at all — it directly contradicts how GRUB's rescue shell works."
+      - id: c
+        text: "The next reboot will succeed, but only because `linux` and `initrd` write their target paths to a persistent GRUB environment file."
+        explanation: "There's no such persistent environment file involved in this manual sequence; each rescue-prompt boot starts from a clean slate."
+      - id: d
+        text: "The system will now boot directly into `rd.break` mode on every subsequent startup."
+        explanation: "`rd.break` is an entirely unrelated kernel parameter from a different recovery scenario (password reset), not something the GRUB rescue prompt sequence triggers or relates to."
+    correct_option: a
+    explanation: "Correct. Nothing typed at the `grub>` rescue prompt is written to disk — `set root`, `linux`, `initrd`, and `boot` only configure that one in-memory boot attempt. The underlying problem (GRUB's own installed code and/or configuration missing or corrupted) is completely unaddressed until `grub-install` reinstalls the boot-sector/EFI code and `update-grub`/`grub-mkconfig` regenerates a working `grub.cfg`, both run from inside the now-booted system."
+
+  - id: ats002-080-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Check a filesystem without changing it"
+    source_readings:
+      - sections/section-080/module-05/course-01-superblock-and-checking-safely.md
+    prompt: |-
+      You suspect errors on the unmounted ext4 partition `/dev/vdb1` and want a report only, with nothing changed. Which command?
+    options:
+      - id: a
+        text: "`sudo fsck.ext4 -y /dev/vdb1`"
+        explanation: "`-y` answers yes to every repair, which changes the filesystem."
+      - id: b
+        text: "`sudo fsck.ext4 -n -f /dev/vdb1`"
+        explanation: "Correct. `-n` answers no to every repair question, and `-f` forces a full check."
+      - id: c
+        text: "`sudo mke2fs /dev/vdb1`"
+        explanation: "`mke2fs` creates a new filesystem and destroys the data."
+      - id: d
+        text: "`sudo dumpe2fs -h /dev/vdb1`"
+        explanation: "This prints the superblock but does not check the filesystem for errors."
+    correct_option: b
+    explanation: "Correct. `-n` answers no to every repair question, and `-f` forces a full check."
+
+  - id: ats002-080-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Repair an ext4 filesystem from a backup superblock"
+    source_readings:
+      - sections/section-080/module-05/course-02-backup-superblock-and-repair.md
+    prompt: |-
+      The primary superblock of an ext4 filesystem with 4096-byte blocks is destroyed, and the partition will not mount. Which command repairs it from the first backup?
+    options:
+      - id: a
+        text: "`sudo e2fsck -b 8193 -y /dev/vdb1`"
+        explanation: "Block 8193 is the first backup for 1024-byte blocks, not for 4096."
+      - id: b
+        text: "`sudo mke2fs /dev/vdb1`"
+        explanation: "This creates a new empty filesystem and destroys the files."
+      - id: c
+        text: "`sudo e2fsck -b 32768 -y /dev/vdb1`"
+        explanation: "Correct. With 4096-byte blocks the first backup superblock is block 32768."
+      - id: d
+        text: "`sudo resize2fs /dev/vdb1`"
+        explanation: "`resize2fs` changes the size of a filesystem. It does not repair a destroyed superblock."
+    correct_option: c
+    explanation: "Correct. With 4096-byte blocks the first backup superblock is block 32768."
+
+  - id: ats002-080-q08
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "List backup superblock locations without destroying data"
+    source_readings:
+      - sections/section-080/module-05/course-02-backup-superblock-and-repair.md
+    prompt: |-
+      Which command prints where the backup superblocks of a 4096-byte-block filesystem are, without writing anything?
+    options:
+      - id: a
+        text: "`sudo mke2fs -b 4096 /dev/vdb1`"
+        explanation: "Without `-n` it creates a new filesystem and destroys the data."
+      - id: b
+        text: "`sudo e2fsck -n /dev/vdb1`"
+        explanation: "This reports errors and does not print the backup locations."
+      - id: c
+        text: "`sudo blkid /dev/vdb1`"
+        explanation: "`blkid` shows the type, label and UUID, not the backup superblocks."
+      - id: d
+        text: "`sudo mke2fs -n -b 4096 /dev/vdb1`"
+        explanation: "Correct. The `-n` option makes it a dry run."
+    correct_option: d
+    explanation: "Correct. The `-n` option makes it a dry run."
+
+  - id: ats002-080-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Create a missing initramfs image on Ubuntu"
+    source_readings:
+      - sections/section-080/module-06/course-02-inspect-and-rebuild.md
+    prompt: |-
+      `/boot/initrd.img-$(uname -r)` was deleted from an Ubuntu machine that is still running. Which command creates it again?
+    options:
+      - id: a
+        text: "`sudo update-initramfs -c -k $(uname -r)`"
+        explanation: "Correct. `-c` creates a new image for the named kernel."
+      - id: b
+        text: "`sudo update-initramfs -u -k $(uname -r)`"
+        explanation: "`-u` updates an existing image and has nothing to update here."
+      - id: c
+        text: "`sudo update-grub`"
+        explanation: "This regenerates `grub.cfg` and does not create an initramfs image."
+      - id: d
+        text: "`sudo dracut -f`"
+        explanation: "`dracut` is the tool of the Red Hat family, not of Ubuntu."
+    correct_option: a
+    explanation: "Correct. `-c` creates a new image for the named kernel."
+
+  - id: ats002-080-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Rebuild the initramfs from a rescue chroot"
+    source_readings:
+      - sections/section-080/module-06/course-02-inspect-and-rebuild.md
+    prompt: |-
+      From a rescue shell you have chrooted into an installed system and want to rebuild its initramfs. Why must you not use `$(uname -r)` inside the chroot?
+    options:
+      - id: a
+        text: "`uname -r` does not work inside a chroot at all."
+        explanation: "It works, but it answers for the running rescue kernel."
+      - id: b
+        text: "It reports the rescue kernel that is running, not the installed kernel. Read the installed release from `/boot`."
+        explanation: "Correct. The chroot shares the running kernel of the rescue environment."
+      - id: c
+        text: "It would rebuild every installed kernel's image."
+        explanation: "`-k` takes the release you give. `-k all` is the option for all kernels."
+      - id: d
+        text: "`update-initramfs` only accepts release numbers from a file."
+        explanation: "It accepts the release as an argument. The point is to name the installed kernel's release."
+    correct_option: b
+    explanation: "Correct. The chroot shares the running kernel of the rescue environment."
+
+  - id: ats002-080-q11
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Finish a password reset on an SELinux system"
+    source_readings:
+      - sections/section-080/module-02/course-01-two-doors-rd-break-and-init.md
+    prompt: |-
+      You reset the root password from the `rd.break` shell on a Rocky Linux machine that uses SELinux. Which extra step keeps the reboot from failing logins?
+    options:
+      - id: a
+        text: "Run `setenforce 1` before rebooting."
+        explanation: "This only changes the enforcing mode of the running emergency shell and does not fix labels."
+      - id: b
+        text: "Run `update-grub` before rebooting."
+        explanation: "This is an Ubuntu command, and GRUB is not the problem."
+      - id: c
+        text: "Create `/.autorelabel` so the files are relabelled at the next boot."
+        explanation: "Correct. The edited `/etc/shadow` has the wrong SELinux label until a relabel happens."
+      - id: d
+        text: "Nothing. The label of `/etc/shadow` is always correct after `passwd`."
+        explanation: "The label can be wrong when the file is changed from the emergency shell. A relabel fixes it."
+    correct_option: c
+    explanation: "Correct. The edited `/etc/shadow` has the wrong SELinux label until a relabel happens."
+
+  - id: ats002-080-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Repair GRUB for good on Ubuntu"
+    source_readings:
+      - sections/section-080/module-04/course-03-durable-repair.md
+    prompt: |-
+      After the one-boot rescue from `grub>`, which commands make the repair last on an Ubuntu machine?
+    options:
+      - id: a
+        text: "`sudo grub-install /dev/vda1` only"
+        explanation: "Boot code goes to the disk, not a partition, and `grub.cfg` is still missing."
+      - id: b
+        text: "`sudo update-initramfs -u` only"
+        explanation: "This rebuilds an initramfs and does not repair GRUB."
+      - id: c
+        text: "`sudo fsck.ext4 -n /dev/vda1` only"
+        explanation: "This only checks a filesystem and writes nothing that GRUB needs."
+      - id: d
+        text: "`sudo grub-install /dev/vda` and `sudo update-grub`"
+        explanation: "Correct. The first reinstalls the boot code and the second writes a new `grub.cfg`."
+    correct_option: d
+    explanation: "Correct. The first reinstalls the boot code and the second writes a new `grub.cfg`."
+
+  - id: ats002-080-q13
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Prepare a chroot properly"
+    source_readings:
+      - sections/section-080/module-01/course-02-mount-and-get-tools-in.md
+    prompt: |-
+      Before you chroot into a broken system mounted at `/mnt/sysroot`, which mounts must you add so that tools such as `mount` and `grub-install` work inside?
+    options:
+      - id: a
+        text: "Bind mount `/dev`, `/proc` and `/sys` into `/mnt/sysroot`."
+        explanation: "Correct. The tools expect these virtual filesystems."
+      - id: b
+        text: "Bind mount only `/home`."
+        explanation: "The tools do not need user data."
+      - id: c
+        text: "Nothing. A chroot inherits everything."
+        explanation: "A chroot sees only the tree under the new root, so the virtual filesystems are missing without bind mounts."
+      - id: d
+        text: "Mount the rescue system's `/etc` over `/mnt/sysroot/etc`."
+        explanation: "This hides the broken system's configuration, which is the very thing you want to fix."
+    correct_option: a
+    explanation: "Correct. The tools expect these virtual filesystems."
+
+  - id: ats002-080-q14
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Restore a volume group from its metadata backup"
+    source_readings:
+      - sections/section-080/module-07/course-02-restore-lost-lvm-metadata.md
+    prompt: |-
+      A volume group vanished after the LVM label on its only disk was wiped. The disk is still there and `/etc/lvm/backup` holds a backup of the group. What is the correct recovery path?
+    options:
+      - id: a
+        text: "Recreate the physical volume with `pvcreate --uuid <old-uuid> --restorefile <backup-file> <disk>`, restore the group with `vgcfgrestore`, then activate it with `vgchange -ay`."
+        explanation: "Correct. The label must carry the old UUID so the restored metadata matches the disk, then the metadata is restored and the group activated."
+      - id: b
+        text: "Run `pvcreate` on the disk without options and run `lvcreate` again with the old sizes."
+        explanation: "A fresh label gets a new UUID, and recreating volumes by hand does not bring back the old metadata or data."
+      - id: c
+        text: "Run `mkfs.ext4` on the disk so the volumes appear again."
+        explanation: "`mkfs` creates a new filesystem and destroys the data you want to recover."
+      - id: d
+        text: "Reboot. LVM rebuilds a wiped label on its own."
+        explanation: "LVM never recreates a wiped label by itself."
+    correct_option: a
+    explanation: "Correct. The label must carry the old UUID so the restored metadata matches the disk, then the metadata is restored and the group activated."
+
+  - id: ats002-080-q15
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Know where LVM keeps its metadata backups"
+    source_readings:
+      - sections/section-080/module-07/course-02-restore-lost-lvm-metadata.md
+    prompt: |-
+      Where does LVM store the automatic backups of a volume group's metadata, and which file is the newest?
+    options:
+      - id: a
+        text: "In `/boot/lvm`, as a file named `latest`."
+        explanation: "`/boot/lvm` is not used for LVM metadata backups."
+      - id: b
+        text: "In `/etc/lvm/backup`, one file per volume group with the most recent state, while older versions are kept in `/etc/lvm/archive`."
+        explanation: "Correct. `/etc/lvm/backup` holds the latest copy and `/etc/lvm/archive` holds earlier ones."
+      - id: c
+        text: "Only in memory, so a backup must be made by hand with `lvmdump` before every change."
+        explanation: "LVM writes the backups on every metadata change by itself."
+      - id: d
+        text: "In `/var/log/lvm`, as text logs of every command."
+        explanation: "The logs record commands, not restorable metadata."
+    correct_option: b
+    explanation: "Correct. `/etc/lvm/backup` holds the latest copy and `/etc/lvm/archive` holds earlier ones."
+
+  - id: ats002-080-q16
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read a degraded software RAID 1 array"
+    source_readings:
+      - sections/section-080/module-08/course-01-reading-a-raid-array.md
+    prompt: |-
+      `cat /proc/mdstat` shows a two-disk mirror with the status `[U_]`. What does it mean?
+    options:
+      - id: a
+        text: "The array is healthy and one disk is idle."
+        explanation: "A healthy two-disk mirror shows `[UU]`."
+      - id: b
+        text: "The array is degraded: one member is missing or failed, so there is no redundancy left."
+        explanation: "Correct. Each `U` is a member that is up, and `_` marks a missing one."
+      - id: c
+        text: "The array is being created and has not started yet."
+        explanation: "A rebuild or creation shows a progress line, not just `[U_]`."
+      - id: d
+        text: "The filesystem on the array is unmounted."
+        explanation: "`/proc/mdstat` reports array members, not mounts."
+    correct_option: b
+    explanation: "Correct. Each `U` is a member that is up, and `_` marks a missing one."
+
+  - id: ats002-080-q17
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Replace a failed member and keep the array across reboots"
+    source_readings:
+      - sections/section-080/module-08/course-02-replace-a-failed-member.md
+    prompt: |-
+      A mirror member has failed. Which sequence replaces it and leaves the array safe across a reboot?
+    options:
+      - id: a
+        text: "Remove the failed member with `mdadm --remove`, add the new disk with `mdadm --add`, wait for the rebuild with `mdadm --wait`, then save the `ARRAY` line from `mdadm --detail --scan` in `/etc/mdadm/mdadm.conf` and run `update-initramfs -u`."
+        explanation: "Correct. The array only has redundancy again after the rebuild, and the saved line makes it assemble under the same name at boot."
+      - id: b
+        text: "Run `mkfs.ext4` on the new disk and mount it next to the array."
+        explanation: "A filesystem on a loose disk does not join the array."
+      - id: c
+        text: "Run `mdadm --create` on the surviving disk and the new disk."
+        explanation: "`--create` writes new labels and can destroy the data. A repair uses `--add`."
+      - id: d
+        text: "Reboot and let the kernel pick the new disk."
+        explanation: "The kernel does not add a disk to an array on its own."
+    correct_option: a
+    explanation: "Correct. The array only has redundancy again after the rebuild, and the saved line makes it assemble under the same name at boot."
+
+  - id: ats002-080-q18
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose the safe badblocks mode"
+    source_readings:
+      - sections/section-080/module-09/course-02-kernel-log-and-bad-blocks.md
+    prompt: |-
+      You need to scan a disk that holds data you cannot lose. Which `badblocks` command is safe?
+    options:
+      - id: a
+        text: "`badblocks -wsv /dev/vdb`, because `-w` is the most thorough."
+        explanation: "`-w` overwrites the whole disk and destroys all data."
+      - id: b
+        text: "`badblocks -sv /dev/vdb`, the default read-only scan, on a disk that is not mounted."
+        explanation: "Correct. It only reads, so the data stays as it is."
+      - id: c
+        text: "`badblocks -wsv /dev/vdb` with the filesystem mounted."
+        explanation: "It is destructive and a mounted filesystem makes the result unreliable."
+      - id: d
+        text: "`mkfs.ext4 -c /dev/vdb`, because it checks first and keeps the data."
+        explanation: "`mkfs` creates a new filesystem and erases what was there."
+    correct_option: b
+    explanation: "Correct. It only reads, so the data stays as it is."
+
+  - id: ats002-080-q19
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find a disk and its errors reliably"
+    source_readings:
+      - sections/section-080/module-09/course-01-identify-and-read-health.md
+    prompt: |-
+      You must report on the disk with serial `lab08a-suspect` and show its kernel I/O errors. What is the most reliable approach?
+    options:
+      - id: a
+        text: "Use `/dev/vdb`, because the second disk is always called that."
+        explanation: "Device letters depend on discovery order and can change."
+      - id: b
+        text: "Resolve `/dev/disk/by-id/virtio-lab08a-suspect` with `readlink -f`, then filter the kernel log with `dmesg | grep -i 'i/o error'` for that device name."
+        explanation: "Correct. The by-id link follows the serial number and the kernel log shows the errors."
+      - id: c
+        text: "Run `smartctl -H` on a partition and trust a missing SMART answer as healthy."
+        explanation: "SMART belongs to the whole disk, and no SMART data means nothing to read, not a healthy disk."
+      - id: d
+        text: "Run `badblocks -w` to find which disk answers."
+        explanation: "It destroys data and does not identify a disk."
+    correct_option: b
+    explanation: "Correct. The by-id link follows the serial number and the kernel log shows the errors."

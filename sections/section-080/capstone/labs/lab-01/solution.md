@@ -1,12 +1,14 @@
 # Solution Walkthrough
 
-Two independent recovery mechanics, back to back — exactly the kind of night a real on-call rotation eventually has. Both are the genuine repair techniques from earlier in this section, just aimed at safe stand-ins so this VM stays reachable over SSH throughout.
+Two separate recovery jobs, back to back: the kind of night every on-call shift meets sooner or later. Both are the real repair techniques, aimed at safe targets so this machine stays reachable over SSH the whole time.
 
 ---
 
-## Part 1: Restore the Secondary Disk's Partition Table
+## First job: restore the secondary disk's partition table
 
-### Step 1: Identify the Secondary Disk
+The secondary disk's table is already wiped, and a backup is already on file. You restore it and then check both layers: the table and the filesystems inside it.
+
+### Step 1: Identify the secondary disk
 
 ```bash
 lsblk -f
@@ -19,19 +21,21 @@ vda
 vdc
 ```
 
-`vdc` here shows no partitions at all — that's the disaster already having happened. Confirm this is the intended secondary disk by its size and by confirming it is **not** the disk mounted as `/`. Your actual device letter may differ — substitute your own from here on.
+This output is a shortened example. On Ubuntu 24.04, `lsblk -f` shows a few more columns and the main disk has more partitions. A single extra disk also usually appears as `vdb`, not `vdc`.
+
+The secondary disk shows no partitions at all: the disaster has already happened. Confirm that it is the intended disk by its size (about 2 GB) and that it is **not** the disk mounted as `/`. The commands below use `/dev/vdc`; use the name your own `lsblk -f` shows, including for the partitions (`vdb1`, `vdb2`). The path `/dev/disk/by-id/virtio-lab080-vdc` always points at this disk.
 
 ---
 
-### Step 2: Verify the Existing Backup Is Sane
+### Step 2: Check the existing backup
 
-Unlike Module 3's lab, this backup already exists — check it before trusting it:
+This backup was taken by someone else, so check it before you trust it:
 
 ```bash
 sudo sgdisk --print /root/vdc-ptable-backup.bin
 ```
 
-Confirm the output shows 2 partitions with plausible sizes.
+Confirm that the output shows 2 partitions with sensible sizes.
 
 ```bash
 ls -lh /root/vdc-ptable-backup.bin
@@ -39,7 +43,7 @@ ls -lh /root/vdc-ptable-backup.bin
 
 ---
 
-### Step 3: Restore From the Backup
+### Step 3: Restore from the backup
 
 ```bash
 sudo sgdisk --load-backup=/root/vdc-ptable-backup.bin /dev/vdc
@@ -47,13 +51,13 @@ sudo sgdisk --load-backup=/root/vdc-ptable-backup.bin /dev/vdc
 
 ---
 
-### Step 4: Confirm Partitions Reappear — Then Separately Verify the Filesystems
+### Step 4: Confirm the partitions, then check the filesystems separately
 
 ```bash
 lsblk -f
 ```
 
-Both partitions should reappear with the original layout. This confirms the partition-table layer only — check the filesystem layer separately:
+Both partitions should be back with their original layout. That confirms the partition table layer only. Check the filesystem layer on its own:
 
 ```bash
 sudo fsck -n /dev/vdc1
@@ -71,13 +75,15 @@ cat /mnt/check2/marker.txt
 sudo umount /mnt/check2
 ```
 
-Both marker files should read back exactly as they were before the disaster. That, combined with a clean `fsck -n`, is what actually proves the disk is usable again — the partition-table restore alone only proved the boundaries were back.
+Both marker files should read exactly as before the disaster. Together with a clean `fsck -n`, that proves the disk is usable again. The table restore alone only proved the boundaries were back.
 
 ---
 
-## Part 2: Reinstall GRUB on the Primary Disk
+## Second job: repair GRUB on the main disk
 
-### Step 5: Confirm the Symptom
+Only `/boot/grub/grub.cfg` is missing, but a full repair runs both tools: `grub-install` for the boot code and `update-grub` for the menu file.
+
+### Step 5: Confirm the symptom
 
 ```bash
 ls -l /boot/grub/grub.cfg
@@ -87,11 +93,11 @@ ls -l /boot/grub/grub.cfg
 ls: cannot access '/boot/grub/grub.cfg': No such file or directory
 ```
 
-Your SSH session staying alive right now only proves the **current** boot, which already happened before this file went missing, is unaffected.
+Your SSH session working right now only proves that the current boot, which finished before this file went missing, is unaffected.
 
 ---
 
-### Step 6: Determine the Firmware/Boot Mode
+### Step 6: Find the firmware type
 
 ```bash
 [ -d /sys/firmware/efi ] && echo "UEFI" || echo "BIOS/legacy"
@@ -99,18 +105,18 @@ Your SSH session staying alive right now only proves the **current** boot, which
 
 ---
 
-### Step 7: Identify the Primary Disk
+### Step 7: Identify the primary disk
 
 ```bash
 lsblk -f
 findmnt -no SOURCE /
 ```
 
-Strip the partition number from the root source device (e.g. `/dev/vda1` → `/dev/vda`) to get the whole-disk device `grub-install` needs. Confirm it with `lsblk` before running anything that writes to a disk.
+Remove the partition number from the device `findmnt` prints (for example `/dev/vda1` becomes `/dev/vda`) to get the whole disk that `grub-install` needs on BIOS. Confirm it with `lsblk` before running anything that writes to a disk.
 
 ---
 
-### Step 8: Reinstall GRUB's Boot-Sector/EFI Code
+### Step 8: Reinstall GRUB's boot code
 
 BIOS/legacy:
 
@@ -124,9 +130,11 @@ UEFI:
 sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi
 ```
 
+The UEFI form above is for 64-bit Intel and AMD machines; on an ARM computer the target is `arm64-efi`. Either form also rewrites GRUB's core image under `/boot/grub`, which is how the grader knows you ran it.
+
 ---
 
-### Step 9: Regenerate a Fresh grub.cfg
+### Step 9: Write a fresh grub.cfg
 
 ```bash
 sudo update-grub
@@ -137,17 +145,17 @@ ls -l /boot/grub/grub.cfg
 grep -c menuentry /boot/grub/grub.cfg
 ```
 
-Confirm the file exists, carries a fresh timestamp, and its `menuentry` count is non-zero.
+Confirm that the file exists, has a fresh timestamp, and that its `menuentry` count is above zero.
 
 ---
 
-### Step 10: Confirm the Repair Is Durable
+### Step 10: Check the repair
 
 ```bash
 sudo grub-install --recheck /dev/vda        # or the --target=x86_64-efi form on UEFI
 ```
 
-`--recheck` reports success without needing an actual reboot to find out.
+`--recheck` makes `grub-install` look at the disks again and install once more. A run that ends with `No error reported` shows the repair works, without a reboot.
 
 ---
 
@@ -162,10 +170,14 @@ grep -c menuentry /boot/grub/grub.cfg
 sudo grub-install --recheck /dev/vda
 ```
 
-Once both halves verify cleanly, run the local validation suite to pass the lab.
+When both halves check out, send the lab for grading from your own computer:
+
+```bash
+astrona submit -c sections/section-080/capstone/labs/lab-01
+```
 
 ---
 
-## Why Both, Together
+## Why both, together
 
-Neither half of tonight's incident depends on the other — that's deliberate. A real on-call shift rarely gets the luxury of exactly one thing being wrong at a time, and the two skills this capstone combines (partition-table backup/restore discipline, and knowing the difference between reinstalling GRUB's own code versus regenerating its menu) are independent enough that mixing them up costs you nothing on one and everything on the other. Treat them as two separate incidents that happen to share a ticket, verify each on its own terms, and don't let progress on one convince you the other is also fine.
+Neither half of tonight's incident depends on the other, and that is on purpose. A real on-call shift rarely has exactly one thing wrong at a time. Treat the two problems as two separate incidents that share one ticket. Check each one on its own terms, and do not let progress on one convince you the other is fine too.

@@ -1,10 +1,18 @@
-# Part 1 — Inspecting modules and their parameters
+# Inspecting Modules And Their Parameters
 
-> Prerequisite: [module landing page](./course.md). Next: [Part 2 — Loading: modprobe, depmod, and the dependency graph](./course-02-loading-modprobe-and-dependencies.md).
+Astronaut, a **kernel module** is a plug-in reactor part: a piece of kernel code, such as a device driver, a filesystem or a network protocol, that the kernel can fit or remove while the ship is flying. It is added at runtime instead of being built into the kernel image. Before you fit one, you want to know three things: which parts are already fitted, which settings a part accepts, and which settings a fitted part is running with right now.
 
-A loadable kernel module is kernel functionality added at runtime instead of at compile time — a driver, a filesystem, a protocol handler. Before you load one you want to know what is already loaded, what parameters a module accepts, and how to read a loaded module's live parameter values. This part is those three read-only skills; nothing here changes the system.
+This part teaches those three read-only skills. Nothing here changes the system.
 
 ## What is loaded: `lsmod` and `/proc/modules`
+
+The kernel keeps its own list of every module it has loaded. Two tools read that list, and they show the same data.
+
+### Read the list
+
+<!-- astrona:playground:renew -->
+
+Ask for the first few loaded modules:
 
 ```bash
 # shell: any host, unprivileged
@@ -18,17 +26,28 @@ nf_tables             229376  1
 xt_conntrack           16384  2 iptable_filter,ip6table_filter
 ```
 
-`lsmod` is a thin formatter over `/proc/modules` — the kernel's own list, readable directly when `lsmod` is not installed:
+This output came from a machine where `dummy` was already loaded, so your list will look different. `lsmod` only formats a file that the kernel writes: `/proc/modules`. You can read that file directly when `lsmod` is not installed:
 
 ```bash
 cat /proc/modules
 ```
 
-Each row: the module **name**; its **size** in bytes of kernel memory; a **reference count** (how many things are using it — a module with a non-zero count cannot be unloaded); and in brackets the **dependent modules** currently holding it. `xt_conntrack` above has refcount 2, held by `iptable_filter` and `ip6table_filter` — unloading it means unloading those first.
+### What each column means
+
+Each row has four pieces of information:
+
+- The module **name**.
+- Its **size**: how many bytes of kernel memory it uses.
+- Its **reference count** (refcount): how many things are using it right now. The kernel will not unload a module whose count is above zero.
+- In the last column, the **dependent modules** that are holding it.
+
+In the output above, `xt_conntrack` has a reference count of 2. The modules `iptable_filter` and `ip6table_filter` hold it. To unload `xt_conntrack`, you must unload those two first.
 
 ## What parameters a module accepts: `modinfo`
 
-Never guess a parameter name. Ask the module:
+A **module parameter** is a setting chosen when the part is fitted, for example "how many interfaces to create". Never guess a parameter name. Ask the module itself.
+
+### Ask the module
 
 ```bash
 modinfo dummy          # full metadata: path, license, deps, description, parm: lines
@@ -39,49 +58,66 @@ modinfo -p dummy       # just the parameter declarations
 numdummies:Number of dummy pseudo devices (int)
 ```
 
-`man modinfo`: `-p` filters to the module's declared `parm:` lines. Each shows the exact parameter **name**, a description, and the **type** in parentheses (`int`, `bool`, `charp` for a string, `array of int`, …). This is a ten-second check that prevents a whole class of silent failure: `modprobe` passing an unknown `key=value` does **not** reliably error — the bogus key can be ignored, and you discover it only when the behaviour you wanted never happened.
+The `-p` option shows only the module's declared `parm:` lines. Each line gives the exact parameter **name**, a description, and the **type** in brackets. Common types are `int` (a whole number), `bool` (yes or no), `charp` (a piece of text) and `array of int` (a list of numbers).
 
-`modinfo` also shows `depends:` (modules that must load first — Part 2) and `filename:` (the `.ko` path, under `/lib/modules/$(uname -r)/`).
+### Why this ten-second check matters
 
-## What a loaded module is actually running with: `/sys/module`
+`modprobe` does not always reject an unknown `key=value`. It may ignore a misspelled key without any error. You only find out later, when the behaviour you wanted never happens. Checking the name with `modinfo -p` first stops that whole class of silent failure.
+
+`modinfo` also shows two other useful fields. `depends:` lists the modules that must load first. `filename:` gives the path of the `.ko` file (the module file on disk), under `/lib/modules/$(uname -r)/`.
+
+## What a loaded module is running with: `/sys/module`
+
+A configuration file says what a *future* load will use. To see what a loaded module uses *right now*, read its live values from `/sys`.
+
+### Read a live value
 
 ```bash
 cat /sys/module/dummy/parameters/numdummies
 ```
 
-`/sys/module/<name>/parameters/` exposes the **live parameter values of a currently loaded module** — one file per parameter, exactly analogous to reading a live sysctl out of `/proc/sys`. It reports what is in effect *right now*, independent of any config file. Not every parameter is world-readable, and some are not represented at all if the module did not expose them (`0644` vs `0000` on the file), but for anything writable-at-load it is the ground truth.
+This folder exists only while `dummy` is loaded. On a fresh playground nothing is loaded yet, so the command fails until you load the module.
 
-`/sys/module/<name>/` also carries `refcnt` (same number `lsmod` shows), `holders/` (the dependent modules), and `initstate` (`live`).
+The kernel publishes the folder `/sys/module/<name>/parameters/` for each loaded module. It holds one file per parameter, and each file holds the value in effect right now. This works just like reading a live kernel setting from `/proc/sys`: the kernel answers directly, whatever any configuration file says.
 
-> [!TIP]
-> **Try it — inspect before you load.** On the playground host (`astrona ssh astro-kernel-modules-lab`):
->
-> ```bash
-> lsmod | head -3
-> modinfo -p dummy
-> modinfo -F depends dummy
-> ```
->
-> Expect something like:
->
-> ```text
-> Module                  Size  Used by
-> nf_tables             229376  1
-> ...
-> numdummies:Number of dummy pseudo devices (int)
->
-> ```
->
-> `modinfo -p` shows `dummy` accepts exactly one parameter, `numdummies`, an `int`. `depends` is blank — nothing has to load first. Now you know the real name to pass, instead of guessing.
+Some parameters are not readable by everyone, and a module may choose not to publish a parameter at all (the file mode is `0644` or `0000`). But for any parameter you can set at load time, this folder shows the real value.
+
+### Other files in the same folder
+
+`/sys/module/<name>/` holds a few more useful files:
+
+- `refcnt`: the same reference count that `lsmod` shows.
+- `holders/`: the dependent modules.
+- `initstate`: `live` when the module is loaded and running.
+
+The manual pages on the machine explain all of this in more detail: `man lsmod`, `man modinfo` (the `-p`, `-F` and `-n` options) and `man 5 sysfs`.
+
+## Try it: inspect before you load
+
+Run these three read-only commands in your playground:
+
+```bash
+lsmod | head -3
+modinfo -p dummy
+modinfo -F depends dummy
+```
+
+Expect something like:
+
+```text
+Module                  Size  Used by
+nf_tables             229376  1
+...
+numdummies:Number of dummy pseudo devices (int)
+
+```
+
+`modinfo -p` shows that `dummy` accepts exactly one parameter, `numdummies`, which is an `int`. The `depends` line is empty, so nothing has to load first. Now you know the real name to pass, instead of guessing.
+
+> *`lsmod` and `/proc/modules` show what is loaded, with its reference count and dependents. `modinfo -p` shows the parameter names and types a module accepts. `/sys/module/<name>/parameters/` shows what a loaded module is running with now.*
+
+## Common pitfalls
 
 > [!WARNING]
-> - **Guessing a parameter name.** A misspelled `key=` on `modprobe` may be silently dropped, not rejected. `modinfo -p` first, every time.
-> - **Assuming a config file reflects the loaded state.** `/sys/module/<name>/parameters/` is what the module is running with now; a `.conf` under `/etc` is only what a *future* load will use (Part 3).
-
-> *`lsmod`/`/proc/modules` shows what's loaded and its refcount and dependents; `modinfo -p` shows the parameter names and types a module accepts; `/sys/module/<name>/parameters/` shows what a loaded module is actually running with.*
-
-## Reference
-
-- `man lsmod` — the `/proc/modules` columns and what refcount / "Used by" mean.
-- `man modinfo` — `-p` (parameters), `-F` (one field), `-n` (filename); reading `parm:` types.
-- `man 5 sysfs` — `/sys/module/` layout: `parameters/`, `refcnt`, `holders/`, `initstate`.
+> - **Guessing a parameter name.** `modprobe` may drop a misspelled `key=` without an error. Run `modinfo -p` first, every time.
+> - **Thinking a configuration file shows the loaded state.** `/sys/module/<name>/parameters/` shows what the module is running with now. A `.conf` file under `/etc` only says what a *future* load will use.

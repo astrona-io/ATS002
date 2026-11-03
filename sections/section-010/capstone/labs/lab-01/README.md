@@ -1,9 +1,31 @@
-# section-010 / capstone: Kernel, Process, Module & Device Runtime Management Capstone
+# Kernel, Process, Module & Device Runtime Management Capstone Lab
 
-QEMU VM for the LFCS course — a single integrated "runaway telemetry pipeline" incident touching sysctl auditing, pid_max, kernel modules, udev device rules, and strace-based process diagnosis.
+Astronaut, this is the final mission of the section. One training ship, an edge telemetry host, has a whole night of problems waiting for you at once: a kernel state to record, a crew badge limit (`kernel.pid_max`) that is too low, two reactor parts (kernel modules) to fit or ban, a new cargo bay (disk) with no stable name, and a hung crew member (`telemetry-agent`) to diagnose with `strace` and stop.
 
-## Run
+Each problem uses a skill from this section, and the grader checks the real state of the machine for each one.
 
-```bash
+## Launching the lab
+
+Start the virtual machine:
+
+```sh
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-010/capstone/labs/lab-01
+```
+
+Open a terminal on it:
+
+```sh
+astrona ssh ats-002-lab-010
+```
+
+When you think you have finished, send it for grading:
+
+```sh
+astrona submit -c sections/section-010/capstone/labs/lab-01
+```
+
+When you are done, remove the lab:
+
+```sh
+astrona destroy ats-002-lab-010
 ```

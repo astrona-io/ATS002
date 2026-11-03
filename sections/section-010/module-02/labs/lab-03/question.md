@@ -2,22 +2,15 @@
 
 Solve this question on: `terminal`
 
-`data-ingest.service` (run by the `dataproc` user) hits a hard task ceiling
-well before CPU or memory are stressed.
+Astronaut, the `data-ingest.service` unit on this ship runs as the user `dataproc`. It hits a hard task ceiling long before CPU or memory are under any stress.
 
-Three independent ceilings could be responsible — `kernel.pid_max`, the
-user's `ulimit -u` / `RLIMIT_NPROC`, and the unit's own `TasksMax=`. **Only
-one of them is the actual limit here.** The other two are already generous.
+Three independent ceilings could be responsible: `kernel.pid_max`, the user's `ulimit -u` (`RLIMIT_NPROC`), and the unit's own `TasksMax=`. **Only one of them is the real limit here.** The other two are already generous.
 
 1. Inspect all three:
    - `sysctl -n kernel.pid_max`
    - `sudo -iu dataproc bash -c 'ulimit -u'`
    - `systemctl show data-ingest.service -p TasksMax --value`
-2. Identify the single ceiling that is capping the unit far below what a
-   thread-heavy workload needs.
-3. Raise **only that one** — via a systemd override — to `infinity` (or at
-   least `65536`), then apply it to the running unit (`daemon-reload` +
-   `restart`).
+2. Find the one ceiling that caps the unit far below what a thread-heavy workload needs.
+3. Raise **only that one**, with a systemd override, to `infinity` or at least `65536`. Then apply it to the running unit, so that `systemctl show data-ingest.service -p TasksMax --value` reports the new value.
 
-Do **not** raise `kernel.pid_max` or `dataproc`'s `ulimit -u` — they are
-already fine, and touching them here is a misdiagnosis.
+Do **not** raise `kernel.pid_max` or `dataproc`'s `ulimit -u`. They are already fine. Adding a `kernel.pid_max` line to any sysctl file, or a new `nproc` line for `dataproc` under `/etc/security/limits.d/`, counts as a wrong diagnosis here.

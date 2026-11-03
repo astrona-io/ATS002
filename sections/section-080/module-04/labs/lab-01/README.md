@@ -1,13 +1,31 @@
-# section-080 / module-04: GRUB Corruption Recovery
+# GRUB Corruption Recovery Lab
 
-QEMU VM for the LFCS course — reinstalling GRUB's boot-sector/EFI code and regenerating its configuration after a stale, missing `grub.cfg`, directly on the VM's own primary disk.
+Welcome to a launch computer repair, astronaut. On a real machine, this failure shows up as a bare `grub>` prompt with no menu, at a console the grader cannot reach. So this mission sets it up safely on your training ship itself: the setup script removes `/boot/grub/grub.cfg`, GRUB's launch checklist.
 
-## How This Lab Stays Safely Gradable
+The kernel your ship is running now was loaded before the file went missing, and GRUB's installed boot code is not touched. Your SSH session keeps working. Only the next reboot would fail, so your job is to fix it before that reboot happens.
 
-The real-world version of this scenario is a machine dropping straight to a bare `grub>` rescue prompt with no menu at all — an interactive, console-only failure this platform's SSH-driven grading harness cannot script, and cannot recover from if it genuinely happened. So rather than skip the scenario, this lab re-stages it safely, directly on your primary VM: bootstrap removes `/boot/grub/grub.cfg` — the on-disk config GRUB needs to build its menu — but never touches the kernel your **current** boot already loaded into memory, and never touches GRUB's own installed boot-sector/EFI code. Your VM stays fully reachable over SSH the entire time. Only the **next** reboot would be affected, which is exactly the framing this lab uses: fix it now, before that happens, not "you're already down."
+## Launching the Lab
 
-## Run
+Run this command to start the virtual machine:
 
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-04/labs/lab-01
+```
+
+Open a terminal on it:
+
+```bash
+astrona ssh ats-002-lab-084
+```
+
+When you think you have finished, send it for grading:
+
+```bash
+astrona submit -c sections/section-080/module-04/labs/lab-01
+```
+
+When you are done, remove the lab:
+
+```bash
+astrona destroy ats-002-lab-084
 ```

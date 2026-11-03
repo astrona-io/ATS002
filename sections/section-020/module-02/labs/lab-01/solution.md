@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Follow these steps to stop a container, extract precise facts from another, and launch a third with exact constraints.
+Follow these steps to stop one container, pull two exact facts out of another, and launch a third with exact limits. Add `sudo` in front of the `docker` commands if your user is not in the `docker` group.
 
 ---
 
@@ -10,7 +10,7 @@ Follow these steps to stop a container, extract precise facts from another, and 
 docker stop frontend_v1
 ```
 
-This sends `SIGTERM` to the container's PID 1, waits up to the default 10-second grace period for it to exit on its own, and only sends `SIGKILL` if it hasn't. This is the correct default for "stop" — reach for `docker kill` only when a process is genuinely hung and ignoring termination signals.
+The Docker engine sends `SIGTERM` to the container's PID 1, waits up to the default 10-second grace period for it to exit, and sends `SIGKILL` only if it is still alive. This is the right default for "stop". Use `docker kill` only when a process really hangs and ignores `SIGTERM`. Do not run `docker rm`: the grader expects `frontend_v1` to still exist, in the `exited` state.
 
 ## Step 2: Prepare the output directory
 
@@ -18,36 +18,36 @@ This sends `SIGTERM` to the container's PID 1, waits up to the default 10-second
 mkdir -p /opt/course/11
 ```
 
-Redirection doesn't create parent directories — this trips up more candidates than the Docker commands themselves.
+Redirection with `>` does not create missing folders. This trips up more candidates than the Docker commands themselves. If your user may not write to `/opt`, work in a root shell (`sudo -i`) for this step and the next two, because the redirections in them also write under `/opt`.
 
-## Step 3: Extract frontend_v2's IP address
+## Step 3: Read frontend_v2's IP address
 
 ```bash
 docker inspect --format '{{ .NetworkSettings.IPAddress }}' frontend_v2 > /opt/course/11/ip-address
 ```
 
-`--format` runs a Go template against the same structure `docker inspect frontend_v2` would otherwise print as raw JSON. `.NetworkSettings.IPAddress` is populated for containers on the classic default bridge network. If this comes back empty instead, the container is very likely on a custom user-defined network, in which case you need the per-network path:
+`--format` runs a Go template against the same record that `docker inspect frontend_v2` would print as raw JSON. Docker fills `.NetworkSettings.IPAddress` for containers on the default bridge network. If the file ends up empty, the container is most likely on a network you created, and you need the per-network path:
 
 ```bash
 docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' frontend_v2 > /opt/course/11/ip-address
 ```
 
-`range` iterates the `Networks` map without you needing to know the network's name in advance.
+`range` goes through the `Networks` map, so you do not need to know the network's name.
 
-## Step 4: Extract frontend_v2's volume mount destination
+## Step 4: Read frontend_v2's mount destination
 
 ```bash
 docker inspect --format '{{ (index .Mounts 0).Destination }}' frontend_v2 > /opt/course/11/mount-destination
 ```
 
-`.Mounts` is a JSON array of mount objects. `index .Mounts 0` addresses the first element generically — the task states there is exactly one mount, so index `0` is safe and complete — and `.Destination` on that object is the in-container path. To double-check the count first:
+`.Mounts` is a JSON list of mount entries. `index .Mounts 0` picks the first entry; the task says there is exactly one mount, so index `0` is safe and complete. `.Destination` on that entry is the path inside the container. To check the count first:
 
 ```bash
 docker inspect --format '{{ len .Mounts }}' frontend_v2
 # 1
 ```
 
-## Step 5: Start frontend_v3 with a memory limit and port mapping
+## Step 5: Start frontend_v3 with a memory limit and a port mapping
 
 ```bash
 docker run -d \
@@ -57,9 +57,9 @@ docker run -d \
   nginx:alpine
 ```
 
-`-d` detaches so the container runs in the background. `--name` fixes a human-readable name instead of a random one. `--memory=30m` caps the container's cgroup memory at 30 megabytes — if the process inside tries to exceed it, the kernel's OOM killer terminates it rather than letting usage grow unbounded. `-p 1234:80` maps host port 1234 to container port 80 — the left side of `-p` is always the host-facing port, the right side is what the process inside is actually listening on.
+`-d` detaches, so the container runs in the background. `--name` sets a fixed, readable name instead of a random one. `--memory=30m` makes the kernel cap the container's cgroup memory at 30 MiB; if the process inside tries to use more, the kernel's OOM killer (out-of-memory killer) ends it. `-p 1234:80` maps host port 1234 to container port 80. The left side of `-p` is always the host port; the right side is the port the process inside listens on.
 
-## Step 6: Verify
+## Step 6: Check the result
 
 ```bash
 docker ps -a --filter "name=frontend_v1"
@@ -75,7 +75,13 @@ docker inspect --format '{{ .HostConfig.Memory }}' frontend_v3
 # 31457280   (30 * 1024 * 1024 bytes = 30MB)
 ```
 
-A command you typed correctly and a container that's actually configured the way you intended are two different things — a typo in `-p` or `--memory` fails silently from the shell's point of view. Always verify against the running state, not the command you remember typing.
+A command you typed correctly and a container that is really set up the way you meant are two different things. A typo in `-p` or `--memory` does not cause an error in the shell. Always check the running state, not the command you remember typing.
+
+When the checks look right, send the lab for grading:
+
+```sh
+astrona submit -c sections/section-020/module-02/labs/lab-01
+```
 
 ---
 
@@ -90,5 +96,3 @@ docker run -d --name frontend_v3 --memory=30m -p 1234:80 nginx:alpine
 docker ps --filter "name=frontend_v3"
 docker inspect --format '{{ .HostConfig.Memory }}' frontend_v3
 ```
-
-Once verified, run the local validation suite to pass the lab!

@@ -1,0 +1,45 @@
+metadata:
+  name: "ats-002-lab-026"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 3072
+    diskSizeGB: 20
+    display: false
+    sshPasswordAuth: true
+
+bootstrap:
+  init:
+    - name: "lab-026-podman-and-pilot-user"
+      description: "Installs Podman and creates the user pilot with subordinate ID ranges, without lingering"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-rootless-container"
+      description: "Confirms pilot runs the container relay from docker.io/library/nginx:alpine, published on host port 8090"
+      type: "file"
+      source: "validation/validate-container.sh"
+
+    - name: "verify-linger"
+      description: "Confirms lingering is enabled for pilot"
+      type: "file"
+      source: "validation/validate-linger.sh"
+
+    - name: "verify-image-id-file"
+      description: "Confirms /home/pilot/relay-image-id.txt holds the image ID of the container relay"
+      type: "file"
+      source: "validation/validate-image-id.sh"
+
+teardown:
+  keepCluster: false

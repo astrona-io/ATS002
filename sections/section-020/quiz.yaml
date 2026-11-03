@@ -1,0 +1,324 @@
+# Knowledge check for section 020. Listed in astrona.yaml as a `type: quiz` entry after the last module.
+schema_version: 1
+kind: question_bank
+id: ats002-020
+course_id: ATS002
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-020
+  title: "Scheduled & Containerized Workloads"
+questions:
+  - id: ats002-020-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Spot a system-wide cron line pasted into a per-user crontab"
+    source_readings:
+      - sections/section-020/module-01/course-01-where-a-cron-job-lives.md
+    prompt: |-
+      You are migrating a job off `/etc/cron.d/data-sync`, which currently reads `45 3 * * * etl-runner /opt/scripts/sync.sh`, into the crontab owned by the user `etl-runner`. You run `sudo crontab -u etl-runner -e` and paste the line in completely unchanged, then save. What actually happens at 3:45am?
+    options:
+      - id: a
+        text: "The job runs correctly, since `etl-runner` is simply a valid path component."
+        explanation: "This option is incorrect because `etl-runner` is not a valid executable name in `$PATH`, so the \"command\" cron actually tries to run fails."
+      - id: b
+        text: "Cron treats `etl-runner` as the first word of the command itself, tries to execute a program by that name, and `/opt/scripts/sync.sh` never runs."
+        explanation: "Correct. A system-wide cron line has six fields: five time fields plus a required username field. A per-user crontab line has only the five time fields and then the command, because the owner is already clear from whose crontab it is. If you paste a six-field line into a per-user crontab and keep the username, you get no helpful error. Cron treats the leftover username as the first word of the command and tries to run a program with that name. That fails silently at the scheduled time, with nobody watching."
+      - id: c
+        text: "`crontab -e` refuses to save the file and prints a syntax error before you can exit the editor."
+        explanation: "This option is incorrect because the line has a wrong command, not a syntax error. `crontab` checks the structure of the fields, not whether the command makes sense."
+      - id: d
+        text: "The job runs twice, once as `etl-runner` and once as `root`."
+        explanation: "This option is incorrect because nothing in this scenario schedules the job to run under two different accounts; it was moved, not duplicated."
+    correct_option: b
+    explanation: "A system-wide cron line has six fields: five time fields plus a required username field. A per-user crontab line has only the five time fields and then the command, because the owner is already clear from whose crontab it is. If you paste a six-field line into a per-user crontab and keep the username, you get no helpful error. Cron treats the leftover username as the first word of the command and tries to run a program with that name. That fails silently at the scheduled time, with nobody watching."
+
+  - id: ats002-020-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Edit another account's crontab with crontab -u"
+    source_readings:
+      - sections/section-020/module-01/course-02-migrating-a-job-safely.md
+    prompt: |-
+      You are logged in as root and need to add a new job to the `dataproc` service account's crontab. Which command correctly does this?
+    options:
+      - id: a
+        text: "`crontab -e`"
+        explanation: "This option is incorrect because plain `crontab -e`, run as root, edits *root's own* crontab, not `dataproc`'s. This is the single most common mistake when migrating a job to a service account."
+      - id: b
+        text: "`sudo crontab -u dataproc -e`"
+        explanation: "Correct. The `-u <user>` option tells `crontab` to work on that account's spool file instead of your own. Working on another account's crontab needs root rights, which is why the command starts with `sudo`. `-e` opens the crontab for editing."
+      - id: c
+        text: "`sudo nano /var/spool/cron/crontabs/dataproc`"
+        explanation: "This option is incorrect because hand-editing the spool file directly bypasses `crontab`'s syntax validation and can leave behind a file with permissions or formatting cron refuses to trust."
+      - id: d
+        text: "`crontab -u dataproc`"
+        explanation: "This option is incorrect because it is missing `-e` (or `-l`). Without an action option, `crontab` waits for a complete crontab file on standard input (stdin) to install, which is not the same as opening an editor."
+    correct_option: b
+    explanation: "The `-u <user>` option tells `crontab` to work on that account's spool file instead of your own. Working on another account's crontab needs root rights, which is why the command starts with `sudo`. `-e` opens the crontab for editing."
+
+  - id: ats002-020-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Move a job between cron locations without running it twice"
+    source_readings:
+      - sections/section-020/module-01/course-02-migrating-a-job-safely.md
+    prompt: |-
+      After migrating a job from `/etc/cron.d/asset-cleanup` into `asset-manager`'s per-user crontab, an administrator notices duplicate log entries appearing every night at 8:30pm. What is the most likely cause, and the correct fix?
+    options:
+      - id: a
+        text: "The minute field needs to be offset slightly to avoid a scheduling collision."
+        explanation: "This option is incorrect because offsetting the time doesn't address the root cause, two independent schedules, it just staggers the duplicate runs instead of eliminating one."
+      - id: b
+        text: "The original `/etc/cron.d/asset-cleanup` file was never deleted, so the same command is now scheduled from two independent sources; delete the original file."
+        explanation: "Correct. Cron never removes duplicates. If the same command is scheduled in a system-wide file and in a per-user crontab, it runs twice, once from each, at the same time. A move is not finished until you delete the original file (or remove its line) and search again with `grep` to confirm that nothing is left."
+      - id: c
+        text: "Cron always executes any newly added job twice on its first scheduled run."
+        explanation: "This option is incorrect; cron does not have any built-in \"run once extra on first fire\" behavior."
+      - id: d
+        text: "The per-user crontab line is missing a username field, causing cron to run it under two identities."
+        explanation: "This option is incorrect because a per-user crontab line correctly has *no* username field, adding one would break the command, not cause double-execution under two identities."
+    correct_option: b
+    explanation: "Cron never removes duplicates. If the same command is scheduled in a system-wide file and in a per-user crontab, it runs twice, once from each, at the same time. A move is not finished until you delete the original file (or remove its line) and search again with `grep` to confirm that nothing is left."
+
+  - id: ats002-020-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose docker stop over docker kill by default"
+    source_readings:
+      - sections/section-020/module-02/course-01-the-container-lifecycle-and-stopping.md
+    prompt: |-
+      A task instructs you to "stop the container named `cache_v1`." Which command is the correct default choice, and why?
+    options:
+      - id: a
+        text: "`docker kill cache_v1`, it terminates the container immediately, which is faster."
+        explanation: "This option is incorrect because `docker kill` skips the grace period entirely, sending `SIGKILL` immediately, appropriate only for a genuinely hung process ignoring termination signals, not as a default."
+      - id: b
+        text: "`docker stop cache_v1`, it sends `SIGTERM` to the container's PID 1, waits up to a grace period (10 seconds by default) for a clean exit, and only sends `SIGKILL` if it's still alive after that."
+        explanation: "Correct. `docker stop` is the correct default whenever a task says \"stop\", it gives the container's main process a chance to shut down cleanly via `SIGTERM` before escalating to `SIGKILL`. This is the graceful path and matches what \"stop\" means in normal operational usage."
+      - id: c
+        text: "`docker rm -f cache_v1`, it stops and removes the container in one step."
+        explanation: "This option is incorrect because the task asked to stop the container, not remove it, `docker rm -f` destroys the container object entirely, which is a different and more destructive operation than what was requested."
+      - id: d
+        text: "`docker pause cache_v1`, it freezes the container's processes without terminating them."
+        explanation: "This option is incorrect because `docker pause` freezes processes in place using cgroups freezer state; it does not stop or terminate anything, and isn't what \"stop\" means here."
+    correct_option: b
+    explanation: "`docker stop` is the correct default whenever a task says \"stop\", it gives the container's main process a chance to shut down cleanly via `SIGTERM` before escalating to `SIGKILL`. This is the graceful path and matches what \"stop\" means in normal operational usage."
+
+  - id: ats002-020-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read a container IP address on any network with a template"
+    source_readings:
+      - sections/section-020/module-02/course-02-inspecting-with-format.md
+    prompt: |-
+      You run `docker inspect --format '{{ .NetworkSettings.IPAddress }}' web_v2` and get empty output, even though `web_v2` is running and reachable over the network. What is the most likely cause, and the correct fix?
+    options:
+      - id: a
+        text: "The container isn't actually running; it must be restarted first."
+        explanation: "This option is incorrect because the scenario states the container is running and reachable, the empty field is a template-path issue, not a container-state issue."
+      - id: b
+        text: "`web_v2` is attached to a custom, user-defined network instead of the default bridge, Docker only populates the top-level `.NetworkSettings.IPAddress` field for default-bridge containers. Use `{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}` instead."
+        explanation: "Correct. Docker only fills the top-level `.NetworkSettings.IPAddress` field for containers on the default bridge network. When a container is on a network you created, Docker keeps its address per network instead, under `.NetworkSettings.Networks.<network-name>.IPAddress`. The `range` form goes through that map without you needing to know the network's name, so it is the safer template to use."
+      - id: c
+        text: "`docker inspect` requires `sudo` to report IP address fields; without it, the field is silently blanked."
+        explanation: "This option is incorrect; `docker inspect` does not gate JSON fields behind privilege escalation, and an unprivileged user with Docker socket access sees the same data root would."
+      - id: d
+        text: "The field name is deprecated in current Docker releases and was renamed to `.NetworkSettings.Address`."
+        explanation: "This option is incorrect; `.NetworkSettings.IPAddress` is not deprecated or renamed, it's simply left blank when it doesn't apply to the container's network mode."
+    correct_option: b
+    explanation: "Docker only fills the top-level `.NetworkSettings.IPAddress` field for containers on the default bridge network. When a container is on a network you created, Docker keeps its address per network instead, under `.NetworkSettings.Networks.<network-name>.IPAddress`. The `range` form goes through that map without you needing to know the network's name, so it is the safer template to use."
+
+  - id: ats002-020-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Write an OnCalendar expression for a weekday schedule"
+    source_readings:
+      - sections/section-020/module-03/course-02-schedule-expressions.md
+    prompt: |-
+      Which `OnCalendar=` value starts a timer's service at 02:30 on Monday to Friday?
+    options:
+      - id: a
+        text: "`*-*-* 02:30:00 Mon-Fri`"
+        explanation: "The weekday goes first, and the range uses two dots."
+      - id: b
+        text: "`Mon..Fri *-*-* 02:30:00`"
+        explanation: "Correct. A calendar event starts with an optional weekday part (`Mon..Fri`), then the date (`*-*-*`), then the time. You can check an expression with `systemd-analyze calendar`."
+      - id: c
+        text: "`2:30 weekdays`"
+        explanation: "`weekdays` is not a valid calendar word."
+      - id: d
+        text: "`02:30 * * 1-5`"
+        explanation: "That is cron syntax. A timer does not read it."
+    correct_option: b
+    explanation: "A calendar event starts with an optional weekday part (`Mon..Fri`), then the date (`*-*-*`), then the time. You can check an expression with `systemd-analyze calendar`."
+
+  - id: ats002-020-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain what Persistent=true does for a timer"
+    source_readings:
+      - sections/section-020/module-03/course-04-operating-timers.md
+    prompt: |-
+      A timer with `OnCalendar=daily` and `Persistent=true` should have run at midnight, but the machine was powered off then. The machine starts at 08:00. What happens?
+    options:
+      - id: a
+        text: "Nothing. The job waits until the next midnight."
+        explanation: "That is the behaviour of a timer without `Persistent=true`."
+      - id: b
+        text: "The timer runs the service once soon after the timer starts, to catch up the missed run."
+        explanation: "Correct. `Persistent=true` makes systemd store the last run time on disk. If a run was missed while the machine was off, it triggers the service once soon after the timer starts."
+      - id: c
+        text: "The timer runs the service once for every hour it missed."
+        explanation: "A missed schedule is caught up once, not once per period."
+      - id: d
+        text: "The timer is disabled until you enable it again."
+        explanation: "A missed run does not disable a timer."
+    correct_option: b
+    explanation: "`Persistent=true` makes systemd store the last run time on disk. If a run was missed while the machine was off, it triggers the service once soon after the timer starts."
+
+  - id: ats002-020-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Turn a one-shot command into a queued at job and manage the queue"
+    source_readings:
+      - sections/section-020/module-04/course-01-one-shot-jobs-with-at.md
+    prompt: |-
+      You queued a job with `at` and `atq` lists it with job number 7. You no longer want it to run. Which command removes it?
+    options:
+      - id: a
+        text: "`atrm 7`"
+        explanation: "Correct. `atq` lists queued jobs with their numbers and `atrm <number>` removes one. Use `at -c <number>` to read what a job will run."
+      - id: b
+        text: "`at -d 8`"
+        explanation: "`-d` is an old form of `atrm`, but the number is wrong here. The job is number 7."
+      - id: c
+        text: "`crontab -r`"
+        explanation: "`crontab -r` removes a crontab, not at jobs."
+      - id: d
+        text: "`systemctl stop atd`"
+        explanation: "That stops the whole service. The job stays in the queue."
+    correct_option: a
+    explanation: "`atq` lists queued jobs with their numbers and `atrm <number>` removes one. Use `at -c <number>` to read what a job will run."
+
+  - id: ats002-020-q09
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read the fields of an anacrontab line"
+    source_readings:
+      - sections/section-020/module-04/course-02-anacron-and-cron-access-control.md
+    prompt: |-
+      Which `/etc/anacrontab` line runs `/usr/local/sbin/report.sh` once every 7 days, 10 minutes after anacron starts, under the job name `weekly-report`?
+    options:
+      - id: a
+        text: "`10 7 weekly-report /usr/local/sbin/report.sh`"
+        explanation: "The period in days comes first and the delay in minutes second."
+      - id: b
+        text: "`7 weekly-report 10 /usr/local/sbin/report.sh`"
+        explanation: "The job name is the third field and the command is the last."
+      - id: c
+        text: "`0 0 */7 * * /usr/local/sbin/report.sh`"
+        explanation: "That is a cron line. anacron does not read it."
+      - id: d
+        text: "`7 10 weekly-report /usr/local/sbin/report.sh`"
+        explanation: "Correct. An anacrontab line has four fields: the period in days, the delay in minutes, a job identifier and the command. Anacron runs jobs that were missed while the machine was off."
+    correct_option: d
+    explanation: "An anacrontab line has four fields: the period in days, the delay in minutes, a job identifier and the command. Anacron runs jobs that were missed while the machine was off."
+
+  - id: ats002-020-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain how cron.allow and cron.deny decide who may use crontab"
+    source_readings:
+      - sections/section-020/module-04/course-02-anacron-and-cron-access-control.md
+    prompt: |-
+      The file `/etc/cron.allow` exists and lists only `ops-monitor`. The file `/etc/cron.deny` is empty. Can the user `asset-manager` edit their own crontab?
+    options:
+      - id: a
+        text: "No. When `cron.allow` exists, only users listed in it may use `crontab`."
+        explanation: "Correct. If `/etc/cron.allow` exists, only the users listed there may use `crontab`. Only when it does not exist does cron read `/etc/cron.deny` and refuse the users listed there."
+      - id: b
+        text: "Yes. An empty `cron.deny` always lets everyone in."
+        explanation: "`cron.deny` is read only if `cron.allow` does not exist."
+      - id: c
+        text: "Yes. Every user may always edit their own crontab."
+        explanation: "The two files exist to limit this."
+      - id: d
+        text: "Yes, but only on weekdays."
+        explanation: "The files do not know about days."
+    correct_option: a
+    explanation: "If `/etc/cron.allow` exists, only the users listed there may use `crontab`. Only when it does not exist does cron read `/etc/cron.deny` and refuse the users listed there."
+
+  - id: ats002-020-q11
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain what happens to data in a named volume when its container is removed"
+    source_readings:
+      - sections/section-020/module-05/course-02-volumes-and-bind-mounts.md
+    prompt: |-
+      A database container uses the named volume `dbdata`. You run `docker rm -f db`. What happens to the data?
+    options:
+      - id: a
+        text: "The data is deleted together with the container."
+        explanation: "A named volume has its own life and is not deleted with the container."
+      - id: b
+        text: "The data stays in the volume `dbdata` until you run `docker volume rm dbdata`."
+        explanation: "Correct. A named volume is managed by Docker and is separate from any container. Removing a container leaves it in place. Only `docker volume rm` (or a prune) deletes it."
+      - id: c
+        text: "The data moves to the image that the container used."
+        explanation: "Images are read-only and never receive data."
+      - id: d
+        text: "The data stays only if the container was stopped first with `docker stop`."
+        explanation: "The way the container ended does not matter. The volume is separate."
+    correct_option: b
+    explanation: "A named volume is managed by Docker and is separate from any container. Removing a container leaves it in place. Only `docker volume rm` (or a prune) deletes it."
+
+  - id: ats002-020-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Use a user-defined network so that containers find each other by name"
+    source_readings:
+      - sections/section-020/module-05/course-03-networks-logs-and-exec.md
+    prompt: |-
+      Two containers must reach each other by container name, for example `curl http://api`. Which setup gives that name lookup?
+    options:
+      - id: a
+        text: "Start both on the default `bridge` network and use `--name`."
+        explanation: "The default bridge does not give name lookup between containers."
+      - id: b
+        text: "Create a network with `docker network create appnet` and start both containers with `--network appnet`."
+        explanation: "Correct. A user-defined network comes with an embedded name lookup, so containers on it find each other by name. The default bridge does not offer this."
+      - id: c
+        text: "Publish both with `-p` and use `localhost`."
+        explanation: "Inside a container `localhost` is the container itself."
+      - id: d
+        text: "Edit `/etc/hosts` on the host."
+        explanation: "The containers do not read the host's file."
+    correct_option: b
+    explanation: "A user-defined network comes with an embedded name lookup, so containers on it find each other by name. The default bridge does not offer this."
+
+  - id: ats002-020-q13
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Keep a rootless Podman container running after the user logs out"
+    source_readings:
+      - sections/section-020/module-06/course-02-rootless-containers-and-systemd.md
+    prompt: |-
+      A normal user starts a rootless Podman container as a user service. The container stops when the user logs out. Which command keeps the user's services running without a login?
+    options:
+      - id: a
+        text: "`sudo loginctl enable-linger <user>`"
+        explanation: "Correct. `loginctl enable-linger` keeps the user's systemd manager running after logout and starts it at boot. Without it, the user's services stop at logout."
+      - id: b
+        text: "`sudo systemctl enable podman`"
+        explanation: "That is a system unit, not the user's own services."
+      - id: c
+        text: "`podman run --restart=never`"
+        explanation: "A restart policy does not keep the user manager alive."
+      - id: d
+        text: "`sudo usermod -s /sbin/nologin <user>`"
+        explanation: "That blocks logins. It does not keep services running."
+    correct_option: a
+    explanation: "`loginctl enable-linger` keeps the user's systemd manager running after logout and starts it at boot. Without it, the user's services stop at logout."

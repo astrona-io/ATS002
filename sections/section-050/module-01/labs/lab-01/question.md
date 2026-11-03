@@ -2,10 +2,12 @@
 
 Solve this question on: `terminal`
 
-Your team needs a specific vendor build of `nginx` that isn't in Ubuntu's default archive. A "vendor" repository is already running on this VM, serving packages over plain HTTP at `http://127.0.0.1:8100` under the codename `vendor-nginx`, component `main`. The vendor's GPG public key is published at `http://127.0.0.1:8100/vendor-nginx-archive-keyring.asc`.
+Astronaut, your team needs a vendor's own build of `nginx` that Ubuntu's archive does not carry. The vendor's supply depot (an APT repository) is already running on this ship. It serves packages over plain HTTP at `http://127.0.0.1:8100`, under the suite (codename) `vendor-nginx` and the component `main`. The vendor's GPG public key (its signing key, in ASCII-armored text form) is published at `http://127.0.0.1:8100/vendor-nginx-archive-keyring.asc`.
 
-1.  Import the vendor's GPG key the current, non-deprecated way — dearmor it into its own dedicated file under `/etc/apt/keyrings/` (do **not** use `apt-key`).
-2.  Add the repository to APT using a `signed-by=` reference to that dedicated keyring, as its own file under `/etc/apt/sources.list.d/`. The repository line's suite/codename is `vendor-nginx` and its component is `main`.
-3.  Refresh APT's index and confirm the repository registered — `apt-cache policy nginx` should now show a candidate from `127.0.0.1:8100` alongside anything Ubuntu's own archive offers.
-4.  Install the **exact** version of `nginx` that the vendor repository publishes (copy the version string verbatim from `apt-cache policy nginx` — do not guess or retype it).
-5.  Hold `nginx` at that version so a routine `apt upgrade`/`apt full-upgrade` cannot move it. Confirm the hold actually took.
+1. Import the vendor's key the current, non-deprecated way: convert it with `gpg --dearmor` into its own dedicated keyring file under `/etc/apt/keyrings/`, with a name ending in `.gpg`. Do **not** use `apt-key`.
+2. Add the repository to APT as its own `.list` file under `/etc/apt/sources.list.d/`. The repository line must use `signed-by=` to point at the keyring file from step 1. Its suite is `vendor-nginx` and its component is `main`.
+3. Refresh APT's package index and check that the repository registered: `apt-cache policy nginx` should now show a version from `127.0.0.1:8100` next to anything Ubuntu's own archive offers.
+4. Install the **exact** version of `nginx` that the vendor repository publishes. Copy the version string from `apt-cache policy nginx`; do not guess or retype it.
+5. Hold `nginx` at that version so a routine `apt upgrade` or `apt full-upgrade` cannot move it, and confirm that the hold took.
+
+The grader checks that a `.list` file under `/etc/apt/sources.list.d/` contains `signed-by=/etc/apt/keyrings/<name>.gpg` and that this keyring file exists and is a valid GPG keyring, that `nginx` is fully installed at exactly the vendor's version, and that `apt-mark showhold` lists `nginx`.

@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Six steps, run in order — the everyday `apt` maintenance loop.
+Six steps, run in order: the everyday `apt` maintenance loop. Run `astrona submit` after a step to see which checks already pass.
 
 ---
 
@@ -10,17 +10,17 @@ Six steps, run in order — the everyday `apt` maintenance loop.
 sudo apt update
 ```
 
-This re-syncs the local package index against every repository listed in `/etc/apt/sources.list` and `/etc/apt/sources.list.d/*`. Nothing installed on the system changes — this only updates APT's knowledge of what's currently available and at what version. Everything after this step depends on this index being current.
+This downloads the package index again from every repository listed in `/etc/apt/sources.list` and `/etc/apt/sources.list.d/*`. Nothing installed on the system changes. It only updates APT's knowledge of what is available right now, and at what version. Everything after this step depends on that index being current.
 
 ---
 
-## Step 2: Preview what's upgradable, without upgrading
+## Step 2: Preview what is upgradable, without upgrading
 
 ```bash
 apt list --upgradable
 ```
 
-This lists every installed package with a newer candidate version now available, changing nothing in the process. Each line shows the package name, the new candidate version, and (in brackets) the currently installed version.
+This lists every installed package that has a newer candidate version available, and changes nothing. Each line shows the package name, the new candidate version and, in brackets, the version installed now.
 
 ---
 
@@ -30,13 +30,13 @@ This lists every installed package with a newer candidate version now available,
 sudo apt upgrade
 ```
 
-This installs the newer version of every currently-installed package that *can* be upgraded without also installing or removing some other package. If the output ends with a "kept back" list, those specific packages need the more aggressive:
+This installs the newer version of every installed package that *can* be upgraded without also installing or removing another package. If the output ends with a "kept back" list, those packages need the stronger command:
 
 ```bash
 sudo apt full-upgrade
 ```
 
-`full-upgrade` (the same operation as `apt-get dist-upgrade`) is willing to add or remove packages to complete an upgrade plain `upgrade` wouldn't attempt on its own.
+`full-upgrade` (the same operation as `apt-get dist-upgrade`) is willing to add or remove packages to complete an upgrade that plain `upgrade` would not try. Run it only if the kept-back change is expected.
 
 ---
 
@@ -46,37 +46,39 @@ sudo apt full-upgrade
 sudo apt install fail2ban
 ```
 
-A plain `apt install` resolves `fail2ban`'s dependencies against the index refreshed in Step 1 and installs everything needed in one transaction.
+A plain `apt install` resolves `fail2ban`'s dependencies against the index you refreshed in Step 1 and installs everything needed in one transaction.
+
+At this point `astrona submit` should pass the `fail2ban` check.
 
 ---
 
-## Step 5: Fully purge the unneeded package, including config
+## Step 5: Purge the unneeded package, including its configuration
 
 ```bash
 apt list --installed | grep ftp
 ```
 
-Confirm it's actually installed and note the exact package name first.
+Confirm that it is installed and note the exact package name first.
 
 ```bash
 sudo apt purge ftp
 ```
 
-`purge` removes both the package's binaries *and* any configuration files it left under `/etc` (its "conffiles") — a genuinely clean slate. `apt remove ftp` here instead would leave `/etc/ftp.conf` behind, which is the wrong outcome when the goal is a clean future reinstall.
+`purge` removes the package's programs *and* the configuration files it tracks under `/etc` (its "conffiles"), leaving a clean slate. `apt remove ftp` would leave `/etc/ftp.conf` behind instead, which is the wrong result when the goal is a clean future reinstall.
 
 ---
 
-## Step 6: Clean up now-orphaned dependencies
+## Step 6: Clean up orphaned dependencies
 
 ```bash
 sudo apt autoremove
 ```
 
-This identifies every package that was installed automatically as a dependency of something now gone, and that nothing currently installed still depends on, and removes it. This is a separate, deliberate follow-up — purging `ftp` itself never automatically cascades to its orphaned dependencies without this explicit step.
+This finds every package that was installed automatically as a dependency, and that nothing installed still needs, and removes it. It is a separate, deliberate step: purging `ftp` never cascades to its orphaned dependencies on its own.
 
 ---
 
-## Verify
+## Check
 
 ```bash
 apt list --upgradable
@@ -112,4 +114,8 @@ sudo apt purge ftp
 sudo apt autoremove
 ```
 
-Once verified, run the local validation suite to pass the lab!
+When every check looks right, send the lab for grading:
+
+```bash
+astrona submit -c sections/section-050/module-03/labs/lab-01
+```

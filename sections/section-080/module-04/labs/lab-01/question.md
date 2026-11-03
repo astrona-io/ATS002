@@ -2,15 +2,21 @@
 
 Solve this question on: `terminal`
 
-**Scenario.** This VM's bootloader is stale. On the next reboot, GRUB would come up needing a configuration file that is no longer there — the on-disk equivalent of a machine dropping to a bare `grub>` rescue prompt with no menu at all. Your **current** session is unaffected: this VM's boot already completed before anything below was touched, GRUB's own installed boot-sector/EFI code was never corrupted, and SSH stays fully reachable throughout. Fix this before the next reboot happens, not after.
+This machine's bootloader is in trouble. `/boot/grub/grub.cfg` is missing, so on the next reboot GRUB would have no menu to show. That is the on-disk version of a machine stopping at a bare `grub>` prompt.
 
-Your job:
+Your current session is not affected. The machine finished booting before the file was removed, GRUB's installed boot code was not damaged, and SSH keeps working. Fix the problem now, before the next reboot.
 
-1.  Confirm the symptom: `ls -l /boot/grub/grub.cfg` should show it missing.
-2.  Determine this VM's firmware/boot mode before assuming a specific `grub-install` invocation: `[ -d /sys/firmware/efi ] && echo UEFI || echo "BIOS/legacy"`.
-3.  Identify the primary disk backing your root filesystem with `lsblk` and `findmnt -no SOURCE /` (do not assume a specific `/dev/vdX` letter — confirm your own).
-4.  Reinstall GRUB's own boot-sector or EFI code with `grub-install` — targeting the whole disk on BIOS/legacy (e.g. `sudo grub-install /dev/vda`), or the EFI system partition on UEFI (`sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi`).
-5.  Regenerate a fresh `/boot/grub/grub.cfg` with `sudo update-grub`.
-6.  Confirm the repair is durable, without needing an actual reboot to find out: `sudo grub-install --recheck` against the same disk/target you used in step 4 should report success, and `/boot/grub/grub.cfg` should exist, be non-empty, and contain real `menuentry` lines (`grep -c menuentry /boot/grub/grub.cfg`).
+1. Confirm the symptom: `/boot/grub/grub.cfg` is missing.
+2. Find out whether this machine started with BIOS or UEFI firmware before you choose a `grub-install` command.
+3. Identify the disk that holds your root filesystem. Do not assume a device letter; check it yourself.
+4. Reinstall GRUB's boot code with `grub-install`: on BIOS, target the whole disk; on UEFI, target the EFI system partition with `--target=x86_64-efi --efi-directory=/boot/efi`.
+5. Write a fresh `/boot/grub/grub.cfg` with `update-grub`.
+6. Without rebooting, check the repair: `grub-install --recheck` against the same disk or target must succeed, and `/boot/grub/grub.cfg` must contain `menuentry` lines.
 
-The fix is graded by confirming `/boot/grub/grub.cfg` exists, is non-empty, contains menu entries, and was genuinely regenerated during this session (not left over from the base VM image) — and separately, that GRUB's installed boot-sector/EFI image was also genuinely rewritten during this session.
+Do not reboot before the repair is finished: the machine would not come back.
+
+The grader checks that:
+
+- `/boot/grub/grub.cfg` exists, is not empty, has at least one line starting with `menuentry`, and was written after the lab was set up
+- GRUB's installed core image (`core.img` or `core.efi` under `/boot/grub`) was rewritten after the lab was set up, which shows you really ran `grub-install`
+- `grub-install --recheck` on the disk behind `/` (or in its UEFI form) finishes without an error

@@ -2,11 +2,12 @@
 
 Solve this question on: `terminal`
 
-Routine maintenance window on this host. Work through the loop in order:
+Astronaut, this ship has a routine maintenance window. Start it the usual way: refresh the local package index, check what is upgradable without upgrading yet, and then apply the available upgrades. The grader does not check these first steps, but they are the normal start of every maintenance window.
 
-1.  Refresh the local package index so the system's view of available versions is current.
-2.  Check what's upgradable — *without* upgrading yet.
-3.  Apply the available upgrades.
-4.  Install the `fail2ban` package, newly required per a security policy update.
-5.  The `ftp` package is no longer needed anywhere on this host. Fully purge it — including its configuration files under `/etc` — so a future reinstall would start from a genuinely clean state rather than picking up old leftover config.
-6.  Clean up any now-orphaned dependency packages left behind by the purge.
+Then finish the window:
+
+1. Install the `fail2ban` package. A security policy update now requires it.
+2. The `ftp` package is no longer needed anywhere on this host. Purge it completely, including its configuration file `/etc/ftp.conf`, so a future reinstall would start from a clean state instead of picking up old settings.
+3. Clean up any dependency packages that are now orphaned, that is, installed automatically and no longer needed by anything.
+
+The grader checks that `fail2ban` has the status `install ok installed`, that `dpkg` has no record of `ftp` at all and `/etc/ftp.conf` no longer exists, and that `apt-get autoremove --dry-run` has nothing left to remove.

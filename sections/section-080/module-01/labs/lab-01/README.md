@@ -1,13 +1,31 @@
-# section-080 / module-01: Root-Filesystem Repair via chroot
+# Root-Filesystem Repair via chroot Lab
 
-QEMU VM for the LFCS course — chroot-based recovery of a broken `/etc/fstab` entry on a disposable stand-in disk representing a "data-001" host that failed to boot.
+Welcome to a rescue mission, astronaut. The `data-001` host had a new data volume added to its `/etc/fstab`, and someone mistyped one character of its UUID. On its next boot, systemd would wait on that mount and drop to an emergency shell.
 
-## How This Lab Stays Safely Gradable
+The grader reaches your training ship only over SSH, so it cannot work with a ship that really fails to boot. Instead, the mission adds a second, disposable 2 GB disk (serial `lab081-data001`). It holds a stand-in `data-001` system: a small root partition with its own `/etc/fstab`, and a data partition. Your own ship's root filesystem and boot are never touched. You mount the stand-in, step into it with `chroot`, and fix the typo with the same steps as a real repair.
 
-Your primary VM's own root filesystem and boot process are never touched. Bootstrap attaches a second, disposable disk (`extraDisks`, serial `lab081-data001`) and builds a small standalone filesystem tree on it — its own `/etc/fstab`, deliberately seeded with a mistyped UUID. Your job is to mount that disk, bind-mount your primary VM's own tools into it, `chroot` in, and fix the typo — the exact same mechanic a real chroot repair uses, aimed at a safe stand-in instead of the machine you're SSHed into.
+## Launching the Lab
 
-## Run
+Run this command to start the virtual machine:
 
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-01/labs/lab-01
+```
+
+Open a terminal on it:
+
+```bash
+astrona ssh ats-002-lab-081
+```
+
+When you think you have finished, send it for grading:
+
+```bash
+astrona submit -c sections/section-080/module-01/labs/lab-01
+```
+
+When you are done, remove the lab:
+
+```bash
+astrona destroy ats-002-lab-081
 ```

@@ -1,20 +1,41 @@
-# section-060 / module-05: DNF Package Groups Sandbox
+# DNF Package Groups Lab
 
-Welcome to the Module 5 targeted practice sandbox. In this lab, you will discover what package groups a system's repositories actually publish, inspect a specific group's real mandatory/default/optional membership before installing it, install and confirm it, then remove it cleanly as a unit — and reason precisely about which packages a group removal does and doesn't touch.
+Welcome aboard, astronaut. You will find out which package groups this ship's repositories publish, read the real mandatory, default and optional members of one group before installing it, install and confirm it, and then remove it as a unit. Along the way you see for yourself which packages a group removal takes and which it leaves.
 
-## Important: This Lab Runs Inside a Container
+## Where you work
 
-This repository's only VM image is Ubuntu 24.04 — there is no Rocky Linux/RHEL VM available. To give you a real `dnf` group experience instead of a faked one, bootstrap installs Docker on the Ubuntu VM and starts a long-lived, privileged Rocky Linux 9 container named `rpmbox`. All of this lab's work happens **inside that container**, not on the Ubuntu host itself.
+The lab machine runs Ubuntu 24.04, so the lab starts a real Rocky Linux 9 container named `rpmbox` on it. All the work happens **inside that container**, not on the Ubuntu machine itself.
 
-Get a shell inside it with:
+Open a shell inside it with:
+
 ```bash
 docker exec -it rpmbox bash
 ```
 
-Bootstrap has also pre-installed `automake` inside `rpmbox` on its own, independently of any group — before you ever touch `"Development Tools"`. That's deliberate: it's what lets you observe, for real, exactly which packages a later `dnf group remove` does and doesn't remove.
+The lab's setup has also installed `automake` inside `rpmbox` on its own, outside any group, before you touch `"Development Tools"`. That is on purpose: it lets you see, for real, which packages a later `dnf group remove` does and does not remove.
 
 ## Launching the Lab
-Run the following command in your terminal to boot the QEMU VM:
+
+Run this command to start the virtual machine:
+
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-05/labs/lab-01
+```
+
+Open a terminal on it:
+
+```bash
+astrona ssh ats-002-lab-065
+```
+
+When you think you have finished, send it for grading:
+
+```bash
+astrona submit -c sections/section-060/module-05/labs/lab-01
+```
+
+When you are done, remove the lab:
+
+```bash
+astrona destroy ats-002-lab-065
 ```

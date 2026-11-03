@@ -1,24 +1,24 @@
-# Overview — kernel-modules playground
+# Overview: Kernel Modules Playground
 
-A **playground**, not a lab: boots, runs `bootstrap/prepare.sh`, waits. No task, no `astrona submit`, no pass/fail.
+This is a **playground**, not a lab. It starts, runs `bootstrap/prepare.sh`, and waits for you. There is no task, no `astrona submit`, and no pass or fail.
 
-## What's in the box
+## What is in the box
 
-- One Ubuntu 24.04 qemu VM with its **own real kernel** — `modprobe` genuinely loads and unloads modules. Reached with `astrona ssh astro-kernel-modules-lab`.
-- `kmod` tooling: `lsmod`, `modprobe`, `modinfo`, `depmod`, `rmmod`.
-- Nothing is loaded or configured. `/etc/modules-load.d/` and `/etc/modprobe.d/` hold only distro defaults.
-- The **`dummy`** virtual-NIC module is in-tree and always loadable. `pcspkr` (the module text's real-world blacklist example) may not exist for a VM kernel — the hands-on checkpoints use `dummy` for both loading and blacklisting.
-- `lsblk` shows `vda` (~15 GiB OS disk) and `vdb` (~366 KiB cloud-init disk). No extra disks.
+- One Ubuntu 24.04 virtual machine (`qemu`) with its **own real kernel**, so `modprobe` really loads and unloads modules. Open a terminal on it with `astrona ssh astro-kernel-modules-lab`.
+- The `kmod` tools: `lsmod`, `modprobe`, `modinfo`, `depmod` and `rmmod`.
+- Nothing is loaded or configured. `/etc/modules-load.d/` and `/etc/modprobe.d/` hold only the Ubuntu defaults.
+- The **`dummy`** module (a virtual network driver) ships with the kernel and can always be loaded. `pcspkr`, the real-world blacklist example in the course text, may not exist for a virtual machine kernel, so the hands-on steps use `dummy` for both loading and blacklisting.
+- `lsblk` shows `vda` (the 15 GiB operating system disk) and `vdb` (a small cloud-init disk of about 366 KiB). There are no extra disks.
 
 ## Things to try
 
-- `lsmod | head` and `cat /proc/modules | head` — same data, two sources.
-- `modinfo -p dummy` — its one parameter, `numdummies (int)`.
+- `lsmod | head` and `cat /proc/modules | head`: the same data from two sources.
+- `modinfo -p dummy`: its one parameter, `numdummies (int)`.
 - `sudo modprobe dummy numdummies=2`, then `cat /sys/module/dummy/parameters/numdummies` and `ip link show type dummy`.
-- `sudo modprobe -r dummy`, add `options dummy numdummies=2` under `/etc/modprobe.d/`, `sudo modprobe dummy` (bare), re-check the parameter.
-- `echo 'blacklist dummy' | sudo tee /etc/modprobe.d/bl-dummy.conf` — then confirm `sudo modprobe dummy` still works (explicit load), only auto-load is blocked.
+- `sudo modprobe -r dummy`, then save the line `options dummy numdummies=2` in a file such as `/etc/modprobe.d/dummy.conf`. Load the module with a bare `sudo modprobe dummy` and read the parameter again.
+- Save the line `blacklist dummy` as `/etc/modprobe.d/bl-dummy.conf`. Then confirm that `sudo modprobe dummy` still works: a blacklist only blocks automatic loads, not explicit ones.
 
-## When you're done
+## When you are done
 
 ```sh
 astrona destroy kernel-modules-lab

@@ -1,14 +1,31 @@
-# section-030 / module-02 / lab-02: Transient → Persistent domain
+# Transient to Persistent Domain Lab
 
-QEMU VM for the LFCS course. `metrics-cache` is running but **transient**
-(started with `virsh create`, no definition on disk). Promote it to a
-**persistent** domain in place with `virsh define /root/metrics-cache.xml` —
-without stopping it — then `virsh autostart` it. Confirm
-`/etc/libvirt/qemu/metrics-cache.xml` now exists and the domain survives a
-`virsh destroy`.
+Welcome to a rescue mission, astronaut. A smaller ship, `metrics-cache`, is flying in this hangar, but it was launched from a blueprint nobody filed: it is a **transient** domain, started with `virsh create`. The moment it lands, or the host reboots, it is gone.
 
-## Run
+Your job is to file its blueprint while it keeps flying, so it becomes a **persistent** domain, and to make it launch whenever the hangar opens.
+
+## Launching the Lab
+
+Run this command to start the virtual machine:
 
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-030/module-02/labs/lab-02
+```
+
+Open a terminal on it:
+
+```bash
+astrona ssh ats-002-lab-033
+```
+
+When you think you have finished, send it for grading:
+
+```bash
+astrona submit -c sections/section-030/module-02/labs/lab-02
+```
+
+When you are done, remove the lab:
+
+```bash
+astrona destroy ats-002-lab-033
 ```

@@ -13,14 +13,14 @@ Operations Deployment represents **25% of the total LFCS exam weight** — the l
 To make learning intuitive, digestible, and robust, this curriculum is built around a symmetrical **1:1:1 educational architecture**:
 
 1.  **The Textbook Lesson (`sections/section-XXX/module-YY/course.md`):** Narrative, book-style chapters written in a warm, expert "teacher's voice" that explain *why* the operating system functions the way it does using real-world metaphors, inline command option breakdowns, and clear diagrams.
-2.  **The Interactive Quiz (`sections/section-XXX/quiz.md`):** A scenario-based theoretical knowledge check testing diagnostic reasoning, complete with collapsible answers and technical explanation keys.
+2.  **The Interactive Quiz (`sections/section-XXX/quiz.yaml`):** A scenario-based theoretical knowledge check testing diagnostic reasoning, complete with collapsible answers and technical explanation keys.
 3.  **The Dedicated Laboratory (`sections/section-XXX/module-YY/labs/`, plus a `sections/section-XXX/capstone/labs/` per section):** A virtual machine sandbox environment launched instantly via the `astrona` CLI where you must solve practical operational objectives and validate your system states using automated testing scripts.
 
 ---
 
 ## Complete Curriculum & Lab Mapping
 
-The training series is divided into **8 main sections** containing **28 highly focused modules**, **41 targeted lab sandboxes**, and **8 comprehensive Section Capstone Challenges**:
+The training series is divided into **8 main sections** containing **38 highly focused modules**, **51 targeted lab sandboxes**, and **8 comprehensive Section Capstone Challenges**:
 
 | Section & Domain | Module & Chapter Reader | Practice Lab Sandbox | astrona CLI Run Command |
 | :--- | :--- | :--- | :--- |
@@ -59,6 +59,11 @@ The training series is divided into **8 main sections** containing **28 highly f
 | | [M2: Password Reset](sections/section-080/module-02/course.md) | [lab](sections/section-080/module-02/labs/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-02/labs/lab-01` |
 | | [M3: Partition Table Backup](sections/section-080/module-03/course.md) | [lab](sections/section-080/module-03/labs/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-03/labs/lab-01` |
 | | [M4: GRUB Recovery](sections/section-080/module-04/course.md) | [lab](sections/section-080/module-04/labs/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-04/labs/lab-01` |
+| | [M5: Filesystem Check & Repair](sections/section-080/module-05/course.md) | [lab](sections/section-080/module-05/labs/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-05/labs/lab-01` |
+| | [M6: Initramfs Rebuild](sections/section-080/module-06/course.md) | [lab](sections/section-080/module-06/labs/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-06/labs/lab-01` |
+| | [M7: LVM Recovery](sections/section-080/module-07/course.md) | [lab](sections/section-080/module-07/labs/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-07/labs/lab-01` |
+| | [M8: Software RAID (mdadm)](sections/section-080/module-08/course.md) | [lab](sections/section-080/module-08/labs/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-08/labs/lab-01` |
+| | [M9: Disk Health & Diagnosis](sections/section-080/module-09/course.md) | [lab](sections/section-080/module-09/labs/lab-01) | `astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/module-09/labs/lab-01` |
 | | **Section Capstone Challenge** | **[capstone](sections/section-080/capstone/labs/lab-01)** | `astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-080/capstone/labs/lab-01` |
 
 ---
@@ -70,10 +75,10 @@ To get the most value out of this curriculum, follow this step-by-step roadmap:
 1.  **Enter a Domain Portal:** Navigate into a domain directory, such as `sections/section-010/`, and open its `README.md` to review the section's core philosophy and administrative master competencies.
 2.  **Read the Chapters:** Open and read the narrative chapters in order (e.g., `module-01/course.md` and then `module-02/course.md`). Focus on the metaphors, diagrams, and inline command breakdowns.
 3.  **Take the Chapter Self-Check:** Challenge yourself with the conceptual questions at the bottom of the course modules.
-4.  **Test Your Diagnostics:** Open `quiz.md` inside that section and answer its scenario questions. Expand the HTML details tags to read the deep-dive teacher's explanations.
+4.  **Test Your Diagnostics:** Open `quiz.yaml` inside that section and answer its scenario questions. Expand the HTML details tags to read the deep-dive teacher's explanations.
 5.  **Practice the Sandboxes:** Run the targeted module labs (e.g., `sections/section-010/module-01/labs/lab-01`, `sections/section-010/module-02/labs/lab-01`, …) to build muscle memory on atomic configurations.
 6.  **Conquer the Capstone Challenges:** Ready for high-stakes practice? Boot up the section's comprehensive **Capstone Challenge Lab** (e.g., `sections/section-010/capstone/labs/lab-01`, `sections/section-020/capstone/labs/lab-01`, etc.), solve the integration prompts, and run the automated test validation suites to confirm your passing state.
-7.  **Simulate the Exam:** Once you have completed all 26 modules, open **`sections/final-domain-quiz.md`** and complete the final domain exam simulator under a time cap to audit your readiness.
+7.  **Simulate the Exam:** Once you have completed all 38 modules, open **`sections/final-domain-quiz.yaml`** and complete the final domain exam simulator under a time cap to audit your readiness.
 
 ---
 

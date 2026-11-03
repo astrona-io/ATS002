@@ -1,20 +1,41 @@
-# section-060 / module-01: RPM Low-Level Package Management Sandbox
+# RPM Low-Level Package Management Lab
 
-Welcome to the Module 1 targeted practice sandbox. In this lab, you will inspect a standalone `.rpm` file before installing it, install it directly with `rpm`, answer file-ownership questions in both directions, and verify an installed package's integrity.
+Welcome aboard, astronaut. A supply crate with no depot behind it has arrived: a standalone `.rpm` file. You will read its label before you open it, load it with `rpm`, answer which crate owns which file, and check its contents against the ledger.
 
-## Important: This Lab Runs Inside a Container
+## Where you work
 
-This repository's only VM image is Ubuntu 24.04 — there is no Rocky Linux/RHEL VM available. To give you a real `rpm` experience instead of a faked one, bootstrap installs Docker on the Ubuntu VM and starts a long-lived, privileged Rocky Linux 9 container named `rpmbox`. All of this lab's work happens **inside that container**, not on the Ubuntu host itself.
+The lab machine runs Ubuntu 24.04, and `rpm` is not Ubuntu's package tool. So the lab starts a real Rocky Linux 9 container named `rpmbox` on it. A container is a sealed pod docked to the ship, with its own tools and its own RPM database. All the work in this lab happens **inside that container**, not on the Ubuntu machine itself.
 
-Get a shell inside it with:
+Open a shell inside it with:
+
 ```bash
 docker exec -it rpmbox bash
 ```
 
-Everything you need — the RPM to install, `rpm` itself, the RPM database — lives inside `rpmbox`. Commands run on the bare Ubuntu host will not see any of it.
+The package file, `rpm` and the RPM database all live inside `rpmbox`. Commands run on the Ubuntu machine itself do not see any of it.
 
 ## Launching the Lab
-Run the following command in your terminal to boot the QEMU VM:
+
+Run this command to start the virtual machine:
+
 ```bash
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-01/labs/lab-01
+```
+
+Open a terminal on it:
+
+```bash
+astrona ssh ats-002-lab-061
+```
+
+When you think you have finished, send it for grading:
+
+```bash
+astrona submit -c sections/section-060/module-01/labs/lab-01
+```
+
+When you are done, remove the lab:
+
+```bash
+astrona destroy ats-002-lab-061
 ```
