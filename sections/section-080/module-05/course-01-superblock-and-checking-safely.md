@@ -50,7 +50,7 @@ Repairing writes to the filesystem's own structures. If the kernel has it mounte
 
 - Unmount the filesystem first: `sudo umount "${DISK}1"`.
 - Or boot into a rescue environment where it was never mounted.
-- The root filesystem cannot be unmounted while the system runs from it. Repair it from a rescue shell.
+- The root filesystem cannot be unmounted while the system runs from it. Repair it from a rescue shell, as in module 01 of this section.
 
 ## Common pitfalls
 

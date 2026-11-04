@@ -22,7 +22,7 @@ Check that you have the knowledge and the tools this module expects before you b
 
 - **How to use a Linux shell and `sudo`.**
 - **What the kernel is**, and that `uname -r` prints its release.
-- **How to use a chroot** from a rescue shell.
+- **How to use a chroot** from a rescue shell (module 01 of this section).
 
 ### What is in your playground
 
