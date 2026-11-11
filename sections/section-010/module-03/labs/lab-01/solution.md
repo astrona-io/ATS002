@@ -55,7 +55,7 @@ dummy
 
 ## Step 5: Keep the parameter for every load
 
-Save this as `/etc/modprobe.d/dummy.conf`:
+Save this as `/etc/modprobe.d/zz-course-dummy.conf`:
 
 ```ini
 options dummy numdummies=2
@@ -70,7 +70,7 @@ ip -o link show type dummy | wc -l
 # 2
 ```
 
-`modprobe` read the `options` line from `/etc/modprobe.d/dummy.conf` and passed `numdummies=2` to the kernel, even though you did not type it.
+`modprobe` read the `options` line from `/etc/modprobe.d/zz-course-dummy.conf` and passed `numdummies=2` to the kernel, even though you did not type it.
 
 ---
 
@@ -112,7 +112,7 @@ ip -o link show type dummy | wc -l
 cat /etc/modules-load.d/dummy.conf
 # dummy
 
-cat /etc/modprobe.d/dummy.conf
+cat /etc/modprobe.d/zz-course-dummy.conf
 # options dummy numdummies=2
 
 lsmod | grep pcspkr
@@ -137,7 +137,7 @@ The three configuration files:
 | File | Content |
 | --- | --- |
 | `/etc/modules-load.d/dummy.conf` | `dummy` |
-| `/etc/modprobe.d/dummy.conf` | `options dummy numdummies=2` |
+| `/etc/modprobe.d/zz-course-dummy.conf` | `options dummy numdummies=2` |
 | `/etc/modprobe.d/blacklist-pcspkr.conf` | `blacklist pcspkr` |
 
 The commands:

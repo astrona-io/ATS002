@@ -5,7 +5,7 @@ sudo tee /etc/modules-load.d/dummy.conf >/dev/null <<'REFERENCE_FILE'
 dummy
 REFERENCE_FILE
 sudo mkdir -p /etc/modprobe.d
-sudo tee /etc/modprobe.d/dummy.conf >/dev/null <<'REFERENCE_FILE'
+sudo tee /etc/modprobe.d/zz-course-dummy.conf >/dev/null <<'REFERENCE_FILE'
 options dummy numdummies=2
 REFERENCE_FILE
 sudo mkdir -p /etc/modprobe.d
