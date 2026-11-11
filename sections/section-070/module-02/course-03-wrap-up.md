@@ -25,7 +25,7 @@ You proved these skills in a graded mission, right after the part that taught th
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Zypper Package Information Lookup Lab](./labs/lab-01/README.md) | Installed-Only Search and the rpm Fallback | found `fail2ban` by keyword, read `nginx`'s details without installing it, named `iproute2` as the supplier of `/usr/sbin/ip`, and listed installed `python3-*` packages |
+| [Zypper Package Information Lookup Lab](./labs/lab-01/README.md) | Installed-Only Search and the rpm Fallback | found `fail2ban` by keyword, read `nginx`'s details without installing it, named `iproute2` as the supplier of `/usr/sbin/ip`, and listed installed `python3*` packages |
 
 If you skipped it, go back to it now. The exam asks for exactly these skills.
 
@@ -54,11 +54,11 @@ No. It only reads the cached repository metadata and prints the details. The `In
 <details>
 <summary>4. How do you list only installed packages whose names start with <code>python3-</code>?</summary>
 
-`zypper search --installed-only 'python3-*'`, or the short form `zypper se -i 'python3-*'`. The quotes stop the shell from expanding the `*`.
+`zypper search --installed-only 'python3*'`, or the short form `zypper se -i 'python3*'`. The quotes stop the shell from expanding the `*`.
 </details>
 
 <details>
-<summary>5. Why is <code>zypper se -i</code> better than <code>zypper se 'python3-*' | grep</code>?</summary>
+<summary>5. Why is <code>zypper se -i</code> better than <code>zypper se 'python3*' | grep</code>?</summary>
 
 The built-in filter is exact. Scanning the status column with `grep` or by eye is slower and easy to get wrong across many rows.
 </details>

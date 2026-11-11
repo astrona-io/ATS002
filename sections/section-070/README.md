@@ -19,7 +19,7 @@ Inside it, `zypper`, the RPM database and the openSUSE repositories are all real
 By the end of this section you can:
 
 - **Refresh, then choose patches or updates.** Refresh repository metadata, tell a raw update (`zypper list-updates`, `zypper update`) from a reviewed patch (`zypper list-patches`, `zypper patch`), and pick the one a policy asks for.
-- **Install, remove and audit.** Install and remove packages with `zypper install` and `zypper remove`, and read `zypper history` as a record of what happened, not as an undo tool.
+- **Install, remove and audit.** Install and remove packages with `zypper install` and `zypper remove`, and read `cat /var/log/zypp/history` as a record of what happened, not as an undo tool.
 - **Research before you act.** Find a package by keyword (`zypper search`), read one package's full details without installing it (`zypper info`), find which package would supply a missing file (`zypper what-provides`), and list only installed matches (`zypper search --installed-only`).
 
 ## The modules

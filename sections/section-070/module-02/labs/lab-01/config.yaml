@@ -22,7 +22,7 @@ runtime:
 bootstrap:
   init:
     - name: "lab-072-zypperbox-setup"
-      description: "Installs Docker on the Ubuntu host, starts the zypperbox openSUSE Leap 16.0 container, seeds python3-base/python3-pip as installed, and pre-creates /root/answers for the student's research findings"
+      description: "Installs Docker on the Ubuntu host, starts the zypperbox openSUSE Leap 16.0 container, seeds python3-base/python313-pip as installed, and pre-creates /root/answers for the student's research findings"
       type: "folder"
       source: "bootstrap/"
 
@@ -44,7 +44,7 @@ validation:
       source: "validation/validate-what-provides-answer.sh"
 
     - name: "verify-installed-python3-answer"
-      description: "Confirms /root/answers/04-installed-python3.txt records an installed-only zypper search listing python3-base and python3-pip"
+      description: "Confirms /root/answers/04-installed-python3.txt records an installed-only zypper search listing python3-base and python313-pip"
       type: "file"
       source: "validation/validate-installed-python3-answer.sh"
 

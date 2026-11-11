@@ -22,7 +22,7 @@ This module was about the everyday `zypper` loop on openSUSE: refresh the catalo
 **From [Installing, Removing and Reading History](./course-03-install-remove-history.md):**
 
 - `zypper in` and `zypper rm` install and remove. The RPM layer keeps changed configuration files as `.rpmsave`, and there is no `zypper purge`.
-- `zypper history` and the file `/var/log/zypp/history` are an audit log. There is no `zypper history undo`; you reverse changes by hand.
+- `cat /var/log/zypp/history` and the file `/var/log/zypp/history` are an audit log. There is no `zypper history undo`; you reverse changes by hand.
 
 ## Your missions
 

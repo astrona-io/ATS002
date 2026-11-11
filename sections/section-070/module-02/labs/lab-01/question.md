@@ -27,6 +27,6 @@ The grader checks:
 - Confirms /root/answers/01-search.txt records a zypper search hit for fail2ban.
 - Confirms /root/answers/02-info.txt records zypper info metadata for nginx, without nginx actually being installed.
 - Confirms /root/answers/03-what-provides.txt records zypper what-provides identifying iproute2 for /usr/sbin/ip.
-- Confirms /root/answers/04-installed-python3.txt records an installed-only zypper search listing python3-base and python3-pip.
+- Confirms /root/answers/04-installed-python3.txt records an installed-only zypper search listing python3-base and python313-pip.
 
 Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

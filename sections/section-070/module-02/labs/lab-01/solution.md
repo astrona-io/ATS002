@@ -47,11 +47,11 @@ zypper what-provides /usr/sbin/ip | tee /root/answers/03-what-provides.txt
 ## Step 4: Filtered installed-only listing
 
 ```bash
-zypper search --installed-only 'python3-*' | tee /root/answers/04-installed-python3.txt
-# shorthand: zypper se -i 'python3-*'
+zypper search --installed-only 'python3*' | tee /root/answers/04-installed-python3.txt
+# shorthand: zypper se -i 'python3*'
 ```
 
-The `-i` (`--installed-only`) option keeps only packages that match the pattern **and** are installed, in one `zypper` command. The lab setup installed `python3-base` and `python3-pip` so this step has real results. Both should appear with an `i` in the leading status column. The grader also fails the answer if any `python3-` row is not marked installed, which is what an unfiltered search would produce.
+The `-i` (`--installed-only`) option keeps only packages that match the pattern **and** are installed, in one `zypper` command. The lab setup installed `python3-base` and `python313-pip` so this step has real results. Both should appear with an `i` in the leading status column. The grader also fails the answer if any Python package row is not marked installed, which is what an unfiltered search would produce.
 
 ---
 
@@ -75,7 +75,7 @@ Expected: a row naming `iproute2`.
 ```bash
 cat /root/answers/04-installed-python3.txt
 ```
-Expected: rows for `python3-base` and `python3-pip`, each marked `i` (installed) in the status column.
+Expected: rows for `python3-base` and `python313-pip`, each marked `i` (installed) in the status column.
 
 ```bash
 rpm -q nginx fail2ban 2>&1

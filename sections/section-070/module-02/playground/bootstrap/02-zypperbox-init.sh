@@ -24,10 +24,10 @@ sudo docker ps --format '{{.Names}}' | grep -qx zypperbox
 # module's research-only scenario.
 sudo docker exec zypperbox zypper --non-interactive --gpg-auto-import-keys refresh
 
-# Seed a couple of genuinely-installed python3-* packages, so the filtered
+# Seed a couple of genuinely-installed python3* packages, so the filtered
 # installed-only search the student runs in Step 4 has real, concrete
 # results to find rather than an empty result set.
-sudo docker exec zypperbox zypper --non-interactive install python3-base python3-pip
+sudo docker exec zypperbox zypper --non-interactive install python3-base python313-pip
 
 # Pre-create the directory the question asks the student to save each
 # research finding into.

@@ -202,7 +202,7 @@ section is only true for this one.
   as the shell, **systemd** as the service manager and **AppArmor** as the
   mandatory access control system. Section 060 runs the real RHEL-family
   tools inside a **Rocky Linux 9** container (`rpmbox`) and section 070 the
-  real SUSE tools inside an **openSUSE Leap 15.6** container (`zypperbox`),
+  real SUSE tools inside an **openSUSE Leap 16.0** container (`zypperbox`),
   both on the Ubuntu machine. Section 040/module-02 uses a pinned Rocky
   Linux VM for real SELinux enforcement. `rd.break` in section 080 remains
   a worked walkthrough; the Ubuntu image does not implement that boot flow. Do not teach options or behaviour from other
@@ -483,7 +483,7 @@ tables above.
   `/boot/grub/grub.cfg`.
 - **Other distributions run in containers.** Sections 060 and 070 install
   Docker on the Ubuntu machine and run `rockylinux:9`-based `rpmbox` and
-  `opensuse/leap:15.6`-based `zypperbox` as long-lived privileged
+  `opensuse/leap:16.0`-based `zypperbox` as long-lived privileged
   containers. Commands run inside them (`docker exec -it rpmbox bash`).
   The package tools inside are real; only the host is different.
 - **Distribution-specific practice.** The SELinux module runs Rocky Linux

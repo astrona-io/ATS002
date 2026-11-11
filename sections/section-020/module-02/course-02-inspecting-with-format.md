@@ -74,3 +74,13 @@ docker inspect --format '{{ (index .Mounts 0).Destination }}' web_demo
 > - **An absent legacy IP field, read as "no network".** Inspect `.NetworkSettings.Networks`.
 > - **Using `index .Mounts 0` without `len .Mounts`.** Check the shape of the list first. A template that asks for an item that is not there fails with an error.
 > - **Mixing up `.Destination` and `.Source`.** The destination is the path inside the container; the source is the folder on the host.
+
+## Select a named network
+
+For a container attached to several networks, choose the required entry explicitly:
+
+```sh
+docker inspect --format '{{ (index .NetworkSettings.Networks "backend").IPAddress }}' web_v2
+```
+
+This returns only the backend address. A loop without separators would concatenate addresses from every attached network. See [Docker's deprecated network fields](https://docs.docker.com/engine/deprecated/#top-level-network-properties-in-networksettings) for why the old top-level field should be avoided.

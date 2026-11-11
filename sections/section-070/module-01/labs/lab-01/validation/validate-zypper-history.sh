@@ -21,17 +21,17 @@ fi
 # remove, patch, ...) as the second field. Match the action column and the
 # package name loosely on the same line, rather than depending on an exact
 # column count, since column count varies slightly between line types.
-if ! echo "$history_log" | grep -E '^[^|]+\|install\|' | grep -qi 'fail2ban'; then
-  echo "FAIL: zypper history has no 'install' entry for fail2ban"
+if ! echo "$history_log" | grep -E '^[^|]+\|install[[:space:]]*\|' | grep -qi 'fail2ban'; then
+  echo "FAIL: cat /var/log/zypp/history has no 'install' entry for fail2ban"
   exit 1
 fi
 
-if ! echo "$history_log" | grep -E '^[^|]+\|remove\|' | grep -qi 'telnet-server'; then
-  echo "FAIL: zypper history has no 'remove' entry for telnet-server"
+if ! echo "$history_log" | grep -E '^[^|]+\|remove[[:space:]]*\|' | grep -qi 'telnet-server'; then
+  echo "FAIL: cat /var/log/zypp/history has no 'remove' entry for telnet-server"
   exit 1
 fi
 
-echo "PASS: zypper history log records the fail2ban install and telnet-server removal"
+echo "PASS: cat /var/log/zypp/history log records the fail2ban install and telnet-server removal"
 exit 0
 GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

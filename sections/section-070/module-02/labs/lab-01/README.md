@@ -2,7 +2,7 @@
 
 Welcome to a research mission, astronaut. Before anyone orders a crate, the quartermaster needs answers: which package does a job, what exactly is in one package, which package supplies a missing command, and what is already on board. You will find each answer with `zypper` and save it to a file. Nothing gets installed, removed or updated.
 
-The training ship runs Ubuntu 24.04, which has no `zypper`. The setup starts Docker and runs a real openSUSE Leap 16.0 container called `zypperbox` on it, with `python3-base` and `python3-pip` installed and an empty `/root/answers` directory. Do all your work inside it:
+The training ship runs Ubuntu 24.04, which has no `zypper`. The setup starts Docker and runs a real openSUSE Leap 16.0 container called `zypperbox` on it, with `python3-base` and `python313-pip` installed and an empty `/root/answers` directory. Do all your work inside it:
 
 ```bash
 docker exec -it zypperbox bash

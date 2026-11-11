@@ -1464,7 +1464,7 @@ modules:
       The zypper package tool used across openSUSE and SUSE Linux Enterprise,
       including the patch-vs-update distinction unique to SUSE,
       install/remove/history operations, and the search/info/ what-provides
-      research workflow — exercised inside a real opensuse/leap:15.6 Docker
+      research workflow — exercised inside a real opensuse/leap:16.0 Docker
       sandbox on the platform's Ubuntu VM.
 
     content:

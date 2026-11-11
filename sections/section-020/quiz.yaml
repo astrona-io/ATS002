@@ -110,26 +110,26 @@ questions:
   - id: ats002-020-q05
     type: single_choice
     difficulty: intermediate
-    learning_objective: "Read a container IP address on any network with a template"
+    learning_objective: "Read a container IP address on a named network"
     source_readings:
       - sections/section-020/module-02/course-02-inspecting-with-format.md
     prompt: |-
-      You run `docker inspect --format '{{ .NetworkSettings.IPAddress }}' web_v2` and get empty output, even though `web_v2` is running and reachable over the network. What is the most likely cause, and the correct fix?
+      The running container `web_v2` is attached to both `frontend` and `backend`. An audit needs only its IPv4 address on `backend`. Which inspect template selects that address without depending on the legacy top-level IP field?
     options:
       - id: a
-        text: "The container isn't actually running; it must be restarted first."
-        explanation: "This option is incorrect because the scenario states the container is running and reachable, the empty field is a template-path issue, not a container-state issue."
+        text: "`{{ .NetworkSettings.Networks.frontend.IPAddress }}`"
+        explanation: "This selects the address on frontend, not backend."
       - id: b
-        text: "`web_v2` is attached to a custom, user-defined network instead of the default bridge, Docker only populates the top-level `.NetworkSettings.IPAddress` field for default-bridge containers. Use `{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}` instead."
-        explanation: "Correct. Docker only fills the top-level `.NetworkSettings.IPAddress` field for containers on the default bridge network. When a container is on a network you created, Docker keeps its address per network instead, under `.NetworkSettings.Networks.<network-name>.IPAddress`. The `range` form goes through that map without you needing to know the network's name, so it is the safer template to use."
+        text: "`{{ (index .NetworkSettings.Networks \"backend\").IPAddress }}`"
+        explanation: "The Networks map is keyed by network name. Indexing backend selects its address."
       - id: c
-        text: "`docker inspect` requires `sudo` to report IP address fields; without it, the field is silently blanked."
-        explanation: "This option is incorrect; `docker inspect` does not gate JSON fields behind privilege escalation, and an unprivileged user with Docker socket access sees the same data root would."
+        text: "`{{ .NetworkSettings.Gateway }}`"
+        explanation: "A gateway field is the router address, not the container address."
       - id: d
-        text: "The field name is deprecated in current Docker releases and was renamed to `.NetworkSettings.Address`."
-        explanation: "This option is incorrect; `.NetworkSettings.IPAddress` is not deprecated or renamed, it's simply left blank when it doesn't apply to the container's network mode."
+        text: "`{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}`"
+        explanation: "This emits addresses from both networks without selecting backend."
     correct_option: b
-    explanation: "Docker only fills the top-level `.NetworkSettings.IPAddress` field for containers on the default bridge network. When a container is on a network you created, Docker keeps its address per network instead, under `.NetworkSettings.Networks.<network-name>.IPAddress`. The `range` form goes through that map without you needing to know the network's name, so it is the safer template to use."
+    explanation: "Select backend from NetworkSettings.Networks, then read its IPAddress field."
 
   - id: ats002-020-q06
     type: single_choice

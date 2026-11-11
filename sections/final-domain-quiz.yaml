@@ -138,13 +138,13 @@ questions:
     source_readings:
       - sections/section-020/module-02/course.md
     prompt: |-
-      You need to extract just the IP address of a running Docker container named `frontend_v2` for an audit report, in a single command with no manual JSON parsing. Which is correct?
+      You need to extract just the IP address of a running Docker container named `frontend_v2` attached to exactly one network for an audit report, in a single command with no manual JSON parsing. Which is correct?
     options:
       - id: a
         text: "`docker ps | grep frontend_v2 | awk '{print $NF}'`"
         explanation: "`docker ps` output doesn't include the container's IP address at all."
       - id: b
-        text: "`docker inspect --format '{{.NetworkSettings.IPAddress}}' frontend_v2`"
+        text: "`docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' frontend_v2`"
         explanation: "Correct. `docker inspect --format` with a Go template lets you pull one exact field out of a container's full metadata JSON precisely and reliably, without eyeballing or manually parsing raw output."
       - id: c
         text: "`docker logs frontend_v2 | grep -i \"ip address\"`"

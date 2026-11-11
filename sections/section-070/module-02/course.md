@@ -28,7 +28,7 @@ Check that you have the knowledge and the tools this module expects before you b
 Your playground is a training ship: one Ubuntu 24.04 virtual machine. That machine has no tools of this package family, so the playground runs a real openSUSE Leap 16.0 **container** named `zypperbox` on it. A container is a sealed pod docked to the ship: it has its own files and tools but shares the ship's reactor core (the kernel). Inside it, the package tools and the package database are all real.
 
 - A fresh repository catalogue inside `zypperbox`.
-- `python3-base` and `python3-pip` installed.
+- `python3-base` and `python313-pip` installed.
 - An empty folder `/root/answers` inside the container for saving what you find.
 
 Start the playground, then open a terminal on it with `astrona ssh astro-zypper-package-research`. Step into the pod with `docker exec -it zypperbox bash` and run every package command in that shell. If Docker refuses with a permission error, put `sudo` in front. It is already set up with a container for read-only package research.
