@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the starting state for the LVM recovery playground: a spare disk
 # used as one LVM physical volume, a volume group cargo_vg, one logical
 # volume deck with an ext4 filesystem and two known files. Nothing is
@@ -46,3 +48,4 @@ rmdir "$MOUNT_POINT"
 # LVM writes /etc/lvm/backup/cargo_vg on its own; this makes sure it is current.
 sudo vgcfgbackup cargo_vg
 sync
+ASTRONA_STUDENT_SCRIPT

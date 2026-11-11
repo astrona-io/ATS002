@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Breaks this capstone's "stale GRUB config" half directly on this VM's
 # own primary disk -- safely, using the exact lab-084 mechanism. This
 # VM's CURRENT boot already succeeded before this script ever runs: the
@@ -31,3 +33,4 @@ echo "  Removed: $GRUB_CFG"
 echo "  Marker : $MARKER (repair must postdate this timestamp)"
 
 exit 0
+ASTRONA_STUDENT_SCRIPT

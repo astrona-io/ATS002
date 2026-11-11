@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms /opt/course/apt-research/python3-installed.txt matches the
 # live set of installed python3-* packages, compared as a sorted set so
 # line order doesn't matter.
@@ -31,3 +33,4 @@ fi
 
 echo "PASS: $path matches the live set of installed python3-* packages"
 exit 0
+ASTRONA_STUDENT_SCRIPT

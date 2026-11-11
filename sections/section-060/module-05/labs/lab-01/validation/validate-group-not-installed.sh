@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the "Development Tools" group no longer shows as installed
 # inside rpmbox -- proving the group was actually removed as a unit, not
 # just left in place.
@@ -22,3 +24,4 @@ fi
 
 echo "PASS: Development Tools group no longer shows as installed inside rpmbox"
 exit 0
+ASTRONA_STUDENT_SCRIPT

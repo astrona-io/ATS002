@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the default boot target is now multi-user.target:
 #   - systemctl get-default reports it
 #   - /etc/systemd/system/default.target symlink resolves to it
@@ -18,3 +20,4 @@ esac
 
 echo "PASS: default boot target is multi-user.target (get-default + default.target symlink both agree)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

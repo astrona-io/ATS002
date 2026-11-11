@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms a custom udev rule under /etc/udev/rules.d/ creates /dev/backup-drive
 # and /dev/backup-drive1 symlinks that resolve to the actual disk/partition
 # carrying serial "lab014-backup-drive" -- ground-truthed via the always-present
@@ -47,3 +49,4 @@ fi
 
 echo "PASS: /dev/backup-drive -> $actual_disk and /dev/backup-drive1 -> $actual_part"
 exit 0
+ASTRONA_STUDENT_SCRIPT

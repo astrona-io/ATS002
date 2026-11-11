@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: defensively ensures fail2ban is not installed, regardless of
 # what the base VM image happens to carry, so the "install fail2ban" task
 # always starts from a genuinely clean baseline.
@@ -10,3 +12,4 @@ sudo apt-get update -y
 if dpkg -s fail2ban >/dev/null 2>&1; then
   sudo DEBIAN_FRONTEND=noninteractive apt-get purge -y fail2ban
 fi
+ASTRONA_STUDENT_SCRIPT

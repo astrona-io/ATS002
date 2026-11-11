@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the build-agent domain is defined persistently with 2048 MiB
 # memory, 2 vCPUs, the default network attached, and autostart enabled.
 set -u
@@ -44,3 +46,4 @@ fi
 
 echo "PASS: domain '$DOMAIN' is persistently defined with 2048 MiB memory, 2 vCPUs, attached to the default network, and autostart enabled"
 exit 0
+ASTRONA_STUDENT_SCRIPT

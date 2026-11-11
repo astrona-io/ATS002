@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: creates and starts data-ingest.service, a long-running unit
 # with an explicit, low TasksMax= cgroup cap -- simulating the systemd-side
 # ceiling the scenario asks the student to raise. It runs as the dataproc
@@ -29,3 +31,4 @@ EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now data-ingest.service
+ASTRONA_STUDENT_SCRIPT

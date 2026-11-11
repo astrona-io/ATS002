@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the credsync AppArmor READ denial was genuinely fixed:
 #   - the profile is loaded and in enforce mode (not complain)
 #   - the daemon can now read /etc/credsync/api.key -> it writes
@@ -32,3 +34,4 @@ den="$(sudo journalctl -k --since '10 seconds ago' 2>/dev/null | grep 'apparmor=
 
 echo "PASS: credsync profile is enforcing, the daemon reads /etc/credsync/api.key, and no fresh denials"
 exit 0
+ASTRONA_STUDENT_SCRIPT

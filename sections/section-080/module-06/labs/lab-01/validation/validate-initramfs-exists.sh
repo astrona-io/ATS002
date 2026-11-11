@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the initramfs image of the running kernel exists again and was
 # created after the lab started.
 
@@ -21,3 +23,4 @@ fi
 
 echo "PASS: $INITRD exists and was rebuilt during the lab"
 exit 0
+ASTRONA_STUDENT_SCRIPT

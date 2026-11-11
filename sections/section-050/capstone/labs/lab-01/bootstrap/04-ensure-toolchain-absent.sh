@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: defensively ensures curl, git, and jq are not installed,
 # regardless of what the base VM image happens to carry, so the
 # "install the baseline ops toolchain in one transaction" task always
@@ -15,3 +17,4 @@ for pkg in curl git jq; do
 done
 
 sudo apt-get autoremove -y
+ASTRONA_STUDENT_SCRIPT

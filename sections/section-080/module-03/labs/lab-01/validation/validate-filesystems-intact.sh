@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the filesystem layer is separately intact after the restore --
 # not just that partitions reappeared, but that each one mounts cleanly
 # and its original marker file (written by bootstrap before the
@@ -59,3 +61,4 @@ check_partition "$P2" "vdc2 original data - LFCS lab-083, do not lose me" /mnt/l
 
 echo "PASS: both partitions pass fsck -n cleanly and their original marker files are intact"
 exit 0
+ASTRONA_STUDENT_SCRIPT

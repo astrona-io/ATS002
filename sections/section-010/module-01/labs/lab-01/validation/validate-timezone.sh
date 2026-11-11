@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks /opt/course/timezone against timedatectl (falls back to /etc/timezone)
 
 set -u
@@ -20,3 +22,4 @@ else
   echo "FAIL: timezone - $path = '$actual', expected '$expected'"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

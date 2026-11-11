@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms disk c is an active member of the array and disk b is not.
 
 set -u
@@ -29,3 +31,4 @@ fi
 
 echo "PASS: disk c is an active member and disk b is not"
 exit 0
+ASTRONA_STUDENT_SCRIPT

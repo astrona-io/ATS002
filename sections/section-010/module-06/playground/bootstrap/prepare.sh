@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for the systemd service-debugging playground. Installs apache2,
 # then parks a tiny listener on TCP 80 via its own systemd unit so that
 # `systemctl start apache2` fails with (98)Address already in use — a
@@ -37,3 +39,4 @@ sleep 2
 echo "[playground] systemd-service-debugging: ready."
 echo "[playground] apache2 is FAILED (port 80 is held by port80-hog.service)."
 echo "[playground] try:  systemctl status apache2  ;  journalctl -xeu apache2  ;  sudo ss -ltnp 'sport = :80'"
+ASTRONA_STUDENT_SCRIPT

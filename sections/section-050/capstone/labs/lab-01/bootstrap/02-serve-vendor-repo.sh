@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: serves /srv/vendor-repo over plain HTTP on 127.0.0.1:8200 as
 # a persistent systemd unit, standing in for the vendor's real repository
 # server. Runs for the lifetime of the VM so the student's `apt update`
@@ -30,3 +32,4 @@ for _ in $(seq 1 10); do
   fi
   sleep 1
 done
+ASTRONA_STUDENT_SCRIPT

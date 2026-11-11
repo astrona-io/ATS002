@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: builds a small, real .deb package -- logtail-utils -- and
 # stages it under /home/candidate/downloads/, standing in for "a
 # colleague handed you a standalone .deb, not available in any
@@ -57,3 +59,4 @@ sudo dpkg-deb --build --root-owner-group "${BUILD_DIR}" "${DEB_PATH}"
 
 sudo chmod -R a+rX /home/candidate
 sudo chmod 644 "${DEB_PATH}"
+ASTRONA_STUDENT_SCRIPT

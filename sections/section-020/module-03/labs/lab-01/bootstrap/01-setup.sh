@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Provides the two maintenance scripts and one existing cron job the
 # student will work with.
 set -eu
@@ -27,3 +29,4 @@ EOF
 echo "lab-023 bootstrap complete."
 echo "  scripts: /usr/local/sbin/report.sh, /usr/local/sbin/dbclean.sh"
 echo "  existing cron job to convert: /etc/cron.d/dbclean (every 6h)"
+ASTRONA_STUDENT_SCRIPT

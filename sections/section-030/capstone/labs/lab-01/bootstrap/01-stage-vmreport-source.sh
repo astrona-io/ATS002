@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap (1/2): stages a genuinely buildable "vmreport 1.0" source
 # tarball at /tools/vmreport-1.0.tar.gz and installs build tooling.
 #
@@ -177,3 +179,4 @@ sudo mv /tmp/vmreport-1.0.tar.gz /tools/vmreport-1.0.tar.gz
 sudo chmod 644 /tools/vmreport-1.0.tar.gz
 
 rm -rf "$BUILD_ROOT"
+ASTRONA_STUDENT_SCRIPT

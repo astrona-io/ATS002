@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Ensures the starting state for an APT pinning task:
 #   - curl is installed
 #   - the noble release pocket AND noble-updates are both enabled, so
@@ -24,3 +26,4 @@ sudo rm -f /etc/apt/preferences.d/*curl* 2>/dev/null || true
 
 echo "lab-051b bootstrap: current curl candidate ->"
 apt-cache policy curl | sed 's/^/  /'
+ASTRONA_STUDENT_SCRIPT

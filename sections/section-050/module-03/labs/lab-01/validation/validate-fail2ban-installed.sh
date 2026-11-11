@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms fail2ban is now cleanly installed.
 
 set -u
@@ -12,3 +14,4 @@ fi
 
 echo "PASS: fail2ban is installed"
 exit 0
+ASTRONA_STUDENT_SCRIPT

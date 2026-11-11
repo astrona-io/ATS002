@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the student recorded httpd's full dnf metadata at
 # /home/candidate/answers/info.txt inside rpmbox, and that httpd itself
 # was never actually installed -- this lab is entirely read-only, and
@@ -33,3 +35,4 @@ fi
 
 echo "PASS: info.txt records httpd's metadata, and httpd was never installed"
 exit 0
+ASTRONA_STUDENT_SCRIPT

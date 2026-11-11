@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the previously half-configured cowsay package now shows a
 # clean "ii" (install ok installed) status, and that no package on the
 # system is left in any pending/incomplete state.
@@ -21,3 +23,4 @@ fi
 
 echo "PASS: cowsay is fully configured (ii) and dpkg --audit reports no outstanding issues"
 exit 0
+ASTRONA_STUDENT_SCRIPT

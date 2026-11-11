@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Prepares the secondary GPT disk for lab-083 (partition table backup and
 # recovery). This scenario needs no safety adaptation -- it operates
 # entirely on a non-root secondary disk, so the VM stays fully
@@ -75,3 +77,4 @@ sudo rmdir /mnt/vdc2
 echo "lab-083 bootstrap complete. Secondary disk: $BASEDEV ($P1, $P2)"
 
 exit 0
+ASTRONA_STUDENT_SCRIPT

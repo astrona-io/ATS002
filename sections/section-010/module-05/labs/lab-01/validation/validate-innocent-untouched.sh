@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms collector1 and collector3 (which never call kill()) are still
 # running with their executables intact -- penalizes "kill everything to
 # be safe" instead of acting only on the confirmed offender.
@@ -25,3 +27,4 @@ fi
 
 echo "PASS: collector1 and collector3 are still running with their executables intact"
 exit 0
+ASTRONA_STUDENT_SCRIPT

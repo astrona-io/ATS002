@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND - Container Images, Volumes And Networks
 #
 # Runs once when the environment comes up. Environment preparation only:
@@ -35,3 +37,4 @@ sudo chmod 0777 /opt/demo/status-page
 sudo chmod 0644 /opt/demo/status-page/index.html
 
 echo "[playground] container-build-bay: ready."
+ASTRONA_STUDENT_SCRIPT

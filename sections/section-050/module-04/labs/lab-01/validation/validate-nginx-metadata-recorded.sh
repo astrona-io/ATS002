@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms /opt/course/apt-research/nginx-show.txt contains nginx's
 # Package/Version fields from 'apt show nginx', with the recorded
 # Version matching the live candidate version (computed fresh here, not
@@ -33,3 +35,4 @@ fi
 
 echo "PASS: $path contains nginx's Package/Version metadata matching the live candidate version ($recorded_version)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

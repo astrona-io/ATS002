@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms ftp was fully purged, not just removed: the package itself is
 # gone from dpkg's database AND its /etc/ftp.conf conffile is gone too.
 
@@ -17,3 +19,4 @@ fi
 
 echo "PASS: ftp is fully purged and /etc/ftp.conf is gone"
 exit 0
+ASTRONA_STUDENT_SCRIPT

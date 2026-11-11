@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms ops-monitor's per-user crontab has an every-minute job that,
 # either directly or via a referenced script, restarts billing_v2.
 
@@ -58,3 +60,4 @@ fi
 
 echo "PASS: ops-monitor's crontab has an every-minute job that restarts billing_v2"
 exit 0
+ASTRONA_STUDENT_SCRIPT

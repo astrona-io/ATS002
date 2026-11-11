@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms frontend_v3 is running, detached, image nginx:alpine, memory
 # limit 30m (31457280 bytes), and port map 1234(host) -> 80(container).
 
@@ -36,3 +38,4 @@ fi
 
 echo "PASS: frontend_v3 is running, image=$image, memory=$mem bytes, ports=$port_map"
 exit 0
+ASTRONA_STUDENT_SCRIPT

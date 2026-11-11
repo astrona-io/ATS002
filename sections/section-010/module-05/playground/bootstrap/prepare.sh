@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for the strace playground. Installs strace and starts three
 # long-running "collector" processes so pgrep/strace/readlink have real
 # subjects. One of them (collector2) periodically makes a kill() syscall,
@@ -44,3 +46,4 @@ sudo systemctl enable --now collector1.service collector2.service collector3.ser
 
 echo "[playground] strace-process-forensics: ready."
 echo "[playground] try:  pgrep -a -f collector  ;  sudo strace -p \$(pgrep -f collector2) -e trace=kill,clock_nanosleep"
+ASTRONA_STUDENT_SCRIPT

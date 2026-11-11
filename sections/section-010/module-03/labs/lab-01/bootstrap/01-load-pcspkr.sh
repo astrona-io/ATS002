@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: ensures pcspkr is loaded, simulating the "already beeping"
 # starting state the scenario describes. Some virtualized environments
 # don't auto-load it via hardware detection, so this loads it explicitly
@@ -8,3 +10,4 @@
 set -eu
 
 sudo modprobe pcspkr || true
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Ensures there are several python3-* packages installed inside rpmbox
 # (beyond whatever the base image ships, e.g. python3 itself as a dnf
 # dependency) so the "list installed python3-* packages" research step has
@@ -11,3 +13,4 @@ sudo docker exec rpmbox dnf -y install python3-pip python3-setuptools python3-re
 
 echo "Confirming installed python3-* packages inside rpmbox:"
 sudo docker exec rpmbox bash -c "dnf list installed | grep '^python3-'"
+ASTRONA_STUDENT_SCRIPT

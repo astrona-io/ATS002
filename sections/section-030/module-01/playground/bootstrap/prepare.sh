@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND -- Compile & Install From Source
 #
 # Runs once when the environment comes up. Environment preparation only:
@@ -148,3 +150,4 @@ sudo chmod 644 /tools/links-2.14.tar.bz2
 rm -rf "$BUILD_ROOT"
 
 echo "[playground] source-build-bay: ready. Tarball: /tools/links-2.14.tar.bz2"
+ASTRONA_STUDENT_SCRIPT

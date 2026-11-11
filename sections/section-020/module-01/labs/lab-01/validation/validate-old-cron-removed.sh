@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms no trace of the old system-wide nightly-sync.sh cron entry
 # remains in /etc/crontab or /etc/cron.d/, so the job cannot fire twice.
 
@@ -14,3 +16,4 @@ fi
 
 echo "PASS: no trace of the old system-wide nightly-sync.sh cron entry remains in /etc/crontab or /etc/cron.d/"
 exit 0
+ASTRONA_STUDENT_SCRIPT

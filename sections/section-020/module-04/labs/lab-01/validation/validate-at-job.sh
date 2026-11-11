@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 set -u
 
 SCRIPT=/usr/local/sbin/archive-logs.sh
@@ -18,3 +20,4 @@ done
 
 echo "FAIL: no job queued for 03:00 calls $SCRIPT"
 exit 1
+ASTRONA_STUDENT_SCRIPT

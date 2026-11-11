@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the starting state for the filesystem check and repair playground:
 # a spare disk with one GPT partition and a healthy ext4 filesystem holding
 # known files. Nothing is broken here.
@@ -59,3 +61,4 @@ rmdir "$MNT"
 # The playground stays healthy. Zeroing the superblock is your own experiment:
 # see docs/overview.md.
 sync
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: builds and installs a small, real, locally-built stand-in
 # "observability agent module family" -- three minimal .deb packages
 # sharing the obsagent- name prefix, installed directly with dpkg -i.
@@ -54,3 +56,4 @@ build_and_install "obsagent-disk" "Disk/IO metrics collector module for the obse
 
 echo "obsagent family installed:"
 dpkg -l | grep -E '^ii  obsagent-'
+ASTRONA_STUDENT_SCRIPT

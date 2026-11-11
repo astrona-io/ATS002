@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the starting state for lab-08a (disk health diagnosis): two spare 1 GB disks (serials
 # lab08a-suspect and lab08a-other), a known pattern in the first MiB of the
 # suspect disk (its hash is stored so a read-only scan can be proven), and an
@@ -37,3 +39,4 @@ sudo sh -c "head -c 1048576 '$SUSPECT' | sha256sum > /var/lib/lab08a/suspect.sha
 sudo sh -c "echo '<3>lab08a-monitor: I/O error, dev $SUSPECT_NAME, sector 4096 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 2' > /dev/kmsg"
 sudo mkdir -p /var/tmp/disk-report
 sudo chmod 1777 /var/tmp/disk-report
+ASTRONA_STUDENT_SCRIPT

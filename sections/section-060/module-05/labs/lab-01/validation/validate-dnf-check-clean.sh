@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms dnf's own transaction-check logic (dnf check) passes cleanly
 # inside rpmbox after the group install/remove cycle -- a basic sanity
 # check that the group operations didn't leave the package database in an
@@ -17,3 +19,4 @@ fi
 
 echo "PASS: dnf check passed cleanly inside rpmbox"
 exit 0
+ASTRONA_STUDENT_SCRIPT

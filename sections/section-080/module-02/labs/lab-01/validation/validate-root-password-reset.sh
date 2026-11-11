@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms root's password hash on the stand-in "data-001" disk was
 # actually reset. Runs entirely from the primary VM, outside of any
 # chroot -- mounts the stand-in disk read-only and checks /etc/shadow's
@@ -52,3 +54,4 @@ fi
 
 echo "PASS: root's password hash on the data-001 stand-in disk has been reset"
 exit 0
+ASTRONA_STUDENT_SCRIPT

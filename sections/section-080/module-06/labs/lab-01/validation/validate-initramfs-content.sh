@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the rebuilt image is a real, readable initramfs.
 
 set -u
@@ -22,3 +24,4 @@ fi
 
 echo "PASS: $INITRD is a readable initramfs with the boot scripts inside"
 exit 0
+ASTRONA_STUDENT_SCRIPT

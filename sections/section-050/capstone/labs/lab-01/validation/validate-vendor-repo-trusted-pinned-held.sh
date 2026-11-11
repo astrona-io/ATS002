@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms: (1) modern signed-by trust is configured (a sources.list.d
 # entry references a dedicated keyring under /etc/apt/keyrings/, not the
 # deprecated apt-key global keyring), (2) telemetry-agent is installed at
@@ -58,3 +60,4 @@ fi
 
 echo "PASS: vendor repo is trusted via a dedicated signed-by keyring, telemetry-agent is pinned at $expected and held"
 exit 0
+ASTRONA_STUDENT_SCRIPT

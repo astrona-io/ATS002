@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms GRUB's own installed boot-sector/EFI code on the primary disk
 # was genuinely reinstalled during this session -- not just left over
 # from the base VM image -- and that a final `grub-install --recheck`
@@ -78,3 +80,4 @@ rm -f "$RECHECK_LOG"
 
 echo "PASS: $CORE_IMG was genuinely rewritten after bootstrap ($CORE_SIZE bytes) and grub-install --recheck on $DISK confirms GRUB is healthy"
 exit 0
+ASTRONA_STUDENT_SCRIPT

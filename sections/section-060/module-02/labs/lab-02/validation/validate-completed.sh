@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the student recognised this was NOT database corruption and
 # resolved the actual dependency gap:
 #   - `dnf check` inside rpmbox now passes cleanly
@@ -35,3 +37,4 @@ fi
 
 echo "PASS: dnf check is clean and the dependency gap is resolved (this was a look-alike, not rpmdb corruption)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

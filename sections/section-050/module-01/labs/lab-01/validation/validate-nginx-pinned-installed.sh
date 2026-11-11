@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms nginx is installed at exactly the vendor-published version
 # recorded by bootstrap in /opt/lab-meta/nginx-vendor-version.
 
@@ -26,3 +28,4 @@ fi
 
 echo "PASS: nginx is installed at the exact pinned vendor version $installed"
 exit 0
+ASTRONA_STUDENT_SCRIPT

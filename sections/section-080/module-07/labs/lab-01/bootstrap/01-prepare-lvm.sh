@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the STARTING state for lab-088 (LVM recovery): a spare disk used as
 # one LVM physical volume, a volume group cargo_vg, one logical volume deck
 # with an ext4 filesystem holding known files. The group is then switched
@@ -57,3 +59,4 @@ sudo dd if=/dev/zero of="$TARGET_DISK" bs=1M count=1 conv=notrunc status=none
 sync
 sudo udevadm settle --timeout=10 || true
 sudo pvscan --cache >/dev/null 2>&1 || true
+ASTRONA_STUDENT_SCRIPT

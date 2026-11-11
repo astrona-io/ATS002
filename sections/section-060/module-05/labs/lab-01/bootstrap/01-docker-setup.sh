@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Installs Docker on the Ubuntu host and starts a long-lived, privileged
 # Rocky Linux 9 container ("rpmbox") that provides a REAL dnf environment
 # for this lab. This repo's only VM base image is Ubuntu 24.04 -- there is
@@ -38,3 +40,4 @@ echo "Refreshing dnf repo metadata (including comps/group data) inside rpmbox...
 sudo docker exec rpmbox dnf -y makecache
 
 echo "rpmbox is ready."
+ASTRONA_STUDENT_SCRIPT

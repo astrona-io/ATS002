@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms lingering is enabled for the user pilot.
 
 set -u
@@ -15,3 +17,4 @@ fi
 
 echo "PASS: lingering is enabled for pilot"
 exit 0
+ASTRONA_STUDENT_SCRIPT

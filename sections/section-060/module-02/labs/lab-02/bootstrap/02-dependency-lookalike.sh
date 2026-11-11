@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Creates a corruption LOOK-ALIKE inside rpmbox.
 #
 # The section-060/module-02 course teaches: before assuming rpmdb
@@ -47,3 +49,4 @@ D dnf check 2>&1 | tail -8 || true
 # Leave a breadcrumb the validator can use to know what was broken.
 D bash -c "printf '%s\n%s\n' '$VICTIM' '$DEP' > /root/.lab066-broken"
 echo "lab-066 look-alike ready."
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms dummy is loaded live with numdummies=4 and persisted (both the
 # load and the parameter), and that pcspkr is blacklisted, unloaded now,
 # and stays absent after a simulated hardware re-detection pass.
@@ -67,3 +69,4 @@ if [[ "$fail" -ne 0 ]]; then
 fi
 
 exit 0
+ASTRONA_STUDENT_SCRIPT

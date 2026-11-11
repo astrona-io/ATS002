@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms asset-manager's per-user crontab contains both required jobs:
 # the converted 8:30pm daily job (no leftover username field) and the new
 # Mon/Thu 11:15am clean.sh job (with the required "bash" prefix).
@@ -68,3 +70,4 @@ fi
 
 echo "PASS: asset-manager's crontab contains both the converted nightly-sync.sh job and the new Mon/Thu clean.sh job"
 exit 0
+ASTRONA_STUDENT_SCRIPT

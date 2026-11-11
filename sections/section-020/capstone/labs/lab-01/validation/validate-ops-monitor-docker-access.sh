@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms ops-monitor is in the docker group, a prerequisite for its cron
 # job to run docker commands non-interactively without a permission error.
 
@@ -16,3 +18,4 @@ fi
 
 echo "PASS: ops-monitor is a member of the docker group"
 exit 0
+ASTRONA_STUDENT_SCRIPT

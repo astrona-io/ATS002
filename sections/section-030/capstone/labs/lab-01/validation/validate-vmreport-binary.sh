@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms vmreport is installed at /usr/local/bin/vmreport, is a real
 # compiled ELF binary, and was built with color output disabled.
 
@@ -40,3 +42,4 @@ fi
 
 echo "PASS: vmreport installed at /usr/local/bin/vmreport, built from source with color output disabled"
 exit 0
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Puts the journal into the "logs are lost on reboot" default state and
 # removes any size cap, so the task (make it persistent + bounded) has a
 # real starting point.
@@ -24,3 +26,4 @@ sudo systemctl restart systemd-journald
 
 echo "lab-016e bootstrap: journald is volatile (no /var/log/journal) and uncapped."
 journalctl --header 2>/dev/null | grep -i 'storage\|file' | head -3 || true
+ASTRONA_STUDENT_SCRIPT

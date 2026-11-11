@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: an AppArmor *read* denial (contrast with lab-01's write
 # denial). The credsync daemon reads its API key on every cycle. The key
 # was relocated from /var/lib/credsync/api.key to /etc/credsync/api.key,
@@ -102,3 +104,4 @@ UNIT
 sudo systemctl daemon-reload
 sudo systemctl enable --now credsync
 sleep 6
+ASTRONA_STUDENT_SCRIPT

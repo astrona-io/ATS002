@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: stages the build folder with the web page to pack into the image
 # and pulls the base image, so the build does not depend on a slow download.
 
@@ -13,3 +15,4 @@ sudo tee /opt/course/25/build/index.html >/dev/null <<'HTML'
 HTML
 sudo chmod 0777 /opt/course/25/build
 sudo chmod 0644 /opt/course/25/build/index.html
+ASTRONA_STUDENT_SCRIPT

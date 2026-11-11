@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the fstab typo on the stand-in "data-001" disk was actually
 # fixed. Runs entirely from the primary VM, outside of any chroot --
 # mounts the stand-in disk's root partition read-only and checks its
@@ -61,3 +63,4 @@ fi
 
 echo "PASS: /etc/fstab on the data-001 stand-in disk now references the correct UUID ($REAL_UUID) for /data"
 exit 0
+ASTRONA_STUDENT_SCRIPT

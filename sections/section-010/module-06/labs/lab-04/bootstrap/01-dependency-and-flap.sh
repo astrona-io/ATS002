@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: a two-unit chain where the *upstream* unit is the real fault,
 # plus a restart flap on the downstream unit.
 #
@@ -78,3 +80,4 @@ systemctl daemon-reload
 # Deliberately NOT enabled. Start ingest to drive it into the flap/failed state.
 systemctl start ingest.service || true
 sleep 8   # let it trip start-limit-hit
+ASTRONA_STUDENT_SCRIPT

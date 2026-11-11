@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms status-web is attached to the user-defined network status-net.
 
 set -u
@@ -16,3 +18,4 @@ fi
 
 echo "PASS: status-web is on the network status-net"
 exit 0
+ASTRONA_STUDENT_SCRIPT

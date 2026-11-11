@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Simulates a real, unattended RPM database corruption inside rpmbox: a
 # disk-full/interrupted-write style truncation-plus-overwrite of the actual
 # sqlite-backed rpmdb file Rocky Linux 9 uses. RHEL 9 / Rocky 9 default to
@@ -47,3 +49,4 @@ echo "Confirming the database is now genuinely broken (expect an error below -- 
 sudo docker exec rpmbox rpm -qa 2>&1 | tail -5
 
 echo "rpmbox's RPM database is now corrupted. Installed package files are untouched. This is the student's diagnose-and-repair task."
+ASTRONA_STUDENT_SCRIPT

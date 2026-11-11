@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms frontend_v1 was stopped (not removed) via docker stop.
 
 set -u
@@ -17,3 +19,4 @@ fi
 
 echo "PASS: frontend_v1 is stopped (status=$state)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

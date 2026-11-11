@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms metrics-shipper-1.4.0-1.x86_64 is installed inside rpmbox and
 # its files verify clean against what was recorded at install time.
 
@@ -28,3 +30,4 @@ fi
 
 echo "PASS: $nvr is installed inside rpmbox and verifies clean"
 exit 0
+ASTRONA_STUDENT_SCRIPT

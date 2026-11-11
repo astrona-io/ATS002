@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 set -euo pipefail
 
 if ! id pilot >/dev/null 2>&1; then
@@ -14,3 +16,4 @@ if ! grep -q '^pilot:' /etc/subgid; then
 fi
 
 sudo loginctl disable-linger pilot || true
+ASTRONA_STUDENT_SCRIPT

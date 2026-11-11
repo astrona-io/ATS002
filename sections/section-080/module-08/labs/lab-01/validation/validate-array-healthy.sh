@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms /dev/md/cargo is clean with two active devices and none failed.
 
 set -u
@@ -32,3 +34,4 @@ fi
 
 echo "PASS: $ARRAY is clean with two active devices"
 exit 0
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms reportd.service was genuinely repaired:
 #   - active (running) now
 #   - enabled for boot
@@ -30,3 +32,4 @@ after="$(wc -l < "$log")"
 
 echo "PASS: reportd.service is active, enabled, and writing heartbeats (ExecStart -> $exec_path)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

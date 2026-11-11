@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds a small, REAL logship-agent-2.1.0-1 RPM inside rpmbox using
 # rpmbuild against a real, trivial spec file, and stages the built package
 # at /home/candidate/downloads/logship-agent-2.1.0-1.x86_64.rpm INSIDE the
@@ -62,3 +64,4 @@ echo "Confirming the staged RPM is present..."
 sudo docker exec rpmbox ls -l /home/candidate/downloads/logship-agent-2.1.0-1.x86_64.rpm
 
 echo "logship-agent RPM staged. It is NOT installed yet -- that is the student's task."
+ASTRONA_STUDENT_SCRIPT

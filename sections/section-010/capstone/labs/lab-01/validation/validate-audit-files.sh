@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms /opt/course/audit/kernel-release matches `uname -r` and
 # /opt/course/audit/vm-swappiness matches the live vm.swappiness value.
 
@@ -43,3 +45,4 @@ if [[ "$fail" -ne 0 ]]; then
 fi
 
 exit 0
+ASTRONA_STUDENT_SCRIPT

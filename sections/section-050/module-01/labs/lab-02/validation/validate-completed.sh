@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms curl is pinned to the noble release pocket:
 #   - a file under /etc/apt/preferences.d/ targets curl, pins on the
 #     release pocket (a=noble / o=Ubuntu with the release archive), and
@@ -40,3 +42,4 @@ echo "$src" | grep -qE 'noble-updates|noble-security' && fail "Candidate still c
 
 echo "PASS: curl is pinned to the noble release pocket (priority $prio); Candidate '$cand' from $src"
 exit 0
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: defensively ensures build-essential, git, cmake, and
 # pkg-config are not installed, regardless of what the base VM image
 # happens to carry (git in particular is commonly pre-installed on
@@ -16,3 +18,4 @@ for pkg in build-essential git cmake pkg-config; do
 done
 
 sudo apt-get autoremove -y
+ASTRONA_STUDENT_SCRIPT

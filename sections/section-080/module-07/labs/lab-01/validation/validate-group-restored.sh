@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms cargo_vg exists again on the spare disk and its physical volume
 # has the UUID recorded in the metadata backup.
 
@@ -40,3 +42,4 @@ fi
 
 echo "PASS: cargo_vg is back on the spare disk with the original physical volume UUID"
 exit 0
+ASTRONA_STUDENT_SCRIPT

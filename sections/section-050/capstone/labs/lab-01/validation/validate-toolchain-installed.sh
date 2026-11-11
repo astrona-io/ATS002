@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms curl, git, and jq are all cleanly installed.
 
 set -u
@@ -19,3 +21,4 @@ fi
 
 echo "PASS: curl, git, and jq are all installed"
 exit 0
+ASTRONA_STUDENT_SCRIPT

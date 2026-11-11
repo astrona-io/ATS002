@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: seeds the two running containers the scenario describes.
 # frontend_v1 exists only to be stopped. frontend_v2 carries a real bridge
 # IP address and exactly one bind-mounted volume, so its metadata has
@@ -17,3 +19,4 @@ sudo docker run -d \
   --name frontend_v2 \
   -v /opt/frontend_v2/html:/usr/share/nginx/html \
   nginx:alpine
+ASTRONA_STUDENT_SCRIPT

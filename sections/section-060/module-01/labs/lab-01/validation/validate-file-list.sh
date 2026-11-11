@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms logship-agent's recorded file list contains its binary and
 # config file inside rpmbox.
 
@@ -24,3 +26,4 @@ fi
 
 echo "PASS: logship-agent owns /usr/bin/logship-agent and /etc/logship-agent/agent.conf"
 exit 0
+ASTRONA_STUDENT_SCRIPT

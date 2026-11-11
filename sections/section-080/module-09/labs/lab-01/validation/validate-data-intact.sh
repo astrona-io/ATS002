@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the first MiB of the suspect disk still has its original hash,
 # which proves the scan did not write to it.
 
@@ -27,3 +29,4 @@ fi
 
 echo "PASS: the data on the suspect disk is intact"
 exit 0
+ASTRONA_STUDENT_SCRIPT

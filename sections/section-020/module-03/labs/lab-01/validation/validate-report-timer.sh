@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the report.timer / report.service pair:
 #   - both units exist
 #   - report.timer is enabled (survives reboot) and active
@@ -37,3 +39,4 @@ echo "$es" | grep -q '/usr/local/sbin/report.sh' || fail "report.service ExecSta
 
 echo "PASS: report.timer is enabled+active, Persistent, OnCalendar='$cal', activating report.service"
 exit 0
+ASTRONA_STUDENT_SCRIPT

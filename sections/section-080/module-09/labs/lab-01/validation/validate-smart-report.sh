@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms smart.txt holds the output of smartctl.
 
 set -u
@@ -17,3 +19,4 @@ fi
 
 echo "PASS: smart.txt holds smartctl output"
 exit 0
+ASTRONA_STUDENT_SCRIPT

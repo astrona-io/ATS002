@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 set -u
 
 if ! sudo docker ps --format '{{.Names}}' | grep -qx zypperbox; then
@@ -36,3 +38,4 @@ fi
 
 echo "PASS: /root/answers/04-installed-python3.txt lists python3-base and python3-pip via a filtered installed-only search"
 exit 0
+ASTRONA_STUDENT_SCRIPT

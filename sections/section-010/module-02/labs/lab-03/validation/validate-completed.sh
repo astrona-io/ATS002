@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Diagnosis variant: only the unit's TasksMax= was the clamp. Confirms:
 #   - data-ingest.service TasksMax is raised (infinity or >= 65536) AND
 #     applied to the RUNNING unit (systemctl show reflects it live)
@@ -32,3 +34,4 @@ student_lim="$(grep -rlE '^\s*dataproc\s+(soft|hard)\s+nproc' /etc/security/limi
 
 echo "PASS: only TasksMax was raised (now $tm, applied live); pid_max ($pidmax) and ulimit -u ($ul) correctly left as-is"
 exit 0
+ASTRONA_STUDENT_SCRIPT

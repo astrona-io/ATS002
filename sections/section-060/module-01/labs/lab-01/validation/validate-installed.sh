@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms logship-agent-2.1.0-1.x86_64 is installed inside rpmbox.
 
 set -u
@@ -18,3 +20,4 @@ fi
 
 echo "PASS: $nvr is installed inside rpmbox"
 exit 0
+ASTRONA_STUDENT_SCRIPT

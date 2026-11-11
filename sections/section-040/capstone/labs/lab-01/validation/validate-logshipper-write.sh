@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 set -u
 
 if ! grep -rq "/srv/shiplogs" /etc/apparmor.d/usr.sbin.logshipper /etc/apparmor.d/local/usr.sbin.logshipper 2>/dev/null; then
@@ -22,3 +24,4 @@ fi
 
 echo "PASS: logshipper is actively and successfully writing to /srv/shiplogs"
 exit 0
+ASTRONA_STUDENT_SCRIPT

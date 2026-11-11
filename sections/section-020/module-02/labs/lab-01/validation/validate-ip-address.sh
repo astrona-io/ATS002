@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks /opt/course/11/ip-address against frontend_v2's actual assigned
 # IP address (default-bridge field, falling back to the per-network map).
 
@@ -31,3 +33,4 @@ else
   echo "FAIL: ip-address - $path = '$actual', expected '$expected'"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

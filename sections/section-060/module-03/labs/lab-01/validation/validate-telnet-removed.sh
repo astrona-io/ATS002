@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms telnet has been fully removed inside rpmbox.
 
 set -u
@@ -10,3 +12,4 @@ fi
 
 echo "PASS: telnet is not installed inside rpmbox"
 exit 0
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for the kernel-modules playground. This host is a real qemu VM
 # with its own kernel, so modprobe genuinely loads modules. Nothing is
 # loaded or configured here — that is what you explore. No task, no grading.
@@ -16,3 +18,4 @@ echo "[playground] dummy module available: $(modinfo -n dummy 2>/dev/null || ech
 
 echo "[playground] kernel-modules-lab: ready. Nothing is loaded."
 echo "[playground] try:  lsmod | head  ;  modinfo -p dummy  ;  sudo modprobe dummy numdummies=2"
+ASTRONA_STUDENT_SCRIPT

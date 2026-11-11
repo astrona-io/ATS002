@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds a small, REAL metrics-shipper-1.4.0-1 RPM inside rpmbox using
 # rpmbuild against a real, trivial spec file (same technique as
 # lab-061/bootstrap/02-build-logship-agent.sh), and stages the built
@@ -66,3 +68,4 @@ echo "Confirming the staged RPM is present..."
 sudo docker exec rpmbox ls -l /home/candidate/downloads/metrics-shipper-1.4.0-1.x86_64.rpm
 
 echo "metrics-shipper RPM staged. It is NOT installed yet -- that is part of the student's task."
+ASTRONA_STUDENT_SCRIPT

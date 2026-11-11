@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the disposable "data-001" stand-in disk for lab-082.
 #
 # Same safety rationale as lab-081: this VM's own root filesystem and
@@ -75,3 +77,4 @@ sudo rmdir "$BUILD"
 echo "lab-082 bootstrap complete. data-001 root filesystem: $BASEDEV (root account locked)"
 
 exit 0
+ASTRONA_STUDENT_SCRIPT

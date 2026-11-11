@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the dbclean cron job was converted to a systemd timer:
 #   - no cron entry for dbclean.sh remains anywhere
 #   - a timer exists, is enabled + active, activates a service that runs
@@ -42,3 +44,4 @@ fi
 
 echo "PASS: dbclean cron job removed and replaced by $found -> $FOUND_SVC, enabled+active, ~6-hourly"
 exit 0
+ASTRONA_STUDENT_SCRIPT

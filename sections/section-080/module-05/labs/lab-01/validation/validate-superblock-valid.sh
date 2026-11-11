@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the partition on the spare disk has a readable ext4 superblock again.
 
 set -u
@@ -31,3 +33,4 @@ fi
 
 echo "PASS: $P1 has a readable ext4 superblock again"
 exit 0
+ASTRONA_STUDENT_SCRIPT

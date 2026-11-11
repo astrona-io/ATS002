@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms a non-empty sgdisk partition-table backup file was created at
 # the path the lab instructs (/root/vdc-ptable-backup.bin), proving the
 # student actually took a backup before touching anything, per the
@@ -21,3 +23,4 @@ fi
 
 echo "PASS: $BACKUP exists and is non-empty ($SIZE bytes)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

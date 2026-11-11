@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap for lab-033: "persistent vs. transient" recovery scenario.
 #
 # Installs libvirt/QEMU tooling, ensures libvirtd + its default NAT network
@@ -80,3 +82,4 @@ sudo virsh create /root/metrics-cache.xml
 
 sudo virsh list --all
 sudo virsh dominfo metrics-cache || true
+ASTRONA_STUDENT_SCRIPT

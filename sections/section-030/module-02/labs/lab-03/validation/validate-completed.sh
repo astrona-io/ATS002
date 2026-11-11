@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms 'web-db' was reconfigured to 2048 MiB / 2 vCPU PERSISTENTLY:
 #   - Persistent: yes
 #   - the inactive (on-disk) config has <memory> and <currentMemory> at
@@ -55,3 +57,4 @@ echo "$inact" | grep -q "web-db.qcow2" \
 
 echo "PASS: '$DOMAIN' reconfigured to 2048 MiB / 2 vCPU in the persistent config and running with it; disk and network untouched"
 exit 0
+ASTRONA_STUDENT_SCRIPT

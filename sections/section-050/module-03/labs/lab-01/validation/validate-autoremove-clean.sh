@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms no orphaned auto-installed packages remain -- 'apt autoremove'
 # was run as a deliberate follow-up after the purge.
 
@@ -14,3 +16,4 @@ fi
 
 echo "PASS: no orphaned auto-installed packages remain"
 exit 0
+ASTRONA_STUDENT_SCRIPT

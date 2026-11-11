@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: starts telemetry-agent.service as a long-running unit that is
 # genuinely, deliberately hung -- blocked forever inside the pause() libc/
 # syscall, waiting on a signal that will never arrive. This gives an
@@ -55,3 +57,4 @@ EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now telemetry-agent.service
+ASTRONA_STUDENT_SCRIPT

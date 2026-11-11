@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the hung telemetry-agent process (stuck in pause()) has been
 # terminated and, since the unit has no Restart=, has stayed dead.
 
@@ -11,3 +13,4 @@ fi
 
 echo "PASS: telemetry-agent is terminated and not running"
 exit 0
+ASTRONA_STUDENT_SCRIPT

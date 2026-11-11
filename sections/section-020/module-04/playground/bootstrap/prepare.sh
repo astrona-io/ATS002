@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND: One-Shot And Missed Jobs.
 #
 # Installs at and anacron, starts atd, creates the user ops-monitor and
@@ -25,3 +27,4 @@ sudo chmod 0755 /usr/local/sbin/archive-logs.sh
 sudo rm -f /etc/cron.allow /etc/cron.deny
 
 echo "[playground] at-anacron-bay: ready. Try: echo date | at now + 2 minutes"
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Diagnosis variant: only ulimit -u was the clamp. Confirms:
 #   - dataproc's ulimit -u is raised (>= 32768) for a fresh session AND
 #     persisted via a student-added /etc/security/limits.d/ drop-in
@@ -36,3 +38,4 @@ tm="$(systemctl show data-ingest.service -p TasksMax --value 2>/dev/null || true
 
 echo "PASS: only ulimit -u was raised (now $actual); pid_max ($pidmax) and TasksMax ($tm) correctly left as-is"
 exit 0
+ASTRONA_STUDENT_SCRIPT

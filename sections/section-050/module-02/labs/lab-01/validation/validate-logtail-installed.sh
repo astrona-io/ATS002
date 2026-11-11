@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms logtail-utils is cleanly installed (status: install ok
 # installed) and that /usr/bin/logtail actually landed on disk and is
 # executable.
@@ -19,3 +21,4 @@ fi
 
 echo "PASS: logtail-utils is cleanly installed and /usr/bin/logtail is present and executable"
 exit 0
+ASTRONA_STUDENT_SCRIPT

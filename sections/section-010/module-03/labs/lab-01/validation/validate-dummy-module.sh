@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the dummy module is loaded live with numdummies=2, and that both
 # the load and the parameter are persisted for future boots.
 
@@ -27,3 +29,4 @@ fi
 
 echo "PASS: dummy module is loaded with numdummies=2 and persisted via modules-load.d/modprobe.d"
 exit 0
+ASTRONA_STUDENT_SCRIPT

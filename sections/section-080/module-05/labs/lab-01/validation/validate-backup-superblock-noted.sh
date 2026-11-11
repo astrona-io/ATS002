@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the student recorded which backup superblock they used.
 # With 4096-byte blocks on a filesystem this size the backups are at
 # 32768, 98304, 163840 and 229376.
@@ -24,3 +26,4 @@ case "$VALUE" in
     exit 1
     ;;
 esac
+ASTRONA_STUDENT_SCRIPT

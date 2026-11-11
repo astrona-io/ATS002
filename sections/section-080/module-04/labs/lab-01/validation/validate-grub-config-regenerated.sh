@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
-# Confirms /boot/grub/grub.cfg on the primary disk was actually
-# regenerated. Runs entirely from the live SSH session -- no reboot
-# needed or attempted. Checks not just that the file exists and is
-# non-empty with real menuentry lines, but that its mtime postdates the
-# timestamp marker bootstrap recorded before removing it, proving the
-# file was genuinely rebuilt during this session rather than somehow
-# still being present from before bootstrap ran.
-
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 set -u
 
 GRUB_CFG=/boot/grub/grub.cfg
@@ -44,3 +38,4 @@ fi
 
 echo "PASS: $GRUB_CFG exists, is non-empty, contains $MENUENTRIES menuentry line(s), and was regenerated after bootstrap"
 exit 0
+ASTRONA_STUDENT_SCRIPT

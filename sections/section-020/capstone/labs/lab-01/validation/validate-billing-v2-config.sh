@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms billing_v2 is running, detached, image nginx:alpine, memory
 # limit 64m (67108864 bytes), and port map 9090(host) -> 80(container).
 
@@ -36,3 +38,4 @@ fi
 
 echo "PASS: billing_v2 is running, image=$image, memory=$mem bytes, ports=$port_map"
 exit 0
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms pcspkr is blacklisted, currently unloaded, and stays absent after
 # a simulated hardware re-detection pass (udevadm trigger).
 
@@ -24,3 +26,4 @@ fi
 
 echo "PASS: pcspkr is blacklisted, unloaded, and stays absent after re-triggered hardware detection"
 exit 0
+ASTRONA_STUDENT_SCRIPT

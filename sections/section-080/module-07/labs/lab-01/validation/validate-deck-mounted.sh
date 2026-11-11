@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the deck is mounted at /srv/deck and the original files are
 # still there with their original content.
 
@@ -32,3 +34,4 @@ fi
 
 echo "PASS: the deck is mounted at $MOUNT_POINT and both original files are intact"
 exit 0
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: a service that will not start because its ExecStart= names a
 # path that does not exist.
 #
@@ -49,3 +51,4 @@ systemctl daemon-reload
 systemctl enable reportd.service
 # Attempt to start it so it is already in the failed state on login.
 systemctl start reportd.service || true
+ASTRONA_STUDENT_SCRIPT

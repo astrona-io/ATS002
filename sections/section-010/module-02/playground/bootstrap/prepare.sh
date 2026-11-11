@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for the process-limits playground. Gives each of the three
 # ceilings something concrete to look at. No task, no grading.
 set -eu
@@ -29,3 +31,4 @@ sudo systemctl enable --now data-ingest.service
 
 echo "[playground] process-limits-ceilings: ready."
 echo "[playground] try:  sysctl -n kernel.pid_max  ;  ulimit -u  ;  systemctl show data-ingest.service -p TasksMax -p TasksCurrent"
+ASTRONA_STUDENT_SCRIPT

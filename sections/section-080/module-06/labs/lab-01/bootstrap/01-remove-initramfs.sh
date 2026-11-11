@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the STARTING state for lab-087: the initramfs image of the running
 # kernel is deleted from /boot. The machine keeps running (the kernel is
 # already in memory), so it stays reachable over SSH. Nothing reboots it.
@@ -19,3 +21,4 @@ date +%s | sudo tee /root/.lab087-start >/dev/null
 
 sudo rm -f "$INITRD"
 sync
+ASTRONA_STUDENT_SCRIPT

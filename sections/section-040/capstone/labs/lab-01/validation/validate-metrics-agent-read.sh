@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 set -u
 
 if ! grep -rq "/etc/metrics-agent/remote.conf" /etc/apparmor.d/usr.sbin.metrics-agent /etc/apparmor.d/local/usr.sbin.metrics-agent 2>/dev/null; then
@@ -27,3 +29,4 @@ fi
 
 echo "PASS: metrics-agent is actively and successfully reading /etc/metrics-agent/remote.conf"
 exit 0
+ASTRONA_STUDENT_SCRIPT

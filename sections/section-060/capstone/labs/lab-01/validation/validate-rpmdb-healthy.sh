@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms rpm -qa inside rpmbox completes cleanly (no database errors) and
 # returns a plausible, non-trivial package count -- proving the corrupted
 # database from bootstrap was genuinely repaired.
@@ -28,3 +30,4 @@ fi
 
 echo "PASS: rpm -qa is clean and returned $count packages"
 exit 0
+ASTRONA_STUDENT_SCRIPT

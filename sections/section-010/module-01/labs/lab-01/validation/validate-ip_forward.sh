@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks /opt/course/ip_forward equals 1 (bootstrap sets net.ipv4.ip_forward=1)
 
 set -u
@@ -20,3 +22,4 @@ else
   echo "FAIL: ip_forward - $path = '$actual', expected '$expected'"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

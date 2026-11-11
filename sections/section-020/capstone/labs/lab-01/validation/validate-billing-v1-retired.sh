@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the decommissioned billing_v1 container was fully retired
 # (stopped AND removed), not just stopped - it was squatting on the port
 # billing_v2 needs, so a merely-stopped container would still be wrong.
@@ -12,3 +14,4 @@ fi
 
 echo "PASS: billing_v1 no longer exists"
 exit 0
+ASTRONA_STUDENT_SCRIPT

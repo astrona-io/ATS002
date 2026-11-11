@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 set -eu
 
 # Start the long-lived openSUSE Leap 15.6 sandbox container, if not already running.
@@ -30,3 +32,4 @@ sudo docker exec zypperbox zypper --non-interactive install python3-base python3
 # Pre-create the directory the question asks the student to save each
 # research finding into.
 sudo docker exec zypperbox mkdir -p /root/answers
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Diagnosis variant of the process-limits lab: of the three independent
 # ceilings, only ONE is actually clamping the dataproc workload.
 #
@@ -56,3 +58,4 @@ EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now data-ingest.service
+ASTRONA_STUDENT_SCRIPT
