@@ -1,0 +1,13 @@
+{
+  "initial_failures": {
+    "default/verify-partition-table-restored": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}

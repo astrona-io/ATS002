@@ -1,0 +1,10 @@
+{
+  "initial_failures": {
+    "default/verify-rpmdb-queryable": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ]
+}
