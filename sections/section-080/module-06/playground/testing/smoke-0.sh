@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -euo pipefail
+for tool in lsblk blkid mount; do command -v "$tool"; done
