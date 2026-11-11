@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+sudo -n bash <<'BOOTSTRAP_ROOT'
 # Bootstrap: two units want TCP 8080. portsquatter.service grabs it first
 # (a plain listener that does nothing useful); webreport.service - the one
 # that actually matters - then fails to bind:
@@ -56,4 +57,5 @@ systemctl enable --now portsquatter.service
 sleep 1
 systemctl enable webreport.service
 systemctl start webreport.service || true
+BOOTSTRAP_ROOT
 ASTRONA_STUDENT_SCRIPT
