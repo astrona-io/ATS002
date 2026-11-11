@@ -22,7 +22,7 @@ runtime:
 bootstrap:
   init:
     - name: "lab-072-zypperbox-setup"
-      description: "Installs Docker on the Ubuntu host, starts the zypperbox openSUSE Leap 15.6 container, seeds python3-base/python3-pip as installed, and pre-creates /root/answers for the student's research findings"
+      description: "Installs Docker on the Ubuntu host, starts the zypperbox openSUSE Leap 16.0 container, seeds python3-base/python3-pip as installed, and pre-creates /root/answers for the student's research findings"
       type: "folder"
       source: "bootstrap/"
 

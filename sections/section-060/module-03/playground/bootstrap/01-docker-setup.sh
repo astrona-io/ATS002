@@ -36,6 +36,8 @@ done
 
 echo "Refreshing dnf repo metadata inside rpmbox..."
 sudo docker exec rpmbox dnf -y makecache
+# Keep undo transactions independent of obsolete packages in the container image.
+sudo docker exec rpmbox dnf -y upgrade
 
 echo "rpmbox is ready."
 ASTRONA_STUDENT_SCRIPT

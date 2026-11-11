@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms automake -- pre-installed independently of the Development
 # Tools group, before the student ever touched it -- survived the group
 # removal. Proves the student understands (and dnf actually enforces)
@@ -17,4 +19,5 @@ fi
 
 echo "PASS: automake is still installed inside rpmbox after the group removal"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

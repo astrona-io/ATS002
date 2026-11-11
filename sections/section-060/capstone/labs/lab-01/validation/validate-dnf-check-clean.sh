@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms dnf's own transaction-check logic (dnf check) passes cleanly
 # inside rpmbox after the full incident: database rebuild, the standalone
 # RPM install, and the Development Tools group install.
@@ -18,4 +20,5 @@ fi
 
 echo "PASS: dnf check passed cleanly inside rpmbox"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

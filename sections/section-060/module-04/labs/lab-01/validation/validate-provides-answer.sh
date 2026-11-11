@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the student recorded the correct dnf provides result for the
 # `ip` command at /home/candidate/answers/provides.txt inside rpmbox --
 # the answer should point at the iproute package, and iproute should
@@ -35,4 +37,5 @@ fi
 
 echo "PASS: provides.txt correctly identifies iproute as providing the ip command"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

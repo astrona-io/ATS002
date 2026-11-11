@@ -45,7 +45,13 @@ This is not optional. It is your only way back if the rebuild does not go as exp
 ## Step 4: Rebuild the database
 
 ```bash
-sudo rpm --rebuilddb
+cp -a /var/lib/rpm /var/lib/rpm.damaged
+(cd /root/rpmdb-known-good && sha256sum -c /root/rpmdb-known-good.sha256)
+cp -a /root/rpmdb-known-good/. /var/lib/rpm/
+rm -f /var/lib/rpm/rpmdb.sqlite-wal /var/lib/rpm/rpmdb.sqlite-shm
+rpm --rebuilddb
+rpm -qa | LC_ALL=C sort > /root/rpm-packages-restored.txt
+diff -u /root/rpm-packages-before.txt /root/rpm-packages-restored.txt
 ```
 If a separate `rpmdb` command exists on this system (`command -v rpmdb`), this newer form does the same repair:
 ```bash
@@ -80,7 +86,7 @@ rpm -qa | grep -i "error\|rpmdb" | wc -l   # expect 0
 sudo dnf check                              # expect a clean exit
 ```
 
-The grader runs `rpm -qa` and `dnf check` inside `rpmbox`: both must succeed, `rpm -qa` must print no error text, and it must list at least 20 packages.
+The grader runs `rpm -qa` and `dnf check` inside `rpmbox`: both must succeed, `rpm -qa` must print no error text, and it must retain the complete pre-damage package inventory.
 
 From your own computer, not the lab machine, send the lab for grading:
 
@@ -88,4 +94,4 @@ From your own computer, not the lab machine, send the lab for grading:
 astrona submit -c sections/section-060/module-02/labs/lab-01
 ```
 
-Depending on how badly the damage hit, the rebuilt package count may come back slightly lower than before, if one record was really lost rather than only badly indexed. If you notice a specific package missing after the rebuild, `dnf reinstall <package>` restores it. `--rebuilddb` fixes indexes; it cannot bring back lost header data.
+The restored inventory must retain every original package record. An empty or partially rebuilt database is not a successful recovery, even if `dnf check` returns zero.

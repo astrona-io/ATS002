@@ -5,7 +5,7 @@ This is a **playground**, not a lab. The training ship starts clean, runs its se
 ## What is in the box
 
 - One Ubuntu 24.04 virtual machine. Open a terminal on it with `astrona ssh astro-zypper-everyday`.
-- Docker with a long-lived openSUSE Leap 15.6 container named `zypperbox`. Inside it `zypper`, the RPM database and the openSUSE repositories are all real. Open a shell in it with `docker exec -it zypperbox bash`.
+- Docker with a long-lived openSUSE Leap 16.0 container named `zypperbox`. Inside it `zypper`, the RPM database and the openSUSE repositories are all real. Open a shell in it with `docker exec -it zypperbox bash`.
 - The community `network:utilities` repository added inside `zypperbox`.
 - `telnet-server` installed. `fail2ban` not installed.
 

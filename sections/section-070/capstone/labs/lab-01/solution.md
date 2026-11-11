@@ -1,6 +1,6 @@
 # Solution Guide: Zypper Research-Then-Act Capstone
 
-This capstone joins the two halves of `zypper` work: research a package thoroughly before you touch the system, then act on that research with real patch, install and remove operations. Everything runs inside the real openSUSE Leap 15.6 `zypperbox` container. The grader reads the three files in `/root/answers` and checks which packages are installed.
+This capstone joins the two halves of `zypper` work: research a package thoroughly before you touch the system, then act on that research with real patch, install and remove operations. Everything runs inside the real openSUSE Leap 16.0 `zypperbox` container. The grader reads the three files in `/root/answers` and checks which packages are installed.
 
 ---
 

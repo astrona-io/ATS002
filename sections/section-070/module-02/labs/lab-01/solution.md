@@ -1,6 +1,6 @@
 # Solution Guide: Zypper Package Information Lookup
 
-This guide walks through four real `zypper` research tasks inside the `zypperbox` openSUSE Leap 15.6 container. Nothing is installed, removed or changed along the way: every command here only reads. The grader reads the four files in `/root/answers` and checks that `nginx` is still not installed.
+This guide walks through four real `zypper` research tasks inside the `zypperbox` openSUSE Leap 16.0 container. Nothing is installed, removed or changed along the way: every command here only reads. The grader reads the four files in `/root/answers` and checks that `nginx` is still not installed.
 
 ---
 

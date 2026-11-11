@@ -10,7 +10,7 @@ docker exec -it zypperbox bash
 
 Every `zypper` command below runs inside that shell. The Ubuntu host itself has no `zypper` installed.
 
-You are running a routine maintenance pass on an openSUSE Leap 15.6 host (the `zypperbox` container). This host follows a conservative, security-focused update policy: apply reviewed security patches promptly, but do not chase every routine package version bump.
+You are running a routine maintenance pass on an openSUSE Leap 16.0 host (the `zypperbox` container). This host follows a conservative, security-focused update policy: apply reviewed security patches promptly, but do not chase every routine package version bump.
 
 1. Refresh the repository metadata.
 2. Report which raw package updates are currently available and, separately, which patches are currently available. These are two different questions, and the policy review needs both answered before anything is applied.

@@ -3,9 +3,9 @@
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 set -eu
 
-# Start the long-lived openSUSE Leap 15.6 sandbox container, if not already running.
+# Start the long-lived openSUSE Leap 16.0 sandbox container, if not already running.
 if ! sudo docker ps -a --format '{{.Names}}' | grep -qx zypperbox; then
-  sudo docker run -d --name zypperbox --privileged opensuse/leap:15.6 sleep infinity
+  sudo docker run -d --name zypperbox --privileged opensuse/leap:16.0 sleep infinity
 fi
 
 # Wait for the container to actually be up before exec'ing into it.
@@ -27,7 +27,7 @@ sudo docker exec zypperbox zypper --non-interactive --gpg-auto-import-keys refre
 # module-01's lab-071 setup.
 if ! sudo docker exec zypperbox zypper lr | grep -qi network-utilities; then
   sudo docker exec zypperbox zypper --non-interactive addrepo --refresh \
-    "https://download.opensuse.org/repositories/network:/utilities/15.6/" \
+    "https://download.opensuse.org/repositories/network:/utilities/16.0/" \
     network-utilities
 fi
 sudo docker exec zypperbox zypper --non-interactive --gpg-auto-import-keys refresh

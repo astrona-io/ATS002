@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms rpm -qa inside rpmbox completes cleanly (no database errors) and
 # returns a plausible, non-trivial package count -- proving the corrupted
 # database from bootstrap was genuinely repaired.
@@ -28,6 +30,19 @@ if [[ "$count" -lt 20 ]]; then
   exit 1
 fi
 
+if ! sudo docker exec rpmbox bash -c '
+  set -euo pipefail
+  current=$(mktemp)
+  trap '''rm -f "$current"''' EXIT
+  rpm -qa | LC_ALL=C sort > "$current"
+  missing=$(LC_ALL=C comm -23 /root/rpm-packages-before.txt "$current")
+  test -z "$missing" || { printf "Missing records:\n%s\n" "$missing"; exit 1; }
+'; then
+  echo "FAIL: rpmdb inventory is missing original package records"
+  exit 1
+fi
+
 echo "PASS: rpm -qa is clean and returned $count packages"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

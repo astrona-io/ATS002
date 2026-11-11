@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms `rpm -V logship-agent` reports a clean verify (no output) inside
 # rpmbox -- proving the installed files still match what rpm recorded at
 # install time.
@@ -24,4 +26,5 @@ fi
 
 echo "PASS: rpm -V logship-agent is clean"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

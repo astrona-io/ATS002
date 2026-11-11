@@ -21,7 +21,7 @@ echo "Writing the logship-agent spec file inside rpmbox..."
 sudo docker exec -i rpmbox bash -c 'cat > /root/rpmbuild/SPECS/logship-agent.spec' <<'SPEC'
 Name:           logship-agent
 Version:        2.1.0
-Release:        1%{?dist}
+Release:        1
 Summary:        Internal log-shipping monitoring agent
 License:        Proprietary
 BuildArch:      x86_64

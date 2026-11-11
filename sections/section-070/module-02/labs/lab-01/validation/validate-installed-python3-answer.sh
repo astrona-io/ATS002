@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 set -u
 
 if ! sudo docker ps --format '{{.Names}}' | grep -qx zypperbox; then
@@ -18,12 +20,12 @@ fi
 # Both seeded packages should appear, each marked installed ('i') in
 # zypper's leading status column. Allow for zypper's normal column padding
 # rather than requiring an exact fixed-width match.
-if ! echo "$answer" | grep -E '^i[[:space:]]*\|[[:space:]]*python3-base'; then
+if ! echo "$answer" | grep -E '^i[+]?[[:space:]]*\|[[:space:]]*python3-base'; then
   echo "FAIL: /root/answers/04-installed-python3.txt does not list python3-base as installed"
   exit 1
 fi
 
-if ! echo "$answer" | grep -E '^i[[:space:]]*\|[[:space:]]*python3-pip'; then
+if ! echo "$answer" | grep -E '^i[+]?[[:space:]]*\|[[:space:]]*python3-pip'; then
   echo "FAIL: /root/answers/04-installed-python3.txt does not list python3-pip as installed"
   exit 1
 fi
@@ -38,4 +40,5 @@ fi
 
 echo "PASS: /root/answers/04-installed-python3.txt lists python3-base and python3-pip via a filtered installed-only search"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

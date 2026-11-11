@@ -24,7 +24,7 @@ echo "Writing the metrics-shipper spec file inside rpmbox..."
 sudo docker exec -i rpmbox bash -c 'cat > /root/rpmbuild/SPECS/metrics-shipper.spec' <<'SPEC'
 Name:           metrics-shipper
 Version:        1.4.0
-Release:        1%{?dist}
+Release:        1
 Summary:        Internal metrics-shipping monitoring agent
 License:        Proprietary
 BuildArch:      x86_64

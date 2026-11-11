@@ -22,6 +22,15 @@ sudo docker exec rpmbox ls -la /var/lib/rpm
 echo "Pre-corruption package count (bootstrap log only, not shown to the student):"
 sudo docker exec rpmbox rpm -qa | wc -l
 
+# No package transaction runs while taking this lab snapshot.
+sudo docker exec rpmbox bash -c '
+  set -eu
+  rpm --rebuilddb
+  cp -a /var/lib/rpm /root/rpmdb-known-good
+  rpm -qa | LC_ALL=C sort > /root/rpm-packages-before.txt
+  cd /root/rpmdb-known-good
+  sha256sum rpmdb.sqlite > /root/rpmdb-known-good.sha256
+'
 echo "Corrupting /var/lib/rpm/rpmdb.sqlite inside rpmbox..."
 sudo docker exec rpmbox bash -c '
   set -eu
@@ -30,10 +39,7 @@ sudo docker exec rpmbox bash -c '
 
   # Overwrite a chunk of real page data roughly 40% into the file with
   # random bytes. We deliberately never touch the first 4KB (the sqlite
-  # file header + master schema page), so the file is still recognized as
-  # a sqlite database and enough of it remains readable for
-  # rpm --rebuilddb to salvage what it can -- this mirrors a real
-  # interrupted-write event, not a total wipe.
+  # file header + master schema page). Recovery requires the saved snapshot.
   offset=$(( size * 40 / 100 ))
   dd if=/dev/urandom of="$f" bs=1024 seek=$(( offset / 1024 )) count=64 conv=notrunc status=none
 

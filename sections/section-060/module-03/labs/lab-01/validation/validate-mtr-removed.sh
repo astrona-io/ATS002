@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms mtr (the package deliberately bundled into the fail2ban install
 # to simulate a colleague's mistake) is NOT installed -- proving the
 # student actually found the mixed transaction and undid it with
@@ -16,4 +18,5 @@ fi
 
 echo "PASS: mtr is not installed inside rpmbox"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

@@ -10,7 +10,7 @@ docker exec -it zypperbox bash
 
 Every `zypper` command below runs inside that shell. The Ubuntu host itself has no `zypper` installed. A `/root/answers` directory already exists inside the container for you to save your research findings into.
 
-You are running a maintenance window on an openSUSE Leap 15.6 host (the `zypperbox` container) that follows a conservative, security-focused update policy. Two changes have been requested. Research each one before you act on it; do not guess package names.
+You are running a maintenance window on an openSUSE Leap 16.0 host (the `zypperbox` container) that follows a conservative, security-focused update policy. Two changes have been requested. Research each one before you act on it; do not guess package names.
 
 1. **Refresh metadata.** Start with `zypper refresh`, so every question below is answered from current data.
 

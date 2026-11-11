@@ -22,7 +22,7 @@ runtime:
 bootstrap:
   init:
     - name: "lab-070-zypperbox-setup"
-      description: "Installs Docker on the Ubuntu host, starts the zypperbox openSUSE Leap 15.6 container, adds the network-utilities repo, seeds telnet-server installed and fail2ban absent, and pre-creates /root/answers for the student's research findings"
+      description: "Installs Docker on the Ubuntu host, starts the zypperbox openSUSE Leap 16.0 container, adds the network-utilities repo, seeds telnet-server installed and fail2ban absent, and pre-creates /root/answers for the student's research findings"
       type: "folder"
       source: "bootstrap/"
 

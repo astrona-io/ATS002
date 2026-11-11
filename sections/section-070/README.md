@@ -4,7 +4,7 @@ Astronaut, welcome to the SUSE supply depots. Refreshing the catalogue, searchin
 
 ## How this section runs
 
-Every lab here starts one training ship: an Ubuntu 24.04 virtual machine, because that is the only system image the platform offers. There is no openSUSE image to boot. Instead, each lab installs Docker on the ship and runs a long-lived container from the real `opensuse/leap:15.6` image, called `zypperbox`. A container is a sealed pod docked to the ship: its own crew and files, sharing the ship's reactor.
+Every lab here starts one training ship: an Ubuntu 24.04 virtual machine, because that is the only system image the platform offers. There is no openSUSE image to boot. Instead, each lab installs Docker on the ship and runs a long-lived container from the real `opensuse/leap:16.0` image, called `zypperbox`. A container is a sealed pod docked to the ship: its own crew and files, sharing the ship's reactor.
 
 You do all your `zypper` work inside that pod:
 

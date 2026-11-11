@@ -39,3 +39,7 @@ When you are done, remove the lab:
 ```bash
 astrona destroy ats-002-lab-060
 ```
+
+## Recovery evidence
+
+The setup saved `/root/rpmdb-known-good`, its checksum file `/root/rpmdb-known-good.sha256`, and `/root/rpm-packages-before.txt` before the simulated damage. Preserve the damaged database, verify and restore this snapshot, then rebuild and check the package inventory. Rebuilding alone cannot recreate destroyed package headers.

@@ -15,7 +15,7 @@ The host machine itself runs Ubuntu 24.04, which has no `rpm`-family tools of it
 
 - Run `rpm -qa` and `dnf check` inside `rpmbox` and read the errors.
 - Make a copy of `/var/lib/rpm` before you change anything.
-- Rebuild with `rpm --rebuilddb`, then run `rpm -qa | wc -l` and `dnf check` again.
+- Verify `/root/rpmdb-known-good.sha256` from `/root/rpmdb-known-good`, restore that saved database, then run `rpm --rebuilddb` and `dnf check`. Compare `rpm -qa | LC_ALL=C sort` with `/root/rpm-packages-before.txt`; every original record must survive.
 - Run `rpm -V tree` to prove the files themselves were never harmed.
 
 ## When you are done

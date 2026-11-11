@@ -30,3 +30,7 @@ The grader checks:
 - Confirms dnf check inside rpmbox passes cleanly against the rebuilt database after all transactions.
 
 Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.
+
+## Recovery evidence
+
+The setup saved `/root/rpmdb-known-good`, its checksum file `/root/rpmdb-known-good.sha256`, and `/root/rpm-packages-before.txt` before the simulated damage. Preserve the damaged database, verify and restore this snapshot, then rebuild and check the package inventory. Rebuilding alone cannot recreate destroyed package headers.

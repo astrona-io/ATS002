@@ -2,7 +2,7 @@
 
 Welcome to a maintenance mission, astronaut. You will refresh an openSUSE host's catalogue, check updates and patches separately, apply only the patches, install one package, remove another, and read the history log that records it all.
 
-The training ship runs Ubuntu 24.04, which has no `zypper`. The setup starts Docker and runs a real openSUSE Leap 15.6 container called `zypperbox` on it, with `telnet-server` installed and `fail2ban` not installed. Inside that container, `zypper`, the RPM database and the openSUSE repositories are all real. Do all your work inside it:
+The training ship runs Ubuntu 24.04, which has no `zypper`. The setup starts Docker and runs a real openSUSE Leap 16.0 container called `zypperbox` on it, with `telnet-server` installed and `fail2ban` not installed. Inside that container, `zypper`, the RPM database and the openSUSE repositories are all real. Do all your work inside it:
 
 ```bash
 docker exec -it zypperbox bash

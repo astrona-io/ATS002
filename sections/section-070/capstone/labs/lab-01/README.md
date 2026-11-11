@@ -2,7 +2,7 @@
 
 Welcome to your final SUSE mission, astronaut. Two changes are waiting on an openSUSE host: one tool must be added and one package removed. You will research each change first, save what you found, apply only the reviewed patches, then act and read the history log.
 
-The training ship runs Ubuntu 24.04, which has no `zypper`. The setup starts Docker and runs a real openSUSE Leap 15.6 container called `zypperbox` on it. It adds the `network-utilities` repository, installs `telnet-server`, makes sure `fail2ban` is not installed, and creates an empty `/root/answers` directory. Do all your work inside the container:
+The training ship runs Ubuntu 24.04, which has no `zypper`. The setup starts Docker and runs a real openSUSE Leap 16.0 container called `zypperbox` on it. It adds the `network-utilities` repository, installs `telnet-server`, makes sure `fail2ban` is not installed, and creates an empty `/root/answers` directory. Do all your work inside the container:
 
 ```bash
 docker exec -it zypperbox bash

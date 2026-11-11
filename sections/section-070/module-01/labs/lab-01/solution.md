@@ -1,6 +1,6 @@
 # Solution Guide: Zypper Basic Package Operations
 
-This guide walks through a realistic maintenance pass with real `zypper` commands, run inside the `zypperbox` openSUSE Leap 15.6 container. The grader looks at the container's real state: whether `fail2ban` and `telnet-server` are installed, and what `/var/log/zypp/history` recorded.
+This guide walks through a realistic maintenance pass with real `zypper` commands, run inside the `zypperbox` openSUSE Leap 16.0 container. The grader looks at the container's real state: whether `fail2ban` and `telnet-server` are installed, and what `/var/log/zypp/history` recorded.
 
 ---
 

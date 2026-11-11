@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the "Development Tools" group shows as installed inside rpmbox,
 # with real core build tools (gcc, make) actually present -- proving the
 # group install landed real packages, not just a metadata label.
@@ -34,4 +36,5 @@ fi
 
 echo "PASS: Development Tools group is installed inside rpmbox with gcc and make present"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

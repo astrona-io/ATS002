@@ -22,7 +22,7 @@ questions:
     options:
       - id: a
         text: "The virtual machine itself is Ubuntu 24.04, not openSUSE — `zypper` only exists inside the `zypperbox` container. You need to run `docker exec -it zypperbox bash` first, then run zypper commands inside that shell."
-        explanation: "Correct. This lab's virtual machine boots from the platform's only available base image, Ubuntu 24.04, which has no zypper or openSUSE package database at all. To provide a genuine openSUSE experience anyway, bootstrap installs Docker and starts a long-lived `opensuse/leap:15.6` container named `zypperbox`. All zypper work happens inside that container, reached via `docker exec -it zypperbox bash` — not on the Ubuntu host directly."
+        explanation: "Correct. This lab's virtual machine boots from the platform's only available base image, Ubuntu 24.04, which has no zypper or openSUSE package database at all. To provide a genuine openSUSE experience anyway, bootstrap installs Docker and starts a long-lived `opensuse/leap:16.0` container named `zypperbox`. All zypper work happens inside that container, reached via `docker exec -it zypperbox bash` — not on the Ubuntu host directly."
       - id: b
         text: "The virtual machine's `zypper` program is corrupted and needs to be reinstalled with `apt`."
         explanation: "There is no zypper binary to corrupt on an Ubuntu host — it was never installed there in the first place, by design."
@@ -33,7 +33,7 @@ questions:
         text: "`zypper` must be prefixed with `sudo` for the shell to recognize it as a valid command."
         explanation: "`sudo` changes privilege level, not command lookup — a genuinely missing binary returns \"command not found\" regardless of `sudo`."
     correct_option: a
-    explanation: "Correct. This lab's virtual machine boots from the platform's only available base image, Ubuntu 24.04, which has no zypper or openSUSE package database at all. To provide a genuine openSUSE experience anyway, bootstrap installs Docker and starts a long-lived `opensuse/leap:15.6` container named `zypperbox`. All zypper work happens inside that container, reached via `docker exec -it zypperbox bash` — not on the Ubuntu host directly."
+    explanation: "Correct. This lab's virtual machine boots from the platform's only available base image, Ubuntu 24.04, which has no zypper or openSUSE package database at all. To provide a genuine openSUSE experience anyway, bootstrap installs Docker and starts a long-lived `opensuse/leap:16.0` container named `zypperbox`. All zypper work happens inside that container, reached via `docker exec -it zypperbox bash` — not on the Ubuntu host directly."
 
   - id: ats002-070-q02
     type: single_choice
@@ -72,8 +72,8 @@ questions:
         text: "Yes — after a refresh, both commands should always report identical results, so a mismatch indicates a stale cache."
         explanation: "A fresh refresh does not force these two structurally different reports to converge — they answer different questions by design."
       - id: b
-        text: "Yes — `list-patches` is deprecated in openSUSE Leap 15.6 and should never return results."
-        explanation: "`list-patches` is a fully supported, current subcommand on openSUSE Leap 15.6."
+        text: "Yes — `list-patches` is deprecated in openSUSE Leap 16.0 and should never return results."
+        explanation: "`list-patches` is a fully supported, current subcommand on openSUSE Leap 16.0."
       - id: c
         text: "No — `list-updates` reports every installed package with a newer version available (a raw version comparison), while `list-patches` reports only the curated, tracked patch bundles a maintainer has explicitly published; a package can have a newer version with no patch covering it yet, so the two lists legitimately differ."
         explanation: "Correct. These two commands answer genuinely different questions. `list-updates` is a straightforward package-by-package version comparison with no curation involved. `list-patches` lists SUSE's tracked patch objects — named bundles a repository maintainer explicitly assembled and classified by category and severity. A package appearing in one list without appearing in the other is expected behavior, not a malfunction."

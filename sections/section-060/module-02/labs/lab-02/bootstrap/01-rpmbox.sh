@@ -19,5 +19,7 @@ sudo docker run -d --name rpmbox --privileged rockylinux:9 sleep infinity
 
 for i in $(seq 1 30); do sudo docker exec rpmbox dnf --version >/dev/null 2>&1 && break; sleep 1; done
 sudo docker exec rpmbox dnf -y makecache
+# Keep undo transactions independent of obsolete packages in the container image.
+sudo docker exec rpmbox dnf -y upgrade
 echo "rpmbox is ready."
 ASTRONA_STUDENT_SCRIPT
