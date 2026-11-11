@@ -12,3 +12,14 @@ Your team wants APT to prefer the **release-pocket** version of `curl`. Use APT'
 Do not use `apt-mark hold`, and do not switch off the `noble-updates` repository.
 
 The grader checks that a file under `/etc/apt/preferences.d/` contains `Package: curl`, a `Pin: release a=noble` line and a `Pin-Priority:` greater than `500`, and that the Candidate in `apt-cache policy curl` comes from `noble/main`, not from `noble-updates` or `noble-security`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms an /etc/apt/preferences.d/ file pins curl to the noble release pocket at a priority above the default 500, and apt-cache policy shows the release-pocket version (not noble-updates) as the Candidate.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

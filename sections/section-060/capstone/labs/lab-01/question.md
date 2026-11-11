@@ -16,3 +16,17 @@ Astronaut, this ship was halfway through being set up overnight when a maintenan
 5. **Confirm everything landed.** Show that `metrics-shipper` is installed and its files verify clean against the install-time record, that `"Development Tools"` shows as an installed group with real build tools (such as `gcc` and `make`) present, and that `dnf check` reports the whole system consistent.
 
 The grader checks the end state inside `rpmbox`: `rpm -qa` succeeds with no error text and at least 20 packages; `metrics-shipper-1.4.0-1.x86_64` is installed and `rpm -V metrics-shipper` prints nothing; `"Development Tools"` shows as an installed group and `gcc` and `make` are installed; and `dnf check` succeeds.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../../module-01/course.md), [module-02](../../../module-02/course.md), [module-03](../../../module-03/course.md), [module-04](../../../module-04/course.md), [module-05](../../../module-05/course.md).
+
+The grader checks:
+
+- Confirms rpm -qa inside rpmbox completes cleanly with no database errors and a plausible package count.
+- Confirms metrics-shipper-1.4.0-1.x86_64 is installed inside rpmbox.
+- Confirms the Development Tools group is installed inside rpmbox, with gcc and make actually present.
+- Confirms dnf check inside rpmbox passes cleanly against the rebuilt database after all transactions.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

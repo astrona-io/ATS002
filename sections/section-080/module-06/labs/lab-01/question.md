@@ -14,3 +14,16 @@ The grader checks that:
 - `/boot/initrd.img-<running kernel>` exists, is not empty, and was created after the lab started
 - `lsinitramfs` can read it and it contains the initramfs boot scripts
 - `/boot/initrd.img` resolves to an existing file
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-06](../../course.md).
+
+The grader checks:
+
+- Confirms /boot/initrd.img-<running kernel> exists, is not empty and was created after the lab started.
+- Confirms lsinitramfs can read the image and it holds the initramfs boot scripts.
+- Confirms the /boot/initrd.img link resolves to an existing file.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

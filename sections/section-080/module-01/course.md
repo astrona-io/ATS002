@@ -51,3 +51,10 @@ Start the playground, then open a terminal on it with `astrona ssh astro-chroot-
 ## Why this matters
 
 A fstab mistake is one of the most common reasons a server will not come back after a reboot. The fix takes two minutes once you know the steps. Without them, people reinstall systems that only needed one character changed. The habit you build here, "prove it inside the chroot before you reboot", is the same one every other recovery task depends on.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Root-Filesystem Repair via chroot Lab](labs/lab-01/question.md): Mount a broken root filesystem and prepare it for chroot with bind mounts; Fix a mistyped UUID in /etc/fstab and prove it with mount -a; Unmount everything cleanly in reverse order.
+- [chroot Repair: Wrong fstab Filesystem Type Lab](labs/lab-02/question.md): Read a wrong fs type error from mount -a inside a chroot; Correct the filesystem type in /etc/fstab and prove it with mount -a.
+- [System Disaster Recovery Integration Capstone Lab](../capstone/labs/lab-01/question.md): Restore a wiped GPT table from a backup and prove the filesystems are intact; Reinstall GRUB and regenerate grub.cfg on the running machine.

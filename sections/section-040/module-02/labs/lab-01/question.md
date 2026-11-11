@@ -10,3 +10,14 @@ Allow 10–15 minutes for the tasks. The first image download and package instal
 4. Restart Apache. Verify that `/` returns `SELinux page ready` and `/probe` returns `SELinux backend ready` through `http://127.0.0.1:8888`. Reboot with `sudo reboot`, reconnect, and repeat both requests.
 
 The grader checks policy and real requests. CI also checks the result after a reboot. Disabling SELinux or making Apache permissive does not satisfy the task.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Checks policy, live labels, confinement, local page and backend requests.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

@@ -47,3 +47,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-passwor
 ## Why this matters
 
 Every administrator meets a locked-out machine sooner or later: an old server whose password nobody wrote down, or a test system where the only account was disabled. Knowing the one-boot edit turns a reinstall into a five-minute job. Knowing how `/etc/shadow` works means you can still finish the job when the usual `passwd` command is not available.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Password Reset & Single-User Recovery Lab](labs/lab-01/question.md): Enter a stand-in root filesystem with chroot; Write a new password hash into root's /etc/shadow line by hand.
+- [System Disaster Recovery Integration Capstone Lab](../capstone/labs/lab-01/question.md): Restore a wiped GPT table from a backup and prove the filesystems are intact; Reinstall GRUB and regenerate grub.cfg on the running machine.

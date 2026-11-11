@@ -18,3 +18,9 @@ You need a working shell and `sudo`. The playground contains Apache, a page at `
 2. [Booleans, ports and denials](course-02-booleans-ports-and-reading-denials.md)
 3. [Service repair lab](labs/lab-01/question.md)
 4. [Review](course-03-wrap-up.md)
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [SELinux Service Repair Lab](labs/lab-01/question.md): Make a file label last with semanage fcontext and restorecon; Turn on a boolean persistently with setsebool -P; Allow a new TCP port with semanage port.
+- [Two Services, Two Denials Capstone Lab](../capstone/labs/lab-01/question.md): Find and close a write denial and a read denial in two different profiles; Leave both profiles in enforce mode with no new denials.

@@ -44,3 +44,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-dnf-eve
 ## Why this matters
 
 Routine package maintenance is most of an administrator's package work. Doing it in the right order, and cleaning up after yourself, keeps a server predictable. When a transaction pulls in more than anyone wanted, `dnf history undo` puts the ship back exactly as it was, in one step.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [DNF Basic Package Operations Lab](labs/lab-01/question.md): List and apply upgrades, install and remove packages with dnf; Find a transaction in dnf history and undo it as one unit.
+- [RPM/DNF Package Management Capstone Lab](../capstone/labs/lab-01/question.md): Diagnose and repair a corrupted RPM database with a backup first; Inspect, install and verify a standalone .rpm file; Install a package group and prove the system is consistent with dnf check.

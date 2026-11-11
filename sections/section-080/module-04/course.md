@@ -55,3 +55,9 @@ This exercise starts with a working SSH session and a removed GRUB menu. Repair 
 After `sudo grub-script-check /boot/grub/grub.cfg` succeeds, record `cat /proc/sys/kernel/random/boot_id`, run `sudo reboot`, reconnect and compare the boot ID. It must change. Recheck the generated menu and service state before submission. CI performs this reboot and reruns both graders. The graders inspect state; they do not run `grub-install` for you.
 
 This is a preventive repair on the VM's real boot disk. Rescue-media boot, initramfs emergency shells and offline password recovery remain separate skills; this SSH exercise does not assess them.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [GRUB Corruption Recovery Lab](labs/lab-01/question.md): Find the boot mode and the disk that holds the root filesystem; Reinstall GRUB and regenerate grub.cfg, then prove the repair without a reboot.
+- [System Disaster Recovery Integration Capstone Lab](../capstone/labs/lab-01/question.md): Restore a wiped GPT table from a backup and prove the filesystems are intact; Reinstall GRUB and regenerate grub.cfg on the running machine.

@@ -17,3 +17,14 @@ Astronaut, a colleague ran some package operations late last night. Now `dnf` co
 4. Confirm the end state: `dnf check` exits `0`, and `rpm -qa` still returns a full, clean package list (it was never broken).
 
 The grader checks that `dnf check` succeeds inside `rpmbox`, that `rpm -qa` succeeds with no error text and at least 20 packages, and that the broken dependency is really closed: either the missing package is installed again, or the package that needed it was removed.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms dnf check now passes and the dependency gap is closed - and that the fix was NOT a pointless rpm --rebuilddb (rpm -qa was queryable the whole time; the database was never corrupt).
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

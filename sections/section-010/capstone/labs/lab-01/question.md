@@ -15,3 +15,18 @@ Astronaut, overnight the on-call team flagged several problems on this edge tele
 4.  **A new disk was just attached to this host** to hold telemetry buffer data. It has no stable name yet, only a `/dev/vdX` letter from the kernel that could change at the next boot. Find its hardware serial, and write a custom udev rule under `/etc/udev/rules.d/` that creates a stable `/dev/telemetry-disk` symlink for it, matched by that serial and not by the device letter. Apply the rule now, without rebooting, so that `/dev/telemetry-disk` points at that disk.
 
 5.  **`telemetry-agent.service` has stopped answering health checks:** no CPU use, no log output, nothing. Before you act, attach to its process with `strace` to see what it is blocked on. Once you are sure it is really hung and not just slow, terminate it, so that no `telemetry-agent` process is running.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../../module-01/course.md), [module-02](../../../module-02/course.md), [module-03](../../../module-03/course.md), [module-04](../../../module-04/course.md), [module-05](../../../module-05/course.md), [module-06](../../../module-06/course.md), [module-07](../../../module-07/course.md).
+
+The grader checks:
+
+- Confirms /opt/course/audit/kernel-release and /opt/course/audit/vm-swappiness match the live system state.
+- Confirms kernel.pid_max is raised live and persisted via /etc/sysctl.d/.
+- Confirms dummy is loaded with numdummies=4 persistently, and pcspkr is blacklisted and unloaded.
+- Confirms a custom udev rule creates a stable /dev/telemetry-disk symlink for the disk with serial lab010-telemetry.
+- Confirms the hung telemetry-agent process (stuck in pause()) has been terminated.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

@@ -16,3 +16,16 @@ The grader checks that:
 - `/root/vdc-ptable-backup.bin` exists and is not empty
 - the secondary disk has both of its partitions again
 - each partition passes `fsck -n` without errors, mounts, and still holds its original `marker.txt` with its original content
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-03](../../course.md).
+
+The grader checks:
+
+- Confirms a non-empty sgdisk partition-table backup file exists at /root/vdc-ptable-backup.bin.
+- Confirms the secondary disk currently has 2 partitions matching the original layout.
+- Confirms both partitions mount cleanly and their original marker files are readable.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

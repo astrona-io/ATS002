@@ -55,3 +55,14 @@ Start the playground with `astrona run`, then open a terminal on it with `astron
 ## Why this matters
 
 A service that will not start is one of the most common problems on a real server, and one of the most common tasks on the exam. The exam does not check what you typed; it checks the machine's real state, often after a reboot. Reading `systemctl status` and `journalctl -u` in the right order tells you the exact cause before you touch a file, and `is-active` plus `is-enabled` prove that your fix holds.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Configure journald: Persistent & Bounded Lab](labs/lab-05/question.md): Make the journal persistent so logs survive a reboot; Cap the journal's disk use and apply the change now.
+- [Service Won't Start: Bad ExecStart Path Lab](labs/lab-01/question.md): Read a 203/EXEC failure from systemctl status and the unit's journal; Point the unit's ExecStart at the real binary and prove the service runs and is enabled.
+- [Service Won't Start: Port Already In Use Lab](labs/lab-03/question.md): Find which service already holds the port another service needs; Stop and disable the leftover service and prove the right service now answers on the port.
+- [Service Won't Start: Permission Denied Lab](labs/lab-02/question.md): Trace a Permission denied start failure to the directory the service writes to; Fix the ownership so the service runs as its non-root user.
+- [Service Won't Start: Failed Dependency & Restart Flap Lab](labs/lab-04/question.md): Follow a failure through Requires= to the broken dependency; Clear the start-limit-hit state with reset-failed and start the whole chain; Enable both units so the pipeline comes back after a reboot.
+- [Set the Default Boot Target Lab](labs/lab-06/question.md): Read and change the default boot target; Prove the default.target link points at multi-user.target.
+- [Kernel, Process, Module & Device Runtime Management Capstone Lab](../capstone/labs/lab-01/question.md): Record live kernel state and raise kernel.pid_max live and persistently; Load, parameterise, persist and blacklist kernel modules, and name a disk with a udev rule; Confirm a hung service with strace before you stop it.

@@ -20,3 +20,15 @@ hours as root. Replace it with an equivalent systemd timer:
 - **remove the cron job**, so `dbclean.sh` no longer runs from two places. No cron entry that mentions `dbclean` may remain in `/etc/crontab`, in `/etc/cron.d/` or in any user's crontab.
 
 Check both with `systemctl list-timers`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-03](../../course.md).
+
+The grader checks:
+
+- Confirms report.timer + report.service exist, the timer is enabled and active, activates report.service, uses OnCalendar Mon,Thu 11:15, and has Persistent=true.
+- Confirms the dbclean cron job was removed and replaced by an enabled, active systemd timer running dbclean.sh every 6 hours, activating a dbclean service.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

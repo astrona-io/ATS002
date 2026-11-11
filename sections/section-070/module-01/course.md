@@ -45,3 +45,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-zypper-
 ## Why this matters
 
 On the exam, a task that says "conservative" or "security patches only" wants `zypper patch`, not `zypper update`. Both commands finish without errors, so nothing warns you if you pick the wrong one. Knowing which question each command answers is what keeps the system inside its policy.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Zypper Basic Package Operations Lab](labs/lab-01/question.md): Refresh metadata and list available updates and patches as two separate questions; Apply only patches, install one package and remove another; Read zypper's history to confirm what changed.
+- [Zypper Research-Then-Act Capstone Lab](../capstone/labs/lab-01/question.md): Research a package by keyword and metadata before installing it; Apply only curated patches, install and remove packages, and read the history.

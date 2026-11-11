@@ -12,3 +12,15 @@ Astronaut, a security alert came in for this ship. Three processes are running: 
 3.  Leave every innocent process running, and leave its program file in place.
 
 The grader checks that the guilty process is no longer running and that its program file is gone, and that the innocent processes are still running with their program files intact.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-05](../../course.md).
+
+The grader checks:
+
+- Confirms collector2 (the only process that calls kill()) is terminated and its executable removed.
+- Confirms collector1 and collector3 (which never call kill()) are still running with their executables intact.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

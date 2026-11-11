@@ -46,3 +46,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-dnf-pac
 ## Why this matters
 
 Groups turn "install the forty packages a build server needs" into one reviewed command, and "retire them" into another. The catch is in the removal: if you do not know what `dnf` tracks, you either leave packages behind or are surprised by what disappears. The exam likes exactly that kind of question.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [DNF Package Groups Lab](labs/lab-01/question.md): List the package groups and inspect a group's members before installing it; Install and remove a group as one unit; Explain which packages a group removal leaves behind.
+- [RPM/DNF Package Management Capstone Lab](../capstone/labs/lab-01/question.md): Diagnose and repair a corrupted RPM database with a backup first; Inspect, install and verify a standalone .rpm file; Install a package group and prove the system is consistent with dnf check.

@@ -22,3 +22,16 @@ Work as the user `pilot` for the container steps. The `pilot` account already ex
 - `pilot` runs the container `relay` from `nginx:alpine`, published on host port 8090.
 - Lingering is enabled for `pilot`.
 - `/home/pilot/relay-image-id.txt` holds the image ID of `relay`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-06](../../course.md).
+
+The grader checks:
+
+- Confirms pilot runs the container relay from docker.io/library/nginx:alpine, published on host port 8090.
+- Confirms lingering is enabled for pilot.
+- Confirms /home/pilot/relay-image-id.txt holds the image ID of the container relay.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

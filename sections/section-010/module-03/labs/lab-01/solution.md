@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-This walkthrough first loads the `dummy` module with its parameter and makes both survive a reboot. Then it blacklists `pcspkr`, unloads it, and proves the blacklist holds. You can run `astrona submit` after any step: each failing check names the one thing still missing.
+This walkthrough first loads the `dummy` module with its parameter and makes both survive a reboot. Then it blacklists `pcspkr`, unloads it, and proves the blacklist holds. Use the inspection commands below as you work. Submit only after completing the lab.
 
 ---
 

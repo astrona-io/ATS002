@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Follow these steps to trust the vendor's repository, install its exact `nginx` build and hold it. Run `astrona submit` after each step to see which checks already pass.
+Follow these steps to trust the vendor's repository, install its exact `nginx` build and hold it. Use the inspection commands below as you work. Submit only after completing the lab.
 
 ---
 
@@ -35,7 +35,7 @@ deb [signed-by=/etc/apt/keyrings/vendor-nginx.gpg] http://127.0.0.1:8100 vendor-
 
 The `[signed-by=...]` bracket ties trust to exactly this repository line. Nothing else on the system is affected by this key. The file lives under `/etc/apt/sources.list.d/`, separate from the shared `/etc/apt/sources.list` that holds Ubuntu's own repositories.
 
-At this point `astrona submit` should pass the trust check.
+The commands above let you check the trust check before continuing.
 
 ---
 
@@ -78,7 +78,7 @@ sudo apt install nginx=1.25.4-1~vendorfake1
 
 The `=version` form is an exact match. Every character counts, including the `~` and the revision suffix. One wrong character and APT reports that it cannot find a matching version at all.
 
-At this point `astrona submit` should pass the exact-version check.
+The commands above let you check the exact-version check before continuing.
 
 ---
 

@@ -56,3 +56,10 @@ Start the playground, then open a terminal on it with `astrona ssh astro-apparmo
 ## Why this matters
 
 MAC turns a "the permissions are clearly fine, why is this broken?" incident from a mystery into a two-minute diagnosis. It shows up whenever a service is moved to a path or port it did not use before: a moved web folder, a moved log folder, a new listening port. That is exactly the shape of the missions in this module. Keep the path-versus-label difference in mind: it tells you which set of tools the machine in front of you needs.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [AppArmor Profile Enforcement Lab](labs/lab-01/question.md): Find an AppArmor write denial in the kernel audit log; Add a profile rule for the new path and reload the profile; Prove the profile still enforces and the service writes again.
+- [AppArmor: Repair a Read Denial Lab](labs/lab-02/question.md): Read a read denial's operation, requested mask and path from the audit line; Allow only read access to the new key file and reload the profile in enforce mode.
+- [Two Services, Two Denials Capstone Lab](../capstone/labs/lab-01/question.md): Find and close a write denial and a read denial in two different profiles; Leave both profiles in enforce mode with no new denials.

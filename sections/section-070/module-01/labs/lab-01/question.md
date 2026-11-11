@@ -20,3 +20,16 @@ You are running a routine maintenance pass on an openSUSE Leap 15.6 host (the `z
 6. Review `zypper`'s own operation history to confirm exactly what was done during this maintenance window, and in what order.
 
 Use `zypper` for the install and the removal, so that its history log records both. The grader checks that `fail2ban` is installed, that `telnet-server` is not installed, and that `/var/log/zypp/history` holds an `install` entry for `fail2ban` and a `remove` entry for `telnet-server`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms fail2ban is installed inside zypperbox.
+- Confirms telnet-server has been removed from zypperbox.
+- Confirms zypper's own history log recorded the fail2ban install and telnet-server removal.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

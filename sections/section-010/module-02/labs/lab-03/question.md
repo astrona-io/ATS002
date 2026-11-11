@@ -14,3 +14,14 @@ Three independent ceilings could be responsible: `kernel.pid_max`, the user's `u
 3. Raise **only that one**, with a systemd override, to `infinity` or at least `65536`. Then apply it to the running unit, so that `systemctl show data-ingest.service -p TasksMax --value` reports the new value.
 
 Do **not** raise `kernel.pid_max` or `dataproc`'s `ulimit -u`. They are already fine. Adding a `kernel.pid_max` line to any sysctl file, or a new `nproc` line for `dataproc` under `/etc/security/limits.d/`, counts as a wrong diagnosis here.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms data-ingest.service's TasksMax is raised and applied to the running unit; that kernel.pid_max and dataproc's ulimit -u were left at their already-generous values and no student file needlessly raised them.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

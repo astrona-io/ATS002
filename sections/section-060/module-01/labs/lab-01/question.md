@@ -17,3 +17,17 @@ Astronaut, someone has handed you `/home/candidate/downloads/logship-agent-2.1.0
 6. Query what `logship-agent` needs to run and which capabilities it provides.
 
 The grader checks that `logship-agent-2.1.0-1.x86_64` is installed, that its recorded files include `/usr/bin/logship-agent` and `/etc/logship-agent/agent.conf`, that `rpm -V logship-agent` prints nothing, and that the package declares requirements on `bash` and `coreutils`. Steps 1, 3, 4 and 6 are for your own practice; the grader does not read your answers to them.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms logship-agent-2.1.0-1.x86_64 is installed inside rpmbox.
+- Confirms logship-agent's files landed on disk inside rpmbox.
+- Confirms rpm -V logship-agent reports a clean verify inside rpmbox.
+- Confirms logship-agent declares its expected Requires inside rpmbox.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

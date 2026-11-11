@@ -11,3 +11,14 @@ The host has libvirt and its default NAT network. A checksum-verified CirrOS 0.6
 A `running` domain only proves that the QEMU process exists. The guest address and SSH service prove that Linux booted. Do not replace the staged disk or create a host service to stand in for the guest. This isolated training image uses public CirrOS credentials and must not be exposed outside the lab network.
 
 Run `astrona submit` once, after your checks. Submission destroys this lab.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Checks persistent domain resources, autostart, the assigned disk, a guest DHCP lease and a live SSH service.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

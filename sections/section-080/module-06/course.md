@@ -46,3 +46,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-initram
 ## Why this matters
 
 A kernel update that ran out of disk space, a deleted file in `/boot` or a new storage driver can all leave you with a machine that works until the next reboot. Knowing the one command that rebuilds the image turns a recovery that ends in a reinstall into a two-minute job.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Initramfs Rebuild Lab](labs/lab-01/question.md): Create the initramfs image of the running kernel after it was deleted; Check the new image with lsinitramfs and check the /boot/initrd.img link.
+- [System Disaster Recovery Integration Capstone Lab](../capstone/labs/lab-01/question.md): Restore a wiped GPT table from a backup and prove the filesystems are intact; Reinstall GRUB and regenerate grub.cfg on the running machine.

@@ -14,3 +14,15 @@ Astronaut, the platform team sent two separate requests for this ship.
     - `pcspkr` stays unloaded after a replayed hardware detection pass (`udevadm trigger`). Do not reboot.
 
 The grader runs `udevadm trigger` itself and checks that `pcspkr` does not come back.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-03](../../course.md).
+
+The grader checks:
+
+- Confirms the dummy module is loaded with numdummies=2 live, and persists both the load and the parameter across reboots.
+- Confirms pcspkr is blacklisted, unloaded now, and stays absent after a udevadm trigger re-detection pass.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

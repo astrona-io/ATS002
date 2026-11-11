@@ -17,3 +17,17 @@ Astronaut, this is a routine maintenance window. The EPEL repository is already 
 6. Install `fail2ban` again cleanly, on its own, with nothing unrelated bundled in.
 
 The grader checks the end state inside `rpmbox`: `fail2ban` is installed, `mtr` is not installed, `telnet` is not installed, and `dnf autoremove` has nothing left to remove. Steps 1 and 2 are part of a good maintenance window; the grader does not check them.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-03](../../course.md).
+
+The grader checks:
+
+- Confirms fail2ban is installed cleanly inside rpmbox.
+- Confirms mtr (the deliberately-bundled unwanted package) is not installed, proving the mixed transaction was undone.
+- Confirms telnet has been fully removed inside rpmbox.
+- Confirms no orphaned dependency packages remain after cleanup.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

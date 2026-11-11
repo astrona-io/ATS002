@@ -31,3 +31,17 @@ Do not reboot before the GRUB repair is finished: the machine would not come bac
 - Each partition passes `fsck -n` without errors, mounts, and still holds its original `marker.txt` with its original content.
 - `/boot/grub/grub.cfg` exists, is not empty, has at least one line starting with `menuentry`, and was written after the lab was set up.
 - GRUB's installed core image (`core.img` or `core.efi` under `/boot/grub`) was rewritten after the lab was set up, and `grub-install --recheck` on the disk behind `/` (or in its UEFI form) finishes without an error.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../../module-01/course.md), [module-02](../../../module-02/course.md), [module-03](../../../module-03/course.md), [module-04](../../../module-04/course.md), [module-05](../../../module-05/course.md), [module-06](../../../module-06/course.md), [module-07](../../../module-07/course.md), [module-08](../../../module-08/course.md), [module-09](../../../module-09/course.md).
+
+The grader checks:
+
+- Confirms the secondary disk currently has 2 partitions matching the original layout.
+- Confirms both partitions on the secondary disk mount cleanly and their original marker files are readable.
+- Confirms /boot/grub/grub.cfg on the primary disk exists, is non-empty, contains menuentry lines, and was regenerated after bootstrap ran.
+- Confirms GRUB's boot-sector/EFI code on the primary disk was genuinely reinstalled and grub-install --recheck reports success.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

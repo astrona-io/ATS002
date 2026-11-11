@@ -45,3 +45,10 @@ Start the playground, then open a terminal on it with `astrona ssh astro-rpm-dat
 ## Why this matters
 
 A broken ledger stops every package task on a server: no installs, no updates, no security fixes. The rebuild itself is one command. The skill is knowing *when* it is the right command, and never running it without a backup.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [RPM Database: Corruption Look-Alike Lab](labs/lab-02/question.md): Read dnf check errors and tell a broken dependency from a corrupt database; Fix the missing dependency without rebuilding the database.
+- [Rebuilding a Corrupted RPM Database Lab](labs/lab-01/question.md): Confirm that a failure is real database corruption and find the database backend; Back up and rebuild the RPM database, then prove rpm and dnf both work.
+- [RPM/DNF Package Management Capstone Lab](../capstone/labs/lab-01/question.md): Diagnose and repair a corrupted RPM database with a backup first; Inspect, install and verify a standalone .rpm file; Install a package group and prove the system is consistent with dnf check.

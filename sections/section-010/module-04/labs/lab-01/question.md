@@ -13,3 +13,14 @@ The backup disk is the extra disk that already holds one ext4 partition. Give it
 3.  Apply the rule now, without rebooting.
 
 The grader checks that a rule under `/etc/udev/rules.d/` mentions `backup-drive`, that `/dev/backup-drive` points to the disk with the backup serial, and that `/dev/backup-drive1` points to that disk's first partition.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-04](../../course.md).
+
+The grader checks:
+
+- Confirms a custom udev rule under /etc/udev/rules.d/ creates stable /dev/backup-drive and /dev/backup-drive1 symlinks that resolve to the disk with serial lab014-backup-drive.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

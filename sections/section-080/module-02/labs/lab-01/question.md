@@ -17,3 +17,14 @@ Reset root's password on the stand-in system:
 7. Leave the chroot and unmount everything.
 
 The grader mounts the stand-in disk read-only, from outside any chroot, and checks root's line in its `/etc/shadow`: the second field must not be empty and must not be a lock placeholder (`!`, `!!` or `*`). The password itself is not checked.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms the stand-in disk's /etc/shadow root line has a non-empty password hash different from the bootstrap-seeded placeholder.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

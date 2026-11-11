@@ -12,3 +12,14 @@ The unit runs as its own non-root user and writes its data under `/var/lib/metri
 - the daemon really runs: it adds a line to `/var/lib/metricsd/metrics.log` every few seconds, so the file keeps growing
 
 Running the service as `root`, or disabling or masking the unit, does not count. Fix the access problem itself.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-06](../../course.md).
+
+The grader checks:
+
+- Confirms metricsd.service is active and enabled, still runs as a non-root user, and can now write into its state directory (the permission/ownership problem was genuinely fixed).
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

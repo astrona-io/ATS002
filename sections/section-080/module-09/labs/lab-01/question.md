@@ -18,3 +18,18 @@ The grader checks that:
 - `kernel-errors.txt` holds the I/O error line about the suspect disk
 - `badblocks.txt` holds the summary of a finished scan
 - the data at the start of the suspect disk is unchanged
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-09](../../course.md).
+
+The grader checks:
+
+- Confirms device.txt names the suspect disk and size.txt holds its exact size in bytes.
+- Confirms smart.txt holds the output of smartctl for the suspect disk.
+- Confirms kernel-errors.txt holds the I/O error line about the suspect disk.
+- Confirms badblocks.txt holds the result of a finished bad-block scan.
+- Confirms the first MiB of the suspect disk still has its original hash.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

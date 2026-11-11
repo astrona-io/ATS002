@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Five research questions, all read-only. `/opt/course/apt-research/` already exists and is owned by your user, so none of these commands need `sudo`. Run `astrona submit` after a step to see which checks already pass.
+Five research questions, all read-only. `/opt/course/apt-research/` already exists and is owned by your user, so none of these commands need `sudo`. Use the inspection commands below as you work. Submit only after completing the lab.
 
 ---
 

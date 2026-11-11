@@ -17,3 +17,17 @@ Astronaut, a development team needs a full local build toolchain in one go. `aut
 6. **Check the aftermath.** After the removal, find out (do not assume) whether `automake` and `gcc` are still installed. Be ready to explain the two different outcomes in terms of what `dnf` recorded at group install time, not in terms of group membership.
 
 The grader checks the end state inside `rpmbox`: `"Development Tools"` no longer shows as an installed group, `gcc` is not installed, `automake` is still installed, and `dnf check` reports no problems. Do not remove `automake` yourself.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-05](../../course.md).
+
+The grader checks:
+
+- Confirms the Development Tools group no longer shows as installed inside rpmbox after removal.
+- Confirms automake (pre-installed independently of the group) survived the group removal.
+- Confirms gcc (installed only because of the group) was actually removed along with the group.
+- Confirms dnf check inside rpmbox passes cleanly after the install/remove cycle.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

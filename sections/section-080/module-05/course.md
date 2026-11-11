@@ -47,3 +47,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-fsck-re
 ## Why this matters
 
 A power cut, a bad cable or a stray `dd` can damage the first sectors of a partition. If you know the superblock is only one of several copies, the fix takes a minute. If you do not, the usual reaction is to reformat, and that loses the data.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Filesystem Check & Repair Lab](labs/lab-01/question.md): Find a backup superblock for an ext4 filesystem whose primary superblock was wiped; Repair the filesystem with e2fsck and prove its files survived.
+- [System Disaster Recovery Integration Capstone Lab](../capstone/labs/lab-01/question.md): Restore a wiped GPT table from a backup and prove the filesystems are intact; Reinstall GRUB and regenerate grub.cfg on the running machine.

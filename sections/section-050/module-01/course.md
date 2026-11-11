@@ -50,3 +50,10 @@ Start the playground, then open a terminal on it with `astrona ssh astro-apt-rep
 ## Why this matters
 
 A server that pulls a crate from the wrong depot, or lets a routine upgrade swap a carefully chosen version, breaks quietly. Nothing fails at install time. The trouble shows up weeks later, and nobody remembers why the version changed. Scoped trust, exact versions and a checked hold keep the ship exactly as predictable as it was yesterday.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Third-Party Repositories & Package Pinning Lab](labs/lab-01/question.md): Add a third-party repository with its own keyring and a signed-by reference; Install the exact version the repository publishes and hold it.
+- [APT Pinning (not a hold) Lab](labs/lab-02/question.md): Write a preferences file that pins a package to the release pocket; Prove the new candidate version with apt-cache policy.
+- [New App Server Onboarding Capstone Lab](../capstone/labs/lab-01/question.md): Add a vendor repository with a dedicated keyring and install and hold its exact version; Recover a half-configured package and hold a whole package family by pattern; Record which version and repository APT would install, without installing.

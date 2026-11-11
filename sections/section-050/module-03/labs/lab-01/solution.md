@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Six steps, run in order: the everyday `apt` maintenance loop. Run `astrona submit` after a step to see which checks already pass.
+Six steps, run in order: the everyday `apt` maintenance loop. Use the inspection commands below as you work. Submit only after completing the lab.
 
 ---
 
@@ -48,7 +48,7 @@ sudo apt install fail2ban
 
 A plain `apt install` resolves `fail2ban`'s dependencies against the index you refreshed in Step 1 and installs everything needed in one transaction.
 
-At this point `astrona submit` should pass the `fail2ban` check.
+The commands above let you check the `fail2ban` check before continuing.
 
 ---
 

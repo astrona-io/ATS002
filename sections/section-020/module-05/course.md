@@ -49,3 +49,9 @@ Start the playground with `astrona run --git git@github.com:astrona-io/ATS002.gi
 ## Why this matters
 
 A container that runs is only half the job. The exam asks you to build an image that holds exactly what a task names, keep its data when the container goes away, and put it on the right network. Each of these fails without an error: a build with the wrong tag, a volume that was never mounted, a network that was never joined. These parts teach you to build, mount and connect, and then read the result back from Docker.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Container Images, Volumes And Networks Lab](labs/lab-01/question.md): Build an image from a Dockerfile with a tag; Create a named volume and a user-defined network; Run a container that uses the volume and the network.
+- [Scheduled Container Recovery Capstone Lab](../capstone/labs/lab-01/question.md): Remove a container that holds a host port and start its replacement with limits; Schedule a per-user watchdog script that restarts the container when it stops.

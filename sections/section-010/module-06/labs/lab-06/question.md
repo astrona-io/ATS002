@@ -9,3 +9,14 @@ Astronaut, this machine is set to boot into `graphical.target`. It is a server w
 3. Make sure that `systemctl get-default` reports `multi-user.target`, and that `/etc/systemd/system/default.target` points at `multi-user.target`.
 
 You do **not** need to switch the running system to the new target now. Only change what it boots into. (`systemctl isolate <target>` would switch the *running* system, and adding `systemd.unit=<target>` to the kernel line in the boot loader would change the target for one boot only. Neither is needed here.)
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-06](../../course.md).
+
+The grader checks:
+
+- Confirms systemctl get-default reports multi-user.target and /etc/systemd/system/default.target points at it.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

@@ -46,3 +46,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-apt-pac
 ## Why this matters
 
 `apt-cache policy` is the command that ties all package work together. It tells you which repository and which version any later action will really touch. A minute of read-only research before a change saves hours of finding out afterwards why a server runs a version nobody chose.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [APT Package Information Lookup Lab](labs/lab-01/question.md): Search for packages by keyword and show one package's metadata without installing it; Compare installed and candidate versions and their source with apt-cache policy; List installed packages by name pattern and list upgradable packages.
+- [New App Server Onboarding Capstone Lab](../capstone/labs/lab-01/question.md): Add a vendor repository with a dedicated keyring and install and hold its exact version; Recover a half-configured package and hold a whole package family by pattern; Record which version and repository APT would install, without installing.

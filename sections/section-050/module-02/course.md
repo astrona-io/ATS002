@@ -47,3 +47,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-dpkg-lo
 ## Why this matters
 
 A package stuck halfway through an install does not shout. It shows up as two quiet letters in a list, and the software may not run. Reading those letters and knowing the fixed two-command recovery turns "the package system looks broken" into a two-minute job, and the exam expects you to do it.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [dpkg Low-Level Package Management Lab](labs/lab-01/question.md): Inspect a .deb file's metadata and file list before installing it; Install it with dpkg and query file ownership both ways; Recover a half-configured package to a clean state.
+- [New App Server Onboarding Capstone Lab](../capstone/labs/lab-01/question.md): Add a vendor repository with a dedicated keyring and install and hold its exact version; Recover a half-configured package and hold a whole package family by pattern; Record which version and repository APT would install, without installing.

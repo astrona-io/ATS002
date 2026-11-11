@@ -55,3 +55,11 @@ Start the playground with `astrona run --git git@github.com:astrona-io/ATS002.gi
 ## Why this matters
 
 A domain defined the wrong way does not fail loudly. Started with `create` instead of `define`, or left without autostart, it works fine until the next stop or reboot, and then it is simply not there. The difference between a persistent and a transient domain is the single idea most likely to be tested as a trap, so it is worth getting completely right.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Transient to Persistent Domain Lab](labs/lab-02/question.md): Make a running transient domain persistent without stopping it; Mark it to autostart and prove its definition is on disk.
+- [Reconfigure a Persistent Domain Lab](labs/lab-03/question.md): Change a domain's memory and vCPUs in its persistent configuration; Start the domain and prove the new size with virsh dominfo.
+- [libvirt Virtual Machine Lifecycle Lab](labs/lab-01/question.md): Define a persistent domain around an existing qcow2 disk with set memory and vCPUs; Mark the domain to autostart and start it; Tell a graceful shutdown from a hard destroy by the state each leaves.
+- [New Toolchain, New Host Capstone Lab](../capstone/labs/lab-01/question.md): Build and install a tool from source to an exact path with a feature turned off; Define, autostart and start a persistent domain around an existing disk; Use the new tool to prove the domain is running.

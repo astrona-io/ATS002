@@ -11,3 +11,16 @@ Astronaut, your team needs a vendor's own build of `nginx` that Ubuntu's archive
 5. Hold `nginx` at that version so a routine `apt upgrade` or `apt full-upgrade` cannot move it, and confirm that the hold took.
 
 The grader checks that a `.list` file under `/etc/apt/sources.list.d/` contains `signed-by=/etc/apt/keyrings/<name>.gpg` and that this keyring file exists and is a valid GPG keyring, that `nginx` is fully installed at exactly the vendor's version, and that `apt-mark showhold` lists `nginx`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms a sources.list.d entry uses signed-by= pointing at a valid, dedicated keyring under /etc/apt/keyrings/ (not the deprecated apt-key global keyring).
+- Confirms nginx is installed at the exact vendor-published version recorded during bootstrap.
+- Confirms nginx appears in apt-mark showhold.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

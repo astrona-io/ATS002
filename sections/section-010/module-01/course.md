@@ -49,3 +49,9 @@ Every command block in the parts also says which shell and which rights it expec
 ## Why this matters
 
 On the exam, and on a real server, a fix that only lives in memory is a problem that comes back after the next reboot. The habit you build here, "change it live, write it down, and check both", is the same habit you need for process limits, kernel module options and device names. Each of those has a live action and a file under `/etc` that a service reads again at boot.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [sysctl Live Kernel State Lab](labs/lab-01/question.md): Write the running kernel release into a file with the right uname option; Read a live kernel parameter value with no extra text around it; Record the system timezone from timedatectl.
+- [Kernel, Process, Module & Device Runtime Management Capstone Lab](../capstone/labs/lab-01/question.md): Record live kernel state and raise kernel.pid_max live and persistently; Load, parameterise, persist and blacklist kernel modules, and name a disk with a udev rule; Confirm a hung service with strace before you stop it.

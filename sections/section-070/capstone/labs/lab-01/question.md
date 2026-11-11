@@ -27,3 +27,18 @@ You are running a maintenance window on an openSUSE Leap 15.6 host (the `zypperb
 7. **Close the window.** Review `zypper`'s own operation history to confirm exactly what was done, and in what order.
 
 The grader checks the three answer files, that the package you identified (`fail2ban`) is installed, and that `telnet-server` is no longer installed.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../../module-01/course.md), [module-02](../../../module-02/course.md).
+
+The grader checks:
+
+- Confirms /root/answers/01-research-search.txt records a zypper search hit for fail2ban.
+- Confirms /root/answers/02-research-info.txt records zypper info metadata for fail2ban.
+- Confirms /root/answers/03-confirm-telnet-installed.txt records telnet-server correctly confirmed as installed via an installed-only search.
+- Confirms fail2ban is installed inside zypperbox.
+- Confirms telnet-server has been removed from zypperbox.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.
