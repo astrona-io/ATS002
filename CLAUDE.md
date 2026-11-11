@@ -203,9 +203,9 @@ section is only true for this one.
   mandatory access control system. Section 060 runs the real RHEL-family
   tools inside a **Rocky Linux 9** container (`rpmbox`) and section 070 the
   real SUSE tools inside an **openSUSE Leap 15.6** container (`zypperbox`),
-  both on the Ubuntu machine. SELinux (section 040) and `rd.break`
-  (section 080) are taught as worked walkthroughs, because the Ubuntu image
-  cannot run them for real. Do not teach options or behaviour from other
+  both on the Ubuntu machine. Section 040/module-02 uses a pinned Rocky
+  Linux VM for real SELinux enforcement. `rd.break` in section 080 remains
+  a worked walkthrough; the Ubuntu image does not implement that boot flow. Do not teach options or behaviour from other
   distributions without saying so.
 - **The main sources:** the manual pages on the lab machine (`man sysctl`,
   `man systemd.exec`, `man modprobe.d`, `man udev`, `man strace`,
@@ -379,7 +379,7 @@ Use these names exactly as the scripts create them:
 | `ats-002-lab-030` | `section-030/capstone/labs/lab-01` | `/tools/vmreport-1.0.tar.gz`, libvirt and `/var/lib/libvirt/images/build-agent.qcow2` |
 | `ats-002-lab-041` | `section-040/module-01/labs/lab-01` | The `appservice` daemon and a too-strict AppArmor profile in enforce mode |
 | `ats-002-lab-042` | `section-040/module-01/labs/lab-02` | The `credsync` daemon; its profile denies `/etc/credsync/api.key` |
-| `ats-002-lab-043` | `section-040/module-02/labs/lab-01` | `/srv/web` with a sample page; SELinux is not active, the lab grades the script the learner writes |
+| `ats-002-lab-043` | `section-040/module-02/labs/lab-01` | Rocky Linux with SELinux enforcing; repair Apache labels, TCP 8888 and backend access |
 | `ats-002-lab-040` | `section-040/capstone/labs/lab-01` | Services `logshipper` and `metrics-agent`, each with a too-strict profile |
 | `ats-002-lab-051` | `section-050/module-01/labs/lab-01` | A local signed APT repository on `127.0.0.1` with a stub `nginx` package |
 | `ats-002-lab-051b` | `section-050/module-01/labs/lab-02` | `curl` with a newer version in `noble-updates` than in `noble` |
@@ -430,7 +430,7 @@ The playgrounds (no task, no grading):
 | `container-build-bay` | `section-020/module-05/playground` | Docker, `nginx:alpine`, `alpine` and `/opt/demo/status-page` with an `index.html` |
 | `podman-rootless-bay` | `section-020/module-06/playground` | Podman, rootless helpers and user `pilot` with lingering enabled |
 | `source-build-bay` | `section-030/module-01/playground` | `gcc`, `make` and `/tools/links-2.14.tar.bz2` |
-| `selinux-commands-bay` | `section-040/module-02/playground` | `/srv/web` with a sample page and an empty notes file; SELinux is not active |
+| `selinux-commands-bay` | `section-040/module-02/playground` | Rocky Linux with enforcing SELinux, Apache and a backend |
 | `apt-repos-and-pinning` | `section-050/module-01/playground` | A local vendor repository on `127.0.0.1:8100`, `curl` with two competing versions |
 | `dpkg-low-level` | `section-050/module-02/playground` | A `logtail-utils` `.deb` in `/home/candidate/downloads/` and a half-configured `cowsay` |
 | `apt-basic-operations` | `section-050/module-03/playground` | `ftp` installed with a tracked config file, `fail2ban` not installed |
@@ -486,10 +486,9 @@ tables above.
   `opensuse/leap:15.6`-based `zypperbox` as long-lived privileged
   containers. Commands run inside them (`docker exec -it rpmbox bash`).
   The package tools inside are real; only the host is different.
-- **Ubuntu-only gaps.** Real SELinux enforcement, `rd.break` and the
-  RHEL-family boot flow cannot run on the Ubuntu image. Pages teach them as
-  worked walkthroughs and say so plainly; never pretend the reader can run
-  them in a lab.
+- **Distribution-specific practice.** The SELinux module runs Rocky Linux
+  and grades real enforcement. `rd.break` remains a conceptual exercise
+  because the Ubuntu recovery VM does not use the RHEL boot flow.
 - **Local package repositories.** Section 050 labs serve their own signed
   APT repository on `127.0.0.1` (built with `reprepro`) and build their own
   `.deb` files, so they do not depend on outside vendors.

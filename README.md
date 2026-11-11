@@ -88,7 +88,7 @@ Sections 050, 060, and 070 each teach a different Linux family's native package 
 
 Section 080 similarly re-stages boot-breaking recovery scenarios (chroot repair, password reset, GRUB corruption) onto a disposable secondary disk or the VM's own next-boot configuration, so the grading VM always stays fully reachable over SSH — the exact commands are practiced in the exact order, just against a target built specifically so a mistake costs nothing.
 
-Section 040 teaches AppArmor hands-on (the MAC system Ubuntu actually enforces) and covers SELinux as a fully worked conceptual walkthrough, since real SELinux enforcement cannot be reliably enabled on this platform's Ubuntu image.
+Section 040 teaches AppArmor on Ubuntu and SELinux on a pinned Rocky Linux VM. The SELinux exercise verifies live Apache requests with enforcement enabled and repeats the checks after reboot.
 
 ---
 
