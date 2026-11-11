@@ -16,7 +16,7 @@ Your playground is one docking bay, with one pod already docked:
 
 - Run `docker ps` and `docker ps -a` and compare the lists.
 - Run `docker stop web_demo`, then `docker ps -a`: the container is `Exited`, not removed. `docker start web_demo` brings it back.
-- Read its record with `docker inspect web_demo`, then pull out single facts: `docker inspect --format '{{ .NetworkSettings.IPAddress }}' web_demo` and `docker inspect --format '{{ (index .Mounts 0).Destination }}' web_demo`.
+- Read its record with `docker inspect web_demo`, then pull out single facts: `docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' web_demo` and `docker inspect --format '{{ (index .Mounts 0).Destination }}' web_demo`.
 - Launch a limited container: `docker run -d --name api_demo --memory=128m -p 8080:80 nginx:alpine`, then read `.HostConfig.Memory` back (it is in bytes) and `docker ps`.
 - Try `docker kill --signal=HUP web_demo` and `docker kill web_demo`, and see the difference from `docker stop`.
 

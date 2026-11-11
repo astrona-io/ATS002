@@ -1,6 +1,6 @@
 {
   "initial_failures": {
-    "default/verify-stubborn-stopped": "still running"
+    "default/verify-stubborn-stopped": "still alive"
   },
   "solution": [
     {

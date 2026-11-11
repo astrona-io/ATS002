@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks /opt/course/11/mount-destination against frontend_v2's actual
 # first (and only) volume mount destination.
 
@@ -29,4 +31,5 @@ else
   echo "FAIL: mount-destination - $path = '$actual', expected '$expected'"
   exit 1
 fi
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

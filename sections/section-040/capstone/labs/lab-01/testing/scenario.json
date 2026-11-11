@@ -1,6 +1,6 @@
 {
   "initial_failures": {
-    "default/verify-logshipper-enforce": "FAIL:"
+    "default/verify-logshipper-write": "no rule for /srv/shiplogs"
   },
   "solution": [
     {

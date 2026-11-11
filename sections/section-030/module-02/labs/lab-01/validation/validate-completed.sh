@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 set -u
 
 DOMAIN=inventory-db
@@ -64,4 +66,5 @@ for attempt in $(seq 1 90); do
 done
 echo 'FAIL: guest has no reachable SSH service on its libvirt DHCP lease'
 exit 1
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

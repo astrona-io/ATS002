@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the previously half-configured tree package now shows a clean
 # "ii" (install ok installed) status, and that no package on the system
 # is left in any pending/incomplete state.
@@ -23,4 +25,5 @@ fi
 
 echo "PASS: tree is fully configured (ii) and dpkg --audit reports no outstanding issues"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

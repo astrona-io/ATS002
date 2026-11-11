@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms cargo_vg exists again on the spare disk and its physical volume
 # has the UUID recorded in the metadata backup.
 
@@ -42,4 +44,5 @@ fi
 
 echo "PASS: cargo_vg is back on the spare disk with the original physical volume UUID"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

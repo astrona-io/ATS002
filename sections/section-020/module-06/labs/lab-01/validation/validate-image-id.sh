@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms /home/pilot/relay-image-id.txt holds the image ID of the container relay.
 
 set -u
+cd /tmp
 
 file=/home/pilot/relay-image-id.txt
 if [[ ! -s "$file" ]]; then
@@ -34,4 +37,5 @@ fi
 
 echo "PASS: $file holds the image ID of relay"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

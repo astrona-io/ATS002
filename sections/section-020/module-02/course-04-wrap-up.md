@@ -18,7 +18,7 @@ This module was about the states a container moves through, the orders that stop
 
 - `docker inspect` prints the full record: `.Config` from create time, and `.State`, `.NetworkSettings`, `.Mounts` and `.HostConfig` kept up to date while it runs.
 - `--format` runs a Go template: field paths, `range`, `index`, `len`, `json` and `printf`.
-- `.NetworkSettings.IPAddress` is only filled on the default bridge. `range .NetworkSettings.Networks` works on any network.
+- Use `.NetworkSettings.Networks` for per-network addresses; legacy top-level IP fields may be absent.
 - Count a list with `len .Mounts` before you pick an item with `index .Mounts 0`.
 
 **From [Launching With Limits](./course-03-launching-with-limits.md):**
@@ -60,9 +60,10 @@ The shell form makes `/bin/sh -c nginx` PID 1, and `sh` does not pass `SIGTERM` 
 </details>
 
 <details>
-<summary>4. <code>docker inspect --format '{{ .NetworkSettings.IPAddress }}' app</code> prints nothing, but the container is running. Why, and what do you run instead?</summary>
+<summary>4. An older IP-address template references <code>.NetworkSettings.IPAddress</code> and fails on a current engine. What should you inspect?</summary>
 
-The container is not on the default bridge network, so the top-level field is empty. Use `docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' app`.
+Use `docker inspect --format '{{ json .NetworkSettings.Networks }}' app` to see each attached network and its address. Read the address from that network record instead of relying on the legacy top-level field.
+
 </details>
 
 <details>

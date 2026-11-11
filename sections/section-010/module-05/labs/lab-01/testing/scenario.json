@@ -1,6 +1,6 @@
 {
   "initial_failures": {
-    "default/verify-guilty-process-removed": "still running"
+    "default/verify-guilty-process-removed": "still alive"
   },
   "solution": [
     {

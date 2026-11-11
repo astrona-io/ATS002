@@ -34,10 +34,10 @@ Check that it worked:
 
 ```bash
 lsmod | grep dummy
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 ```
 
-The kernel publishes the live value in `/sys/module/dummy/parameters/numdummies`. It should show `2`. This load is not kept: after a reboot, the module and its parameter would be gone.
+This parameter is not exposed through sysfs on the lab kernel. Count the dummy interfaces instead; there should be two. This load is not kept: after a reboot, the module and its parameter would be gone.
 
 ---
 
@@ -66,7 +66,7 @@ Apply it by unloading the module and loading it again with a bare `modprobe`. Th
 ```bash
 sudo modprobe -r dummy
 sudo modprobe dummy
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 # 2
 ```
 
@@ -106,7 +106,7 @@ lsmod | grep pcspkr
 lsmod | grep dummy
 # dummy   ...   0
 
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 # 2
 
 cat /etc/modules-load.d/dummy.conf
@@ -149,7 +149,7 @@ modinfo -p dummy
 sudo modprobe dummy numdummies=2
 sudo modprobe -r dummy
 sudo modprobe dummy
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 
 sudo modprobe -r pcspkr
 sudo udevadm trigger

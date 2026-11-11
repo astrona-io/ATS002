@@ -16,6 +16,9 @@ sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 
 set -eu
 
+sudo apt-get update -y
+sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y cowsay
+
 sudo python3 - <<'PYEOF'
 import re
 

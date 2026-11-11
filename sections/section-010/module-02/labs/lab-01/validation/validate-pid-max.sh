@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms kernel.pid_max is raised live to at least 1048576 AND persisted
 # in a config file under /etc/sysctl.d/ (or /etc/sysctl.conf) with a value
 # that would win over the low bootstrap baseline.
@@ -25,4 +27,5 @@ fi
 
 echo "PASS: kernel.pid_max is $live live and persisted at $persisted"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

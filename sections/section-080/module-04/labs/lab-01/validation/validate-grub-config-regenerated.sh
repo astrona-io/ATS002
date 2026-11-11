@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 set -u
 
 GRUB_CFG=/boot/grub/grub.cfg
@@ -28,14 +30,13 @@ if [[ "$MENUENTRIES" -lt 1 ]]; then
   exit 1
 fi
 
-MARKER_TS=$(sudo stat -c %Y "$MARKER" 2>/dev/null || echo 0)
-CFG_TS=$(sudo stat -c %Y "$GRUB_CFG" 2>/dev/null || echo 0)
 
-if [[ "$CFG_TS" -le "$MARKER_TS" ]]; then
+if ! sudo test "$GRUB_CFG" -nt "$MARKER"; then
   echo "FAIL: grub config regenerated - $GRUB_CFG is not newer than the bootstrap marker; it does not appear to have been regenerated this session"
   exit 1
 fi
 
 echo "PASS: $GRUB_CFG exists, is non-empty, contains $MENUENTRIES menuentry line(s), and was regenerated after bootstrap"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

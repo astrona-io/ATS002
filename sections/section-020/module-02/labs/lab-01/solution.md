@@ -23,16 +23,10 @@ Redirection with `>` does not create missing folders. This trips up more candida
 ## Step 3: Read frontend_v2's IP address
 
 ```bash
-docker inspect --format '{{ .NetworkSettings.IPAddress }}' frontend_v2 > /opt/course/11/ip-address
-```
-
-`--format` runs a Go template against the same record that `docker inspect frontend_v2` would print as raw JSON. Docker fills `.NetworkSettings.IPAddress` for containers on the default bridge network. If the file ends up empty, the container is most likely on a network you created, and you need the per-network path:
-
-```bash
 docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' frontend_v2 > /opt/course/11/ip-address
 ```
 
-`range` goes through the `Networks` map, so you do not need to know the network's name.
+`--format` reads the container inspect record. The per-network map contains the address; older top-level IP fields may be absent on current Docker engines. This lab attaches the container to one network, so the template writes one address.
 
 ## Step 4: Read frontend_v2's mount destination
 
@@ -90,7 +84,7 @@ astrona submit -c sections/section-020/module-02/labs/lab-01
 ```bash
 docker stop frontend_v1
 mkdir -p /opt/course/11
-docker inspect --format '{{ .NetworkSettings.IPAddress }}' frontend_v2 > /opt/course/11/ip-address
+docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' frontend_v2 > /opt/course/11/ip-address
 docker inspect --format '{{ (index .Mounts 0).Destination }}' frontend_v2 > /opt/course/11/mount-destination
 docker run -d --name frontend_v3 --memory=30m -p 1234:80 nginx:alpine
 docker ps --filter "name=frontend_v3"

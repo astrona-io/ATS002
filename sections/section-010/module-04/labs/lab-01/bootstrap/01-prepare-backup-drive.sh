@@ -47,4 +47,8 @@ mkfs_retry() {
 }
 
 mkfs_retry "$PART"
+# This exercise starts without a custom backup-drive name.
+sudo find /etc/udev/rules.d -maxdepth 1 -type f -exec sed -i '/backup-drive/d' {} +
+sudo rm -f /dev/backup-drive /dev/backup-drive1
+sudo udevadm control --reload-rules
 ASTRONA_STUDENT_SCRIPT

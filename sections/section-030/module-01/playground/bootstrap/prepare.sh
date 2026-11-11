@@ -14,6 +14,15 @@ sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # compiles into an ELF binary. There is no task and no grading.
 set -euo pipefail
 
+missing=()
+for package in build-essential bzip2; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
+
 echo "[playground] source-build-bay: checking build tools ..."
 if ! command -v gcc >/dev/null 2>&1 || ! command -v make >/dev/null 2>&1; then
   export DEBIAN_FRONTEND=noninteractive

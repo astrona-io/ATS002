@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms ftp was fully purged, not just removed: the package itself is
-# gone from dpkg's database AND its /etc/ftp.conf conffile is gone too.
+# uninstalled without residual configuration, including /etc/ftp.conf.
 
 set -u
 
-if dpkg-query -W -f='${Status}' ftp >/dev/null 2>&1; then
-  status=$(dpkg-query -W -f='${Status}' ftp 2>/dev/null)
-  echo "FAIL: ftp purged - dpkg still has a record for ftp (status: '$status'); expected no record at all after a purge"
+status=$(dpkg-query -W -f='${db:Status-Status}' ftp 2>/dev/null || true)
+if [[ -n "$status" && "$status" != "not-installed" ]]; then
+  echo "FAIL: ftp purged - package state is '$status'; expected absent or not-installed"
   exit 1
 fi
 
@@ -19,4 +21,5 @@ fi
 
 echo "PASS: ftp is fully purged and /etc/ftp.conf is gone"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

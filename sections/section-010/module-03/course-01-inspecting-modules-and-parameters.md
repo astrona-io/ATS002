@@ -73,7 +73,7 @@ A configuration file says what a *future* load will use. To see what a loaded mo
 ### Read a live value
 
 ```bash
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 ```
 
 This folder exists only while `dummy` is loaded. On a fresh playground nothing is loaded yet, so the command fails until you load the module.

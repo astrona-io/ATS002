@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 set -u
 
 MARKER=/root/.lab084-bootstrap-marker
@@ -9,7 +11,6 @@ if ! sudo test -e "$MARKER"; then
   echo "FAIL: grub installed - bootstrap marker $MARKER not found (did bootstrap run?)"
   exit 1
 fi
-MARKER_TS=$(sudo stat -c %Y "$MARKER" 2>/dev/null || echo 0)
 
 CORE_IMG=$(sudo find /boot/grub -maxdepth 2 -type f -name 'core.*' 2>/dev/null | head -n1)
 if [[ -z "$CORE_IMG" ]]; then
@@ -23,8 +24,7 @@ if [[ "$CORE_SIZE" -le 0 ]]; then
   exit 1
 fi
 
-CORE_TS=$(sudo stat -c %Y "$CORE_IMG" 2>/dev/null || echo 0)
-if [[ "$CORE_TS" -le "$MARKER_TS" ]]; then
+if ! sudo test "$CORE_IMG" -nt "$MARKER"; then
   echo "FAIL: grub installed - $CORE_IMG was not rewritten after the bootstrap marker; grub-install does not appear to have actually run this session"
   exit 1
 fi
@@ -35,4 +35,5 @@ if ! sudo grub-script-check /boot/grub/grub.cfg; then
 fi
 echo "PASS: $CORE_IMG was rewritten after bootstrap; generated GRUB syntax is valid"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

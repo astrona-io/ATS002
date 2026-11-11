@@ -79,6 +79,7 @@ EOF
 
 # Start it TRANSIENT: running now, but nothing written to the persistent store.
 sudo virsh create /root/metrics-cache.xml
+sudo virsh dumpxml metrics-cache | sudo tee /root/metrics-cache.xml >/dev/null
 
 sudo virsh list --all
 sudo virsh dominfo metrics-cache || true

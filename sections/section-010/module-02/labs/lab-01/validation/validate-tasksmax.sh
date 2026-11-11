@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms data-ingest.service's systemd TasksMax cgroup ceiling has been
 # raised (to "infinity" or at least 65536) and applied to the running unit.
 
@@ -27,4 +29,5 @@ fi
 
 echo "FAIL: TasksMax raised - data-ingest.service TasksMax is '$prop', expected 'infinity' or >= $threshold"
 exit 1
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

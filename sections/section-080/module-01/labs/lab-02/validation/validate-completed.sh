@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Grades from OUTSIDE any chroot: re-mount the stand-in disk's root
 # partition read-only and confirm /etc/fstab's /data entry now declares the
 # data partition's REAL filesystem type (xfs), matching blkid - so a
@@ -42,4 +44,5 @@ esac
 
 echo "PASS: /etc/fstab /data entry now declares xfs, matching blkid; device spec unchanged"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

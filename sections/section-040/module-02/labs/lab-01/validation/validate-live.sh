@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 set -eu
 fail() { echo "FAIL: $*"; exit 1; }
 [ "$(getenforce)" = Enforcing ] || fail 'SELinux must remain enforcing'
@@ -16,4 +18,5 @@ ps -eZ | grep 'httpd_t.*httpd' >/dev/null || fail 'Apache is not confined as htt
 [ "$(curl --fail --silent --max-time 5 http://127.0.0.1:8888/)" = 'SELinux page ready' ] || fail 'Apache cannot serve the page'
 [ "$(curl --fail --silent --max-time 5 http://127.0.0.1:8888/probe)" = 'SELinux backend ready' ] || fail 'Apache cannot reach the backend'
 echo 'PASS: confined Apache serves content and reaches its backend with SELinux enforcing'
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

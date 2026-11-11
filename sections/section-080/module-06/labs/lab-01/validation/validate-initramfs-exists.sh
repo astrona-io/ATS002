@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the initramfs image of the running kernel exists again and was
 # created after the lab started.
 
@@ -23,4 +25,5 @@ fi
 
 echo "PASS: $INITRD exists and was rebuilt during the lab"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

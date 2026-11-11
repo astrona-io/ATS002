@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms webreport.service is genuinely serving on TCP 8080:
 #   - active + enabled
 #   - a webreport process is the listener on :8080
@@ -33,4 +35,5 @@ echo "$body" | grep -q 'report service OK' || fail "HTTP GET on :8080 did not re
 
 echo "PASS: webreport.service is active, enabled, and serving on TCP 8080; portsquatter is stopped"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

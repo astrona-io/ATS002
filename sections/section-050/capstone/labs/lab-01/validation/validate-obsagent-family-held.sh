@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms every installed obsagent-* package is present in
 # `apt-mark showhold`, computed live against whatever the obsagent-*
 # family actually is on this host rather than a hardcoded package list.
@@ -31,4 +33,5 @@ fi
 echo "PASS: every installed obsagent-* package is held (apt-mark showhold):"
 echo "$expected"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

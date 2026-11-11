@@ -18,10 +18,10 @@ Load `dummy` and ask for two interfaces:
 # shell: host, root
 sudo modprobe dummy numdummies=2
 lsmod | grep dummy
-cat /sys/module/dummy/parameters/numdummies      # -> 2
+ip -o link show type dummy | wc -l      # -> 2
 ```
 
-The parameter name `numdummies` comes from `modinfo -p dummy`. With `numdummies=2`, the module creates two interfaces, `dummy0` and `dummy1`, instead of the default zero.
+The parameter name `numdummies` comes from `modinfo -p dummy`. With `numdummies=2`, the module creates two interfaces, `dummy0` and `dummy1`, and you can verify both with `ip link show type dummy`.
 
 ## `modprobe` versus `insmod`
 
@@ -71,7 +71,7 @@ A parameter on the `modprobe` command line applies **only to that one load**. Th
 
 ```bash
 lsmod | grep dummy
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 ip link show type dummy          # dummy0, dummy1 now exist
 ```
 
@@ -82,7 +82,7 @@ Later you will write the value into a configuration file. To prove that the file
 ```bash
 sudo modprobe -r dummy
 sudo modprobe dummy               # no numdummies= here
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 ```
 
 If the value still comes out as `2`, a configuration file is doing the work. With no file in place, it goes back to the default.
@@ -94,7 +94,7 @@ Run the full load and check it in one go:
 ```bash
 sudo modprobe dummy numdummies=2
 lsmod | grep dummy
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 ip -br link show type dummy
 ```
 
@@ -107,7 +107,7 @@ dummy0           DOWN           ...
 dummy1           DOWN           ...
 ```
 
-The module is loaded, `/sys/module/dummy/parameters/numdummies` confirms the value took, and two `dummyN` interfaces now exist. Run `sudo modprobe -r dummy` to remove it again. This parameter was for this load only, and nothing on disk remembers it.
+The module is loaded, `ip -o link show type dummy` confirms the interfaces were created, and two `dummyN` interfaces now exist. Run `sudo modprobe -r dummy` to remove it again. This parameter was for this load only, and nothing on disk remembers it.
 
 To read more on the machine itself, see `man modprobe` (including `--show-depends`), `man depmod`, `man insmod` and `man rmmod`.
 

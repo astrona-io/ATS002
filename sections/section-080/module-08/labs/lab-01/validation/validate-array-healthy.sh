@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms /dev/md/cargo is clean with two active devices and none failed.
 
 set -u
@@ -13,7 +15,7 @@ if [[ ! -e "$ARRAY" ]]; then
 fi
 
 DETAIL=$(sudo mdadm --detail "$ARRAY" 2>/dev/null)
-STATE=$(echo "$DETAIL" | awk -F' : ' '/^ *State :/ {print $2; exit}')
+STATE=$(echo "$DETAIL" | awk -F' : ' '/^ *State :/ {gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2); print $2; exit}')
 ACTIVE=$(echo "$DETAIL" | awk -F' : ' '/Active Devices :/ {gsub(/ /, "", $2); print $2; exit}')
 FAILED=$(echo "$DETAIL" | awk -F' : ' '/Failed Devices :/ {gsub(/ /, "", $2); print $2; exit}')
 
@@ -34,4 +36,5 @@ fi
 
 echo "PASS: $ARRAY is clean with two active devices"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

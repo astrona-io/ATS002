@@ -60,7 +60,7 @@ sudo modprobe dummy                 # bare — no numdummies= on the line
 Then check the result:
 
 ```bash
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 ```
 
 ```text

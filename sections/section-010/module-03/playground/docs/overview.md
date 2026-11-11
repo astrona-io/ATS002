@@ -14,8 +14,8 @@ This is a **playground**, not a lab. It starts, runs `bootstrap/prepare.sh`, and
 
 - `lsmod | head` and `cat /proc/modules | head`: the same data from two sources.
 - `modinfo -p dummy`: its one parameter, `numdummies (int)`.
-- `sudo modprobe dummy numdummies=2`, then `cat /sys/module/dummy/parameters/numdummies` and `ip link show type dummy`.
-- `sudo modprobe -r dummy`, then save the line `options dummy numdummies=2` in a file such as `/etc/modprobe.d/dummy.conf`. Load the module with a bare `sudo modprobe dummy` and read the parameter again.
+- `sudo modprobe dummy numdummies=2`, then `ip -o link show type dummy | wc -l` and `ip link show type dummy`.
+- `sudo modprobe -r dummy`, then save the line `options dummy numdummies=2` in a file such as `/etc/modprobe.d/dummy.conf`. Load the module with a bare `sudo modprobe dummy` and count the dummy interfaces again.
 - Save the line `blacklist dummy` as `/etc/modprobe.d/bl-dummy.conf`. Then confirm that `sudo modprobe dummy` still works: a blacklist only blocks automatic loads, not explicit ones.
 
 ## When you are done

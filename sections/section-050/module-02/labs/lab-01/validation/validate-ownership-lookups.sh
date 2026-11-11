@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms dpkg's package database correctly resolves ownership of
 # /usr/bin/logtail in both directions -- the reverse lookup (file to
 # package) and the forward lookup (package to files) -- which only
@@ -22,4 +24,5 @@ fi
 
 echo "PASS: dpkg -S and dpkg -L both correctly resolve logtail-utils <-> /usr/bin/logtail"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

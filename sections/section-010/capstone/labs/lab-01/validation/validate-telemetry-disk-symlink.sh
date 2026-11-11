@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms a custom udev rule under /etc/udev/rules.d/ creates a
 # /dev/telemetry-disk symlink that resolves to the actual disk carrying
 # serial "lab010-telemetry" -- ground-truthed via the always-present
@@ -37,4 +39,5 @@ fi
 
 echo "PASS: /dev/telemetry-disk -> $actual_disk (serial $SERIAL)"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

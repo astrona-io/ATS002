@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+sudo apt-get update
 sudo mkdir -p /opt/course/apt-research
 apt search fail2ban | sudo tee /opt/course/apt-research/fail2ban-search.txt
 apt show nginx | sudo tee /opt/course/apt-research/nginx-show.txt
