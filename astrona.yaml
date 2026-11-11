@@ -887,9 +887,8 @@ modules:
     description: >
       Diagnose Mandatory Access Control denials that occur even when standard
       DAC permissions are correct. Hands-on AppArmor profile diagnosis and
-      repair on the platform's native Ubuntu image, plus a fully worked,
-      honestly-labeled conceptual walkthrough of the equivalent SELinux
-      workflow used on RHEL-family exam hosts.
+      repair on Ubuntu, followed by live SELinux service repair on a pinned
+      Rocky Linux image with enforcement enabled.
 
     content:
       - type: reading
@@ -971,7 +970,7 @@ modules:
         title: Question
         path: sections/section-040/module-02/labs/lab-01/question.md
       - type: lab
-        title: "SELinux Fix Script Lab"
+        title: "SELinux Service Repair Lab"
         path: sections/section-040/module-02/labs/lab-01
         difficulty: intermediate
         estimated_duration: 15m

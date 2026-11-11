@@ -49,6 +49,7 @@ If your playground is fresh, for example after a mission, `inventory-db` is not 
 
 ```sh
 sudo virt-install \
+  --virt-type qemu --arch x86_64 \
   --name inventory-db \
   --memory 2048 \
   --vcpus 2 \

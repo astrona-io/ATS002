@@ -58,7 +58,8 @@ sudo grub-install /dev/vda
 UEFI:
 
 ```bash
-sudo grub-install --target=x86_64-efi --efi-directory=/boot/efi
+target=x86_64-efi; [ "$(uname -m)" != aarch64 ] || target=arm64-efi
+  sudo grub-install --target="$target" --efi-directory=/boot/efi
 ```
 
 The UEFI form above is for 64-bit Intel and AMD machines. If your training ship runs on an ARM computer, the target is `arm64-efi` instead.
@@ -115,3 +116,11 @@ astrona submit -c sections/section-080/module-04/labs/lab-01
 On a real machine stuck at a bare `grub>` prompt, the work before Step 4 starts in GRUB's own shell instead. `ls` lists the devices in GRUB's naming, and `ls (hd0,gptN)/` finds the partition that holds the kernel and initrd. Then `set root=`, `linux`, `initrd` and `boot` start the installed system by hand for one session.
 
 That hand-built boot lives only in GRUB's memory. Nothing is written to disk, so the next reboot starts from the same broken state. Steps 4 to 6 are exactly what you run once you are back in that way, or through a chroot from rescue media with `/dev`, `/proc` and `/sys` bind-mounted. This lab picks up at that same point, because your ship's current boot already succeeded on its own.
+
+## Verify the next boot
+
+This exercise starts with a working SSH session and a removed GRUB menu. Repair the menu and reinstall GRUB before rebooting. On UEFI, use `x86_64-efi` for `uname -m` output `x86_64`, or `arm64-efi` for `aarch64`. Keep the existing bootloader ID `ubuntu`.
+
+After `sudo grub-script-check /boot/grub/grub.cfg` succeeds, record `cat /proc/sys/kernel/random/boot_id`, run `sudo reboot`, reconnect and compare the boot ID. It must change. Recheck the generated menu and service state before submission. CI performs this reboot and reruns both graders. The graders inspect state; they do not run `grub-install` for you.
+
+This is a preventive repair on the VM's real boot disk. Rescue-media boot, initramfs emergency shells and offline password recovery remain separate skills; this SSH exercise does not assess them.

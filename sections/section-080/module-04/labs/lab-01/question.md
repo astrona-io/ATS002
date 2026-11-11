@@ -20,3 +20,11 @@ The grader checks that:
 - `/boot/grub/grub.cfg` exists, is not empty, has at least one line starting with `menuentry`, and was written after the lab was set up
 - GRUB's installed core image (`core.img` or `core.efi` under `/boot/grub`) was rewritten after the lab was set up, which shows you really ran `grub-install`
 - `grub-install --recheck` on the disk behind `/` (or in its UEFI form) finishes without an error
+
+## Verify the next boot
+
+This exercise starts with a working SSH session and a removed GRUB menu. Repair the menu and reinstall GRUB before rebooting. On UEFI, use `x86_64-efi` for `uname -m` output `x86_64`, or `arm64-efi` for `aarch64`. Keep the existing bootloader ID `ubuntu`.
+
+After `sudo grub-script-check /boot/grub/grub.cfg` succeeds, record `cat /proc/sys/kernel/random/boot_id`, run `sudo reboot`, reconnect and compare the boot ID. It must change. Recheck the generated menu and service state before submission. CI performs this reboot and reruns both graders. The graders inspect state; they do not run `grub-install` for you.
+
+This is a preventive repair on the VM's real boot disk. Rescue-media boot, initramfs emergency shells and offline password recovery remain separate skills; this SSH exercise does not assess them.

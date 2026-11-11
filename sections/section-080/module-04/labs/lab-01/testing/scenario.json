@@ -1,0 +1,31 @@
+{
+  "initial_failures": {
+    "default/verify-grub-config-regenerated": "grub.cfg does not exist"
+  },
+  "solution": [
+    {
+      "script": "testing/reference.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "missing-menu",
+      "apply": [
+        {
+          "script": "testing/remove-menu.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-grub-config-regenerated": "grub.cfg does not exist"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-menu.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}

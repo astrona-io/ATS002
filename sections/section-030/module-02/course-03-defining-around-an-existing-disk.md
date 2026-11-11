@@ -28,6 +28,7 @@ sudo cp inventory-db.qcow2 /var/lib/libvirt/images/
 ```bash
 # shell: host, root — builds XML, defines the domain, starts it
 sudo virt-install \
+  --virt-type qemu --arch x86_64 \
   --name inventory-db \
   --memory 2048 \
   --vcpus 2 \
@@ -111,7 +112,7 @@ If `default` shows `inactive`, a domain that uses it fails to start with a netwo
 
 ## See it in your playground
 
-The playground staged an empty `/var/lib/libvirt/images/inventory-db.qcow2` for exactly this. You define a domain around it, then look at the XML and the process it produced.
+The playground staged a bootable CirrOS image at `/var/lib/libvirt/images/inventory-db.qcow2` for exactly this. You define a domain around it, then look at the XML and the process it produced.
 
 ### Define the domain around the staged disk
 
@@ -119,6 +120,7 @@ On the host, run:
 
 ```sh
 sudo virt-install \
+  --virt-type qemu --arch x86_64 \
   --name inventory-db \
   --memory 2048 \
   --vcpus 2 \
@@ -138,7 +140,7 @@ Starting install...
 Domain creation completed.
 ```
 
-The KVM warning is expected. This host is itself a virtual machine, so libvirt falls back to software emulation (TCG, the Tiny Code Generator inside QEMU). It changes nothing about the lifecycle. `sudo virsh list --all` now shows `inventory-db` as `running`. The guest console would show "no bootable device" because the disk is empty. That is fine: this module is about the domain, not what boots inside it.
+The KVM warning is expected. This host is itself a virtual machine, so libvirt falls back to software emulation (TCG, the Tiny Code Generator inside QEMU). It changes nothing about the lifecycle. `sudo virsh list --all` now shows `inventory-db` as `running`. Wait for the guest to obtain a DHCP lease with `sudo virsh domifaddr inventory-db --source lease`, then run `ssh-keyscan -T 2 ADDRESS` against that lease. A responding SSH service proves that Linux booted; `running` alone does not.
 
 ### Flags became a file, and a process
 
@@ -172,3 +174,9 @@ Expect something like:
 > - **The `default` network is `inactive`.** A domain attached to it fails to start with a network error. Start it with `sudo virsh net-start default`.
 
 > *`virt-install --import` writes the domain XML from its flags, then does a persistent `define` plus a `start`. It is one command, but nothing you could not write and run by hand.*
+
+## Prove the imported guest boots
+
+The playground and lab now stage a checksum-verified CirrOS 0.6.3 disk. It is a small bootable Linux guest. Use `--virt-type qemu --arch x86_64` in this nested environment, then wait for `sudo virsh domifaddr inventory-db --source lease` to show its private address. `ssh-keyscan -T 2 ADDRESS` must return a guest host key. This is a reachability check, not a replacement for verifying host-key trust before a real login.
+
+The lab checks boot, persistent resources and autostart. Its CI test reboots the outer host and checks the guest again. The image has public test credentials and belongs only on the isolated default NAT network.

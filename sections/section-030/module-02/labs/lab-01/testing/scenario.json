@@ -1,0 +1,32 @@
+{
+  "initial_failures": {
+    "default/verify-inventory-db-domain": "domain 'inventory-db' is not defined"
+  },
+  "solution": [
+    {
+      "script": "testing/reference.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "stopped-guest",
+      "apply": [
+        {
+          "script": "testing/stop.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-inventory-db-domain": "guest is not running"
+      },
+      "restore": [
+        {
+          "script": "testing/start.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ],
+  "reboot_timeout": 480
+}
