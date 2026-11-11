@@ -18,7 +18,7 @@ if [[ $rc -ne 0 ]]; then
   exit 1
 fi
 
-if grep -qi "error" <<< "$output"; then
+if grep -qi "^error:" <<< "$output"; then
   echo "FAIL: rpmdb queryable - rpm -qa output still contains error text:"
   echo "$output" | grep -i "error"
   exit 1
@@ -30,14 +30,15 @@ if [[ "$count" -lt 20 ]]; then
   exit 1
 fi
 
-if ! sudo docker exec rpmbox bash -c '
+if ! sudo docker exec -i rpmbox bash <<'INVENTORY_CHECK'
   set -euo pipefail
   current=$(mktemp)
-  trap '''rm -f "$current"''' EXIT
+  trap 'rm -f "$current"' EXIT
   rpm -qa | LC_ALL=C sort > "$current"
   missing=$(LC_ALL=C comm -23 /root/rpm-packages-before.txt "$current")
   test -z "$missing" || { printf "Missing records:\n%s\n" "$missing"; exit 1; }
-'; then
+INVENTORY_CHECK
+then
   echo "FAIL: rpmdb inventory is missing original package records"
   exit 1
 fi

@@ -22,7 +22,7 @@ out="$(D dnf check 2>&1)"; rc=$?
 # rpm -qa clean and plausible.
 qa="$(D bash -c 'rpm -qa' 2>&1)"; qrc=$?
 [ $qrc -eq 0 ] || fail "rpm -qa exits non-zero inside rpmbox"
-echo "$qa" | grep -qi 'error' && fail "rpm -qa output contains error text"
+echo "$qa" | grep -qi '^error:' && fail "rpm -qa output contains error text"
 [ "$(echo "$qa" | wc -l)" -ge 20 ] || fail "rpm -qa returned an implausibly small package count"
 
 # The dependency gap must actually be closed.

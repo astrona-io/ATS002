@@ -13,7 +13,7 @@ fail=0
 
 # --- dummy: loaded live with numdummies=4 ---
 
-if ! lsmod | grep -qw dummy; then
+if ! test -d /sys/module/dummy; then
   echo "FAIL: kernel modules - dummy module is not currently loaded"
   fail=1
 else
@@ -51,14 +51,14 @@ else
   echo "PASS: kernel modules - pcspkr is blacklisted via /etc/modprobe.d/"
 fi
 
-if lsmod | grep -qw pcspkr; then
+if test -d /sys/module/pcspkr; then
   echo "FAIL: kernel modules - pcspkr is still loaded; unload it with 'sudo modprobe -r pcspkr'"
   fail=1
 else
   sudo udevadm trigger --subsystem-match=sound >/dev/null 2>&1 || true
   sudo udevadm settle --timeout=10 >/dev/null 2>&1 || true
 
-  if lsmod | grep -qw pcspkr; then
+  if test -d /sys/module/pcspkr; then
     echo "FAIL: kernel modules - pcspkr reloaded automatically after udevadm trigger; blacklist is not holding"
     fail=1
   else

@@ -52,5 +52,8 @@ with open(status_path, "w") as f:
     f.write("\n\n".join(out))
 PYEOF
 
+printf '%s\n' /etc/ftp.conf | sudo tee /var/lib/dpkg/info/ftp.conffiles >/dev/null
+printf '%s\n' /etc/ftp.conf | sudo tee -a /var/lib/dpkg/info/ftp.list >/dev/null
+
 echo "ftp installed with a tracked conffile at /etc/ftp.conf"
 ASTRONA_STUDENT_SCRIPT

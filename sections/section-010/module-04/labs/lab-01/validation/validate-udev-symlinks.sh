@@ -22,7 +22,7 @@ fi
 expected_disk=$(readlink -f "$BYID")
 expected_part="${expected_disk}1"
 
-if ! grep -rq 'backup-drive' /etc/udev/rules.d/ 2>/dev/null; then
+if ! grep -rq --include='*.rules' 'backup-drive' /etc/udev/rules.d/ 2>/dev/null; then
   echo "FAIL: udev symlinks - no custom rule under /etc/udev/rules.d/ mentions backup-drive"
   exit 1
 fi

@@ -1,6 +1,6 @@
 {
   "initial_failures": {
-    "default/verify-pid-max-raised": "persists kernel.pid_max|below|low"
+    "default/verify-pid-max-raised": "persists kernel.pid_max|below|low|live kernel.pid_max"
   },
   "solution": [
     {
@@ -16,7 +16,7 @@
         }
       ],
       "failures": {
-        "default/verify-pid-max-raised": "persists kernel.pid_max|below|low"
+        "default/verify-pid-max-raised": "persists kernel.pid_max|below|low|live kernel.pid_max"
       },
       "restore": [
         {

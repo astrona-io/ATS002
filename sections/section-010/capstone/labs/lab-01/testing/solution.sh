@@ -20,9 +20,9 @@ sudo mkdir -p /etc/modprobe.d
 sudo tee /etc/modprobe.d/blacklist-pcspkr.conf >/dev/null <<'REFERENCE_FILE'
 blacklist pcspkr
 REFERENCE_FILE
-if lsmod | grep -qw dummy; then sudo modprobe -r dummy; fi
+if test -d /sys/module/dummy; then sudo modprobe -r dummy; fi
 sudo modprobe dummy
-if lsmod | grep -qw pcspkr; then sudo modprobe -r pcspkr; fi
+if test -d /sys/module/pcspkr; then sudo modprobe -r pcspkr; fi
 sudo mkdir -p /etc/udev/rules.d
 sudo tee /etc/udev/rules.d/99-telemetry-disk.rules >/dev/null <<'REFERENCE_FILE'
 SUBSYSTEM=="block", ENV{DEVTYPE}=="disk", ATTRS{serial}=="lab010-telemetry", SYMLINK+="telemetry-disk"

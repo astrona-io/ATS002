@@ -13,7 +13,7 @@ if ! grep -rqE '^\s*blacklist\s+pcspkr\b' /etc/modprobe.d/ 2>/dev/null; then
   exit 1
 fi
 
-if lsmod | grep -qw pcspkr; then
+if test -d /sys/module/pcspkr; then
   echo "FAIL: pcspkr blacklisted - pcspkr is still loaded; unload it with 'sudo modprobe -r pcspkr'"
   exit 1
 fi
@@ -21,7 +21,7 @@ fi
 sudo udevadm trigger --subsystem-match=sound >/dev/null 2>&1 || true
 sudo udevadm settle --timeout=10 >/dev/null 2>&1 || true
 
-if lsmod | grep -qw pcspkr; then
+if test -d /sys/module/pcspkr; then
   echo "FAIL: pcspkr blacklisted - pcspkr reloaded automatically after udevadm trigger; blacklist is not holding"
   exit 1
 fi

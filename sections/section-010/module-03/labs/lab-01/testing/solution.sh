@@ -12,6 +12,6 @@ sudo mkdir -p /etc/modprobe.d
 sudo tee /etc/modprobe.d/blacklist-pcspkr.conf >/dev/null <<'REFERENCE_FILE'
 blacklist pcspkr
 REFERENCE_FILE
-if lsmod | grep -qw dummy; then sudo modprobe -r dummy; fi
+if test -d /sys/module/dummy; then sudo modprobe -r dummy; fi
 sudo modprobe dummy
-if lsmod | grep -qw pcspkr; then sudo modprobe -r pcspkr; fi
+if test -d /sys/module/pcspkr; then sudo modprobe -r pcspkr; fi

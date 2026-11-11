@@ -22,9 +22,9 @@ if [[ "$installed" != "$expected" ]]; then
   exit 1
 fi
 
-status=$(dpkg-query -W -f='${Status}' nginx 2>/dev/null || echo "")
-if [[ "$status" != "install ok installed" ]]; then
-  echo "FAIL: nginx pinned version installed - package status is '$status', expected 'install ok installed'"
+status=$(dpkg-query -W -f='${db:Status-Status}' nginx 2>/dev/null || echo "")
+if [[ "$status" != "installed" ]]; then
+  echo "FAIL: nginx pinned version installed - package status is '$status', expected 'installed'"
   exit 1
 fi
 

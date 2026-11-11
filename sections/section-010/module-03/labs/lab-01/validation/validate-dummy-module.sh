@@ -8,7 +8,7 @@ sudo -n bash <<'GRADER_ROOT'
 
 set -u
 
-if ! lsmod | grep -qw dummy; then
+if ! test -d /sys/module/dummy; then
   echo "FAIL: dummy module - not currently loaded"
   exit 1
 fi

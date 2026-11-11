@@ -12,7 +12,7 @@ sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 set -eu
 
 echo "Installing a few extra real packages inside rpmbox first, so there is realistic data in the RPM database before we corrupt it..."
-sudo docker exec rpmbox dnf -y install vim-enhanced wget tree
+sudo docker exec rpmbox dnf -y install vim-enhanced wget tree diffutils
 
 echo "Confirming rpmdb backend in use inside rpmbox..."
 sudo docker exec rpmbox ls -la /var/lib/rpm
@@ -23,7 +23,11 @@ sudo docker exec rpmbox rpm -qa | wc -l
 # No package transaction runs while taking this lab snapshot.
 sudo docker exec rpmbox bash -c '
   set -eu
-  rpm --rebuilddb
+  # RPM renames its database directory during rebuild. Make that directory
+  # local to the container writable layer before the exercise starts.
+  cp -a /var/lib/rpm /var/lib/rpm-upper
+  rm -rf /var/lib/rpm
+  mv /var/lib/rpm-upper /var/lib/rpm
   cp -a /var/lib/rpm /root/rpmdb-known-good
   rpm -qa | LC_ALL=C sort > /root/rpm-packages-before.txt
   cd /root/rpmdb-known-good

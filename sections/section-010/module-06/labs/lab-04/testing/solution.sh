@@ -7,6 +7,7 @@ ExecStart=
 ExecStart=/usr/local/sbin/ingestdb
 REFERENCE_FILE
 sudo systemctl daemon-reload
+sudo systemctl reset-failed ingest-db
 sudo systemctl enable --now ingest-db
 sudo systemctl reset-failed ingest
 sudo systemctl daemon-reload

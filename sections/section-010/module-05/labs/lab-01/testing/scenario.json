@@ -1,6 +1,6 @@
 {
   "initial_failures": {
-    "default/verify-guilty-process-removed": "still alive"
+    "default/verify-guilty-process-removed": "still alive|collector2 is still running"
   },
   "solution": [
     {

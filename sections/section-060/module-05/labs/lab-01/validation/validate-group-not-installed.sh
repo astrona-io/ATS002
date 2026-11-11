@@ -24,7 +24,12 @@ if grep -qi "Development Tools" <<< "$output"; then
   exit 1
 fi
 
-history=$(sudo docker exec rpmbox dnf history list 2>&1)
+history=$(sudo docker exec -i rpmbox bash -s <<'HISTORY_SCRIPT'
+ids=$(dnf history list | awk -F '|' '$1 ~ /^[[:space:]]*[0-9]+[[:space:]]*$/ {gsub(/ /,"",$1); print $1}')
+dnf history info $ids
+HISTORY_SCRIPT
+)
+
 if ! grep -Eqi 'group install.*Development Tools' <<< "$history" || ! grep -Eqi 'group remove.*Development Tools' <<< "$history"; then
   echo "FAIL: group not installed - transaction history does not show the required install/remove cycle"
   exit 1

@@ -18,7 +18,7 @@ sudo docker exec rpmbox dnf -y install epel-release
 sudo docker exec rpmbox dnf -y makecache
 
 echo "Installing telnet inside rpmbox (the student's removal target)..."
-sudo docker exec rpmbox dnf -y install telnet
+sudo docker exec rpmbox dnf -y install telnet systemd
 
 echo "Confirming fail2ban and mtr are not pre-installed..."
 sudo docker exec rpmbox bash -c '
