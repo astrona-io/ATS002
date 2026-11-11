@@ -26,7 +26,9 @@ echo "$qa" | grep -qi '^error:' && fail "rpm -qa output contains error text"
 [ "$(echo "$qa" | wc -l)" -ge 20 ] || fail "rpm -qa returned an implausibly small package count"
 
 # The dependency gap must actually be closed.
-read -r VICTIM DEP < <(D cat /root/.lab066-broken 2>/dev/null)
+VICTIM=$(D sed -n '1p' /root/.lab066-broken)
+DEP=$(D sed -n '2p' /root/.lab066-broken)
+[ -n "$VICTIM" ] && [ -n "$DEP" ] || fail "dependency scenario metadata is missing"
 if [ -n "$DEP" ]; then
   if D rpm -q "$DEP" >/dev/null 2>&1; then
     :   # dependency reinstalled - good

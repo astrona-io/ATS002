@@ -42,9 +42,9 @@ if [[ -z "$expected" ]]; then
   fail=1
 else
   installed=$(dpkg-query -W -f='${Version}' telemetry-agent 2>/dev/null || echo "")
-  status=$(dpkg-query -W -f='${Status}' telemetry-agent 2>/dev/null || echo "")
+  status=$(dpkg-query -W -f='${db:Status-Status}' telemetry-agent 2>/dev/null || echo "")
 
-  if [[ "$installed" != "$expected" || "$status" != "install ok installed" ]]; then
+  if [[ "$installed" != "$expected" || "$status" != "installed" ]]; then
     echo "FAIL: vendor repo trusted/pinned/held - telemetry-agent version is '$installed' (status '$status'), expected exactly '$expected' installed"
     fail=1
   fi
