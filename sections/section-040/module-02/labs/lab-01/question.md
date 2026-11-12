@@ -1,13 +1,23 @@
-# Question
+# Restore Apache with SELinux enforcing
 
-Solve this question on: `terminal`
+The Rocky Linux VM has a page at `/srv/web/index.html` and a working backend at `127.0.0.1:19090`. Apache is configured to listen on TCP 8888 and proxy `/probe` to that backend. SELinux policy prevents the service from working.
 
-Astronaut, a web server on a RHEL-family machine is refused by SELinux. This training ship cannot run SELinux, so this lab grades the **script you write**, not a live SELinux system. The commands are not run.
+Allow 10–15 minutes for the tasks. The first image download and package installation are separate startup time. This image uses x86_64; ARM hosts emulate it and start more slowly.
 
-Write a shell script at `/root/selinux-fix.sh`, with one command per line, that does all of the following on the target machine:
+1. Read `sudo journalctl -u httpd` and `sudo ausearch -m AVC -ts recent`. Identify the denied operation before changing policy.
+2. Make `/srv/web` and its children use `httpd_sys_content_t` persistently, then apply the labels.
+3. Assign TCP 8888 to `http_port_t` and persistently enable `httpd_can_network_connect`. Keep SELinux enforcing, including for the `httpd_t` domain.
+4. Restart Apache. Verify that `/` returns `SELinux page ready` and `/probe` returns `SELinux backend ready` through `http://127.0.0.1:8888`. Reboot with `sudo reboot`, reconnect, and repeat both requests.
 
-1. Gives `/srv/web` and everything below it the file type `httpd_sys_content_t`, so that the change stays after a full relabel. Then applies it to the files that exist now, recursively.
-2. Allows the web server to make outgoing network connections by turning the boolean `httpd_can_network_connect` on, so that it stays after a reboot.
-3. Allows the web server to listen on TCP port `8888` by giving the port the type `http_port_t`.
+The grader checks policy and real requests. CI also checks the result after a reboot. Disabling SELinux or making Apache permissive does not satisfy the task.
+<!-- curriculum-links -->
 
-The script must pass `bash -n`. The folder `/srv/web` exists on this ship so you can name real paths.
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Checks policy, live labels, confinement, local page and backend requests.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

@@ -7,3 +7,15 @@ Astronaut, a development team needs a full local build toolchain in one go. Inst
 Separately, this ship has a full PHP 8.1 module set installed: packages named like `php8.1-cli`, `php8.1-fpm`, `php8.1-mysql` and others that share the `php8.1-` prefix. An unrelated but risky upgrade is planned elsewhere on the system. Find every one of these packages by naming pattern, not by listing them by hand, and hold the *entire* PHP 8.1 family at its current versions, not just one or two of them. Confirm the full hold list afterwards.
 
 The grader checks that `build-essential`, `git`, `cmake` and `pkg-config` all have the status `install ok installed`, and that every installed package whose name starts with `php8.1-` appears in `apt-mark showhold`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-05](../../course.md).
+
+The grader checks:
+
+- Confirms build-essential, git, cmake, and pkg-config are all cleanly installed.
+- Confirms every installed php8.1-* package is present in apt-mark showhold (recomputed live, not hardcoded).
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

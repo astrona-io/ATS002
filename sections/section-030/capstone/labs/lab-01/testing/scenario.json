@@ -1,0 +1,29 @@
+{
+  "initial_failures": {
+    "default/verify-vmreport-binary": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "regression",
+      "apply": [
+        {
+          "script": "testing/negative.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-vmreport-binary": "FAIL:"
+      },
+      "restore": [
+        {
+          "script": "testing/restore.sh"
+        }
+      ]
+    }
+  ],
+  "reboot_timeout": 480
+}

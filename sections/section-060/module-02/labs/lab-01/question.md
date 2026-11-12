@@ -16,3 +16,19 @@ Astronaut, something happened to this ship overnight. Assume a terminal session 
 5. Prove the system is back to a clean, queryable state, with both `rpm -qa` and `dnf`'s own consistency check.
 
 The grader checks that `rpm -qa` inside `rpmbox` succeeds, prints no error text and lists at least 20 packages, and that `dnf check` succeeds.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms rpm -qa inside rpmbox completes cleanly with no database errors and a plausible package count.
+- Confirms dnf check inside rpmbox passes cleanly against the rebuilt database.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.
+
+## Recovery evidence
+
+The setup saved `/root/rpmdb-known-good`, its checksum file `/root/rpmdb-known-good.sha256`, and `/root/rpm-packages-before.txt` before the simulated damage. Preserve the damaged database, verify and restore this snapshot, then rebuild and check the package inventory. Rebuilding alone cannot recreate destroyed package headers.

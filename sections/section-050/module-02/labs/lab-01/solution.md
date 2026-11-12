@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Six steps: inspect, install, check ownership, then diagnose and recover the stuck package. Run `astrona submit` after a step to see which checks already pass.
+Six steps: inspect, install, check ownership, then diagnose and recover the stuck package. Use the inspection commands below as you work. Submit only after completing the lab.
 
 ## Step 1: Find the exact file, then inspect it before installing
 
@@ -25,7 +25,7 @@ sudo dpkg -i /home/candidate/downloads/logtail-utils_2.3.1_*.deb
 
 This package declares no unmet dependencies, so the install finishes cleanly. If it had a missing dependency, the standard habit is to run `sudo apt --fix-broken install` right afterwards, because `dpkg` alone has no repository to fetch it from.
 
-At this point `astrona submit` should pass the install and ownership checks.
+The commands above let you check the install and ownership checks before continuing.
 
 ---
 

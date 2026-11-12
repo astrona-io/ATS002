@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Creates a corruption LOOK-ALIKE inside rpmbox.
 #
 # The section-060/module-02 course teaches: before assuming rpmdb
@@ -20,30 +22,26 @@ set -eu
 D() { sudo docker exec rpmbox "$@"; }
 
 echo "Installing a package with a clear runtime dependency..."
-# python3-pip requires python3-setuptools on Rocky 9. Fall back to a
-# different well-known pair if that changes.
-if D dnf -y install python3-pip; then
-  VICTIM=python3-pip
-  DEP="$(D rpm -q --requires python3-pip 2>/dev/null | grep -oE 'python3-setuptools' | head -1 || true)"
-  [ -n "$DEP" ] || DEP=python3-setuptools
-else
-  D dnf -y install httpd
-  VICTIM=httpd
-  DEP=httpd-core
-fi
+D dnf -y install httpd
+VICTIM=httpd
+DEP=httpd-core
+D rpm -q --requires "$VICTIM" | grep -q '^httpd-core'
 
 echo "Victim package: $VICTIM   removed requirement: $DEP"
 
-# Remove the dependency from the database WITHOUT removing its files or
-# touching the victim - leaving an unmet Requires:.
+# Remove the dependency while retaining the package that requires it.
 D rpm -e --nodeps "$DEP"
 
 echo "--- rpm -qa still works fine (database is NOT corrupt): ---"
 D bash -c 'rpm -qa | wc -l'
 
 echo "--- but dnf check now fails (this is the student's symptom): ---"
-D dnf check 2>&1 | tail -8 || true
+if D dnf check; then
+  echo "Expected a missing dependency, but dnf check passed" >&2
+  exit 1
+fi
 
 # Leave a breadcrumb the validator can use to know what was broken.
 D bash -c "printf '%s\n%s\n' '$VICTIM' '$DEP' > /root/.lab066-broken"
 echo "lab-066 look-alike ready."
+ASTRONA_STUDENT_SCRIPT

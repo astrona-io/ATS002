@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Two separate tasks: one install transaction, then a bulk hold found by pattern. Run `astrona submit` after a step to see which checks already pass.
+Two separate tasks: one install transaction, then a bulk hold found by pattern. Use the inspection commands below as you work. Submit only after completing the lab.
 
 ---
 
@@ -12,7 +12,7 @@ sudo apt install build-essential git cmake pkg-config
 
 Giving all four names to one command means APT plans the dependencies of all four together. It finds one set of versions that suits all four at once, instead of four separate plans run one after another. `build-essential` is a metapackage: it has no real content of its own and exists only to pull in `gcc`, `g++`, `make` and the rest of a standard build toolchain as dependencies. It installs exactly like any other package name.
 
-At this point `astrona submit` should pass the toolchain check.
+The commands above let you check the toolchain check before continuing.
 
 ---
 

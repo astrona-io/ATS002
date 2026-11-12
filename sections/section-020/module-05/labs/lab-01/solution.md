@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Follow these steps to build an image, create a volume and a network, and start one container that uses all three. Add `sudo` in front of the `docker` commands if your user is not in the `docker` group. After each step you can send the lab for grading with `astrona submit -c sections/section-020/module-05/labs/lab-01`. Checks for the steps you have not done yet fail, and that is fine.
+Follow these steps to build an image, create a volume and a network, and start one container that uses all three. Add `sudo` in front of the `docker` commands if your user is not in the `docker` group. Check each step using the inspection commands below. Submit only after completing the lab.
 
 ---
 

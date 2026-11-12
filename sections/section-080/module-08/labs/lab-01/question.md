@@ -17,3 +17,17 @@ The grader checks that:
 - disk `c` is an active member of the array and disk `b` is not
 - `/etc/mdadm/mdadm.conf` has an `ARRAY` line with the array's UUID
 - the array mounts and `marker.txt` and `logs/flight.log` still have their original content
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-08](../../course.md).
+
+The grader checks:
+
+- Confirms /dev/md/cargo is clean with two active devices and no failed devices.
+- Confirms disk c is an active member and failed disk b is not.
+- Confirms /etc/mdadm/mdadm.conf has an ARRAY line with the array's UUID.
+- Confirms the array mounts and both original files have their original content.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

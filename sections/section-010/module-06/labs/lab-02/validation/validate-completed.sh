@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms metricsd.service was genuinely repaired:
 #   - active + enabled
 #   - still runs as a NON-root user (the fix must not be "run it as root")
@@ -27,3 +31,5 @@ after="$(wc -l < "$log")"
 
 echo "PASS: metricsd.service is active, enabled, running as '$svc_user', and writing $log"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

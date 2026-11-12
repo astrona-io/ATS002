@@ -13,3 +13,14 @@ Change it so the new size is **permanent**: it must survive a host reboot, not j
 The grader checks the stored definition (`virsh dumpxml --inactive`) for `<memory>` of 2097152 KiB, `<currentMemory>` of at least 2097152 KiB and `<vcpu>` of 2, and the running domain for `State: running`, `Max memory: 2097152 KiB` and `CPU(s): 2`.
 
 As practice, be ready to explain why `virsh setmem` or `virsh setvcpus` used *without* `--config` would not have solved this task.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms web-db has 2048 MiB memory and 2 vCPUs in BOTH its persistent (inactive) config and its running state, is running, stays persistent, and keeps its original disk and default-network attachment.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

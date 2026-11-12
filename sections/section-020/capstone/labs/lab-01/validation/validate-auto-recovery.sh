@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Functional proof: stops billing_v2 to simulate a crash, then polls for
 # up to ~100 seconds to confirm the scheduled cron job actually brings it
 # back up on its own - the real test of "correct cron scheduling AND
@@ -30,3 +34,5 @@ fi
 
 echo "PASS: billing_v2 automatically recovered after being stopped, confirming the scheduled cron job works end-to-end"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

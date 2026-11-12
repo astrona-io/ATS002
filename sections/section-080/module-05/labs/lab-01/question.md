@@ -17,3 +17,17 @@ The grader checks that:
 - `fsck.ext4 -n -f` finds no errors, and the partition is not mounted
 - the partition mounts and `marker.txt` and `logs/flight.log` still have their original content
 - `/root/backup-superblock.txt` names one of the filesystem's backup superblocks
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-05](../../course.md).
+
+The grader checks:
+
+- Confirms the partition has a readable ext4 superblock again.
+- Confirms fsck.ext4 -n -f finds no errors and the partition is not mounted.
+- Confirms the filesystem mounts and both original files have their original content.
+- Confirms /root/backup-superblock.txt names one of the filesystem's backup superblocks.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

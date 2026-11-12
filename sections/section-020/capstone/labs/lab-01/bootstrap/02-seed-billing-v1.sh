@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: seeds the decommissioned billing_v1 container the capstone
 # describes. It is running and bound to host port 9090 — the exact port
 # the replacement container needs — so it must be fully retired (stopped
@@ -11,3 +13,4 @@ sudo docker pull nginx:alpine
 sudo docker rm -f billing_v1 billing_v2 >/dev/null 2>&1 || true
 
 sudo docker run -d --name billing_v1 -p 9090:80 nginx:alpine
+ASTRONA_STUDENT_SCRIPT

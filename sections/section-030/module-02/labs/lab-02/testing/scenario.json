@@ -1,0 +1,32 @@
+{
+  "initial_failures": {
+    "default/verify-metrics-cache-persisted": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "regression",
+      "apply": [
+        {
+          "script": "testing/negative.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-metrics-cache-persisted": "FAIL:"
+      },
+      "restore": [
+        {
+          "script": "testing/restore.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ],
+  "reboot_timeout": 480
+}

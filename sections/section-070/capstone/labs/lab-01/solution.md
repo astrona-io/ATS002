@@ -1,6 +1,6 @@
 # Solution Guide: Zypper Research-Then-Act Capstone
 
-This capstone joins the two halves of `zypper` work: research a package thoroughly before you touch the system, then act on that research with real patch, install and remove operations. Everything runs inside the real openSUSE Leap 15.6 `zypperbox` container. The grader reads the three files in `/root/answers` and checks which packages are installed.
+This capstone joins the two halves of `zypper` work: research a package thoroughly before you touch the system, then act on that research with real patch, install and remove operations. Everything runs inside the real openSUSE Leap 16.0 `zypperbox` container. The grader reads the three files in `/root/answers` and checks which packages are installed.
 
 ---
 
@@ -78,7 +78,7 @@ Both actions now rest on the research you saved in steps 2 to 4, not on guesswor
 ## Step 7: Review the operation history
 
 ```bash
-zypper history | tail -15
+cat /var/log/zypp/history | tail -15
 ```
 
 This confirms that the patch run, the `fail2ban` install and the `telnet-server` removal all happened, each with a timestamp, in the order they ran. If your `zypper` answers that `history` is an unknown command, read the log file directly with `tail -n 15 /var/log/zypp/history`. Remember that this is an audit log, not a rollback tool like `dnf history undo`.
@@ -113,7 +113,7 @@ rpm -q telnet-server
 Expected: `package telnet-server is not installed`, which confirms the removal.
 
 ```bash
-zypper history | tail -15
+cat /var/log/zypp/history | tail -15
 ```
 Expected: the `fail2ban` install entry, followed later by the `telnet-server` removal entry, in the order you ran them.
 

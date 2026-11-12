@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Simulates a real, unattended RPM database corruption inside rpmbox --
 # same technique as lab-062/bootstrap/02-corrupt-rpmdb.sh -- a
 # disk-full/interrupted-write style truncation-plus-overwrite of the
@@ -20,6 +22,19 @@ sudo docker exec rpmbox ls -la /var/lib/rpm
 echo "Pre-corruption package count (bootstrap log only, not shown to the student):"
 sudo docker exec rpmbox rpm -qa | wc -l
 
+# No package transaction runs while taking this lab snapshot.
+sudo docker exec rpmbox bash -c '
+  set -eu
+  # RPM renames its database directory during rebuild. Make that directory
+  # local to the container writable layer before the exercise starts.
+  cp -a /var/lib/rpm /var/lib/rpm-upper
+  rm -rf /var/lib/rpm
+  mv /var/lib/rpm-upper /var/lib/rpm
+  cp -a /var/lib/rpm /root/rpmdb-known-good
+  rpm -qa | LC_ALL=C sort > /root/rpm-packages-before.txt
+  cd /root/rpmdb-known-good
+  sha256sum rpmdb.sqlite > /root/rpmdb-known-good.sha256
+'
 echo "Corrupting /var/lib/rpm/rpmdb.sqlite inside rpmbox..."
 sudo docker exec rpmbox bash -c '
   set -eu
@@ -28,10 +43,7 @@ sudo docker exec rpmbox bash -c '
 
   # Overwrite a chunk of real page data roughly 40% into the file with
   # random bytes. We deliberately never touch the first 4KB (the sqlite
-  # file header + master schema page), so the file is still recognized as
-  # a sqlite database and enough of it remains readable for
-  # rpm --rebuilddb to salvage what it can -- this mirrors a real
-  # interrupted-write event, not a total wipe.
+  # file header + master schema page). Recovery requires the saved snapshot.
   offset=$(( size * 40 / 100 ))
   dd if=/dev/urandom of="$f" bs=1024 seek=$(( offset / 1024 )) count=64 conv=notrunc status=none
 
@@ -49,3 +61,4 @@ echo "Confirming the database is now genuinely broken (expect an error below -- 
 sudo docker exec rpmbox rpm -qa 2>&1 | tail -5
 
 echo "rpmbox's RPM database is now corrupted. The staged metrics-shipper RPM and all already-installed package files are untouched. Diagnosing and repairing the database is the first part of the student's task."
+ASTRONA_STUDENT_SCRIPT

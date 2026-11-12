@@ -69,7 +69,7 @@ The number decides what `apt` does with the match:
 | below `0` | never install this version |
 | `500` | the normal priority of a depot |
 | above `500`, below `1000` (for example `990`) | prefer this version, even if a newer one exists elsewhere, but never downgrade an installed package to it |
-| `1000` or more (for example `1001`) | prefer it and also allow a downgrade to it |
+| above `1000` (for example `1001`) | prefer it and also allow a downgrade to it |
 
 After you save a pin file, run `apt update` and read `apt-cache policy <package>`. The new priority shows in the version table, and the `Candidate:` line moves if the pin won. The manual page `man apt_preferences` has the full rules.
 

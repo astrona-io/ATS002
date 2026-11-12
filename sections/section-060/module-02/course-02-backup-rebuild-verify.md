@@ -124,3 +124,7 @@ When the mission is done, remove it and start your playground again:
 astrona destroy ats-002-lab-062
 astrona run --git git@github.com:astrona-io/ATS002.git -c sections/section-060/module-02/playground
 ```
+
+## When rebuilding cannot recover the database
+
+A rebuild reads the package headers that remain. It cannot recreate bytes lost to truncation or overwrite. The recovery lab therefore provides a database snapshot and a sorted inventory taken before the damage, while no package transaction was running. Preserve the damaged database separately, verify the snapshot checksum, restore it, and rebuild. Compare the recovered inventory with the saved list before accepting the repair. A clean `dnf check` against an empty database does not prove recovery. On a real host, a snapshot must match the installed files and intervening package transactions; an old database copied onto a changed system is not sufficient.

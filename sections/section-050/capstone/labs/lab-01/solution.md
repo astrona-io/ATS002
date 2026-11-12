@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-Five onboarding tasks. Do Task 1 first: Task 2 needs `curl`, and this machine does not start with it. Run `astrona submit` after each task to see which checks already pass.
+Five onboarding tasks. Do Task 1 first: Task 2 needs `curl`, and this machine does not start with it. Use the inspection commands below as you work. Submit only after completing the lab.
 
 ---
 

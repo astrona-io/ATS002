@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms /opt/course/apt-research/upgradable.txt matches the live
 # 'apt list --upgradable' output, compared by package name as a sorted
 # set (versions in the live environment can shift between bootstrap and
@@ -28,3 +32,5 @@ fi
 
 echo "PASS: $path matches the live apt list --upgradable output"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

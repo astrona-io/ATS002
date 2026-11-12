@@ -25,3 +25,14 @@ The grader mounts the stand-in root partition read-only, from outside any chroot
 
 - the filesystem type (field 3) matches the data partition's real type as reported by `blkid`
 - the device (field 1) still identifies the data partition, either as `UUID=<its real UUID>` or as a `/dev/disk/by-...` path
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms /etc/fstab on the stand-in disk's root partition now declares the data partition's real filesystem type (xfs), matching blkid, so a boot-time mount -a would succeed.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

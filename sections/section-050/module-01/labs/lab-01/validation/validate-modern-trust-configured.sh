@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms at least one /etc/apt/sources.list.d/*.list file uses
 # signed-by= pointing at a valid, dedicated keyring under
 # /etc/apt/keyrings/, rather than relying on the deprecated global
@@ -34,3 +38,5 @@ fi
 
 echo "PASS: $list_match references a valid dedicated keyring at $keyring_path"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

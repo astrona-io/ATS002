@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the secondary disk currently has its 2 original partitions
 # back -- the partition-table layer of the restore. Resolves the disk via
 # its stable serial-based by-id path, never a raw /dev/vdX guess.
@@ -28,3 +32,5 @@ fi
 
 echo "PASS: $BASEDEV has both original partitions present ($P1, $P2)"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

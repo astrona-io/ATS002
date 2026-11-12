@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-This walkthrough finds the guilty process with `strace`, records its real program file, ends it, and removes that file. The two innocent processes stay untouched. You can run `astrona submit` after any step: each failing check names the one thing still missing.
+This walkthrough finds the guilty process with `strace`, records its real program file, ends it, and removes that file. The two innocent processes stay untouched. Use the inspection commands below as you work. Submit only after completing the lab.
 
 ---
 

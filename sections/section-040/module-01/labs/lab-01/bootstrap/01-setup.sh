@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: installs AppArmor userspace tooling, creates the "appservice"
 # demo daemon and its relocated log directory (with correct DAC perms),
 # and loads a deliberately too-strict AppArmor profile in enforce mode so
@@ -95,3 +97,4 @@ sudo systemctl enable --now appservice
 # Give the service a few cycles to attempt (and fail) its writes, so a
 # real DENIED audit entry already exists for the student to find.
 sleep 6
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND -- Compile & Install From Source
 #
 # Runs once when the environment comes up. Environment preparation only:
@@ -11,6 +13,15 @@
 # --bindir and --disable-ipv6, a Makefile.in and C source that gcc
 # compiles into an ELF binary. There is no task and no grading.
 set -euo pipefail
+
+missing=()
+for package in build-essential bzip2; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 echo "[playground] source-build-bay: checking build tools ..."
 if ! command -v gcc >/dev/null 2>&1 || ! command -v make >/dev/null 2>&1; then
@@ -148,3 +159,4 @@ sudo chmod 644 /tools/links-2.14.tar.bz2
 rm -rf "$BUILD_ROOT"
 
 echo "[playground] source-build-bay: ready. Tarball: /tools/links-2.14.tar.bz2"
+ASTRONA_STUDENT_SCRIPT

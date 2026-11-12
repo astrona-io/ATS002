@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: creates three long-running "collector" processes. Only
 # collector2 periodically calls the forbidden kill() syscall (a harmless
 # signal-0 self-probe every ~5 seconds -- a real kill() syscall, but not
@@ -101,3 +103,4 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now collector1.service
 sudo systemctl enable --now collector2.service
 sudo systemctl enable --now collector3.service
+ASTRONA_STUDENT_SCRIPT

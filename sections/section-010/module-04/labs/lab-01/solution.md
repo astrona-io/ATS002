@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-This walkthrough finds the backup disk, writes a udev rule that matches it by serial number, and applies the rule without a reboot. You can run `astrona submit` after any step: each failing check names the one thing still missing.
+This walkthrough finds the backup disk, writes a udev rule that matches it by serial number, and applies the rule without a reboot. Use the inspection commands below as you work. Submit only after completing the lab.
 
 ---
 

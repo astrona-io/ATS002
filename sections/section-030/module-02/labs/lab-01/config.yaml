@@ -1,34 +1,34 @@
 metadata:
-  name: "ats-002-lab-032"
+  name: ats-002-lab-032
   docs:
-    solution: "solution.md"
-    question: "question.md"
-
+    solution: solution.md
+    question: question.md
 runtime:
-  type: "qemu"
+  type: qemu
   qemu:
   - image:
-      type: "oci"
-      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
-
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
+      checksums:
+        amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
+        arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
     cpus: 2
-    memoryMB: 2048
+    memoryMB: 3072
     diskSizeGB: 20
     display: false
-
 bootstrap:
   init:
-    - name: "lab-032-setup"
-      description: "Installs libvirt-daemon-system/qemu-system-x86, starts libvirtd with its default NAT network active, and stages an empty 2G qcow2 disk at /var/lib/libvirt/images/inventory-db.qcow2"
-      type: "folder"
-      source: "bootstrap/"
-
+  - name: lab-032-setup
+    description: Stages a checksum-verified bootable CirrOS guest and starts the libvirt
+      default network
+    type: folder
+    source: bootstrap/
 validation:
   scripts:
-    - name: "verify-inventory-db-domain"
-      description: "Confirms inventory-db is defined persistently with 2048 MiB memory, 2 vCPUs, the default network attached, and autostart enabled"
-      type: "file"
-      source: "validation/validate-completed.sh"
-
+  - name: verify-inventory-db-domain
+    description: Checks persistent domain resources, autostart, the assigned disk,
+      a guest DHCP lease and a live SSH service
+    type: file
+    source: validation/validate-completed.sh
 teardown:
   keepCluster: false

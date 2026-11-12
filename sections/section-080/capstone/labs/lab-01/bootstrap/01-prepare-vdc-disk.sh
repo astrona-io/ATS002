@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the secondary disk for this capstone's "partition table already
 # wiped" half. Unlike lab-083 (where the student creates their own
 # backup before simulating a disaster), this capstone starts further
@@ -91,3 +93,4 @@ echo "  Secondary disk: $BASEDEV, partition table already wiped"
 echo "  Backup on file: /root/vdc-ptable-backup.bin"
 
 exit 0
+ASTRONA_STUDENT_SCRIPT

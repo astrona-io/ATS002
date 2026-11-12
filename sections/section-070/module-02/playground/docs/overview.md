@@ -5,9 +5,9 @@ This is a **playground**, not a lab. The training ship starts clean, runs its se
 ## What is in the box
 
 - One Ubuntu 24.04 virtual machine. Open a terminal on it with `astrona ssh astro-zypper-package-research`.
-- Docker with a long-lived openSUSE Leap 15.6 container named `zypperbox`. Inside it `zypper`, the RPM database and the openSUSE repositories are all real. Open a shell in it with `docker exec -it zypperbox bash`.
+- Docker with a long-lived openSUSE Leap 16.0 container named `zypperbox`. Inside it `zypper`, the RPM database and the openSUSE repositories are all real. Open a shell in it with `docker exec -it zypperbox bash`.
 - A fresh repository catalogue inside `zypperbox`.
-- `python3-base` and `python3-pip` installed.
+- `python3-base` and `python313-pip` installed.
 - An empty folder `/root/answers` inside the container for saving what you find.
 
 The host machine itself runs Ubuntu 24.04, which has no `rpm`-family tools of its own. Run every package command inside the container, not on the host. If Docker refuses with a permission error, put `sudo` in front of `docker`.

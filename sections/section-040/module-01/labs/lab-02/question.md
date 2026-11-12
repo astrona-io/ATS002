@@ -14,3 +14,14 @@ Repair it so that all of the following are true:
 The profile file is `/etc/apparmor.d/usr.sbin.credsync`, and its local override is `/etc/apparmor.d/local/usr.sbin.credsync`. You may add the rule by hand or with `aa-logprof`. The daemon only reads the key, so a read rule is all it needs.
 
 The grader checks the live machine: the profile's mode in `aa-status`, the service state, that `/run/credsync/ready` exists and was updated in the last few seconds, and the recent kernel log.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms the credsync profile is loaded in enforce mode, the daemon can now read /etc/credsync/api.key (it writes a ready marker only when the read succeeds), and no fresh apparmor DENIED entries for credsync appear.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

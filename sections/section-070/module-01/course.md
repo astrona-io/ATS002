@@ -12,7 +12,7 @@ After this module you can:
 - Tell `zypper list-updates` apart from `zypper list-patches`, and explain why the two lists can differ.
 - Choose between `zypper patch` and `zypper update` from a written policy, and filter patches by category.
 - Install and remove packages, and predict what happens to changed configuration files on removal.
-- Read `zypper history` as a record of what happened, and undo a change by hand, because there is no `zypper history undo`.
+- Read `cat /var/log/zypp/history` as a record of what happened, and undo a change by hand, because there is no `zypper history undo`.
 
 ## Before you start
 
@@ -25,7 +25,7 @@ Check that you have the knowledge and the tools this module expects before you b
 
 ### What is in your playground
 
-Your playground is a training ship: one Ubuntu 24.04 virtual machine. That machine has no tools of this package family, so the playground runs a real openSUSE Leap 15.6 **container** named `zypperbox` on it. A container is a sealed pod docked to the ship: it has its own files and tools but shares the ship's reactor core (the kernel). Inside it, the package tools and the package database are all real.
+Your playground is a training ship: one Ubuntu 24.04 virtual machine. That machine has no tools of this package family, so the playground runs a real openSUSE Leap 16.0 **container** named `zypperbox` on it. A container is a sealed pod docked to the ship: it has its own files and tools but shares the ship's reactor core (the kernel). Inside it, the package tools and the package database are all real.
 
 - The community `network:utilities` repository added inside `zypperbox`.
 - `telnet-server` installed. `fail2ban` not installed.
@@ -38,10 +38,16 @@ Start the playground, then open a terminal on it with `astrona ssh astro-zypper-
 
 1. [Refresh, Updates and Patches](./course-01-refresh-updates-vs-patches.md): `zypper refresh`, the raw update list and the reviewed patch list, and why they can differ.
 2. [Applying Patches or Updates](./course-02-applying-the-right-one.md): `zypper patch` (only what a patch covers) against `zypper update` (everything), and how to read a task's wording to choose.
-3. [Installing, Removing and Reading History](./course-03-install-remove-history.md): `zypper install` and `zypper remove`, how the RPM layer keeps changed configuration files, and `zypper history` as a log with no undo.
+3. [Installing, Removing and Reading History](./course-03-install-remove-history.md): `zypper install` and `zypper remove`, how the RPM layer keeps changed configuration files, and `cat /var/log/zypp/history` as a log with no undo.
    - Mission: [Zypper Basic Package Operations Lab](./labs/lab-01/README.md)
 4. [Wrap-Up: Mission Debrief](./course-04-wrap-up.md)
 
 ## Why this matters
 
 On the exam, a task that says "conservative" or "security patches only" wants `zypper patch`, not `zypper update`. Both commands finish without errors, so nothing warns you if you pick the wrong one. Knowing which question each command answers is what keeps the system inside its policy.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Zypper Basic Package Operations Lab](labs/lab-01/question.md): Refresh metadata and list available updates and patches as two separate questions; Apply only patches, install one package and remove another; Read zypper's history to confirm what changed.
+- [Zypper Research-Then-Act Capstone Lab](../capstone/labs/lab-01/question.md): Research a package by keyword and metadata before installing it; Apply only curated patches, install and remove packages, and read the history.

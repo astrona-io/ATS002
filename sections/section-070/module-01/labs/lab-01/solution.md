@@ -1,6 +1,6 @@
 # Solution Guide: Zypper Basic Package Operations
 
-This guide walks through a realistic maintenance pass with real `zypper` commands, run inside the `zypperbox` openSUSE Leap 15.6 container. The grader looks at the container's real state: whether `fail2ban` and `telnet-server` are installed, and what `/var/log/zypp/history` recorded.
+This guide walks through a realistic maintenance pass with real `zypper` commands, run inside the `zypperbox` openSUSE Leap 16.0 container. The grader looks at the container's real state: whether `fail2ban` and `telnet-server` are installed, and what `/var/log/zypp/history` recorded.
 
 ---
 
@@ -82,13 +82,13 @@ As with any RPM removal, configuration files the package shipped and nobody chan
 ## Step 6: Review zypper's operation log
 
 ```bash
-zypper history
+cat /var/log/zypp/history
 ```
 
 Check the end of the log to confirm that the patch run, the `fail2ban` install and the `telnet-server` removal all appear, each with a timestamp, in the order they ran:
 
 ```bash
-zypper history | tail -10
+cat /var/log/zypp/history | tail -10
 ```
 
 If your `zypper` answers that `history` is an unknown command, read the log file directly with `tail -n 10 /var/log/zypp/history`. That file is what the grader reads.
@@ -110,7 +110,7 @@ rpm -q telnet-server
 Expected: `package telnet-server is not installed`, which confirms the removal.
 
 ```bash
-zypper history | tail -10
+cat /var/log/zypp/history | tail -10
 ```
 Expected: log entries for the patch run, the `fail2ban` install and the `telnet-server` removal, in that order.
 

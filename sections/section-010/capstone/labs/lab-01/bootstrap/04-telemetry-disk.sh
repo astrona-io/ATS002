@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: waits for the extraDisk (serial lab010-telemetry) to fully
 # settle in the guest before the student starts working. The disk itself
 # is intentionally left raw/blank -- the task is only to give it a stable
@@ -18,3 +20,4 @@ for i in $(seq 1 30); do
 done
 
 sudo udevadm settle --timeout=30 || true
+ASTRONA_STUDENT_SCRIPT

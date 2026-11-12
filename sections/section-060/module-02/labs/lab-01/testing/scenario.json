@@ -1,0 +1,28 @@
+{
+  "initial_failures": {
+    "default/verify-rpmdb-queryable": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "lost-package-record",
+      "apply": [
+        {
+          "script": "testing/negative.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-rpmdb-queryable": "inventory is missing original package records"
+      },
+      "restore": [
+        {
+          "script": "testing/restore.sh"
+        }
+      ]
+    }
+  ]
+}

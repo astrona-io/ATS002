@@ -42,3 +42,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-dnf-pac
 ## Why this matters
 
 A script fails with "command not found", or a ticket asks for "something that blocks brute-force logins". In both cases the fastest fix starts with the right lookup, not a guessed package name. Research first also means you never install a package you have not read about.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [DNF Package Information Lookup Lab](labs/lab-01/question.md): Search for packages by keyword and show a package's metadata without installing it; Find which package provides a missing command; List installed packages by name pattern.
+- [RPM/DNF Package Management Capstone Lab](../capstone/labs/lab-01/question.md): Diagnose and repair a corrupted RPM database with a backup first; Inspect, install and verify a standalone .rpm file; Install a package group and prove the system is consistent with dnf check.

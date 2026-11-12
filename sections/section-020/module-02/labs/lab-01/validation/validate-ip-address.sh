@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks /opt/course/11/ip-address against frontend_v2's actual assigned
 # IP address (default-bridge field, falling back to the per-network map).
 
@@ -11,7 +15,7 @@ if [[ ! -f "$path" ]]; then
   exit 1
 fi
 
-expected="$(sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' frontend_v2 2>/dev/null)"
+expected="$(sudo docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' frontend_v2 2>/dev/null)"
 
 if [[ -z "$expected" ]]; then
   expected="$(sudo docker inspect --format '{{ range .NetworkSettings.Networks }}{{ .IPAddress }}{{ end }}' frontend_v2 2>/dev/null)"
@@ -31,3 +35,5 @@ else
   echo "FAIL: ip-address - $path = '$actual', expected '$expected'"
   exit 1
 fi
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

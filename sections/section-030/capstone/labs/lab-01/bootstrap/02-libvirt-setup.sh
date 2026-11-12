@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap (2/2): installs libvirt/QEMU tooling, ensures libvirtd is
 # running with its default NAT network active, and stages an empty 2G
 # qcow2 disk at /var/lib/libvirt/images/build-agent.qcow2.
@@ -12,6 +14,15 @@
 # vmreport's ability to query it), not guest OS behavior.
 
 set -eu
+
+missing=()
+for package in build-essential; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 sudo systemctl enable --now libvirtd
 
@@ -36,3 +47,4 @@ sudo virsh net-autostart default >/dev/null 2>&1 || true
 sudo mkdir -p /var/lib/libvirt/images
 sudo qemu-img create -f qcow2 /var/lib/libvirt/images/build-agent.qcow2 2G
 sudo chmod 644 /var/lib/libvirt/images/build-agent.qcow2
+ASTRONA_STUDENT_SCRIPT

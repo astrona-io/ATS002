@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms /opt/course/onboarding/redis-candidate.txt records
 # redis-server's live candidate version and the source repository URL
 # that candidate would come from -- both recomputed live here, not
@@ -46,3 +50,5 @@ fi
 
 echo "PASS: $path records redis-server's live candidate version ($expected_candidate) and source ($source_url)"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

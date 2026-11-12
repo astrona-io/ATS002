@@ -1,0 +1,47 @@
+{
+  "initial_failures": {
+    "default/verify-enforcing-service": "FAIL: persistent file-context rule missing"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "permissive-bypass",
+      "apply": [
+        {
+          "script": "testing/permissive.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-enforcing-service": "FAIL: SELinux must remain enforcing"
+      },
+      "restore": [
+        {
+          "script": "testing/enforcing.sh"
+        }
+      ]
+    },
+    {
+      "name": "wrong-live-label",
+      "apply": [
+        {
+          "script": "testing/wrong-label.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-enforcing-service": "FAIL: web content still has home labels"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-label.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}

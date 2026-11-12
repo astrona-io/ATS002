@@ -46,3 +46,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-disk-he
 ## Why this matters
 
 A failing disk usually warns first: a rising error count, a few I/O errors in the log, a slow bay. If you cannot find the right disk and read those signs, you replace the wrong one or find out only when the data is gone. The exam asks you to identify a disk and check it without harming what is on it.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Disk Health Diagnosis Lab](labs/lab-01/question.md): Find a disk by serial and report its size, SMART answer and kernel I/O errors; Run a read-only bad-block scan that leaves the data intact.
+- [System Disaster Recovery Integration Capstone Lab](../capstone/labs/lab-01/question.md): Restore a wiped GPT table from a backup and prove the filesystems are intact; Reinstall GRUB and regenerate grub.cfg on the running machine.

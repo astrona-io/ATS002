@@ -49,3 +49,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-partiti
 ## Why this matters
 
 Repartitioning, resizing and disk cloning are everyday jobs, and each one can damage a partition table with one wrong device name. A backup taken first costs seconds. Checking both layers afterwards is what lets you say "the disk is fine" and be right.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Partition Table Backup & Recovery Lab](labs/lab-01/question.md): Back up a disk's GPT table with sgdisk and check the backup file; Restore the table after a wipe and prove the filesystems are intact.
+- [System Disaster Recovery Integration Capstone Lab](../capstone/labs/lab-01/question.md): Restore a wiped GPT table from a backup and prove the filesystems are intact; Reinstall GRUB and regenerate grub.cfg on the running machine.

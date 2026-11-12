@@ -12,19 +12,19 @@ List installed packages whose names start with `python3-`:
 
 ```bash
 # shell: inside the zypperbox container
-zypper search --installed-only 'python3-*'      # shorthand: zypper se -i 'python3-*'
+zypper search --installed-only 'python3*'      # shorthand: zypper se -i 'python3*'
 ```
 
 ```text
 S | Name          | Summary                     | Type
 --+---------------+-----------------------------+--------
 i | python3-base  | Python 3 interpreter        | package
-i | python3-pip   | Python package installer    | package
+i | python313-pip   | Python package installer    | package
 ```
 
-`-i` (long form `--installed-only`) keeps only packages that match the pattern **and** are installed right now, in one `zypper` command. The quotes around `'python3-*'` stop the shell from expanding the `*` before `zypper` sees it. The opposite filter, `-u` (`--not-installed-only`), keeps only packages that are not installed.
+`-i` (long form `--installed-only`) keeps only packages that match the pattern **and** are installed right now, in one `zypper` command. The quotes around `'python3*'` stop the shell from expanding the `*` before `zypper` sees it. The opposite filter, `-u` (`--not-installed-only`), keeps only packages that are not installed.
 
-It is tempting to run `zypper search 'python3-*' | grep` and scan the `S` column by eye. Do not. `zypper` already has the filter built in, and using it is faster and less likely to go wrong than reading a status column across dozens of rows.
+It is tempting to run `zypper search 'python3*' | grep` and scan the `S` column by eye. Do not. `zypper` already has the filter built in, and using it is faster and less likely to go wrong than reading a status column across dozens of rows.
 
 On some `zypper` versions the status column shows `i+` instead of `i` for a package you asked for by name, and plain `i` for one pulled in as a dependency. Both mean "installed".
 

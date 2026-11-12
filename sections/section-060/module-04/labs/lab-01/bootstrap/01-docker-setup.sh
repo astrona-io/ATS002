@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Installs Docker on the Ubuntu host and starts a long-lived, privileged
 # Rocky Linux 9 container ("rpmbox") that provides a REAL dnf environment
 # for this lab. See module-04/course.md and this lab's README.md for why
@@ -35,5 +37,8 @@ done
 echo "Enabling EPEL and refreshing dnf repo metadata inside rpmbox..."
 sudo docker exec rpmbox dnf -y install epel-release
 sudo docker exec rpmbox dnf -y makecache
+# Keep undo transactions independent of obsolete packages in the container image.
+sudo docker exec rpmbox dnf -y upgrade
 
 echo "rpmbox is ready."
+ASTRONA_STUDENT_SCRIPT

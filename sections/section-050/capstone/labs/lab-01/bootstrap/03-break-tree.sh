@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: tree ships pre-installed in the base image; this manually
 # edits its stanza in /var/lib/dpkg/status to flip its Status line from
 # "install ok installed" to "install ok half-configured" -- reproducing,
@@ -47,3 +49,4 @@ PYEOF
 
 echo "tree is now left in a half-configured (iF) state:"
 dpkg -l | grep tree || true
+ASTRONA_STUDENT_SCRIPT

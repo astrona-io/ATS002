@@ -11,3 +11,16 @@ Then finish the window:
 3. Clean up any dependency packages that are now orphaned, that is, installed automatically and no longer needed by anything.
 
 The grader checks that `fail2ban` has the status `install ok installed`, that `dpkg` has no record of `ftp` at all and `/etc/ftp.conf` no longer exists, and that `apt-get autoremove --dry-run` has nothing left to remove.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-03](../../course.md).
+
+The grader checks:
+
+- Confirms fail2ban is now cleanly installed.
+- Confirms ftp is fully purged (not just removed) -- package gone and /etc/ftp* config gone.
+- Confirms no orphaned auto-installed packages remain (apt autoremove --dry-run reports nothing to remove).
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

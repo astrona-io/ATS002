@@ -887,9 +887,8 @@ modules:
     description: >
       Diagnose Mandatory Access Control denials that occur even when standard
       DAC permissions are correct. Hands-on AppArmor profile diagnosis and
-      repair on the platform's native Ubuntu image, plus a fully worked,
-      honestly-labeled conceptual walkthrough of the equivalent SELinux
-      workflow used on RHEL-family exam hosts.
+      repair on Ubuntu, followed by live SELinux service repair on a pinned
+      Rocky Linux image with enforcement enabled.
 
     content:
       - type: reading
@@ -971,7 +970,7 @@ modules:
         title: Question
         path: sections/section-040/module-02/labs/lab-01/question.md
       - type: lab
-        title: "SELinux Fix Script Lab"
+        title: "SELinux Service Repair Lab"
         path: sections/section-040/module-02/labs/lab-01
         difficulty: intermediate
         estimated_duration: 15m
@@ -1465,7 +1464,7 @@ modules:
       The zypper package tool used across openSUSE and SUSE Linux Enterprise,
       including the patch-vs-update distinction unique to SUSE,
       install/remove/history operations, and the search/info/ what-provides
-      research workflow — exercised inside a real opensuse/leap:15.6 Docker
+      research workflow — exercised inside a real opensuse/leap:16.0 Docker
       sandbox on the platform's Ubuntu VM.
 
     content:

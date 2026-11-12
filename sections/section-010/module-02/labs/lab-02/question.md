@@ -14,3 +14,14 @@ Three independent ceilings can cause this: `kernel.pid_max`, the user's `ulimit 
 3. Raise **only that one** to at least `32768`, persistently, in the standard place for that kind of ceiling: a file under `/etc/sysctl.d/` for a kernel parameter, a drop-in file under `/etc/security/limits.d/` for a user limit, or a systemd override for a unit. A fresh login session must show the new value.
 
 Do **not** change the other two. They are already fine. Adding a `kernel.pid_max` line to any sysctl file, or a `TasksMax=` override, counts as a wrong diagnosis here.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms dataproc's ulimit -u is raised and persisted; that kernel.pid_max and the unit's TasksMax were left at their already-generous values; and that no student-added file needlessly raised pid_max (which was never the limiting ceiling).
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

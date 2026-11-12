@@ -1,6 +1,6 @@
 # Solution Walkthrough
 
-This walkthrough first loads the `dummy` module with its parameter and makes both survive a reboot. Then it blacklists `pcspkr`, unloads it, and proves the blacklist holds. You can run `astrona submit` after any step: each failing check names the one thing still missing.
+This walkthrough first loads the `dummy` module with its parameter and makes both survive a reboot. Then it blacklists `pcspkr`, unloads it, and proves the blacklist holds. Use the inspection commands below as you work. Submit only after completing the lab.
 
 ---
 
@@ -34,10 +34,10 @@ Check that it worked:
 
 ```bash
 lsmod | grep dummy
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 ```
 
-The kernel publishes the live value in `/sys/module/dummy/parameters/numdummies`. It should show `2`. This load is not kept: after a reboot, the module and its parameter would be gone.
+This parameter is not exposed through sysfs on the lab kernel. Count the dummy interfaces instead; there should be two. This load is not kept: after a reboot, the module and its parameter would be gone.
 
 ---
 
@@ -55,7 +55,7 @@ dummy
 
 ## Step 5: Keep the parameter for every load
 
-Save this as `/etc/modprobe.d/dummy.conf`:
+Save this as `/etc/modprobe.d/zz-course-dummy.conf`:
 
 ```ini
 options dummy numdummies=2
@@ -66,11 +66,11 @@ Apply it by unloading the module and loading it again with a bare `modprobe`. Th
 ```bash
 sudo modprobe -r dummy
 sudo modprobe dummy
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 # 2
 ```
 
-`modprobe` read the `options` line from `/etc/modprobe.d/dummy.conf` and passed `numdummies=2` to the kernel, even though you did not type it.
+`modprobe` read the `options` line from `/etc/modprobe.d/zz-course-dummy.conf` and passed `numdummies=2` to the kernel, even though you did not type it.
 
 ---
 
@@ -106,13 +106,13 @@ lsmod | grep pcspkr
 lsmod | grep dummy
 # dummy   ...   0
 
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 # 2
 
 cat /etc/modules-load.d/dummy.conf
 # dummy
 
-cat /etc/modprobe.d/dummy.conf
+cat /etc/modprobe.d/zz-course-dummy.conf
 # options dummy numdummies=2
 
 lsmod | grep pcspkr
@@ -137,7 +137,7 @@ The three configuration files:
 | File | Content |
 | --- | --- |
 | `/etc/modules-load.d/dummy.conf` | `dummy` |
-| `/etc/modprobe.d/dummy.conf` | `options dummy numdummies=2` |
+| `/etc/modprobe.d/zz-course-dummy.conf` | `options dummy numdummies=2` |
 | `/etc/modprobe.d/blacklist-pcspkr.conf` | `blacklist pcspkr` |
 
 The commands:
@@ -149,7 +149,7 @@ modinfo -p dummy
 sudo modprobe dummy numdummies=2
 sudo modprobe -r dummy
 sudo modprobe dummy
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 
 sudo modprobe -r pcspkr
 sudo udevadm trigger

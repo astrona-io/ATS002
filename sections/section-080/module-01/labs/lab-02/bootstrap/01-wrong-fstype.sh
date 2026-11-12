@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the disposable "data-002" stand-in disk for lab-085.
 #
 # Companion to lab-081 (mistyped UUID). Here the fstab entry's *device
@@ -67,3 +69,4 @@ echo "lab-085 bootstrap complete."
 echo "  data-002 root partition: $ROOT_PART"
 echo "  data-002 data partition: $DATA_PART  (real type: $REAL_TYPE; fstab wrongly says ext4)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

@@ -1,0 +1,31 @@
+{
+  "initial_failures": {
+    "default/verify-metricsd-running-enabled-and-writing": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "regression",
+      "apply": [
+        {
+          "script": "testing/negative.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-metricsd-running-enabled-and-writing": "FAIL:"
+      },
+      "restore": [
+        {
+          "script": "testing/restore.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}

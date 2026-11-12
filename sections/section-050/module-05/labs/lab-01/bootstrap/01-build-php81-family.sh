@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: builds and installs a small, real, locally-built stand-in
 # for a "PHP 8.1 module family" -- six minimal .deb packages sharing the
 # php8.1- name prefix, installed directly with dpkg -i.
@@ -63,3 +65,4 @@ build_and_install "php8.1-xml"     "DOM/XML module for PHP 8.1"
 
 echo "PHP 8.1 family installed:"
 dpkg -l | grep -E '^ii  php8\.1-'
+ASTRONA_STUDENT_SCRIPT

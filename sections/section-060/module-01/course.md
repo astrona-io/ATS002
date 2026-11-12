@@ -46,3 +46,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-rpm-low
 ## Why this matters
 
 Sooner or later a vendor hands you a single `.rpm` that lives in no depot. If you install it blind, you do not know where it writes or what it needs. And when a server behaves strangely, `rpm -V` tells you in seconds whether any packaged file was changed since install. Both are everyday administrator skills, and the exam tests them directly.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [RPM Low-Level Package Management Lab](labs/lab-01/question.md): Inspect an .rpm file's metadata and file list before installing it; Install it with rpm and query ownership, file lists, requires and provides; Verify the installed files against the RPM database.
+- [RPM/DNF Package Management Capstone Lab](../capstone/labs/lab-01/question.md): Diagnose and repair a corrupted RPM database with a backup first; Inspect, install and verify a standalone .rpm file; Install a package group and prove the system is consistent with dnf check.

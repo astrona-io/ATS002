@@ -9,3 +9,15 @@ Astronaut, on this server (`data-001`) the user `asset-manager` runs the timed j
 3. Remove the original system-wide cron job, so the job no longer runs from two places. No line that runs `nightly-sync.sh` may remain in `/etc/crontab` or in any file under `/etc/cron.d/`.
 
 The grader reads `asset-manager`'s crontab and searches `/etc/crontab` and `/etc/cron.d/`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms asset-manager's per-user crontab contains both the converted 8:30pm nightly-sync.sh job and the new Mon/Thu 11:15am clean.sh job.
+- Confirms the original system-wide nightly-sync.sh entry no longer exists in /etc/crontab or /etc/cron.d/.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

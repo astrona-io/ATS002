@@ -45,3 +45,9 @@ Every command block says which rights it expects, so you can also follow the tex
 ## Why this matters
 
 A repeating job does not fit every task. The exam asks you to schedule one job for a set time, to make a job run even when the machine was off, and to keep a user away from the roster. Each task leaves a file or a queue entry that you can check.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [One-Shot And Missed Jobs Lab](labs/lab-01/question.md): Queue a one-time job for a set time with at and check it with atq and at -c; Add a job to /etc/anacrontab with the right four fields and test the file; Refuse a user for crontab with /etc/cron.deny.
+- [Scheduled Container Recovery Capstone Lab](../capstone/labs/lab-01/question.md): Remove a container that holds a host port and start its replacement with limits; Schedule a per-user watchdog script that restarts the container when it stops.

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms GRUB's own installed boot-sector/EFI code on the primary disk
 # was genuinely reinstalled during this session -- not just left over
 # from the base VM image -- and that a final `grub-install --recheck`
@@ -22,7 +26,6 @@ if ! sudo test -e "$MARKER"; then
   echo "FAIL: grub installed - bootstrap marker $MARKER not found (did bootstrap run?)"
   exit 1
 fi
-MARKER_TS=$(sudo stat -c %Y "$MARKER" 2>/dev/null || echo 0)
 
 CORE_IMG=$(sudo find /boot/grub -maxdepth 2 -type f -name 'core.*' 2>/dev/null | head -n1)
 if [[ -z "$CORE_IMG" ]]; then
@@ -36,8 +39,7 @@ if [[ "$CORE_SIZE" -le 0 ]]; then
   exit 1
 fi
 
-CORE_TS=$(sudo stat -c %Y "$CORE_IMG" 2>/dev/null || echo 0)
-if [[ "$CORE_TS" -le "$MARKER_TS" ]]; then
+if ! sudo test "$CORE_IMG" -nt "$MARKER"; then
   echo "FAIL: grub installed - $CORE_IMG was not rewritten after the bootstrap marker; grub-install does not appear to have actually run this session"
   exit 1
 fi
@@ -78,3 +80,5 @@ rm -f "$RECHECK_LOG"
 
 echo "PASS: $CORE_IMG was genuinely rewritten after bootstrap ($CORE_SIZE bytes) and grub-install --recheck on $DISK confirms GRUB is healthy"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

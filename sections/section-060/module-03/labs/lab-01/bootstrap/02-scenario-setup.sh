@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Prepares the dnf-basics scenario inside rpmbox:
 #  - Enables EPEL (fail2ban is not in Rocky's default BaseOS/AppStream
 #    repos -- it's a standard EPEL package, so a plain `dnf install
@@ -16,7 +18,7 @@ sudo docker exec rpmbox dnf -y install epel-release
 sudo docker exec rpmbox dnf -y makecache
 
 echo "Installing telnet inside rpmbox (the student's removal target)..."
-sudo docker exec rpmbox dnf -y install telnet
+sudo docker exec rpmbox dnf -y install telnet systemd
 
 echo "Confirming fail2ban and mtr are not pre-installed..."
 sudo docker exec rpmbox bash -c '
@@ -32,3 +34,4 @@ sudo docker exec rpmbox bash -c '
 '
 
 echo "rpmbox dnf-basics scenario ready: telnet installed, fail2ban/mtr absent, EPEL enabled."
+ASTRONA_STUDENT_SCRIPT

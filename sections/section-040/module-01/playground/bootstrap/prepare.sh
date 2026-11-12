@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — AppArmor Profile Enforcement
 #
 # Runs once when the environment comes up. Environment preparation only:
@@ -106,3 +108,4 @@ sudo systemctl enable --now appservice
 sleep 8
 
 echo "[playground] ready. Try:  sudo aa-status   and   sudo journalctl -k | grep 'apparmor=\"DENIED\"'"
+ASTRONA_STUDENT_SCRIPT

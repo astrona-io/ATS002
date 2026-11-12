@@ -10,7 +10,7 @@ docker exec -it zypperbox bash
 
 Every `zypper` command below runs inside that shell. The Ubuntu host itself has no `zypper` installed.
 
-You are running a routine maintenance pass on an openSUSE Leap 15.6 host (the `zypperbox` container). This host follows a conservative, security-focused update policy: apply reviewed security patches promptly, but do not chase every routine package version bump.
+You are running a routine maintenance pass on an openSUSE Leap 16.0 host (the `zypperbox` container). This host follows a conservative, security-focused update policy: apply reviewed security patches promptly, but do not chase every routine package version bump.
 
 1. Refresh the repository metadata.
 2. Report which raw package updates are currently available and, separately, which patches are currently available. These are two different questions, and the policy review needs both answered before anything is applied.
@@ -20,3 +20,16 @@ You are running a routine maintenance pass on an openSUSE Leap 15.6 host (the `z
 6. Review `zypper`'s own operation history to confirm exactly what was done during this maintenance window, and in what order.
 
 Use `zypper` for the install and the removal, so that its history log records both. The grader checks that `fail2ban` is installed, that `telnet-server` is not installed, and that `/var/log/zypp/history` holds an `install` entry for `fail2ban` and a `remove` entry for `telnet-server`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms fail2ban is installed inside zypperbox.
+- Confirms telnet-server has been removed from zypperbox.
+- Confirms zypper's own history log recorded the fail2ban install and telnet-server removal.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

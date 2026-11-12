@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the starting state for the software RAID playground: a healthy
 # RAID 1 array /dev/md/cargo on two spare disks (serials lab089-raid-a and
 # lab089-raid-b) with an ext4 filesystem and two known files. A third blank
@@ -51,3 +53,4 @@ sync
 sudo umount "$MOUNT_POINT"
 rmdir "$MOUNT_POINT"
 sync
+ASTRONA_STUDENT_SCRIPT

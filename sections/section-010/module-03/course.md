@@ -46,3 +46,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-kernel-
 ## Why this matters
 
 Exam tasks about modules almost always have two halves: change the running system now, and make sure the change survives a reboot. Get only one half right and the task fails. A blacklist that you think blocks everything, but that only blocks automatic loads, is the classic trap. This module trains you to prove each half with a check command.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Kernel Module Loading & Blacklisting Lab](labs/lab-01/question.md): Load a kernel module with a parameter and make both the load and the parameter survive a reboot; Unload a module and blacklist it so hardware detection cannot load it again.
+- [Kernel, Process, Module & Device Runtime Management Capstone Lab](../capstone/labs/lab-01/question.md): Record live kernel state and raise kernel.pid_max live and persistently; Load, parameterise, persist and blacklist kernel modules, and name a disk with a udev rule; Confirm a hung service with strace before you stop it.

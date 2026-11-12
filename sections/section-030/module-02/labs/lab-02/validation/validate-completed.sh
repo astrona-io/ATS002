@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the transient domain 'metrics-cache' was promoted to a persistent
 # domain IN PLACE:
 #   - the domain still exists (was not lost)
@@ -48,3 +52,5 @@ vcpus="$(echo "$info" | awk -F: '/^CPU\(s\):/ {gsub(/[^0-9]/,"",$2); print $2}')
 
 echo "PASS: '$DOMAIN' is now persistently defined (original spec preserved), autostart enabled, definition present at /etc/libvirt/qemu/${DOMAIN}.xml"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

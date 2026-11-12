@@ -11,3 +11,14 @@ The source XML is still on disk at `/root/metrics-cache.xml`. Work with the syst
 3. Configure it to **autostart** when the host boots.
 
 The grader checks that `metrics-cache` exists and shows `Persistent: yes` and `Autostart: enable` in `virsh dominfo`, that `/etc/libvirt/qemu/metrics-cache.xml` and its autostart link in `/etc/libvirt/qemu/autostart/` exist, that `Max memory` is 1048576 KiB and `CPU(s)` is 1, and that the stored definition still uses the `default` network and the `metrics-cache.qcow2` disk.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms metrics-cache is now persistently defined (with its original 1024 MiB / 1 vCPU / default-network / disk spec preserved), has autostart enabled, and has an on-disk definition at /etc/libvirt/qemu/metrics-cache.xml.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

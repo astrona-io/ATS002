@@ -52,3 +52,11 @@ Every command block in the parts also says which shell, which user and which rig
 ## Why this matters
 
 "Fixed one layer, and the problem moved to the next" is a pattern you will meet again and again in Linux troubleshooting. Process limits show it more clearly than almost anything else. On the exam you may get a workload that hits exactly this failure, and the task expects a check of every layer, not a single `pid_max` bump.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Process Limits: Diagnose the Single Clamp (ulimit -u) Lab](labs/lab-02/question.md): Read all three process ceilings and find the one that is actually too low; Raise only a user's ulimit -u in the right file, leaving the other ceilings alone.
+- [Process & Thread Ceilings Lab](labs/lab-01/question.md): Raise kernel.pid_max both live and in a sysctl drop-in file; Raise one user's process limit with a file under /etc/security/limits.d/; Raise a service's TasksMax with a systemd override and apply it to the running unit.
+- [Process Limits: Diagnose the Single Clamp (TasksMax) Lab](labs/lab-03/question.md): Read all three process ceilings and find the one that is actually too low; Raise only a service's TasksMax with a systemd override and apply it to the running unit.
+- [Kernel, Process, Module & Device Runtime Management Capstone Lab](../capstone/labs/lab-01/question.md): Record live kernel state and raise kernel.pid_max live and persistently; Load, parameterise, persist and blacklist kernel modules, and name a disk with a udev rule; Confirm a hung service with strace before you stop it.

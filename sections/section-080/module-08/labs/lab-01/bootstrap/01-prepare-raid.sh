@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the STARTING state for lab-089 (software RAID recovery): a RAID 1
 # array /dev/md/cargo on two spare disks (serials lab089-raid-a and
 # lab089-raid-b) with an ext4 filesystem and two known files. Disk b is
@@ -55,3 +57,4 @@ rmdir "$MOUNT_POINT"
 sudo mdadm /dev/md/cargo --fail "$DISK_B"
 sudo mdadm /dev/md/cargo --remove "$DISK_B"
 sync
+ASTRONA_STUDENT_SCRIPT

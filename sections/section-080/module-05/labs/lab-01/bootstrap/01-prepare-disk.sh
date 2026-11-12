@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Builds the STARTING state for lab-086 (filesystem check and repair): a
 # spare disk with one GPT partition and an ext4 filesystem holding known
 # files, whose PRIMARY superblock has then been zeroed. The backup
@@ -62,3 +64,4 @@ rmdir "$MNT"
 sudo dd if=/dev/zero of="$P1" bs=1024 seek=1 count=1 conv=notrunc status=none
 sync
 sudo udevadm settle --timeout=10 || true
+ASTRONA_STUDENT_SCRIPT

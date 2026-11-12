@@ -23,3 +23,14 @@ Repair the stand-in system the way you would repair a real one, with a chroot:
 8. Leave the chroot and unmount everything.
 
 The grader mounts the stand-in root partition read-only, from outside any chroot, and checks that its `/etc/fstab` has a line that mounts `UUID=<real UUID of the data partition>` on `/data` as `ext4`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms /etc/fstab on the stand-in disk's root partition now references the data partition's real UUID.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

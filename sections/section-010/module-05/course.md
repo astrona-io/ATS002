@@ -46,3 +46,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-strace-
 ## Why this matters
 
 On the exam and on a real server, the hard part is rarely typing `kill`. It is being sure which process to kill, proving it with evidence, and cleaning up without destroying that evidence or taking down innocent services. This module trains that order until it becomes a habit.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Process Forensics with strace Lab](labs/lab-01/question.md): Attach strace to running processes and filter for one system call; Find a process's real executable through /proc/PID/exe; Stop and remove only the confirmed offender, leaving innocent processes running.
+- [Kernel, Process, Module & Device Runtime Management Capstone Lab](../capstone/labs/lab-01/question.md): Record live kernel state and raise kernel.pid_max live and persistently; Load, parameterise, persist and blacklist kernel modules, and name a disk with a udev rule; Confirm a hung service with strace before you stop it.

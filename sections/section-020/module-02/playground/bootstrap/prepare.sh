@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND -- Docker Container Lifecycle
 #
 # Runs once when the environment comes up. Environment preparation only:
@@ -35,3 +37,4 @@ sudo docker run -d \
   nginx:alpine
 
 echo "[playground] docker-lifecycle-bay: ready."
+ASTRONA_STUDENT_SCRIPT

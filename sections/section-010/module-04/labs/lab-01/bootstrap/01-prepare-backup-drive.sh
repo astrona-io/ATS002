@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: partitions and formats the extraDisk (serial lab014-backup-drive)
 # with a single ext4 partition, simulating an already-in-use external backup
 # drive the student must give a stable udev-based name to.
@@ -45,3 +47,8 @@ mkfs_retry() {
 }
 
 mkfs_retry "$PART"
+# This exercise starts without a custom backup-drive name.
+sudo find /etc/udev/rules.d -maxdepth 1 -type f -exec sed -i '/backup-drive/d' {} +
+sudo rm -f /dev/backup-drive /dev/backup-drive1
+sudo udevadm control --reload-rules
+ASTRONA_STUDENT_SCRIPT

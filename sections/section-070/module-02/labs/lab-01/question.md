@@ -16,3 +16,17 @@ A `/root/answers` directory already exists inside the container. For each resear
 2. **Full details, no install:** Use `zypper info` to pull the complete details of the package `nginx` (version, dependencies, description, installed size) without installing it. Save the output to `/root/answers/02-info.txt`. `nginx` must still not be installed afterwards.
 3. **Which package supplies a missing command:** A colleague reports that a script fails because the `ip` command is not found. Find which package would have to be installed to provide `/usr/sbin/ip`, without installing anything yet. Save the output to `/root/answers/03-what-provides.txt`.
 4. **Filtered installed listing:** List every installed package whose name starts with `python3-`, using `zypper`'s own installed-only search option, not a raw pattern piped through `grep`. Save the output to `/root/answers/04-installed-python3.txt`. Every `python3-` row in it must be marked installed.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms /root/answers/01-search.txt records a zypper search hit for fail2ban.
+- Confirms /root/answers/02-info.txt records zypper info metadata for nginx, without nginx actually being installed.
+- Confirms /root/answers/03-what-provides.txt records zypper what-provides identifying iproute2 for /usr/sbin/ip.
+- Confirms /root/answers/04-installed-python3.txt records an installed-only zypper search listing python3-base and python313-pip.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

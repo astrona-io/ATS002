@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the student recognised this was NOT database corruption and
 # resolved the actual dependency gap:
 #   - `dnf check` inside rpmbox now passes cleanly
@@ -18,11 +22,13 @@ out="$(D dnf check 2>&1)"; rc=$?
 # rpm -qa clean and plausible.
 qa="$(D bash -c 'rpm -qa' 2>&1)"; qrc=$?
 [ $qrc -eq 0 ] || fail "rpm -qa exits non-zero inside rpmbox"
-echo "$qa" | grep -qi 'error' && fail "rpm -qa output contains error text"
+echo "$qa" | grep -qi '^error:' && fail "rpm -qa output contains error text"
 [ "$(echo "$qa" | wc -l)" -ge 20 ] || fail "rpm -qa returned an implausibly small package count"
 
 # The dependency gap must actually be closed.
-read -r VICTIM DEP < <(D cat /root/.lab066-broken 2>/dev/null)
+VICTIM=$(D sed -n '1p' /root/.lab066-broken)
+DEP=$(D sed -n '2p' /root/.lab066-broken)
+[ -n "$VICTIM" ] && [ -n "$DEP" ] || fail "dependency scenario metadata is missing"
 if [ -n "$DEP" ]; then
   if D rpm -q "$DEP" >/dev/null 2>&1; then
     :   # dependency reinstalled - good
@@ -35,3 +41,5 @@ fi
 
 echo "PASS: dnf check is clean and the dependency gap is resolved (this was a look-alike, not rpmdb corruption)"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

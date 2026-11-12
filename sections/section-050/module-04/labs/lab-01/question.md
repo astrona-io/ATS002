@@ -11,3 +11,18 @@ Astronaut, before anyone changes this ship, mission control wants five research 
 5. List everything on this host that is upgradable right now. Save the list to `/opt/course/apt-research/upgradable.txt`.
 
 The grader checks that `fail2ban-search.txt` has a line starting with `fail2ban/`; that `nginx-show.txt` has a `Package: nginx` line and a `Version:` equal to the live candidate version; that `nginx-policy.txt` has `Installed:` and `Candidate:` lines matching the live `apt-cache policy nginx`; that the package names in `python3-installed.txt` match the live set of installed `python3-*` packages; and that the package names in `upgradable.txt` match the live `apt list --upgradable` output.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-04](../../course.md).
+
+The grader checks:
+
+- Confirms /opt/course/apt-research/fail2ban-search.txt contains a genuine apt search hit for fail2ban.
+- Confirms /opt/course/apt-research/nginx-show.txt contains nginx's Package/Version fields, matching the live candidate version.
+- Confirms /opt/course/apt-research/nginx-policy.txt contains Installed:/Candidate: lines matching apt-cache policy's live output.
+- Confirms /opt/course/apt-research/python3-installed.txt matches the live set of installed python3-* packages.
+- Confirms /opt/course/apt-research/upgradable.txt matches the live apt list --upgradable output.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

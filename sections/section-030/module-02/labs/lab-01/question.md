@@ -1,12 +1,24 @@
-# Question
+# Boot and manage a libvirt guest
 
-Solve this question on: `terminal`
+**Learner work: 15 minutes.** First guest boot can take another three minutes under software emulation.
 
-An existing qcow2 disk image for a new virtual machine has been staged at `/var/lib/libvirt/images/inventory-db.qcow2` on this host, which already runs `libvirtd`. Work with the system libvirt instance (`qemu:///system`).
+The host has libvirt and its default NAT network. A checksum-verified CirrOS 0.6.3 image is staged at `/var/lib/libvirt/images/inventory-db.qcow2`. It contains a small Linux system. The domain is not defined yet.
 
-1. Define a new **persistent** domain named `inventory-db` around this disk image, with **2048 MiB** of memory and **2 virtual CPUs**, attached to the `default` NAT network.
-2. Configure it to **autostart** when the host boots.
-3. Start it and confirm that it is running.
-4. Perform a graceful shutdown, then a hard power-off, and be ready to explain the state each one leaves the domain in.
+1. Import the disk as a persistent domain named `inventory-db`, with 2048 MiB of memory and two virtual CPUs. Select `--virt-type qemu --arch x86_64` explicitly: software emulation works even when this outer VM has no nested KVM.
+2. Attach the default libvirt network and start the domain. Use `virsh domifaddr inventory-db --source lease` to find its DHCP address. Confirm the guest's SSH service responds with `ssh-keyscan -T 2 ADDRESS`.
+3. Enable domain autostart. Inspect the persistent configuration with `virsh dumpxml --inactive inventory-db` and keep the guest running for submission.
 
-The grader checks that `inventory-db` exists, is persistent, has `Max memory` of 2097152 KiB (2048 MiB) and 2 CPUs in `virsh dominfo`, is attached to the `default` network, and has autostart enabled, including its link in `/etc/libvirt/qemu/autostart/`. Steps 3 and 4 are practice: the grader does not check whether the domain is running or stopped at the end.
+A `running` domain only proves that the QEMU process exists. The guest address and SSH service prove that Linux booted. Do not replace the staged disk or create a host service to stand in for the guest. This isolated training image uses public CirrOS credentials and must not be exposed outside the lab network.
+
+Run `astrona submit` once, after your checks. Submission destroys this lab.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Checks persistent domain resources, autostart, the assigned disk, a guest DHCP lease and a live SSH service.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

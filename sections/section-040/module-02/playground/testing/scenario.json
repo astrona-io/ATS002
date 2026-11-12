@@ -1,0 +1,7 @@
+{
+  "smoke": [
+    {
+      "script": "testing/smoke.sh"
+    }
+  ]
+}

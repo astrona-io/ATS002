@@ -20,3 +20,17 @@ Then research the following, and save each answer into the exact file named belo
 4. **Installed packages by pattern.** List every installed package whose name starts with `python3-`. Save the full output to `/home/candidate/answers/python-packages.txt`, with one package per line as `dnf` prints it (each line starts with the package name). Every installed `python3-` package must be in the list.
 
 The grader reads the four files inside `rpmbox` and checks that `httpd` is not installed.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-04](../../course.md).
+
+The grader checks:
+
+- Confirms the student recorded a fail2ban-related dnf search result.
+- Confirms the student recorded dnf info httpd metadata without installing it.
+- Confirms the student recorded the correct dnf provides result for /usr/sbin/ip.
+- Confirms the student recorded the installed python3-* package listing.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

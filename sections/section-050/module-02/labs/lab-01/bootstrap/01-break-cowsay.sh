@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: cowsay ships pre-installed in the base image; this manually
 # edits its stanza in /var/lib/dpkg/status to flip its Status line from
 # "install ok installed" to "install ok half-configured" -- reproducing,
@@ -13,6 +15,9 @@
 # independent of anything the student does with logtail-utils.
 
 set -eu
+
+sudo apt-get update -y
+sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y cowsay
 
 sudo python3 - <<'PYEOF'
 import re
@@ -46,3 +51,4 @@ PYEOF
 
 echo "cowsay is now left in a half-configured (iF) state:"
 dpkg -l | grep cowsay || true
+ASTRONA_STUDENT_SCRIPT

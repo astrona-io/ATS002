@@ -47,3 +47,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-apt-pac
 ## Why this matters
 
 A hold that covers four of six related packages looks safe and is not. The next upgrade moves the other two, and the family no longer matches. Finding the whole set by pattern, acting on it in one step and checking the result is how you protect a group for real.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [APT Package Groups & Bulk Operations Lab](labs/lab-01/question.md): Install several packages in one APT transaction; Find a package family by name pattern and hold every member at once.
+- [New App Server Onboarding Capstone Lab](../capstone/labs/lab-01/question.md): Add a vendor repository with a dedicated keyring and install and hold its exact version; Recover a half-configured package and hold a whole package family by pattern; Record which version and repository APT would install, without installing.

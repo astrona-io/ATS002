@@ -44,7 +44,9 @@ Apply it: there is nothing to run now. `systemd-modules-load.service` reads this
 
 ### Write the "parameters" file
 
-Save this as `/etc/modprobe.d/dummy.conf`:
+The image also has a vendor default of `numdummies=0`. Configuration files are read in filename order; the `zz-` prefix makes this setting follow that default. Inspect all active options with `modprobe -c | grep "^options dummy"`.
+
+Save this as `/etc/modprobe.d/zz-course-dummy.conf`:
 
 ```ini
 options dummy numdummies=2
@@ -60,7 +62,7 @@ sudo modprobe dummy                 # bare — no numdummies= on the line
 Then check the result:
 
 ```bash
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 ```
 
 ```text
@@ -69,7 +71,7 @@ cat /sys/module/dummy/parameters/numdummies
 
 ### What the `2` proves
 
-The bare `modprobe dummy` read `/etc/modprobe.d/dummy.conf` and found the `options` line there. You never typed `numdummies=2` on this load, so the `2` proves that the file, and not an earlier command line, sets the value.
+The bare `modprobe dummy` read `/etc/modprobe.d/zz-course-dummy.conf` and found the `options` line there. You never typed `numdummies=2` on this load, so the `2` proves that the file, and not an earlier command line, sets the value.
 
 At boot, `modules-load.d` will load the module, and `modprobe.d` will supply the parameter. You proved both halves without waiting for a reboot. The manual pages `man 5 modules-load.d` and `man 5 modprobe.d` describe both formats in full.
 

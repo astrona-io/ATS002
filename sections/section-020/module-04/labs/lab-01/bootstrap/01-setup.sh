@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: installs at and anacron, starts atd, creates the user
 # ops-monitor and installs the script archive-logs.sh.
 set -eu
@@ -21,3 +23,4 @@ sudo chmod 0755 /usr/local/sbin/archive-logs.sh
 
 # Start clean: no allow file, so cron.deny alone decides.
 sudo rm -f /etc/cron.allow /etc/cron.deny
+ASTRONA_STUDENT_SCRIPT

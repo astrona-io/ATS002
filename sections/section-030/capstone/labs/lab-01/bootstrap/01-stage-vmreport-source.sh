@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap (1/2): stages a genuinely buildable "vmreport 1.0" source
 # tarball at /tools/vmreport-1.0.tar.gz and installs build tooling.
 #
@@ -15,6 +17,15 @@
 # install` compiles with gcc into a genuine ELF binary.
 
 set -eu
+
+missing=()
+for package in build-essential; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 sudo mkdir -p /tools
 BUILD_ROOT="$(mktemp -d)"
@@ -177,3 +188,4 @@ sudo mv /tmp/vmreport-1.0.tar.gz /tools/vmreport-1.0.tar.gz
 sudo chmod 644 /tools/vmreport-1.0.tar.gz
 
 rm -rf "$BUILD_ROOT"
+ASTRONA_STUDENT_SCRIPT

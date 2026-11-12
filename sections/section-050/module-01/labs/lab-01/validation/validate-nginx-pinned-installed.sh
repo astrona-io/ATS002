@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms nginx is installed at exactly the vendor-published version
 # recorded by bootstrap in /opt/lab-meta/nginx-vendor-version.
 
@@ -18,11 +22,13 @@ if [[ "$installed" != "$expected" ]]; then
   exit 1
 fi
 
-status=$(dpkg-query -W -f='${Status}' nginx 2>/dev/null || echo "")
-if [[ "$status" != "install ok installed" ]]; then
-  echo "FAIL: nginx pinned version installed - package status is '$status', expected 'install ok installed'"
+status=$(dpkg-query -W -f='${db:Status-Status}' nginx 2>/dev/null || echo "")
+if [[ "$status" != "installed" ]]; then
+  echo "FAIL: nginx pinned version installed - package status is '$status', expected 'installed'"
   exit 1
 fi
 
 echo "PASS: nginx is installed at the exact pinned vendor version $installed"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

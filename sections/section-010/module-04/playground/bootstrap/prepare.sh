@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for the udev playground. A second virtual disk with a fixed
 # serial ("BACKUPWD42") is attached via the runtime block; it shows up as
 # /dev/vdc. Nothing about udev is configured — that is what you explore.
@@ -13,3 +15,4 @@ echo "[playground] udev-stable-naming: ready."
 echo "[playground] attached disk:"
 lsblk -o NAME,SIZE,SERIAL,TYPE | sed 's/^/[playground]   /'
 echo "[playground] try:  udevadm info --attribute-walk --name=/dev/vdc | grep -i serial"
+ASTRONA_STUDENT_SCRIPT

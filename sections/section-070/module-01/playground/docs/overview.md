@@ -5,7 +5,7 @@ This is a **playground**, not a lab. The training ship starts clean, runs its se
 ## What is in the box
 
 - One Ubuntu 24.04 virtual machine. Open a terminal on it with `astrona ssh astro-zypper-everyday`.
-- Docker with a long-lived openSUSE Leap 15.6 container named `zypperbox`. Inside it `zypper`, the RPM database and the openSUSE repositories are all real. Open a shell in it with `docker exec -it zypperbox bash`.
+- Docker with a long-lived openSUSE Leap 16.0 container named `zypperbox`. Inside it `zypper`, the RPM database and the openSUSE repositories are all real. Open a shell in it with `docker exec -it zypperbox bash`.
 - The community `network:utilities` repository added inside `zypperbox`.
 - `telnet-server` installed. `fail2ban` not installed.
 
@@ -16,7 +16,7 @@ The host machine itself runs Ubuntu 24.04, which has no `rpm`-family tools of it
 - Run `zypper refresh`, then compare `zypper list-updates` with `zypper list-patches`.
 - Apply only the patches with `zypper patch`, or every newer version with `zypper update`.
 - Install `fail2ban` with `zypper install fail2ban`.
-- Remove `telnet-server` with `zypper remove`, then read `zypper history` or `/var/log/zypp/history`.
+- Remove `telnet-server` with `zypper remove`, then read `cat /var/log/zypp/history` or `/var/log/zypp/history`.
 
 ## When you are done
 

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the container status-web is running from status-page:1.0 and
 # mounts the named volume status-data at /data.
 
@@ -29,3 +33,5 @@ fi
 
 echo "PASS: status-web is running from $image with volume status-data at /data"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

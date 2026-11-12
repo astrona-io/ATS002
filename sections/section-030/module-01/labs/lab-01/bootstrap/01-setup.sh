@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: stages a genuinely buildable "links 2.14" source tarball at
 # /tools/links-2.14.tar.bz2 and installs the build tooling needed to
 # compile it, matching the lab-031 scenario exactly.
@@ -15,6 +17,15 @@
 # synthetic instead of network-fetched.
 
 set -eu
+
+missing=()
+for package in build-essential bzip2; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 sudo mkdir -p /tools
 BUILD_ROOT="$(mktemp -d)"
@@ -143,3 +154,4 @@ sudo mv /tmp/links-2.14.tar.bz2 /tools/links-2.14.tar.bz2
 sudo chmod 644 /tools/links-2.14.tar.bz2
 
 rm -rf "$BUILD_ROOT"
+ASTRONA_STUDENT_SCRIPT

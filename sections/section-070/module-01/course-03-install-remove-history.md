@@ -1,6 +1,6 @@
 # Installing, Removing and Reading History
 
-Installing and removing with `zypper` works much like any other tool for RPM packages. The one thing to get exactly right is `zypper history`. It is a record of what happened, not a list of steps you can reverse, unlike `dnf history undo` on Red Hat systems.
+Installing and removing with `zypper` works much like any other tool for RPM packages. The one thing to get exactly right is `cat /var/log/zypp/history`. It is a record of what happened, not a list of steps you can reverse, unlike `dnf history undo` on Red Hat systems.
 
 Run every command inside the `zypperbox` container as root.
 
@@ -25,12 +25,12 @@ Because RPM does the removal, it also decides what happens to configuration file
 
 There is **no `zypper purge`** like the `remove` and `purge` pair in `apt`. RPM makes the keep-or-delete decision automatically, file by file, based on whether the file was changed.
 
-## `zypper history`: a record, not a rewind
+## `cat /var/log/zypp/history`: a record, not a rewind
 
 `zypper` writes every operation (install, remove, patch) into an ordered log with a timestamp on each line. Read it like this:
 
 ```bash
-zypper history
+cat /var/log/zypp/history
 ```
 
 ```text
@@ -51,7 +51,7 @@ Be clear about what the log is **not**. There is **no `zypper history undo`**. W
 - Remove what was newly installed: `zypper rm <pkg>`.
 - Install a specific older version, if the repository still has it: `zypper in <pkg>=<version>`. Add `--oldpackage` when you deliberately want to go back to an older version.
 
-In short: `zypper in` and `zypper rm` install and remove, with RPM keeping changed configuration files as `.rpmsave` (there is no `purge`); `zypper history` and `/var/log/zypp/history` are an audit log only, so any reversal is manual.
+In short: `zypper in` and `zypper rm` install and remove, with RPM keeping changed configuration files as `.rpmsave` (there is no `purge`); `cat /var/log/zypp/history` and `/var/log/zypp/history` are an audit log only, so any reversal is manual.
 
 ## Common pitfalls
 

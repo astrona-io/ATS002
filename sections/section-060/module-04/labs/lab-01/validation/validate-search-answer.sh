@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the student recorded a fail2ban-related `dnf search` result at
 # /home/candidate/answers/search.txt inside rpmbox.
 
@@ -25,3 +29,5 @@ fi
 
 echo "PASS: search.txt records a fail2ban-related dnf search result"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

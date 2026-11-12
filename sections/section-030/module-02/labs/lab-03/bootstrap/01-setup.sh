@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap for lab-034: reconfigure a persistent domain.
 #
 # Installs libvirt/QEMU, ensures libvirtd + the default NAT network are up,
@@ -13,6 +15,15 @@
 # guest boot.
 
 set -eu
+
+missing=()
+for package in build-essential; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 sudo systemctl enable --now libvirtd
 
@@ -49,3 +60,4 @@ sleep 2
 sudo virsh destroy web-db >/dev/null 2>&1 || true
 
 sudo virsh dominfo web-db || true
+ASTRONA_STUDENT_SCRIPT

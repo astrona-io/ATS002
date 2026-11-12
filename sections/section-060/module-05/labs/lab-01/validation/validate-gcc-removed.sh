@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms gcc -- installed only because of the Development Tools group
 # install, with no independent reason to be present beforehand -- was
 # actually removed along with the group. Proves the group removal did
@@ -13,3 +17,5 @@ fi
 
 echo "PASS: gcc is not installed inside rpmbox, confirming the group removal actually removed group-installed packages"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

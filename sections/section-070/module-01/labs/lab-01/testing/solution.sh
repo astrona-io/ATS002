@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+sudo docker exec -i zypperbox bash -se <<'CONTAINER_REFERENCE'
+set -o pipefail
+zypper refresh
+zypper --non-interactive install fail2ban
+zypper --non-interactive remove telnet-server
+CONTAINER_REFERENCE

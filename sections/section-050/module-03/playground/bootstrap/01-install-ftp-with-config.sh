@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: ftp ships pre-installed in the base image; this registers a
 # real configuration file under /etc as one of its tracked dpkg conffiles.
 #
@@ -51,3 +53,4 @@ with open(status_path, "w") as f:
 PYEOF
 
 echo "ftp installed with a tracked conffile at /etc/ftp.conf"
+ASTRONA_STUDENT_SCRIPT

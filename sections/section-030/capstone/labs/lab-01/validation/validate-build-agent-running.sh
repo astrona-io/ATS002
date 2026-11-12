@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the build-agent domain was actually started, not just defined.
 
 set -u
@@ -14,3 +18,5 @@ fi
 
 echo "PASS: domain '$DOMAIN' is running"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: builds the "vendor" side of a fake telemetry-agent
 # third-party repository entirely locally, so the student can practice
 # the full signed-by + sources.list.d + pinned-install + hold workflow
@@ -19,6 +21,15 @@
 # question.md.
 
 set -eu
+
+missing=()
+for package in reprepro; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 ARCH="$(dpkg --print-architecture)"
 VENDOR_VERSION="2.4.0-1~apptoolsfake1"
@@ -90,3 +101,4 @@ sudo reprepro -b "${REPO_DIR}" includedeb "${CODENAME}" "${DEB_PATH}"
 sudo gpg --armor --export "${GPG_EMAIL}" | sudo tee "${REPO_DIR}/app-tools-archive-keyring.asc" >/dev/null
 
 sudo chmod -R a+rX "${REPO_DIR}"
+ASTRONA_STUDENT_SCRIPT

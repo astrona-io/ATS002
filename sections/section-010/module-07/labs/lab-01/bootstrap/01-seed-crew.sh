@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: creates the crew account and starts three background crew
 # processes: a CPU burner, a script that ignores SIGTERM, and a sleeper.
 set -eu
@@ -35,3 +37,4 @@ for name in cpuburn stubborn crew-sleeper; do
   sudo systemctl reset-failed "crew-${name}.service" 2>/dev/null || true
   sudo systemd-run --quiet --unit="crew-${name}" --uid=crew "/opt/crew/${name}.sh"
 done
+ASTRONA_STUDENT_SCRIPT

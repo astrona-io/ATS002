@@ -47,3 +47,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-lvm-rec
 ## Why this matters
 
 When a volume group seems to have vanished, the reflex is to run `pvcreate` and `mkfs`. That destroys the data. LVM keeps a text backup of every layout it has had. If you know where it lives, the repair takes a minute and loses nothing.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [LVM Recovery Lab](labs/lab-01/question.md): Rebuild a wiped physical volume with its old UUID and restore the volume group from its metadata backup; Activate the logical volume and mount it with its files intact.
+- [System Disaster Recovery Integration Capstone Lab](../capstone/labs/lab-01/question.md): Restore a wiped GPT table from a backup and prove the filesystems are intact; Reinstall GRUB and regenerate grub.cfg on the running machine.

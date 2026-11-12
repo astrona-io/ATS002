@@ -1,0 +1,10 @@
+{
+  "initial_failures": {
+    "default/verify-root-password-reset": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ]
+}

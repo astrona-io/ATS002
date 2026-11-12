@@ -38,7 +38,13 @@ ls -d /var/lib/rpm.bak-*
 This is not optional. It is your only way back if the rebuild does not go as expected.
 
 ```bash
-sudo rpm --rebuilddb
+cp -a /var/lib/rpm /var/lib/rpm.damaged
+(cd /root/rpmdb-known-good && sha256sum -c /root/rpmdb-known-good.sha256)
+cp -a /root/rpmdb-known-good/. /var/lib/rpm/
+rm -f /var/lib/rpm/rpmdb.sqlite-wal /var/lib/rpm/rpmdb.sqlite-shm
+rpm --rebuilddb
+rpm -qa | LC_ALL=C sort > /root/rpm-packages-restored.txt
+diff -u /root/rpm-packages-before.txt /root/rpm-packages-restored.txt
 ```
 Or, if a separate database command exists on this system (`command -v rpmdb`):
 ```bash

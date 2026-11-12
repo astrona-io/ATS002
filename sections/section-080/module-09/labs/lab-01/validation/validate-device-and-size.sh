@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms device.txt names the suspect disk and size.txt holds its size.
 
 set -u
@@ -38,3 +42,5 @@ fi
 
 echo "PASS: device.txt names the suspect disk and size.txt is correct"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

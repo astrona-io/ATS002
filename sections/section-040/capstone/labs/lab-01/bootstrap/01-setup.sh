@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: installs AppArmor userspace tooling and stands up two
 # independent demo services, each confined by a deliberately too-strict
 # AppArmor profile in enforce mode:
@@ -193,3 +195,4 @@ sudo systemctl enable --now metrics-agent
 # Give both services a few cycles to attempt (and fail) their access, so
 # real DENIED audit entries already exist for the student to find.
 sleep 6
+ASTRONA_STUDENT_SCRIPT

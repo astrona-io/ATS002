@@ -45,3 +45,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-udev-st
 ## Why this matters
 
 Disk letters change more often than people expect: a new disk, a USB stick, a different boot order. Every script and `/etc/fstab` line that names a raw letter is a quiet risk of writing to the wrong disk. A stable name, proved with a check command, removes that risk, and the exam expects you to create one under time pressure.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Stable Device Naming with udev Lab](labs/lab-01/question.md): Find a disk's stable serial with udevadm instead of trusting its device letter; Write a udev rule that creates symlinks for a disk and its partition, matched by serial; Apply the rule live and prove both symlinks point at the right devices.
+- [Kernel, Process, Module & Device Runtime Management Capstone Lab](../capstone/labs/lab-01/question.md): Record live kernel state and raise kernel.pid_max live and persistently; Load, parameterise, persist and blacklist kernel modules, and name a disk with a udev rule; Confirm a hung service with strace before you stop it.

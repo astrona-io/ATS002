@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the user pilot runs a rootless container named relay from
 # docker.io/library/nginx:alpine with host port 8090 published.
 
 set -u
+cd /tmp
 
 pilot_uid="$(id -u pilot 2>/dev/null || true)"
 if [[ -z "$pilot_uid" ]]; then
@@ -43,3 +48,5 @@ fi
 
 echo "PASS: pilot runs relay from $image with host port 8090"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

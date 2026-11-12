@@ -17,3 +17,16 @@ The grader checks that:
 - the volume group `cargo_vg` exists on the spare disk, and its physical volume has the original UUID
 - the logical volume `cargo_vg/deck` is active
 - the deck is mounted at `/srv/deck`, and `marker.txt` and `logs/flight.log` still have their original content
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-07](../../course.md).
+
+The grader checks:
+
+- Confirms cargo_vg exists again on the spare disk with the original physical volume UUID.
+- Confirms the logical volume cargo_vg/deck is active.
+- Confirms the deck is mounted at /srv/deck and both original files have their original content.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

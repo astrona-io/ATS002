@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms /opt/course/apt-research/nginx-policy.txt contains
 # Installed:/Candidate: lines matching 'apt-cache policy nginx's live
 # output, computed fresh here rather than hardcoded.
@@ -30,3 +34,5 @@ fi
 
 echo "PASS: $path matches live apt-cache policy output (Installed: $recorded_installed, Candidate: $recorded_candidate)"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

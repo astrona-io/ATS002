@@ -47,3 +47,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-raid-re
 ## Why this matters
 
 A mirrored array keeps running when one disk dies, so nobody notices until the second disk fails too. If you do not know how to read a degraded array and replace the dead member, the mirror becomes a single point of failure. The exam asks you to do the replacement and leave the array healthy.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Software RAID Recovery Lab](labs/lab-01/question.md): Replace a failed RAID 1 member with a spare disk and wait for the rebuild; Save the array in mdadm.conf and prove the data is intact.
+- [System Disaster Recovery Integration Capstone Lab](../capstone/labs/lab-01/question.md): Restore a wiped GPT table from a backup and prove the filesystems are intact; Reinstall GRUB and regenerate grub.cfg on the running machine.

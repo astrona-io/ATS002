@@ -12,3 +12,14 @@ Investigate with `systemctl status ingest`, `systemctl status ingest-db`, `journ
 - `ingest.service` really runs: its `SubState` is `running` (not stuck restarting), its `Result` is `success`, and it keeps adding lines to `/var/lib/ingest/ingest.log`
 
 You will need to clear the latched "start request repeated too quickly" state before `ingest` will start again.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-06](../../course.md).
+
+The grader checks:
+
+- Confirms both ingest-db.service and ingest.service are active (running) and enabled for boot, that ingest is no longer in a start-limit / auto-restart flap, and that ingest is doing real work.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

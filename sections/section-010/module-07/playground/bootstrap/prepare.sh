@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND: Process Inspection And Control.
 #
 # Creates the user crew and starts three background processes (a CPU
@@ -49,3 +51,4 @@ sudo chmod 0755 /usr/local/bin/crew-restart
 sudo /usr/local/bin/crew-restart
 
 echo "[playground] process-control-bay: ready. Try: ps -u crew -o pid,ni,pcpu,stat,comm"
+ASTRONA_STUDENT_SCRIPT

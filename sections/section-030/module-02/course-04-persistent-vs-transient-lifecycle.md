@@ -144,4 +144,3 @@ Now repeat with `sudo virsh define /tmp/scratch.xml` plus a separate `sudo virsh
 > The fix is to `virsh define` the XML (you can dump it from a still-running transient domain with `virsh dumpxml` *before* it stops) and from then on start it normally. Also do not overcorrect: `virsh destroy` on a **persistent** domain is fine. It only stops the guest, and the definition stays.
 
 > *`define` registers a domain and does not start it; `create` starts a domain and does not register it. The persistent one has a `shut off` state to come back to, the transient one does not.*
-

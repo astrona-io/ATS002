@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the dummy module is loaded live with numdummies=2, and that both
 # the load and the parameter are persisted for future boots.
 
 set -u
 
-if ! lsmod | grep -qw dummy; then
+if ! test -d /sys/module/dummy; then
   echo "FAIL: dummy module - not currently loaded"
   exit 1
 fi
 
-param=$(cat /sys/module/dummy/parameters/numdummies 2>/dev/null || echo "")
+param=$(ip -o link show type dummy | wc -l | tr -d ' ')
 if [[ "$param" != "2" ]]; then
-  echo "FAIL: dummy module - numdummies parameter is '$param', expected '2'"
+  echo "FAIL: dummy module - dummy interface count is '$param', expected '2'"
   exit 1
 fi
 
@@ -27,3 +31,5 @@ fi
 
 echo "PASS: dummy module is loaded with numdummies=2 and persisted via modules-load.d/modprobe.d"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

@@ -93,7 +93,7 @@ dummy                  16384  0
 
 The blacklist is registered, yet `modprobe dummy` by name loads the module without trouble. A `blacklist` line only stops the *automatic*, uevent-driven load path. To block the explicit path too, you would write `install dummy /bin/false`.
 
-Clean up afterwards with `sudo rm /etc/modprobe.d/bl-dummy.conf /etc/modprobe.d/dummy.conf /etc/modules-load.d/dummy.conf`.
+Clean up afterwards with `sudo rm /etc/modprobe.d/bl-dummy.conf /etc/modprobe.d/zz-course-dummy.conf /etc/modules-load.d/dummy.conf`.
 
 ## Early-boot modules and the initramfs
 

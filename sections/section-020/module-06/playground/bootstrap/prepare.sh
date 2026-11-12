@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND - Podman And Rootless Containers
 #
 # Runs once when the environment comes up. Environment preparation only:
@@ -27,3 +29,4 @@ fi
 sudo loginctl enable-linger pilot
 
 echo "[playground] podman-rootless-bay: ready."
+ASTRONA_STUDENT_SCRIPT

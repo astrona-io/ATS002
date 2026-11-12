@@ -49,3 +49,9 @@ Every command block in the parts also says which shell and which rights it expec
 ## Why this matters
 
 A binary in the wrong folder fails the task that needed it there, even if it works perfectly. A binary built with the wrong feature looks fine until someone relies on that feature. Checking both on the built program is what turns "I think I did it" into "I proved it", and the exam grades the machine, not your intentions.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Compile & Install From Source Lab](labs/lab-01/question.md): Unpack a source tarball and find the configure options it supports; Build and install with a chosen install path and a feature turned off.
+- [New Toolchain, New Host Capstone Lab](../capstone/labs/lab-01/question.md): Build and install a tool from source to an exact path with a feature turned off; Define, autostart and start a persistent domain around an existing disk; Use the new tool to prove the domain is running.

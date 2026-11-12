@@ -81,7 +81,7 @@ modinfo -p dummy
 ```bash
 sudo modprobe dummy numdummies=4
 lsmod | grep dummy
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 # 4
 ```
 
@@ -93,7 +93,7 @@ Save this as `/etc/modules-load.d/dummy.conf`:
 dummy
 ```
 
-Save this as `/etc/modprobe.d/dummy.conf`:
+Save this as `/etc/modprobe.d/zz-course-dummy.conf`:
 
 ```ini
 options dummy numdummies=4
@@ -104,7 +104,7 @@ Apply it, and prove that the configuration file, not the earlier command, now se
 ```bash
 sudo modprobe -r dummy
 sudo modprobe dummy
-cat /sys/module/dummy/parameters/numdummies
+ip -o link show type dummy | wc -l
 # 4
 ```
 
@@ -226,7 +226,7 @@ Before you submit, check every item:
 | --- | --- | --- |
 | 1 | `/opt/course/audit/kernel-release` and `/opt/course/audit/vm-swappiness` match the live values | `cat` both files, compare with `uname -r` and `sysctl -n vm.swappiness` |
 | 2 | `kernel.pid_max` is at least `1048576` live and in `/etc/sysctl.d/99-pid-max.conf` | `sysctl -n kernel.pid_max` |
-| 3 | `dummy` loaded with `numdummies=4`; `/etc/modules-load.d/dummy.conf` and `/etc/modprobe.d/dummy.conf` exist; `pcspkr` blacklisted in `/etc/modprobe.d/blacklist-pcspkr.conf` and not loaded | `cat /sys/module/dummy/parameters/numdummies`, `lsmod \| grep pcspkr` after `sudo udevadm trigger` |
+| 3 | `dummy` loaded with `numdummies=4`; `/etc/modules-load.d/dummy.conf` and `/etc/modprobe.d/zz-course-dummy.conf` exist; `pcspkr` blacklisted in `/etc/modprobe.d/blacklist-pcspkr.conf` and not loaded | `ip -o link show type dummy | wc -l`, `lsmod \| grep pcspkr` after `sudo udevadm trigger` |
 | 4 | `/etc/udev/rules.d/99-telemetry-disk.rules` exists and `/dev/telemetry-disk` points at the disk with that serial | `ls -l /dev/telemetry-disk` |
 | 5 | No `telemetry-agent` process is running | `pgrep -f telemetry-agent` |
 

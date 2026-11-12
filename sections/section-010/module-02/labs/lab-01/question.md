@@ -9,3 +9,16 @@ More than one ceiling can cause this. On this machine, all three are too low. Ra
 1. Raise the kernel parameter `kernel.pid_max` to at least `1048576`, both live and persistently. For the persistent part, add your own configuration file under `/etc/sysctl.d/` (or a line in `/etc/sysctl.conf`). A file that already exists there sets a low value; do not rely on editing that file.
 2. Raise the `dataproc` user's maximum number of processes (`ulimit -u`, also called `RLIMIT_NPROC`) to at least `32768`, persistently, with a drop-in file under `/etc/security/limits.d/`. A fresh login session of `dataproc` must show the new limit.
 3. Raise the `TasksMax=` of the systemd unit `data-ingest.service` to `infinity` or at least `65536`, with a systemd override. Make sure systemd uses the new value for the unit (`systemctl show data-ingest.service -p TasksMax` must report it).
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms kernel.pid_max is raised live and persisted via /etc/sysctl.d/.
+- Confirms the dataproc user's max-processes (ulimit -u / RLIMIT_NPROC) ceiling is raised persistently via /etc/security/limits.d/.
+- Confirms data-ingest.service's systemd TasksMax cgroup ceiling is raised and applied to the running unit.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

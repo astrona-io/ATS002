@@ -15,3 +15,14 @@ Repair it so that all of the following are true:
 The owner and permissions of `/srv/applogs` are already correct, so there is nothing to change there.
 
 The grader checks the live machine: the profile's mode in `aa-status`, the rule in the profile files, the service state, the size of `/srv/applogs/app.log` over a few seconds, and the recent kernel log.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms the appservice AppArmor profile is genuinely enforcing and correctly permits writes to /srv/applogs.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

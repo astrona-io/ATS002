@@ -11,3 +11,16 @@ Each file must hold **only the value**: no label, no `name = ` in front, no extr
 3. Write the system timezone into `/opt/course/timezone`, exactly as the system reports its configured timezone name.
 
 The grader compares each file with the live state of the machine, so read the values from the system itself.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms /opt/course/kernel matches the running kernel's `uname -r` release string.
+- Confirms /opt/course/ip_forward equals 1, the persistent value set at bootstrap.
+- Confirms /opt/course/timezone matches the system's configured timezone.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

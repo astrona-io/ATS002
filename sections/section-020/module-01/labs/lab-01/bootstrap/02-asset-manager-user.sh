@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: creates the asset-manager service account and the two scripts
 # its cron jobs reference (nightly-sync.sh for the pre-existing system-wide
 # job, clean.sh for the new job the scenario asks for), so the starting
@@ -24,3 +26,4 @@ EOF
 
 sudo chmod 755 /home/asset-manager/nightly-sync.sh /home/asset-manager/clean.sh
 sudo chown asset-manager:asset-manager /home/asset-manager/nightly-sync.sh /home/asset-manager/clean.sh
+ASTRONA_STUDENT_SCRIPT

@@ -48,3 +48,9 @@ Every command block says which rights it expects, so you can also follow the tex
 ## Why this matters
 
 On a busy machine you must act on the right process, fast, and leave the others alone. Stopping the wrong process or using a signal that does nothing both fail without a clear error. The exam asks you to find a process, stop it in the right way, and change its priority, then check the result.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Process Inspection And Control Lab](labs/lab-01/question.md): Stop a process that ignores the default signal by sending the signal it cannot ignore; Change the niceness of a running process without ending it; Find a process ID with pgrep and record it in a file.
+- [Kernel, Process, Module & Device Runtime Management Capstone Lab](../capstone/labs/lab-01/question.md): Record live kernel state and raise kernel.pid_max live and persistently; Load, parameterise, persist and blacklist kernel modules, and name a disk with a udev rule; Confirm a hung service with strace before you stop it.

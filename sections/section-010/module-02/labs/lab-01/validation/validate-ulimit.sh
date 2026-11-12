@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the dataproc user's max-processes ceiling (ulimit -u / RLIMIT_NPROC)
 # is raised to at least 32768 for a fresh session, persisted via a drop-in
 # under /etc/security/limits.d/ that overrides the low bootstrap baseline.
@@ -33,3 +37,5 @@ fi
 
 echo "PASS: dataproc's ulimit -u is $actual, persisted via /etc/security/limits.d/"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

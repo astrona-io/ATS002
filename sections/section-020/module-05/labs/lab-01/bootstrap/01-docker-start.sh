@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 set -eu
 
 sudo systemctl enable --now docker
@@ -16,3 +18,4 @@ for _ in $(seq 1 30); do
 done
 
 sudo docker info >/dev/null 2>&1
+ASTRONA_STUDENT_SCRIPT

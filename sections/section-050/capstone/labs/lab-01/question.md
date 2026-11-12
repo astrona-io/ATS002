@@ -19,3 +19,18 @@ Astronaut, this training ship is a freshly built application server, and it must
 5. **Onboarding question.** Before this server goes live, the operations team wants to know exactly which version of `redis-server` would be installed if someone ran `apt install redis-server` right now, and which repository it would come from. Find out without installing anything. Record both answers in `/opt/course/onboarding/redis-candidate.txt` (the directory is already created for you).
 
 The grader checks that `curl`, `git` and `jq` have the status `install ok installed`; that a `.list` file under `/etc/apt/sources.list.d/` contains `signed-by=/etc/apt/keyrings/<name>.gpg` pointing at a valid keyring, `telemetry-agent` is fully installed at exactly the vendor's version, and `apt-mark showhold` lists it; that `tree` has the status `install ok installed` and `sudo dpkg --audit` reports nothing; that every installed `obsagent-*` package appears in `apt-mark showhold`; and that `redis-candidate.txt` contains the live candidate version of `redis-server` and the address of the repository it comes from (for example `http://archive.ubuntu.com/ubuntu`).
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../../module-01/course.md), [module-02](../../../module-02/course.md), [module-03](../../../module-03/course.md), [module-04](../../../module-04/course.md), [module-05](../../../module-05/course.md).
+
+The grader checks:
+
+- Confirms modern signed-by trust is configured, telemetry-agent is installed at the exact vendor-published version, and it is held.
+- Confirms the previously half-configured tree package now shows a clean ii status and dpkg --audit is clean.
+- Confirms curl, git, and jq are all cleanly installed.
+- Confirms every installed obsagent-* package is present in apt-mark showhold (recomputed live, not hardcoded).
+- Confirms /opt/course/onboarding/redis-candidate.txt records redis-server's live candidate version and source repository.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

@@ -49,3 +49,9 @@ Every command block in the parts also says which shell and which rights it expec
 ## Why this matters
 
 On a modern Ubuntu machine, many of the system's own scheduled jobs are already timers, not cron lines. The exam can ask you to build a timer from scratch or to move a cron job into one. A timer that is enabled the wrong way, or a cron line left behind, fails without any error, so you need to know how to check the result.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [systemd Timers Lab](labs/lab-01/question.md): Write a service and timer pair with an OnCalendar schedule and Persistent=true; Replace a cron job with an equivalent timer and remove the cron job; Prove both timers with systemctl list-timers.
+- [Scheduled Container Recovery Capstone Lab](../capstone/labs/lab-01/question.md): Remove a container that holds a host port and start its replacement with limits; Schedule a per-user watchdog script that restarts the container when it stops.

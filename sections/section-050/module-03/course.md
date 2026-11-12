@@ -49,3 +49,9 @@ Start the playground, then open a terminal on it with `astrona ssh astro-apt-bas
 ## Why this matters
 
 `update` instead of `upgrade` leaves a server unpatched while you believe it is current. `remove` instead of `purge` leaves old settings that a later reinstall quietly picks up. Getting these verbs right is the difference between a maintenance window that does what the ticket says and one that only looks like it did.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [APT Basic Package Operations Lab](labs/lab-01/question.md): Refresh the index, list upgrades and apply them; Install a package and purge another with its configuration files; Remove orphaned dependencies.
+- [New App Server Onboarding Capstone Lab](../capstone/labs/lab-01/question.md): Add a vendor repository with a dedicated keyring and install and hold its exact version; Recover a half-configured package and hold a whole package family by pattern; Record which version and repository APT would install, without installing.

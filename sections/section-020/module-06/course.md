@@ -48,3 +48,9 @@ Start the playground with `astrona run --git git@github.com:astrona-io/ATS002.gi
 ## Why this matters
 
 On many Linux distributions, Podman is the container tool that ships by default, and the exam expects you to work with containers without assuming Docker. Rootless containers add four silent failures: a missing ID range, a port below 1024, a container that dies at logout and an image name that no registry list resolves. This module shows each one and how to fix it.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Rootless Podman Container Lab](labs/lab-01/question.md): Run a rootless Podman container with a published high port; Save a container's image ID with podman inspect; Keep a user's services running after logout with enable-linger.
+- [Scheduled Container Recovery Capstone Lab](../capstone/labs/lab-01/question.md): Remove a container that holds a host port and start its replacement with limits; Schedule a per-user watchdog script that restarts the container when it stops.

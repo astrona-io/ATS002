@@ -47,3 +47,9 @@ Every command block in the parts also says which shell and which rights it expec
 ## Why this matters
 
 A scheduled job fails at night, when nobody is watching. If it runs under the wrong account, or runs twice, or does not run at all, you often find out days later from damaged data. The exam asks you to move jobs between the shared roster and a user's crontab, so you need to get the format and the order right the first time.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Per-User Cron Job Scheduling Lab](labs/lab-01/question.md): Move a system-wide cron job into a user's own crontab; Write a cron schedule for two weekdays at a set time; Remove the old job so it does not run twice.
+- [Scheduled Container Recovery Capstone Lab](../capstone/labs/lab-01/question.md): Remove a container that holds a host port and start its replacement with limits; Schedule a per-user watchdog script that restarts the container when it stops.

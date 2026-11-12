@@ -4,7 +4,7 @@ Astronaut, welcome to the SUSE supply depots. Refreshing the catalogue, searchin
 
 ## How this section runs
 
-Every lab here starts one training ship: an Ubuntu 24.04 virtual machine, because that is the only system image the platform offers. There is no openSUSE image to boot. Instead, each lab installs Docker on the ship and runs a long-lived container from the real `opensuse/leap:15.6` image, called `zypperbox`. A container is a sealed pod docked to the ship: its own crew and files, sharing the ship's reactor.
+Every lab here starts one training ship: an Ubuntu 24.04 virtual machine, because that is the only system image the platform offers. There is no openSUSE image to boot. Instead, each lab installs Docker on the ship and runs a long-lived container from the real `opensuse/leap:16.0` image, called `zypperbox`. A container is a sealed pod docked to the ship: its own crew and files, sharing the ship's reactor.
 
 You do all your `zypper` work inside that pod:
 
@@ -19,7 +19,7 @@ Inside it, `zypper`, the RPM database and the openSUSE repositories are all real
 By the end of this section you can:
 
 - **Refresh, then choose patches or updates.** Refresh repository metadata, tell a raw update (`zypper list-updates`, `zypper update`) from a reviewed patch (`zypper list-patches`, `zypper patch`), and pick the one a policy asks for.
-- **Install, remove and audit.** Install and remove packages with `zypper install` and `zypper remove`, and read `zypper history` as a record of what happened, not as an undo tool.
+- **Install, remove and audit.** Install and remove packages with `zypper install` and `zypper remove`, and read `cat /var/log/zypp/history` as a record of what happened, not as an undo tool.
 - **Research before you act.** Find a package by keyword (`zypper search`), read one package's full details without installing it (`zypper info`), find which package would supply a missing file (`zypper what-provides`), and list only installed matches (`zypper search --installed-only`).
 
 ## The modules

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Installs `automake` on its own, independently of any group, BEFORE the
 # student ever touches the "Development Tools" group. `automake` also
 # happens to be a member of that group. This sets up the exact
@@ -28,3 +30,4 @@ sudo docker exec rpmbox bash -c '
 '
 
 echo "rpmbox dnf-groups scenario ready: automake pre-installed independently, Development Tools group not yet installed."
+ASTRONA_STUDENT_SCRIPT

@@ -1,0 +1,10 @@
+{
+  "initial_failures": {
+    "default/verify-array-healthy": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ]
+}

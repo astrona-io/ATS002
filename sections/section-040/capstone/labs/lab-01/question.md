@@ -27,3 +27,17 @@ Repair it so that:
 Neither profile may be left in complain mode. Both denials must be closed with the profile really enforcing.
 
 The grader checks the live machine: each profile's mode in `aa-status`, each service's state, the rules in the profile files, the growth of `/srv/shiplogs/ship.log` and `/var/lib/metrics-agent/status` over a few seconds, the token in the status file, and the recent kernel log.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../../module-01/course.md), [module-02](../../../module-02/course.md).
+
+The grader checks:
+
+- Confirms the logshipper AppArmor profile is loaded and in enforce mode, not complain.
+- Confirms logshipper is actively writing to /srv/shiplogs with no fresh AppArmor denials.
+- Confirms the metrics-agent AppArmor profile is loaded and in enforce mode, not complain.
+- Confirms metrics-agent is successfully reading /etc/metrics-agent/remote.conf with no fresh AppArmor denials.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

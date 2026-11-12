@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms /opt/course/apt-research/fail2ban-search.txt contains a genuine
 # 'apt search fail2ban' hit -- specifically a line for the fail2ban
 # package itself, not just any non-empty file.
@@ -19,3 +23,5 @@ fi
 
 echo "PASS: $path contains a genuine fail2ban search hit"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

@@ -1,0 +1,10 @@
+{
+  "initial_failures": {
+    "default/verify-backup-file-exists": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ]
+}
